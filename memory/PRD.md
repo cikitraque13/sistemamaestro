@@ -4,12 +4,8 @@
 - **Nombre**: Sistema Maestro
 - **Dominio**: sistemamaestro.com
 - **Categoria**: Plataforma guiada de transformacion digital
-- **Fecha creacion**: 11 Abril 2026
 - **Version**: V1.0 (FEATURE FREEZE)
 - **Estado**: Lista para produccion (pendiente API keys del usuario)
-
-## Definicion del Producto
-Sistema Maestro es una plataforma guiada que transforma una necesidad, una idea o un activo existente en una solucion digital estructurada, monetizable y lista para ponerse en marcha.
 
 ## Core Requirements (V1) - COMPLETADO
 - [x] Landing page con Hero, Input module, Rutas, Pricing, FAQ
@@ -29,7 +25,11 @@ Sistema Maestro es una plataforma guiada que transforma una necesidad, una idea 
 - [x] Proteccion brute force en login
 - [x] README completo
 - [x] Endurecimiento codigo: 17 console.error eliminados, 6 array keys mejorados
-- [x] Cierre produccion: features billing en espanol, errores traducidos, enlaces afiliado, noscript en espanol
+- [x] Cierre produccion: features billing en espanol, errores traducidos, enlaces afiliado
+- [x] Badge Emergent oculto (CSS override)
+- [x] Route cards funcionales (navegan a /flow o /register)
+- [x] Auto-submit URL desde Home (flujo directo sin formulario intermedio)
+- [x] Example cards convertidas en bloques informativos (sin hover interactivo)
 
 ## Enlaces de Afiliado
 - SystemeIO: https://systeme.io/es?sa=sa021243679877282e02190853937f18793f713170
@@ -40,7 +40,6 @@ Sistema Maestro es una plataforma guiada que transforma una necesidad, una idea 
 Frontend (React 18 + Tailwind CSS + Framer Motion)
     |
 Backend (FastAPI + Python)
-    |
     +-- MongoDB
     +-- OpenAI GPT-5.2
     +-- Stripe (server-side checkout)
@@ -57,7 +56,7 @@ STRIPE_SECRET_KEY=sk_live_xxx
 MONGO_URL=mongodb+srv://xxx
 DB_NAME=sistemamaestro
 JWT_SECRET=xxx
-ADMIN_EMAIL=tu-email-real@tudominio.com
+ADMIN_EMAIL=tu-email-real
 ADMIN_PASSWORD=ContraseñaSegura
 ```
 
@@ -73,18 +72,16 @@ ADMIN_PASSWORD=ContraseñaSegura
 ### P1 (Post-lanzamiento)
 - [ ] Cookies JWT secure=True para HTTPS
 - [ ] Hook dependencies con useCallback refactoring
-- [ ] Nested ternaries refactoring
 - [ ] Email transaccional
 - [ ] Analytics
 - [ ] Endpoint cambio password
 
 ### P2 (Futuro)
-- [ ] Descomposicion componentes grandes (Flow, Home, Billing)
-- [ ] Split useVoice.js en hooks separados
-- [ ] Refactor funciones Python (fetch_and_analyze_url, analyze_input)
+- [ ] Descomposicion componentes grandes
+- [ ] Split useVoice.js
 - [ ] Export Blueprint a PDF
 - [ ] Multi-idioma (i18n)
 - [ ] Panel admin
 
 ## Ultima actualizacion
-12 Febrero 2026 - Cierre final produccion V1 completado
+12 Febrero 2026 - 3 fixes criticos de produccion aplicados

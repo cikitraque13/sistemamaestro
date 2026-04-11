@@ -53,6 +53,39 @@ const Flow = () => {
   // Voice functionality
   const voice = useVoice();
 
+  // Auto-submit when arriving with content from Home page
+  useEffect(() => {
+    const fromHome = location.state?.inputContent;
+    if (!fromHome) return;
+
+    const autoAnalyze = async () => {
+      setLoading(true);
+      setStep('interpreting');
+      try {
+        const response = await axios.post(
+          `${API_URL}/api/projects`,
+          { input_type: location.state.inputType || 'text', input_content: fromHome },
+          { withCredentials: true }
+        );
+        setProject(response.data);
+        setTimeout(() => {
+          if (response.data.refine_questions?.length > 0) {
+            setStep('refine');
+          } else {
+            setStep('result');
+          }
+        }, 1500);
+      } catch (error) {
+        toast.error('Error al analizar. Intenta de nuevo.');
+        setStep('input');
+      } finally {
+        setLoading(false);
+      }
+    };
+    autoAnalyze();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Update input when voice transcript changes
   useEffect(() => {
     if (voice.transcript && inputType === 'text') {

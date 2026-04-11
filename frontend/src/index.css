@@ -91,7 +91,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card:hover {
-  @apply border-[#0F5257]/50;
+  @apply border-[#262626];
 }
 
 /* Input styles */
@@ -187,6 +187,11 @@ h1, h2, h3, h4, h5, h6 {
 /* Loading spinner */
 .spinner {
   @apply w-6 h-6 border-2 border-white/20 border-t-[#0F5257] rounded-full animate-spin;
+}
+
+/* Hide Emergent platform badge */
+#emergent-badge {
+  display: none !important;
 }
 
 /* Shadcn overrides for dark theme */

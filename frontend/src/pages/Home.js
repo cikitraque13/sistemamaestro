@@ -406,6 +406,13 @@ const Home = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="route-card group"
                 data-testid={`route-card-${route.id}`}
+                onClick={() => {
+                  if (isAuthenticated) {
+                    navigate('/flow', { state: { inputType: 'text', inputContent: '' } });
+                  } else {
+                    navigate('/register');
+                  }
+                }}
               >
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-[#0F5257]/20 rounded-lg">
