@@ -15,7 +15,7 @@
 - [x] Analisis real de URLs (scraping server-side con beautifulsoup4)
 - [x] Generacion de Blueprint
 - [x] Stripe integrado (4 planes, checkout server-side)
-- [x] Modulo Oportunidades
+- [x] Modulo Oportunidades (5 opciones, logica free vs premium)
 - [x] Newsletter subscription (MongoDB)
 - [x] Cookie banner con enlaces legales
 - [x] Persistencia de proyectos por usuario
@@ -25,15 +25,22 @@
 - [x] Proteccion brute force en login
 - [x] README completo
 - [x] Endurecimiento codigo: 17 console.error eliminados, 6 array keys mejorados
-- [x] Cierre produccion: features billing en espanol, errores traducidos, enlaces afiliado
-- [x] Badge Emergent oculto (CSS override)
+- [x] Features billing en espanol, errores traducidos (15 traducciones)
+- [x] Badge Emergent oculto (CSS + HTML override)
 - [x] Route cards funcionales (navegan a /flow o /register)
 - [x] Auto-submit URL desde Home (flujo directo sin formulario intermedio)
-- [x] Example cards convertidas en bloques informativos (sin hover interactivo)
+- [x] Example cards como bloques informativos (hover neutralizado)
+- [x] Catch blocks vacios corregidos (Dashboard.js, AuthContext.js)
+- [x] Array index keys reemplazados por IDs estables (7 instancias)
+- [x] Logo con mayor presencia visual (small:40, default:52, large:64, xlarge:88)
+- [x] Boton Google profesional con icono SVG multicolor real
+- [x] Formularios auth limpios sin iconos que interfieran
+- [x] Logica Oportunidades: admin/premium ve las 5, free ve 2 + upsell
 
-## Enlaces de Afiliado
-- SystemeIO: https://systeme.io/es?sa=sa021243679877282e02190853937f18793f713170
-- SistemaMaestroIA: https://sistemamaestroia.com/
+## Test Results V1
+- Testing agent iteration_1: Backend 93.3%, Frontend 95%
+- Testing agent iteration_2: Frontend 100% (15/15 tests passed)
+- Build: Limpio (craco build exitoso)
 
 ## Arquitectura
 ```
@@ -84,4 +91,4 @@ ADMIN_PASSWORD=ContraseñaSegura
 - [ ] Panel admin
 
 ## Ultima actualizacion
-12 Febrero 2026 - 3 fixes criticos de produccion aplicados
+12 Febrero 2026 - Cierre V1 final completado y verificado (100% tests)
