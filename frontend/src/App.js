@@ -1,53 +1,94 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React from 'react';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { Toaster } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Pages
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import Opportunities from './pages/Opportunities';
+import Billing from './pages/Billing';
+import Settings from './pages/Settings';
+import Flow from './pages/Flow';
+import AuthCallback from './pages/AuthCallback';
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+import './App.css';
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
+  if (!user || user === false) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+// App Router with OAuth handling
+const AppRouter = () => {
+  const location = useLocation();
+
+  // Check URL fragment for session_id (OAuth callback)
+  if (location.hash?.includes('session_id=')) {
+    return <AuthCallback />;
+  }
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      
+      {/* Protected Routes */}
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/dashboard/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+      <Route path="/dashboard/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+      <Route path="/dashboard/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
+      <Route path="/dashboard/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+      <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      
+      {/* Flow Routes */}
+      <Route path="/flow" element={<ProtectedRoute><Flow /></ProtectedRoute>} />
+      <Route path="/flow/:step" element={<ProtectedRoute><Flow /></ProtectedRoute>} />
+      
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };
 
 function App() {
   return (
-    <div className="App">
+    <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <Toaster 
+          position="top-right" 
+          toastOptions={{
+            style: {
+              background: '#171717',
+              color: '#F3F4F6',
+              border: '1px solid #262626'
+            }
+          }}
+        />
+        <AppRouter />
       </BrowserRouter>
-    </div>
+    </AuthProvider>
   );
 }
 
