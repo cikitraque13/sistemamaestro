@@ -42,7 +42,6 @@ const ProjectDetail = () => {
       const response = await axios.get(`${API_URL}/api/projects/${id}`, { withCredentials: true });
       setProject(response.data);
     } catch (error) {
-      console.error('Error fetching project:', error);
       toast.error('Proyecto no encontrado');
       navigate('/dashboard/projects');
     } finally {
@@ -67,7 +66,6 @@ const ProjectDetail = () => {
       setProject(response.data);
       toast.success('Blueprint generado');
     } catch (error) {
-      console.error('Error generating blueprint:', error);
       toast.error(error.response?.data?.detail || 'Error al generar blueprint');
     } finally {
       setGeneratingBlueprint(false);

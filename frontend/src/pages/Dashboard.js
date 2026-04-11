@@ -45,7 +45,6 @@ const Dashboard = () => {
         setStats(statsRes.data);
         setRecentProjects(projectsRes.data.slice(0, 5));
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
       } finally {
         setLoading(false);
       }

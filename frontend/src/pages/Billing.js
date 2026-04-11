@@ -73,7 +73,6 @@ const Billing = () => {
       const response = await axios.get(`${API_URL}/api/user/billing`, { withCredentials: true });
       setBillingData(response.data);
     } catch (error) {
-      console.error('Error fetching billing data:', error);
       toast.error('Error al cargar datos de facturación');
     } finally {
       setLoading(false);
@@ -114,7 +113,6 @@ const Billing = () => {
       // Continue polling
       setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
     } catch (error) {
-      console.error('Error checking payment status:', error);
       setCheckingPayment(false);
     }
   };
@@ -137,7 +135,6 @@ const Billing = () => {
       // Redirect to Stripe checkout
       window.location.href = response.data.url;
     } catch (error) {
-      console.error('Error creating checkout:', error);
       toast.error(error.response?.data?.detail || 'Error al procesar el pago');
       setProcessingPlan(null);
     }
@@ -194,8 +191,8 @@ const Billing = () => {
           </div>
           {billingData?.current_plan?.features && (
             <div className="flex flex-wrap gap-2">
-              {billingData.current_plan.features.map((feature, i) => (
-                <span key={i} className="px-3 py-1 bg-[#262626] text-[#A3A3A3] rounded-full text-sm">
+              {billingData.current_plan.features.map((feature) => (
+                <span key={feature} className="px-3 py-1 bg-[#262626] text-[#A3A3A3] rounded-full text-sm">
                   {feature}
                 </span>
               ))}
@@ -244,8 +241,8 @@ const Billing = () => {
                     <span className="text-[#A3A3A3]">{plan.period}</span>
                   </div>
                   <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-[#A3A3A3]">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2 text-sm text-[#A3A3A3]">
                         <CheckCircle size={16} weight="fill" className="text-[#0F5257]" />
                         {feature}
                       </li>

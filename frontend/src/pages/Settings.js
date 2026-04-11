@@ -31,7 +31,6 @@ const Settings = () => {
       await checkAuth();
       toast.success('Perfil actualizado');
     } catch (error) {
-      console.error('Error updating profile:', error);
       toast.error('Error al actualizar perfil');
     } finally {
       setSaving(false);

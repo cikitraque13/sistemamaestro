@@ -45,7 +45,6 @@ const Opportunities = () => {
       const response = await axios.get(`${API_URL}/api/opportunities`, { withCredentials: true });
       setOpportunities(response.data);
     } catch (error) {
-      console.error('Error fetching opportunities:', error);
       toast.error('Error al cargar oportunidades');
     } finally {
       setLoading(false);

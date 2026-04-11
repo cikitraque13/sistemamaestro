@@ -105,7 +105,6 @@ const Flow = () => {
         }
       }, 1500);
     } catch (error) {
-      console.error('Error analyzing input:', error);
       toast.error('Error al analizar. Intenta de nuevo.');
       setStep('input');
     } finally {
@@ -131,7 +130,6 @@ const Flow = () => {
       setProject(response.data);
       setStep('result');
     } catch (error) {
-      console.error('Error refining project:', error);
       toast.error('Error al guardar respuestas');
     } finally {
       setLoading(false);
@@ -159,7 +157,6 @@ const Flow = () => {
       setProject(response.data);
       setStep('blueprint');
     } catch (error) {
-      console.error('Error generating blueprint:', error);
       toast.error(error.response?.data?.detail || 'Error al generar blueprint');
     } finally {
       setLoading(false);

@@ -519,7 +519,7 @@ const Home = () => {
               }
             ].map((example, index) => (
               <motion.div
-                key={index}
+                key={example.route}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -556,7 +556,7 @@ const Home = () => {
               { no: 'No recibes solo ideas', yes: 'Recibes planes de activación' }
             ].map((item, index) => (
               <motion.div
-                key={index}
+                key={item.no}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -614,8 +614,8 @@ const Home = () => {
                   <span className="text-[#A3A3A3]">{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-[#A3A3A3]">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-sm text-[#A3A3A3]">
                       <CheckCircle size={16} weight="fill" className="text-[#0F5257]" />
                       {feature}
                     </li>
@@ -648,7 +648,7 @@ const Home = () => {
           <div className="space-y-4">
             {FAQ.map((item, index) => (
               <motion.div
-                key={index}
+                key={item.q}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}

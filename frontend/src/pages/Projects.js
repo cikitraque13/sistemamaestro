@@ -43,7 +43,6 @@ const Projects = () => {
       const response = await axios.get(`${API_URL}/api/projects`, { withCredentials: true });
       setProjects(response.data);
     } catch (error) {
-      console.error('Error fetching projects:', error);
       toast.error('Error al cargar proyectos');
     } finally {
       setLoading(false);
@@ -61,7 +60,6 @@ const Projects = () => {
       setProjects(projects.filter(p => p.project_id !== projectId));
       toast.success('Proyecto eliminado');
     } catch (error) {
-      console.error('Error deleting project:', error);
       toast.error('Error al eliminar proyecto');
     }
   };

@@ -41,7 +41,6 @@ export const useVoice = () => {
       };
 
       recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
 
@@ -70,7 +69,6 @@ export const useVoice = () => {
       setIsListening(true);
       return true;
     } catch (error) {
-      console.error('Error starting speech recognition:', error);
       return false;
     }
   }, [isSupported]);
