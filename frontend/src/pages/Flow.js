@@ -617,7 +617,7 @@ const Flow = () => {
                       <p className="text-sm text-[#A3A3A3] mb-3">Prioridades</p>
                       <ol className="space-y-2">
                         {project.blueprint.priorities.map((p, i) => (
-                          <li key={i} className="flex items-start gap-3 text-white">
+                          <li key={`priority-${i}-${p.substring(0, 20)}`} className="flex items-start gap-3 text-white">
                             <span className="w-6 h-6 rounded-full bg-[#0F5257]/20 text-[#0F5257] text-sm flex items-center justify-center flex-shrink-0">
                               {i + 1}
                             </span>
@@ -633,7 +633,7 @@ const Flow = () => {
                       <p className="text-sm text-[#A3A3A3] mb-3">Plan de despliegue</p>
                       <ol className="space-y-2">
                         {project.blueprint.deployment_steps.map((s, i) => (
-                          <li key={i} className="flex items-center gap-2 text-white">
+                          <li key={`deploy-${i}-${s.substring(0, 20)}`} className="flex items-center gap-2 text-white">
                             <CheckCircle size={16} className="text-[#0F5257]" />
                             {s}
                           </li>

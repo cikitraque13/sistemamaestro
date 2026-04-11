@@ -237,7 +237,7 @@ const ProjectDetail = () => {
                   <p className="text-sm text-[#A3A3A3] mb-2">Prioridades</p>
                   <ul className="space-y-2">
                     {project.blueprint.priorities.map((priority, index) => (
-                      <li key={index} className="flex items-start gap-2 text-white">
+                      <li key={`priority-${index}-${priority.substring(0, 20)}`} className="flex items-start gap-2 text-white">
                         <span className="text-[#0F5257] font-medium">{index + 1}.</span>
                         {priority}
                       </li>
@@ -254,8 +254,8 @@ const ProjectDetail = () => {
                       <div className="bg-[#0A0A0A] rounded-lg p-4">
                         <p className="text-xs text-[#A3A3A3] mb-2">Componentes</p>
                         <ul className="space-y-1">
-                          {project.blueprint.architecture.components.map((comp, i) => (
-                            <li key={i} className="text-white text-sm flex items-center gap-2">
+                          {project.blueprint.architecture.components.map((comp) => (
+                            <li key={comp} className="text-white text-sm flex items-center gap-2">
                               <CheckCircle size={14} className="text-[#0F5257]" />
                               {comp}
                             </li>
@@ -267,8 +267,8 @@ const ProjectDetail = () => {
                       <div className="bg-[#0A0A0A] rounded-lg p-4">
                         <p className="text-xs text-[#A3A3A3] mb-2">Tech Stack</p>
                         <ul className="space-y-1">
-                          {project.blueprint.architecture.tech_stack.map((tech, i) => (
-                            <li key={i} className="text-white text-sm flex items-center gap-2">
+                          {project.blueprint.architecture.tech_stack.map((tech) => (
+                            <li key={tech} className="text-white text-sm flex items-center gap-2">
                               <CheckCircle size={14} className="text-[#0F5257]" />
                               {tech}
                             </li>
@@ -292,7 +292,7 @@ const ProjectDetail = () => {
                   <p className="text-sm text-[#A3A3A3] mb-2">Plan de despliegue</p>
                   <ol className="space-y-2">
                     {project.blueprint.deployment_steps.map((step, index) => (
-                      <li key={index} className="flex items-start gap-3 text-white">
+                      <li key={`deploy-${index}-${step.substring(0, 20)}`} className="flex items-start gap-3 text-white">
                         <span className="w-6 h-6 rounded-full bg-[#0F5257]/20 text-[#0F5257] text-sm flex items-center justify-center flex-shrink-0">
                           {index + 1}
                         </span>

@@ -51,8 +51,8 @@ const Opportunities = () => {
     }
   };
 
-  const canAccessAll = user?.plan === 'premium';
-  const isLimited = user?.plan === 'free' && opportunities.length <= 2;
+  const canAccessAll = user?.plan === 'premium' || user?.role === 'admin';
+  const isLimited = !canAccessAll && opportunities.length <= 2;
 
   return (
     <DashboardLayout title="Oportunidades">
@@ -240,7 +240,7 @@ const Opportunities = () => {
                   <p className="text-sm text-[#A3A3A3] mb-2">Primeros pasos</p>
                   <ol className="space-y-2">
                     {selectedOpp.first_steps.map((step, index) => (
-                      <li key={index} className="flex items-start gap-3 text-white">
+                      <li key={`step-${index}-${step.substring(0, 20)}`} className="flex items-start gap-3 text-white">
                         <span className="w-6 h-6 rounded-full bg-[#0F5257]/20 text-[#0F5257] text-sm flex items-center justify-center flex-shrink-0">
                           {index + 1}
                         </span>

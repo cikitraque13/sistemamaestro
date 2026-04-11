@@ -106,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (error) {
+      setUser(false);
     } finally {
       setUser(false);
     }

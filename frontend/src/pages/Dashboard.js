@@ -45,6 +45,7 @@ const Dashboard = () => {
         setStats(statsRes.data);
         setRecentProjects(projectsRes.data.slice(0, 5));
       } catch (error) {
+        setStats(null);
       } finally {
         setLoading(false);
       }
