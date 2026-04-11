@@ -11,12 +11,16 @@ import {
   CheckCircle,
   CaretDown,
   X,
-  EnvelopeSimple
+  EnvelopeSimple,
+  Microphone,
+  Stop
 } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
+import VoiceButton from '../components/VoiceButton';
+import { useVoice } from '../hooks/useVoice';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -169,6 +173,16 @@ const Home = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribing, setSubscribing] = useState(false);
 
+  // Voice functionality
+  const voice = useVoice();
+
+  // Update input when voice transcript changes
+  useEffect(() => {
+    if (voice.transcript && inputMode === 'text') {
+      setInputValue(voice.transcript);
+    }
+  }, [voice.transcript, inputMode]);
+
   useEffect(() => {
     // Check if cookies were already accepted
     const cookiesAccepted = localStorage.getItem('cookies_accepted');
@@ -220,7 +234,7 @@ const Home = () => {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Logo size="default" />
+          <Logo size="large" />
           <div className="hidden md:flex items-center gap-8">
             <a href="#routes" className="text-[#A3A3A3] hover:text-white transition-colors">Rutas</a>
             <a href="#how" className="text-[#A3A3A3] hover:text-white transition-colors">Cómo funciona</a>
@@ -305,13 +319,34 @@ const Home = () => {
 
             {/* Input Field */}
             {inputMode === 'text' ? (
-              <textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Describe tu idea, necesidad o problema que quieres resolver..."
-                className="w-full h-32 bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none"
-                data-testid="input-text"
-              />
+              <div className="relative">
+                <textarea
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={voice.isListening ? "Escuchando..." : "Describe tu idea, necesidad o problema que quieres resolver..."}
+                  className={`w-full h-32 bg-[#0A0A0A] border rounded-lg px-4 py-3 pr-14 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none ${
+                    voice.isListening ? 'border-red-500/50 animate-pulse' : 'border-white/10'
+                  }`}
+                  data-testid="input-text"
+                />
+                {/* Voice Button */}
+                {voice.isSupported && (
+                  <div className="absolute right-3 top-3">
+                    <button
+                      onClick={voice.isListening ? voice.stopListening : voice.startListening}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                        voice.isListening 
+                          ? 'bg-red-500 text-white animate-pulse' 
+                          : 'bg-[#262626] text-[#A3A3A3] hover:bg-[#363636] hover:text-white'
+                      }`}
+                      title={voice.isListening ? 'Detener' : 'Hablar por voz'}
+                      data-testid="voice-input-btn"
+                    >
+                      {voice.isListening ? <Stop size={20} weight="fill" /> : <Microphone size={20} weight="fill" />}
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <input
                 type="url"

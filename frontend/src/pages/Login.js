@@ -53,7 +53,7 @@ const Login = () => {
         >
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <Logo size="large" />
+            <Logo size="xlarge" />
           </div>
 
           {/* Card */}

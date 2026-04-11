@@ -50,7 +50,7 @@ const DashboardLayout = ({ children, title }) => {
       <aside className="hidden lg:flex flex-col w-64 bg-[#171717] border-r border-[#262626]">
         {/* Logo */}
         <div className="p-6 border-b border-[#262626]">
-          <Logo size="default" />
+          <Logo size="large" />
         </div>
 
         {/* New Project Button */}

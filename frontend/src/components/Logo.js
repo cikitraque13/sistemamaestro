@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 
 const Logo = ({ size = 'default', linkTo = '/', className = '' }) => {
   const sizes = {
-    small: { img: 28, text: 'text-lg' },
-    default: { img: 36, text: 'text-xl' },
-    large: { img: 48, text: 'text-2xl' }
+    small: { img: 36 },
+    default: { img: 44 },
+    large: { img: 56 },
+    xlarge: { img: 72 }
   };
 
-  const { img, text } = sizes[size] || sizes.default;
+  const { img } = sizes[size] || sizes.default;
 
   return (
     <Link 

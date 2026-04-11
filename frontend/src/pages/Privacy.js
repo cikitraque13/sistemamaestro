@@ -9,7 +9,7 @@ const Privacy = () => {
       {/* Header */}
       <header className="border-b border-[#262626]">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Logo size="default" />
+          <Logo size="large" />
           <Link to="/" className="text-[#A3A3A3] hover:text-white flex items-center gap-2 text-sm">
             <ArrowLeft size={16} />
             Volver

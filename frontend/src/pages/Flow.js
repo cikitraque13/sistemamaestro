@@ -9,12 +9,17 @@ import {
   Lightning,
   CheckCircle,
   Sparkle,
-  Lock
+  Lock,
+  Microphone,
+  Stop,
+  SpeakerHigh,
+  SpeakerSlash
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
+import { useVoice } from '../hooks/useVoice';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -44,6 +49,24 @@ const Flow = () => {
   const [loading, setLoading] = useState(false);
   const [project, setProject] = useState(null);
   const [refineAnswers, setRefineAnswers] = useState({});
+
+  // Voice functionality
+  const voice = useVoice();
+
+  // Update input when voice transcript changes
+  useEffect(() => {
+    if (voice.transcript && inputType === 'text') {
+      setInputContent(voice.transcript);
+    }
+  }, [voice.transcript, inputType]);
+
+  // Speak diagnosis when result is ready
+  useEffect(() => {
+    if (step === 'result' && project?.diagnosis && voice.voiceEnabled) {
+      const textToSpeak = `${project.diagnosis.understanding}. Hallazgo principal: ${project.diagnosis.main_finding}. ${project.next_step || ''}`;
+      setTimeout(() => voice.speak(textToSpeak), 500);
+    }
+  }, [step, project]);
 
   // Update URL when step changes
   useEffect(() => {
@@ -259,13 +282,34 @@ const Flow = () => {
 
                   {/* Input Field */}
                   {inputType === 'text' ? (
-                    <textarea
-                      value={inputContent}
-                      onChange={(e) => setInputContent(e.target.value)}
-                      placeholder="Describe tu idea, necesidad o problema que quieres resolver..."
-                      className="w-full h-40 bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none"
-                      data-testid="input-text"
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={inputContent}
+                        onChange={(e) => setInputContent(e.target.value)}
+                        placeholder={voice.isListening ? "Escuchando..." : "Describe tu idea, necesidad o problema que quieres resolver..."}
+                        className={`w-full h-40 bg-[#0A0A0A] border rounded-lg px-4 py-3 pr-14 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none ${
+                          voice.isListening ? 'border-red-500/50 animate-pulse' : 'border-white/10'
+                        }`}
+                        data-testid="input-text"
+                      />
+                      {/* Voice Button */}
+                      {voice.isSupported && (
+                        <div className="absolute right-3 top-3">
+                          <button
+                            onClick={voice.isListening ? voice.stopListening : voice.startListening}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                              voice.isListening 
+                                ? 'bg-red-500 text-white animate-pulse' 
+                                : 'bg-[#262626] text-[#A3A3A3] hover:bg-[#363636] hover:text-white'
+                            }`}
+                            title={voice.isListening ? 'Detener' : 'Hablar por voz'}
+                            data-testid="voice-input-btn"
+                          >
+                            {voice.isListening ? <Stop size={20} weight="fill" /> : <Microphone size={20} weight="fill" />}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <input
                       type="url"
@@ -392,6 +436,50 @@ const Flow = () => {
                   <h2 className="text-2xl font-light text-white mb-2" data-testid="result-title">
                     Tu diagnóstico está listo
                   </h2>
+                  {/* Voice Control */}
+                  {voice.isSupported && (
+                    <div className="flex items-center justify-center gap-2 mt-3">
+                      <button
+                        onClick={() => {
+                          if (voice.isSpeaking) {
+                            voice.stopSpeaking();
+                          } else if (project.diagnosis) {
+                            const textToSpeak = `${project.diagnosis.understanding}. Hallazgo principal: ${project.diagnosis.main_finding}. ${project.next_step || ''}`;
+                            voice.speak(textToSpeak);
+                          }
+                        }}
+                        className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all ${
+                          voice.isSpeaking 
+                            ? 'bg-[#0F5257] text-white' 
+                            : 'bg-[#262626] text-[#A3A3A3] hover:text-white'
+                        }`}
+                        data-testid="play-voice-btn"
+                      >
+                        {voice.isSpeaking ? (
+                          <>
+                            <Stop size={16} weight="fill" />
+                            Detener audio
+                          </>
+                        ) : (
+                          <>
+                            <SpeakerHigh size={16} weight="fill" />
+                            Escuchar diagnóstico
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={voice.toggleVoice}
+                        className={`p-2 rounded-lg transition-all ${
+                          voice.voiceEnabled 
+                            ? 'bg-[#262626] text-[#0F5257]' 
+                            : 'bg-[#262626] text-[#A3A3A3]'
+                        }`}
+                        title={voice.voiceEnabled ? 'Voz automática activada' : 'Voz automática desactivada'}
+                      >
+                        {voice.voiceEnabled ? <SpeakerHigh size={18} /> : <SpeakerSlash size={18} />}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Route Badge */}
