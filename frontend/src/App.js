@@ -15,6 +15,9 @@ import Billing from './pages/Billing';
 import Settings from './pages/Settings';
 import Flow from './pages/Flow';
 import AuthCallback from './pages/AuthCallback';
+import Privacy from './pages/Privacy';
+import Cookies from './pages/Cookies';
+import Terms from './pages/Terms';
 
 import './App.css';
 
@@ -53,6 +56,9 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/cookies" element={<Cookies />} />
+      <Route path="/terms" element={<Terms />} />
       
       {/* Protected Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

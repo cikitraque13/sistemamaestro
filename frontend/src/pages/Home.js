@@ -16,6 +16,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'sonner';
+import Logo from '../components/Logo';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -141,8 +142,8 @@ const CookieBanner = ({ onAccept }) => {
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-[#A3A3A3] text-sm text-center sm:text-left">
           Usamos cookies para mejorar tu experiencia. Al continuar, aceptas nuestra{' '}
-          <a href="/privacy" className="text-[#0F5257] hover:underline">política de privacidad</a> y{' '}
-          <a href="/cookies" className="text-[#0F5257] hover:underline">uso de cookies</a>.
+          <Link to="/privacy" className="text-[#0F5257] hover:underline">política de privacidad</Link> y{' '}
+          <Link to="/cookies" className="text-[#0F5257] hover:underline">uso de cookies</Link>.
         </p>
         <div className="flex gap-3">
           <button
@@ -219,9 +220,7 @@ const Home = () => {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-semibold text-white tracking-tight" data-testid="logo">
-            Sistema Maestro
-          </Link>
+          <Logo size="default" />
           <div className="hidden md:flex items-center gap-8">
             <a href="#routes" className="text-[#A3A3A3] hover:text-white transition-colors">Rutas</a>
             <a href="#how" className="text-[#A3A3A3] hover:text-white transition-colors">Cómo funciona</a>
@@ -699,9 +698,9 @@ const Home = () => {
             © 2026 Sistema Maestro. Todos los derechos reservados.
           </div>
           <div className="flex items-center gap-6 text-sm text-[#A3A3A3]">
-            <a href="/privacy" className="hover:text-white transition-colors">Privacidad</a>
-            <a href="/cookies" className="hover:text-white transition-colors">Cookies</a>
-            <a href="/terms" className="hover:text-white transition-colors">Términos</a>
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
+            <Link to="/cookies" className="hover:text-white transition-colors">Cookies</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Términos</Link>
             <a href="mailto:hola@sistemamaestro.com" className="hover:text-white transition-colors">Contacto</a>
           </div>
         </div>

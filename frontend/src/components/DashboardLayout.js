@@ -11,6 +11,7 @@ import {
   List
 } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import Logo from './Logo';
 
 const SIDEBAR_LINKS = [
   { path: '/dashboard', icon: House, label: 'Resumen' },
@@ -49,9 +50,7 @@ const DashboardLayout = ({ children, title }) => {
       <aside className="hidden lg:flex flex-col w-64 bg-[#171717] border-r border-[#262626]">
         {/* Logo */}
         <div className="p-6 border-b border-[#262626]">
-          <Link to="/" className="text-xl font-semibold text-white tracking-tight">
-            Sistema Maestro
-          </Link>
+          <Logo size="default" />
         </div>
 
         {/* New Project Button */}
@@ -116,9 +115,7 @@ const DashboardLayout = ({ children, title }) => {
       {/* Sidebar - Mobile */}
       <aside className={`fixed inset-y-0 left-0 w-64 bg-[#171717] border-r border-[#262626] z-50 transform transition-transform lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-[#262626] flex items-center justify-between">
-          <Link to="/" className="text-xl font-semibold text-white tracking-tight">
-            Sistema Maestro
-          </Link>
+          <Logo size="small" />
           <button onClick={() => setSidebarOpen(false)} className="text-[#A3A3A3]">
             ✕
           </button>

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { EnvelopeSimple, Lock, User, GoogleLogo, ArrowRight } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import Logo from '../components/Logo';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -67,9 +68,9 @@ const Register = () => {
           transition={{ duration: 0.5 }}
         >
           {/* Logo */}
-          <Link to="/" className="block text-center mb-8">
-            <span className="text-3xl font-semibold text-white tracking-tight">Sistema Maestro</span>
-          </Link>
+          <div className="flex justify-center mb-8">
+            <Logo size="large" />
+          </div>
 
           {/* Card */}
           <div className="bg-[#171717] border border-white/10 rounded-2xl p-8">

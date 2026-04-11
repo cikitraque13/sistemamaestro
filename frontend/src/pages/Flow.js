@@ -14,6 +14,7 @@ import {
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import Logo from '../components/Logo';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -163,7 +164,7 @@ const Flow = () => {
             <ArrowLeft size={18} />
             Dashboard
           </button>
-          <span className="text-white font-semibold">Sistema Maestro</span>
+          <Logo size="small" />
           <div className="w-20"></div>
         </div>
       </header>
