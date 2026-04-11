@@ -14,9 +14,27 @@ export const useAuth = () => {
 };
 
 // Helper to format API error details
+const ERROR_TRANSLATIONS = {
+  'Invalid credentials': 'Credenciales incorrectas',
+  'Email already registered': 'Este email ya está registrado',
+  'Too many failed attempts. Try again later.': 'Demasiados intentos fallidos. Inténtalo más tarde.',
+  'Not authenticated': 'No autenticado',
+  'Token expired': 'La sesión ha expirado',
+  'User not found': 'Usuario no encontrado',
+  'Invalid token': 'Token inválido',
+  'Project not found': 'Proyecto no encontrado',
+  'Opportunity not found': 'Oportunidad no encontrada',
+  'Upgrade to Blueprint plan to unlock this feature': 'Mejora al plan Blueprint para desbloquear esta función',
+  'Upgrade to access more opportunities': 'Mejora tu plan para acceder a más oportunidades',
+  'Payment system not configured. Set STRIPE_SECRET_KEY in environment.': 'Sistema de pagos no configurado',
+  'Payment system not configured': 'Sistema de pagos no configurado',
+  'Invalid plan': 'Plan no válido',
+  'Transaction not found': 'Transacción no encontrada'
+};
+
 const formatApiErrorDetail = (detail) => {
   if (detail == null) return "Algo salió mal. Intenta de nuevo.";
-  if (typeof detail === "string") return detail;
+  if (typeof detail === "string") return ERROR_TRANSLATIONS[detail] || detail;
   if (Array.isArray(detail))
     return detail.map((e) => (e && typeof e.msg === "string" ? e.msg : JSON.stringify(e))).filter(Boolean).join(" ");
   if (detail && typeof detail.msg === "string") return detail.msg;

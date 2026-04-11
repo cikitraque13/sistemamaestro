@@ -728,15 +728,21 @@ const Home = () => {
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-[#A3A3A3] text-sm">
-            © 2026 Sistema Maestro. Todos los derechos reservados.
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="text-[#A3A3A3] text-sm">
+              © 2026 Sistema Maestro. Todos los derechos reservados.
+            </div>
+            <div className="flex items-center gap-6 text-sm text-[#A3A3A3]">
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
+              <Link to="/cookies" className="hover:text-white transition-colors">Cookies</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Términos</Link>
+              <a href="mailto:hola@sistemamaestro.com" className="hover:text-white transition-colors">Contacto</a>
+            </div>
           </div>
-          <div className="flex items-center gap-6 text-sm text-[#A3A3A3]">
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
-            <Link to="/cookies" className="hover:text-white transition-colors">Cookies</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Términos</Link>
-            <a href="mailto:hola@sistemamaestro.com" className="hover:text-white transition-colors">Contacto</a>
+          <div className="flex items-center justify-center gap-6 text-xs text-[#666666] pt-4 border-t border-white/5">
+            <a href="https://systeme.io/es?sa=sa021243679877282e02190853937f18793f713170" target="_blank" rel="noopener noreferrer" className="hover:text-[#A3A3A3] transition-colors">Systeme.io</a>
+            <a href="https://sistemamaestroia.com/" target="_blank" rel="noopener noreferrer" className="hover:text-[#A3A3A3] transition-colors">SistemaMaestroIA</a>
           </div>
         </div>
       </footer>

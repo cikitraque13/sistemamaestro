@@ -15,6 +15,17 @@ import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+const FEATURE_LABELS = {
+  diagnosis: 'Diagnóstico',
+  route: 'Ruta recomendada',
+  blueprint: 'Blueprint',
+  priorities: 'Prioridades',
+  continuity: 'Continuidad guiada',
+  deployment: 'Activación y despliegue',
+  support: 'Soporte prioritario',
+  opportunities: 'Oportunidades'
+};
+
 const PLANS = [
   {
     id: 'free',
@@ -193,7 +204,7 @@ const Billing = () => {
             <div className="flex flex-wrap gap-2">
               {billingData.current_plan.features.map((feature) => (
                 <span key={feature} className="px-3 py-1 bg-[#262626] text-[#A3A3A3] rounded-full text-sm">
-                  {feature}
+                  {FEATURE_LABELS[feature] || feature}
                 </span>
               ))}
             </div>
