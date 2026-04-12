@@ -1092,6 +1092,11 @@ async def startup_event():
 # Include router
 app.include_router(api_router)
 
+# Public healthcheck for Railway
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 # CORS - configure for your domain in production
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
@@ -1103,10 +1108,12 @@ app.add_middleware(
 )
 
 # Serve React frontend static files
-STATIC_DIR = ROOT_DIR / "static"
+STATIC_DIR = ROOT_DIR / "frontend" / "build"
 if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR / "static")), name="static")
-    
+    static_assets_dir = STATIC_DIR / "static"
+    if static_assets_dir.exists():
+        app.mount("/static", StaticFiles(directory=str(static_assets_dir)), name="static")
+
     @app.get("/{full_path:path}")
     async def serve_react(full_path: str):
         """Serve React app for all non-API routes"""
