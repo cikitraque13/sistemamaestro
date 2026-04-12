@@ -3,7 +3,7 @@ FROM node:18-alpine AS frontend-build
 
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/yarn.lock* ./
-RUN yarn install --frozen-lockfile 2>/dev/null || yarn install
+RUN yarn install
 COPY frontend/ ./
 # Override env for Railway: backend is same origin
 ENV REACT_APP_BACKEND_URL=""
