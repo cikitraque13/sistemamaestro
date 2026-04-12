@@ -1089,7 +1089,11 @@ async def startup_event():
     
     logger.info("Sistema Maestro started successfully")
 
-# Include router
+# Public healthcheck for Railway
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+    
 # Include router
 app.include_router(api_router)
 
