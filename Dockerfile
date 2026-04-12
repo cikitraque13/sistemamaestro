@@ -1,3 +1,4 @@
+
 # Railway Deployment
 FROM node:22-alpine AS frontend-build
 
@@ -5,10 +6,11 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
+
 # Override env for Railway: backend is same origin
 ENV REACT_APP_BACKEND_URL=""
-RUN yarn build
 
+RUN npm run build
 # Backend
 FROM python:3.11-slim
 
