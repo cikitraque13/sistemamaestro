@@ -19,17 +19,15 @@ const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { register, loginWithGoogle, isAuthenticated } = useAuth();
-  
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Get input data from home page if available
   const inputData = location.state || {};
 
-  // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated) {
       if (inputData.inputContent) {
@@ -52,7 +50,7 @@ const Register = () => {
     }
 
     const result = await register(email, password, name);
-    
+
     if (result.success) {
       toast.success('Cuenta creada correctamente');
       if (inputData.inputContent) {
@@ -64,7 +62,7 @@ const Register = () => {
       setError(result.error);
       toast.error(result.error);
     }
-    
+
     setLoading(false);
   };
 
@@ -76,12 +74,10 @@ const Register = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Logo */}
           <div className="flex justify-center mb-8">
             <Logo size="xlarge" />
           </div>
 
-          {/* Card */}
           <div className="bg-[#171717] border border-white/10 rounded-2xl p-8">
             <h1 className="text-2xl font-light text-white text-center mb-2" data-testid="register-title">
               Crear cuenta
@@ -90,9 +86,19 @@ const Register = () => {
               Empieza gratis, sin tarjeta de crédito
             </p>
 
-            {/* Google Register */}
             <button
-              onClick={loginWithGoogle}
+              onClick={() =>
+                loginWithGoogle(
+                  inputData.inputContent
+                    ? {
+                        redirectPath: '/flow',
+                        redirectState: inputData
+                      }
+                    : {
+                        redirectPath: '/dashboard'
+                      }
+                )
+              }
               className="w-full flex items-center justify-center gap-3 bg-white text-[#1f1f1f] py-3.5 rounded-lg font-medium hover:bg-gray-50 transition-all duration-200 border border-gray-200 shadow-sm mb-6"
               data-testid="google-register-btn"
             >
@@ -106,7 +112,6 @@ const Register = () => {
               <div className="flex-1 h-px bg-white/10"></div>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit}>
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm" data-testid="register-error">
