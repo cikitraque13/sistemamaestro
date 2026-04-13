@@ -19,17 +19,40 @@ import { toast } from 'sonner';
 const API_BASE = '/api';
 
 const ROUTE_NAMES = {
-  // contrato nuevo backend
   improve: 'Mejorar algo existente',
   sell: 'Vender y cobrar',
   automate: 'Automatizar operación',
   idea: 'Idea a proyecto',
 
-  // compatibilidad legado
+  // Compatibilidad legado
   improve_existing: 'Mejorar algo existente',
   sell_and_charge: 'Vender y cobrar',
   automate_operation: 'Automatizar operación',
   idea_to_project: 'Idea a proyecto'
+};
+
+const PLAN_VISUALS = {
+  blueprint: {
+    label: '29',
+    name: 'Blueprint',
+    badgeClass: 'bg-[#0F5257]/20 text-[#0F5257]',
+    borderClass: 'border-[#0F5257]/30',
+    boxClass: 'bg-[#0F5257]/10'
+  },
+  sistema: {
+    label: '79',
+    name: 'Sistema',
+    badgeClass: 'bg-amber-500/20 text-amber-300',
+    borderClass: 'border-amber-500/30',
+    boxClass: 'bg-amber-500/10'
+  },
+  premium: {
+    label: '199',
+    name: 'Premium',
+    badgeClass: 'bg-fuchsia-500/20 text-fuchsia-300',
+    borderClass: 'border-fuchsia-500/30',
+    boxClass: 'bg-fuchsia-500/10'
+  }
 };
 
 const ProjectDetail = () => {
@@ -123,6 +146,30 @@ const ProjectDetail = () => {
       strengths,
       weaknesses,
       quickWins
+    };
+  }, [project]);
+
+  const normalizedPlanRecommendation = useMemo(() => {
+    const rec = project?.plan_recommendation;
+    if (!rec) return null;
+
+    const planId = rec.recommended_plan_id;
+    const visual = PLAN_VISUALS[planId] || PLAN_VISUALS.blueprint;
+
+    return {
+      planId,
+      planName: rec.recommended_plan_name || visual.name,
+      planPrice: rec.recommended_plan_price,
+      planLabel: visual.label,
+      badgeClass: visual.badgeClass,
+      borderClass: visual.borderClass,
+      boxClass: visual.boxClass,
+      scoreTotal: rec.score_total,
+      scores: rec.scores || {},
+      reason: rec.reason,
+      whyNotLower: rec.why_not_lower,
+      unlocks: rec.unlocks,
+      ctaLabel: rec.cta_label || 'Ver plan recomendado'
     };
   }, [project]);
 
@@ -282,6 +329,92 @@ const ProjectDetail = () => {
                 <p className="text-white">{project.next_step}</p>
               </div>
             )}
+          </motion.div>
+        )}
+
+        {normalizedPlanRecommendation && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className={`card mb-6 border ${normalizedPlanRecommendation.borderClass}`}
+            data-testid="plan-recommendation-section"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
+              <div>
+                <h3 className="text-lg font-medium text-white mb-2">
+                  Nivel recomendado
+                </h3>
+                <p className="text-[#A3A3A3]">
+                  Recomendación automática según complejidad, impacto y necesidad real de estructura.
+                </p>
+              </div>
+
+              <div className={`px-4 py-2 rounded-full text-sm font-medium ${normalizedPlanRecommendation.badgeClass}`}>
+                Plan {normalizedPlanRecommendation.planLabel} · {normalizedPlanRecommendation.planName}
+              </div>
+            </div>
+
+            <div className={`rounded-xl p-4 mb-5 border ${normalizedPlanRecommendation.borderClass} ${normalizedPlanRecommendation.boxClass}`}>
+              <p className="text-sm text-[#A3A3A3] mb-1">Motivo</p>
+              <p className="text-white">{normalizedPlanRecommendation.reason}</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4 mb-5">
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <p className="text-sm text-[#A3A3A3] mb-2">Por qué no basta el nivel inferior</p>
+                <p className="text-white">{normalizedPlanRecommendation.whyNotLower}</p>
+              </div>
+
+              <div className="bg-[#0A0A0A] rounded-xl p-4">
+                <p className="text-sm text-[#A3A3A3] mb-2">Qué desbloquea</p>
+                <p className="text-white">{normalizedPlanRecommendation.unlocks}</p>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-5 gap-3 mb-6">
+              <div className="bg-[#0A0A0A] rounded-lg p-3">
+                <p className="text-xs text-[#A3A3A3] mb-1">Complejidad</p>
+                <p className="text-white font-medium">{normalizedPlanRecommendation.scores.complexity ?? 0}/4</p>
+              </div>
+              <div className="bg-[#0A0A0A] rounded-lg p-3">
+                <p className="text-xs text-[#A3A3A3] mb-1">Impacto</p>
+                <p className="text-white font-medium">{normalizedPlanRecommendation.scores.economic_impact ?? 0}/4</p>
+              </div>
+              <div className="bg-[#0A0A0A] rounded-lg p-3">
+                <p className="text-xs text-[#A3A3A3] mb-1">Urgencia</p>
+                <p className="text-white font-medium">{normalizedPlanRecommendation.scores.urgency ?? 0}/4</p>
+              </div>
+              <div className="bg-[#0A0A0A] rounded-lg p-3">
+                <p className="text-xs text-[#A3A3A3] mb-1">Estructura</p>
+                <p className="text-white font-medium">{normalizedPlanRecommendation.scores.structure_need ?? 0}/4</p>
+              </div>
+              <div className="bg-[#0A0A0A] rounded-lg p-3">
+                <p className="text-xs text-[#A3A3A3] mb-1">Continuidad</p>
+                <p className="text-white font-medium">{normalizedPlanRecommendation.scores.continuity_need ?? 0}/4</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-[#A3A3A3]">Score total</p>
+                <p className="text-white text-xl font-medium">
+                  {normalizedPlanRecommendation.scoreTotal}/20
+                </p>
+              </div>
+
+              <Link
+                to="/dashboard/billing"
+                state={{
+                  suggestedPlan: normalizedPlanRecommendation.planId,
+                  fromProjectId: project.project_id
+                }}
+                className="btn-primary inline-flex items-center gap-2"
+              >
+                {normalizedPlanRecommendation.ctaLabel}
+                <ArrowRight size={16} />
+              </Link>
+            </div>
           </motion.div>
         )}
 
