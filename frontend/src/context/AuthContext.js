@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_BASE = '/api';
 
 const AuthContext = createContext(null);
 
@@ -33,13 +33,22 @@ const ERROR_TRANSLATIONS = {
 };
 
 const formatApiErrorDetail = (detail) => {
-  if (detail == null) return "Algo salió mal. Intenta de nuevo.";
-  if (typeof detail === "string") return ERROR_TRANSLATIONS[detail] || detail;
-  if (Array.isArray(detail))
-    return detail.map((e) => (e && typeof e.msg === "string" ? e.msg : JSON.stringify(e))).filter(Boolean).join(" ");
-  if (detail && typeof detail.msg === "string") return detail.msg;
+  if (detail == null) return 'Algo salió mal. Intenta de nuevo.';
+  if (typeof detail === 'string') return ERROR_TRANSLATIONS[detail] || detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((e) => (e && typeof e.msg === 'string' ? e.msg : JSON.stringify(e)))
+      .filter(Boolean)
+      .join(' ');
+  }
+  if (detail && typeof detail.msg === 'string') return detail.msg;
   return String(detail);
 };
+
+const api = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // null = checking, false = not auth, object = auth
@@ -47,9 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/auth/me`, {
-        withCredentials: true
-      });
+      const response = await api.get('/auth/me');
       setUser(response.data);
     } catch (error) {
       setUser(false);
@@ -59,8 +66,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // CRITICAL: If returning from OAuth callback, skip the /me check.
-    // AuthCallback will exchange the session_id and establish the session first.
+    // Si vuelve desde callback OAuth, no ejecutar /me todavía
     if (window.location.hash?.includes('session_id=')) {
       setLoading(false);
       return;
@@ -70,41 +76,33 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/api/auth/login`,
-        { email, password },
-        { withCredentials: true }
-      );
+      const response = await api.post('/auth/login', { email, password });
       setUser(response.data);
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: formatApiErrorDetail(error.response?.data?.detail) || error.message 
+      return {
+        success: false,
+        error: formatApiErrorDetail(error.response?.data?.detail) || error.message
       };
     }
   };
 
   const register = async (email, password, name) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/api/auth/register`,
-        { email, password, name },
-        { withCredentials: true }
-      );
+      const response = await api.post('/auth/register', { email, password, name });
       setUser(response.data);
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: formatApiErrorDetail(error.response?.data?.detail) || error.message 
+      return {
+        success: false,
+        error: formatApiErrorDetail(error.response?.data?.detail) || error.message
       };
     }
   };
 
   const logout = async () => {
     try {
-      await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+      await api.post('/auth/logout', {});
     } catch (error) {
       setUser(false);
     } finally {
@@ -113,31 +111,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   const loginWithGoogle = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + '/dashboard';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    // Pendiente de saneo completo del flujo Google
+    console.warn('Google login aún depende del flujo legado y requiere revisión adicional.');
   };
 
   const handleGoogleCallback = async (sessionId) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/api/auth/google/session`,
-        { session_id: sessionId },
-        { withCredentials: true }
-      );
+      const response = await api.post('/auth/google/session', { session_id: sessionId });
       setUser(response.data);
       return { success: true, user: response.data };
     } catch (error) {
-      return { 
-        success: false, 
-        error: formatApiErrorDetail(error.response?.data?.detail) || error.message 
+      return {
+        success: false,
+        error: formatApiErrorDetail(error.response?.data?.detail) || error.message
       };
     }
   };
 
   const refreshToken = async () => {
     try {
-      await axios.post(`${API_URL}/api/auth/refresh`, {}, { withCredentials: true });
+      await api.post('/auth/refresh', {});
       await checkAuth();
     } catch (error) {
       setUser(false);
@@ -145,18 +138,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      loading,
-      login,
-      register,
-      logout,
-      loginWithGoogle,
-      handleGoogleCallback,
-      refreshToken,
-      checkAuth,
-      isAuthenticated: !!user && user !== false
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        loginWithGoogle,
+        handleGoogleCallback,
+        refreshToken,
+        checkAuth,
+        isAuthenticated: !!user && user !== false
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
