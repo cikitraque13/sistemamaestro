@@ -121,55 +121,37 @@ const PLAN_VISUAL_META = {
     badgeClass: 'bg-[#202020] text-[#D4D4D4]',
     chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
     ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
-    compactLine:
-      'Entrada limpia para detectar si merece avanzar.',
+    compactLine: 'Entrada limpia para detectar si merece avanzar.',
     capabilityTitle: 'Señales clave',
     capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
-    featurePreview: [
-      'Diagnóstico inicial',
-      'Ruta recomendada',
-      'Resultado resumido'
-    ]
+    summaryLine: 'Ideal para abrir posibilidad y romper la inercia inicial.'
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
     badgeClass: 'bg-[#0F5257] text-white',
     chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
     ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
-    compactLine:
-      'La base correcta para empezar a construir de verdad.',
+    compactLine: 'La base correcta para empezar a construir de verdad.',
     capabilityTitle: 'Base estructural',
     capabilityItems: ['Blueprint', 'Prioridades', 'Monetización', 'Prompts'],
-    featurePreview: [
-      'Blueprint estructural',
-      'Prioridades claras',
-      'Base de monetización',
-      'Prompts estructurales'
-    ]
+    summaryLine: 'Ordena la oportunidad y la convierte en base de trabajo real.'
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
     badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
     chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
     ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
-    compactLine:
-      'Optimiza conversión, growth y foco de ejecución.',
+    compactLine: 'Optimiza conversión, growth y foco de ejecución.',
     capabilityTitle: 'Growth + CRO',
     capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Sistema'],
-    featurePreview: [
-      'CRO y mejora de conversión',
-      'Growth y priorización',
-      'Optimización de propuesta',
-      'Prompts de optimización'
-    ]
+    summaryLine: 'Sube el nivel del proyecto cuando ya no basta una estructura base.'
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
     chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
     ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
-    compactLine:
-      'La capa senior para criterio, marketing y dirección estratégica.',
+    compactLine: 'La capa senior para criterio, marketing y dirección estratégica.',
     capabilityTitle: 'Capa estratégica',
     capabilityItems: [
       'CRO',
@@ -181,12 +163,7 @@ const PLAN_VISUAL_META = {
       'Dirección de arte',
       'Marketing visual'
     ],
-    featurePreview: [
-      'CRO estratégico',
-      'Growth y monetización senior',
-      'Auditoría maestra',
-      'Prompt 99 y prompts maestros'
-    ]
+    summaryLine: 'Pensado para decisiones críticas, marketing visual y arquitectura senior.'
   }
 };
 
@@ -770,7 +747,7 @@ const Home = () => {
                     ))}
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 min-h-[124px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 min-h-[110px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                       {entryOffer.promptLayer.label}
                     </p>
@@ -830,7 +807,7 @@ const Home = () => {
             </div>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {pricingPlans.map((plan, index) => {
               const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
 
@@ -841,10 +818,10 @@ const Home = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.08 }}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[860px] ${visual.borderClass}`}
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col h-full min-h-[640px] ${visual.borderClass}`}
                   data-testid={`plan-${plan.id}`}
                 >
-                  <div className="min-h-[40px] mb-4 flex items-start justify-between gap-3">
+                  <div className="min-h-[36px] mb-4 flex items-start justify-between gap-3">
                     <div className="flex flex-wrap gap-2">
                       {plan.badge && (
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
@@ -854,34 +831,27 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <div className="min-h-[180px] mb-5">
-                    <h3 className="text-2xl lg:text-[2rem] font-medium text-white mb-3">
+                  <div className="min-h-[118px] mb-5">
+                    <h3 className="text-2xl lg:text-[2rem] font-medium text-white mb-2">
                       {plan.visibleName}
                     </h3>
-                    <p className="text-[#F0F0F0] text-base leading-snug mb-3">{plan.headline}</p>
-                    <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
+                    <p className="text-[#F0F0F0] text-base leading-snug mb-2">{plan.headline}</p>
+                    <p className="text-sm text-[#A3A3A3] leading-relaxed">{visual.compactLine}</p>
                   </div>
 
-                  <div className="min-h-[84px] flex items-end gap-2 mb-6">
+                  <div className="min-h-[72px] flex items-end gap-2 mb-5">
                     <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[144px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[124px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                       Mejor encaje
                     </p>
                     <p className="text-white text-sm leading-relaxed">{plan.bestFor}</p>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[126px]">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                      {plan.promptLayer.label}
-                    </p>
-                    <p className="text-white text-sm leading-relaxed">{plan.promptLayer.description}</p>
-                  </div>
-
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[152px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[150px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
                       {visual.capabilityTitle}
                     </p>
@@ -892,11 +862,11 @@ const Home = () => {
                         </span>
                       ))}
                     </div>
-                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.insight}</p>
+                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.summaryLine}</p>
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-1">
-                    {plan.features.map((feature) => (
+                    {plan.features.slice(0, 4).map((feature) => (
                       <li key={feature} className="flex items-start gap-2 text-sm text-[#D4D4D4]">
                         <CheckCircle
                           size={16}
