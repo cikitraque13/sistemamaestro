@@ -818,7 +818,7 @@ const Home = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.08 }}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col h-full min-h-[640px] ${visual.borderClass}`}
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col h-full min-h-[590px] ${visual.borderClass}`}
                   data-testid={`plan-${plan.id}`}
                 >
                   <div className="min-h-[36px] mb-4 flex items-start justify-between gap-3">
@@ -831,12 +831,13 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <div className="min-h-[118px] mb-5">
+                  <div className="min-h-[220px] mb-5">
                     <h3 className="text-2xl lg:text-[2rem] font-medium text-white mb-2">
                       {plan.visibleName}
                     </h3>
                     <p className="text-[#F0F0F0] text-base leading-snug mb-2">{plan.headline}</p>
-                    <p className="text-sm text-[#A3A3A3] leading-relaxed">{visual.compactLine}</p>
+                    <p className="text-sm text-[#A3A3A3] leading-relaxed mb-4">{visual.compactLine}</p>
+                    <p className="text-sm text-white leading-relaxed">{plan.bestFor}</p>
                   </div>
 
                   <div className="min-h-[72px] flex items-end gap-2 mb-5">
@@ -844,14 +845,7 @@ const Home = () => {
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[124px]">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                      Mejor encaje
-                    </p>
-                    <p className="text-white text-sm leading-relaxed">{plan.bestFor}</p>
-                  </div>
-
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[150px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[154px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
                       {visual.capabilityTitle}
                     </p>
