@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   ArrowRight,
   ArrowLeft,
   Globe,
@@ -21,9 +21,14 @@ import { toast } from 'sonner';
 import Logo from '../components/Logo';
 import { useVoice } from '../hooks/useVoice';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_BASE = '/api';
 
 const ROUTE_NAMES = {
+  improve: 'Mejorar algo existente',
+  sell: 'Vender y cobrar',
+  automate: 'Automatizar operación',
+  idea: 'Idea a proyecto',
+
   improve_existing: 'Mejorar algo existente',
   sell_and_charge: 'Vender y cobrar',
   automate_operation: 'Automatizar operación',
@@ -31,10 +36,52 @@ const ROUTE_NAMES = {
 };
 
 const ROUTE_DESCRIPTIONS = {
+  improve: 'Analizamos un activo existente y detectamos fricciones que afectan claridad, captación o conversión.',
+  sell: 'Estructuramos la propuesta comercial y detectamos oportunidades de monetización.',
+  automate: 'Identificamos cuellos de botella operativos y oportunidades de automatización.',
+  idea: 'Convertimos una idea en una dirección de proyecto con potencial de validación y crecimiento.',
+
   improve_existing: 'Analizamos tu activo existente y te mostramos cómo mejorarlo.',
   sell_and_charge: 'Estructuramos tu propuesta comercial con el flujo correcto.',
   automate_operation: 'Identificamos cuellos de botella y proponemos automatización.',
   idea_to_project: 'Convertimos tu idea en un proyecto digital monetizable.'
+};
+
+const PLAN_VISUALS = {
+  blueprint: {
+    label: '29',
+    name: 'Blueprint',
+    badgeClass: 'bg-[#0F5257]/20 text-[#0F5257]',
+    borderClass: 'border-[#0F5257]/30',
+    boxClass: 'bg-[#0F5257]/10'
+  },
+  sistema: {
+    label: '79',
+    name: 'Sistema',
+    badgeClass: 'bg-amber-500/20 text-amber-300',
+    borderClass: 'border-amber-500/30',
+    boxClass: 'bg-amber-500/10'
+  },
+  premium: {
+    label: '199',
+    name: 'Premium',
+    badgeClass: 'bg-fuchsia-500/20 text-fuchsia-300',
+    borderClass: 'border-fuchsia-500/30',
+    boxClass: 'bg-fuchsia-500/10'
+  }
+};
+
+const formatApiErrorDetail = (detail) => {
+  if (detail == null) return 'Algo salió mal. Intenta de nuevo.';
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((e) => (e && typeof e.msg === 'string' ? e.msg : JSON.stringify(e)))
+      .filter(Boolean)
+      .join(' ');
+  }
+  if (detail && typeof detail.msg === 'string') return detail.msg;
+  return String(detail);
 };
 
 const Flow = () => {
@@ -42,7 +89,7 @@ const Flow = () => {
   const location = useLocation();
   const { step: urlStep } = useParams();
   const { user } = useAuth();
-  
+
   const [step, setStep] = useState(urlStep || 'input');
   const [inputType, setInputType] = useState(location.state?.inputType || 'text');
   const [inputContent, setInputContent] = useState(location.state?.inputContent || '');
@@ -50,10 +97,67 @@ const Flow = () => {
   const [project, setProject] = useState(null);
   const [refineAnswers, setRefineAnswers] = useState({});
 
-  // Voice functionality
   const voice = useVoice();
 
-  // Auto-submit when arriving with content from Home page
+  const normalizedDiagnosis = useMemo(() => {
+    const diagnosis = project?.diagnosis;
+    if (!diagnosis) return null;
+
+    const strengths = Array.isArray(diagnosis.strengths) ? diagnosis.strengths : [];
+    const weaknesses = Array.isArray(diagnosis.weaknesses) ? diagnosis.weaknesses : [];
+    const quickWins = Array.isArray(diagnosis.quick_wins) ? diagnosis.quick_wins : [];
+
+    const understanding =
+      diagnosis.understanding ||
+      diagnosis.summary ||
+      'Diagnóstico generado correctamente, pendiente de ampliar visualización.';
+
+    const mainFinding =
+      diagnosis.main_finding ||
+      weaknesses[0] ||
+      strengths[0] ||
+      diagnosis.summary ||
+      'Sin hallazgo principal disponible.';
+
+    const opportunity =
+      diagnosis.opportunity ||
+      quickWins[0] ||
+      'Sin oportunidad priorizada disponible.';
+
+    return {
+      understanding,
+      mainFinding,
+      opportunity,
+      strengths,
+      weaknesses,
+      quickWins
+    };
+  }, [project]);
+
+  const normalizedPlanRecommendation = useMemo(() => {
+    const rec = project?.plan_recommendation;
+    if (!rec) return null;
+
+    const planId = rec.recommended_plan_id;
+    const visual = PLAN_VISUALS[planId] || PLAN_VISUALS.blueprint;
+
+    return {
+      planId,
+      planName: rec.recommended_plan_name || visual.name,
+      planPrice: rec.recommended_plan_price,
+      planLabel: visual.label,
+      badgeClass: visual.badgeClass,
+      borderClass: visual.borderClass,
+      boxClass: visual.boxClass,
+      scoreTotal: rec.score_total,
+      scores: rec.scores || {},
+      reason: rec.reason,
+      whyNotLower: rec.why_not_lower,
+      unlocks: rec.unlocks,
+      ctaLabel: rec.cta_label || 'Ver plan recomendado'
+    };
+  }, [project]);
+
   useEffect(() => {
     const fromHome = location.state?.inputContent;
     if (!fromHome) return;
@@ -61,47 +165,52 @@ const Flow = () => {
     const autoAnalyze = async () => {
       setLoading(true);
       setStep('interpreting');
+
       try {
         const response = await axios.post(
-          `${API_URL}/api/projects`,
-          { input_type: location.state.inputType || 'text', input_content: fromHome },
+          `${API_BASE}/projects`,
+          {
+            input_type: location.state.inputType || 'text',
+            input_content: fromHome
+          },
           { withCredentials: true }
         );
+
         setProject(response.data);
+
         setTimeout(() => {
           if (response.data.refine_questions?.length > 0) {
             setStep('refine');
           } else {
             setStep('result');
           }
-        }, 1500);
+        }, 1200);
       } catch (error) {
-        toast.error('Error al analizar. Intenta de nuevo.');
+        toast.error(formatApiErrorDetail(error.response?.data?.detail) || 'Error al analizar. Intenta de nuevo.');
         setStep('input');
       } finally {
         setLoading(false);
       }
     };
+
     autoAnalyze();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update input when voice transcript changes
   useEffect(() => {
     if (voice.transcript && inputType === 'text') {
       setInputContent(voice.transcript);
     }
   }, [voice.transcript, inputType]);
 
-  // Speak diagnosis when result is ready
   useEffect(() => {
-    if (step === 'result' && project?.diagnosis && voice.voiceEnabled) {
-      const textToSpeak = `${project.diagnosis.understanding}. Hallazgo principal: ${project.diagnosis.main_finding}. ${project.next_step || ''}`;
-      setTimeout(() => voice.speak(textToSpeak), 500);
+    if (step === 'result' && normalizedDiagnosis && voice.voiceEnabled) {
+      const textToSpeak = `${normalizedDiagnosis.understanding}. Hallazgo principal: ${normalizedDiagnosis.mainFinding}. Oportunidad: ${normalizedDiagnosis.opportunity}.`;
+      const timeout = setTimeout(() => voice.speak(textToSpeak), 500);
+      return () => clearTimeout(timeout);
     }
-  }, [step, project]);
+  }, [step, normalizedDiagnosis, voice]);
 
-  // Update URL when step changes
   useEffect(() => {
     if (step !== 'input') {
       window.history.replaceState(null, '', `/flow/${step}`);
@@ -119,7 +228,7 @@ const Flow = () => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/api/projects`,
+        `${API_BASE}/projects`,
         {
           input_type: inputType,
           input_content: inputContent
@@ -128,17 +237,16 @@ const Flow = () => {
       );
 
       setProject(response.data);
-      
-      // Small delay for UX
+
       setTimeout(() => {
         if (response.data.refine_questions?.length > 0) {
           setStep('refine');
         } else {
           setStep('result');
         }
-      }, 1500);
+      }, 1200);
     } catch (error) {
-      toast.error('Error al analizar. Intenta de nuevo.');
+      toast.error(formatApiErrorDetail(error.response?.data?.detail) || 'Error al analizar. Intenta de nuevo.');
       setStep('input');
     } finally {
       setLoading(false);
@@ -152,18 +260,18 @@ const Flow = () => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/api/projects/${project.project_id}/refine`,
+        `${API_BASE}/projects/${project.project_id}/refine`,
         {
-          project_id: project.project_id,
           answers: refineAnswers
         },
         { withCredentials: true }
       );
 
       setProject(response.data);
+      toast.success('Afinado guardado correctamente');
       setStep('result');
     } catch (error) {
-      toast.error('Error al guardar respuestas');
+      toast.error(formatApiErrorDetail(error.response?.data?.detail) || 'Error al guardar respuestas');
     } finally {
       setLoading(false);
     }
@@ -174,7 +282,12 @@ const Flow = () => {
 
     if (user?.plan === 'free') {
       toast.error('Necesitas el plan Blueprint o superior');
-      navigate('/dashboard/billing');
+      navigate('/dashboard/billing', {
+        state: {
+          suggestedPlan: normalizedPlanRecommendation?.planId || 'blueprint',
+          fromProjectId: project.project_id
+        }
+      });
       return;
     }
 
@@ -182,7 +295,7 @@ const Flow = () => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/api/projects/${project.project_id}/blueprint`,
+        `${API_BASE}/projects/${project.project_id}/blueprint`,
         {},
         { withCredentials: true }
       );
@@ -190,7 +303,7 @@ const Flow = () => {
       setProject(response.data);
       setStep('blueprint');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al generar blueprint');
+      toast.error(formatApiErrorDetail(error.response?.data?.detail) || 'Error al generar blueprint');
     } finally {
       setLoading(false);
     }
@@ -206,7 +319,6 @@ const Flow = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
-      {/* Header */}
       <header className="border-b border-[#262626] bg-[#0A0A0A]/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
@@ -222,24 +334,29 @@ const Flow = () => {
         </div>
       </header>
 
-      {/* Progress */}
       <div className="border-b border-[#262626]">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             {['input', 'interpreting', 'refine', 'result', 'blueprint'].map((s, i) => (
               <React.Fragment key={s}>
-                <div className={`flex items-center gap-2 ${
-                  step === s ? 'text-[#0F5257]' : 
-                  ['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > i 
-                    ? 'text-[#0F5257]' 
-                    : 'text-[#A3A3A3]'
-                }`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                    step === s ? 'bg-[#0F5257] text-white' :
-                    ['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > i
-                      ? 'bg-[#0F5257]/30 text-[#0F5257]'
-                      : 'bg-[#262626] text-[#A3A3A3]'
-                  }`}>
+                <div
+                  className={`flex items-center gap-2 ${
+                    step === s
+                      ? 'text-[#0F5257]'
+                      : ['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > i
+                        ? 'text-[#0F5257]'
+                        : 'text-[#A3A3A3]'
+                  }`}
+                >
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                      step === s
+                        ? 'bg-[#0F5257] text-white'
+                        : ['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > i
+                          ? 'bg-[#0F5257]/30 text-[#0F5257]'
+                          : 'bg-[#262626] text-[#A3A3A3]'
+                    }`}
+                  >
                     {['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > i ? (
                       <CheckCircle size={14} weight="fill" />
                     ) : (
@@ -247,10 +364,15 @@ const Flow = () => {
                     )}
                   </div>
                   <span className="hidden sm:inline text-sm">
-                    {s === 'input' ? 'Entrada' :
-                     s === 'interpreting' ? 'Interpretando' :
-                     s === 'refine' ? 'Afinado' :
-                     s === 'result' ? 'Resultado' : 'Blueprint'}
+                    {s === 'input'
+                      ? 'Entrada'
+                      : s === 'interpreting'
+                        ? 'Interpretando'
+                        : s === 'refine'
+                          ? 'Afinado'
+                          : s === 'result'
+                            ? 'Resultado'
+                            : 'Blueprint'}
                   </span>
                 </div>
                 {i < 4 && <div className="flex-1 h-px bg-[#262626]"></div>}
@@ -260,11 +382,9 @@ const Flow = () => {
         </div>
       </div>
 
-      {/* Content */}
       <main className="flex-1 py-12 px-6">
         <div className="max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
-            {/* Step 1: Input */}
             {step === 'input' && (
               <motion.div
                 key="input"
@@ -280,15 +400,13 @@ const Flow = () => {
                   Describe tu necesidad o pega una URL para analizar.
                 </p>
 
-                {/* Input Module */}
                 <div className="bg-[#171717] border border-white/10 rounded-2xl p-6">
-                  {/* Tabs */}
                   <div className="flex gap-2 mb-4">
                     <button
                       onClick={() => setInputType('text')}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        inputType === 'text' 
-                          ? 'bg-[#0F5257] text-white' 
+                        inputType === 'text'
+                          ? 'bg-[#0F5257] text-white'
                           : 'bg-[#262626] text-[#A3A3A3] hover:text-white'
                       }`}
                       data-testid="tab-text"
@@ -299,8 +417,8 @@ const Flow = () => {
                     <button
                       onClick={() => setInputType('url')}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        inputType === 'url' 
-                          ? 'bg-[#0F5257] text-white' 
+                        inputType === 'url'
+                          ? 'bg-[#0F5257] text-white'
                           : 'bg-[#262626] text-[#A3A3A3] hover:text-white'
                       }`}
                       data-testid="tab-url"
@@ -310,26 +428,24 @@ const Flow = () => {
                     </button>
                   </div>
 
-                  {/* Input Field */}
                   {inputType === 'text' ? (
                     <div className="relative">
                       <textarea
                         value={inputContent}
                         onChange={(e) => setInputContent(e.target.value)}
-                        placeholder={voice.isListening ? "Escuchando..." : "Describe tu idea, necesidad o problema que quieres resolver..."}
+                        placeholder={voice.isListening ? 'Escuchando...' : 'Describe tu idea, necesidad o problema que quieres resolver...'}
                         className={`w-full h-40 bg-[#0A0A0A] border rounded-lg px-4 py-3 pr-14 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none ${
                           voice.isListening ? 'border-red-500/50 animate-pulse' : 'border-white/10'
                         }`}
                         data-testid="input-text"
                       />
-                      {/* Voice Button */}
                       {voice.isSupported && (
                         <div className="absolute right-3 top-3">
                           <button
                             onClick={voice.isListening ? voice.stopListening : voice.startListening}
                             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                              voice.isListening 
-                                ? 'bg-red-500 text-white animate-pulse' 
+                              voice.isListening
+                                ? 'bg-red-500 text-white animate-pulse'
                                 : 'bg-[#262626] text-[#A3A3A3] hover:bg-[#363636] hover:text-white'
                             }`}
                             title={voice.isListening ? 'Detener' : 'Hablar por voz'}
@@ -370,7 +486,6 @@ const Flow = () => {
               </motion.div>
             )}
 
-            {/* Step 2: Interpreting */}
             {step === 'interpreting' && (
               <motion.div
                 key="interpreting"
@@ -385,7 +500,6 @@ const Flow = () => {
               </motion.div>
             )}
 
-            {/* Step 3: Refine */}
             {step === 'refine' && project?.refine_questions && (
               <motion.div
                 key="refine"
@@ -396,7 +510,7 @@ const Flow = () => {
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#0F5257]/20 text-[#0F5257] rounded-full text-sm mb-4">
                     <Lightning weight="fill" />
-                    {ROUTE_NAMES[project.route]}
+                    {ROUTE_NAMES[project.route] || project.route || 'Ruta detectada'}
                   </div>
                   <h2 className="text-2xl font-light text-white mb-2" data-testid="refine-title">
                     Afinemos tu proyecto
@@ -414,10 +528,12 @@ const Flow = () => {
                       </label>
                       <textarea
                         value={refineAnswers[q.id] || ''}
-                        onChange={(e) => setRefineAnswers({
-                          ...refineAnswers,
-                          [q.id]: e.target.value
-                        })}
+                        onChange={(e) =>
+                          setRefineAnswers({
+                            ...refineAnswers,
+                            [q.id]: e.target.value
+                          })
+                        }
                         placeholder="Tu respuesta..."
                         className="w-full h-20 bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none"
                         data-testid={`refine-answer-${index}`}
@@ -453,7 +569,6 @@ const Flow = () => {
               </motion.div>
             )}
 
-            {/* Step 4: Result */}
             {step === 'result' && project && (
               <motion.div
                 key="result"
@@ -466,21 +581,21 @@ const Flow = () => {
                   <h2 className="text-2xl font-light text-white mb-2" data-testid="result-title">
                     Tu diagnóstico está listo
                   </h2>
-                  {/* Voice Control */}
+
                   {voice.isSupported && (
                     <div className="flex items-center justify-center gap-2 mt-3">
                       <button
                         onClick={() => {
                           if (voice.isSpeaking) {
                             voice.stopSpeaking();
-                          } else if (project.diagnosis) {
-                            const textToSpeak = `${project.diagnosis.understanding}. Hallazgo principal: ${project.diagnosis.main_finding}. ${project.next_step || ''}`;
+                          } else if (normalizedDiagnosis) {
+                            const textToSpeak = `${normalizedDiagnosis.understanding}. Hallazgo principal: ${normalizedDiagnosis.mainFinding}. Oportunidad: ${normalizedDiagnosis.opportunity}.`;
                             voice.speak(textToSpeak);
                           }
                         }}
                         className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all ${
-                          voice.isSpeaking 
-                            ? 'bg-[#0F5257] text-white' 
+                          voice.isSpeaking
+                            ? 'bg-[#0F5257] text-white'
                             : 'bg-[#262626] text-[#A3A3A3] hover:text-white'
                         }`}
                         data-testid="play-voice-btn"
@@ -500,8 +615,8 @@ const Flow = () => {
                       <button
                         onClick={voice.toggleVoice}
                         className={`p-2 rounded-lg transition-all ${
-                          voice.voiceEnabled 
-                            ? 'bg-[#262626] text-[#0F5257]' 
+                          voice.voiceEnabled
+                            ? 'bg-[#262626] text-[#0F5257]'
                             : 'bg-[#262626] text-[#A3A3A3]'
                         }`}
                         title={voice.voiceEnabled ? 'Voz automática activada' : 'Voz automática desactivada'}
@@ -512,7 +627,6 @@ const Flow = () => {
                   )}
                 </div>
 
-                {/* Route Badge */}
                 <div className="bg-[#171717] border border-[#0F5257]/30 rounded-2xl p-6 mb-6">
                   <div className="flex items-start gap-4">
                     <div className="p-3 bg-[#0F5257]/20 rounded-lg">
@@ -520,39 +634,102 @@ const Flow = () => {
                     </div>
                     <div>
                       <p className="text-sm text-[#A3A3A3] mb-1">Ruta recomendada</p>
-                      <h3 className="text-xl text-white font-medium">{ROUTE_NAMES[project.route]}</h3>
-                      <p className="text-[#A3A3A3] text-sm mt-1">{ROUTE_DESCRIPTIONS[project.route]}</p>
+                      <h3 className="text-xl text-white font-medium">
+                        {ROUTE_NAMES[project.route] || project.route || 'Ruta detectada'}
+                      </h3>
+                      <p className="text-[#A3A3A3] text-sm mt-1">
+                        {ROUTE_DESCRIPTIONS[project.route] || 'Ruta generada según el análisis actual del proyecto.'}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Diagnosis */}
-                {project.diagnosis && (
+                {normalizedDiagnosis && (
                   <div className="bg-[#171717] border border-white/10 rounded-2xl p-6 mb-6 space-y-4">
                     <div>
                       <p className="text-sm text-[#A3A3A3] mb-1">Comprensión</p>
-                      <p className="text-white">{project.diagnosis.understanding}</p>
+                      <p className="text-white">{normalizedDiagnosis.understanding}</p>
                     </div>
                     <div>
                       <p className="text-sm text-[#A3A3A3] mb-1">Hallazgo principal</p>
-                      <p className="text-white font-medium text-lg">"{project.diagnosis.main_finding}"</p>
+                      <p className="text-white font-medium text-lg">{normalizedDiagnosis.mainFinding}</p>
                     </div>
                     <div>
                       <p className="text-sm text-[#A3A3A3] mb-1">Oportunidad</p>
-                      <p className="text-white">{project.diagnosis.opportunity}</p>
+                      <p className="text-white">{normalizedDiagnosis.opportunity}</p>
                     </div>
                   </div>
                 )}
 
-                {/* Next Step */}
-                {project.next_step && (
-                  <div className="bg-[#0F5257]/10 border border-[#0F5257]/30 rounded-2xl p-6 mb-6">
-                    <p className="text-sm text-[#0F5257] mb-1">Siguiente paso recomendado</p>
-                    <p className="text-white">{project.next_step}</p>
+                {normalizedPlanRecommendation && (
+                  <div className={`border rounded-2xl p-6 mb-6 ${normalizedPlanRecommendation.borderClass} ${normalizedPlanRecommendation.boxClass}`}>
+                    <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
+                      <div>
+                        <p className="text-sm text-[#A3A3A3] mb-1">Nivel recomendado</p>
+                        <h3 className="text-xl text-white font-medium">
+                          Plan {normalizedPlanRecommendation.planLabel} · {normalizedPlanRecommendation.planName}
+                        </h3>
+                      </div>
+                      <div className={`px-4 py-2 rounded-full text-sm font-medium ${normalizedPlanRecommendation.badgeClass}`}>
+                        {normalizedPlanRecommendation.scoreTotal}/20
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-[#A3A3A3] mb-1">Motivo</p>
+                        <p className="text-white">{normalizedPlanRecommendation.reason}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#A3A3A3] mb-1">Por qué no basta el nivel inferior</p>
+                        <p className="text-white">{normalizedPlanRecommendation.whyNotLower}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#A3A3A3] mb-1">Qué desbloquea</p>
+                        <p className="text-white">{normalizedPlanRecommendation.unlocks}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-5 mb-5">
+                      <div className="bg-[#0A0A0A] rounded-lg p-3">
+                        <p className="text-xs text-[#A3A3A3] mb-1">Complejidad</p>
+                        <p className="text-white font-medium">{normalizedPlanRecommendation.scores.complexity ?? 0}/4</p>
+                      </div>
+                      <div className="bg-[#0A0A0A] rounded-lg p-3">
+                        <p className="text-xs text-[#A3A3A3] mb-1">Impacto</p>
+                        <p className="text-white font-medium">{normalizedPlanRecommendation.scores.economic_impact ?? 0}/4</p>
+                      </div>
+                      <div className="bg-[#0A0A0A] rounded-lg p-3">
+                        <p className="text-xs text-[#A3A3A3] mb-1">Urgencia</p>
+                        <p className="text-white font-medium">{normalizedPlanRecommendation.scores.urgency ?? 0}/4</p>
+                      </div>
+                      <div className="bg-[#0A0A0A] rounded-lg p-3">
+                        <p className="text-xs text-[#A3A3A3] mb-1">Estructura</p>
+                        <p className="text-white font-medium">{normalizedPlanRecommendation.scores.structure_need ?? 0}/4</p>
+                      </div>
+                      <div className="bg-[#0A0A0A] rounded-lg p-3">
+                        <p className="text-xs text-[#A3A3A3] mb-1">Continuidad</p>
+                        <p className="text-white font-medium">{normalizedPlanRecommendation.scores.continuity_need ?? 0}/4</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        navigate('/dashboard/billing', {
+                          state: {
+                            suggestedPlan: normalizedPlanRecommendation.planId,
+                            fromProjectId: project.project_id
+                          }
+                        })
+                      }
+                      className="w-full btn-primary flex items-center justify-center gap-2"
+                    >
+                      {normalizedPlanRecommendation.ctaLabel}
+                      <ArrowRight weight="bold" />
+                    </button>
                   </div>
                 )}
 
-                {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={goToProject}
@@ -563,12 +740,19 @@ const Flow = () => {
                   </button>
                   {user?.plan === 'free' ? (
                     <button
-                      onClick={() => navigate('/dashboard/billing')}
+                      onClick={() =>
+                        navigate('/dashboard/billing', {
+                          state: {
+                            suggestedPlan: normalizedPlanRecommendation?.planId || 'blueprint',
+                            fromProjectId: project.project_id
+                          }
+                        })
+                      }
                       className="btn-primary flex-1 flex items-center justify-center gap-2"
                       data-testid="unlock-blueprint-btn"
                     >
                       <Lock size={16} />
-                      Desbloquear Blueprint
+                      {normalizedPlanRecommendation?.ctaLabel || 'Desbloquear Blueprint'}
                     </button>
                   ) : (
                     <button
@@ -591,7 +775,6 @@ const Flow = () => {
               </motion.div>
             )}
 
-            {/* Step 5: Blueprint */}
             {step === 'blueprint' && project?.blueprint && (
               <motion.div
                 key="blueprint"
