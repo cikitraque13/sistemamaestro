@@ -13,7 +13,6 @@ export const useAuth = () => {
   return context;
 };
 
-// Helper to format API error details
 const ERROR_TRANSLATIONS = {
   'Invalid credentials': 'Credenciales incorrectas',
   'Email already registered': 'Este email ya está registrado',
@@ -66,7 +65,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // Si vuelve desde callback OAuth, no ejecutar /me todavía
     if (window.location.hash?.includes('session_id=')) {
       setLoading(false);
       return;
@@ -110,9 +108,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = () => {
-    // Pendiente de saneo completo del flujo Google
-    console.warn('Google login aún depende del flujo legado y requiere revisión adicional.');
+  const loginWithGoogle = ({ redirectPath = '/dashboard', redirectState = null } = {}) => {
+    const callbackUrl = `${window.location.origin}${window.location.pathname}`;
+
+    sessionStorage.setItem(
+      'google_auth_redirect',
+      JSON.stringify({
+        redirectPath,
+        redirectState
+      })
+    );
+
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(callbackUrl)}`;
   };
 
   const handleGoogleCallback = async (sessionId) => {
