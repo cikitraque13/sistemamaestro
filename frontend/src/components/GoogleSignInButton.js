@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -36,6 +36,9 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   const navigate = useNavigate();
   const { loginWithGoogleCredential } = useAuth();
 
+  const [status, setStatus] = useState('loading'); // loading | ready | missing_client | error
+  const [errorMessage, setErrorMessage] = useState('');
+
   useEffect(() => {
     let active = true;
 
@@ -44,6 +47,10 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 
       if (!clientId) {
         console.error('Falta REACT_APP_GOOGLE_CLIENT_ID');
+        if (active) {
+          setStatus('missing_client');
+          setErrorMessage('Falta configurar Google Sign-In en producción.');
+        }
         return;
       }
 
@@ -82,8 +89,16 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           logo_alignment: 'left',
           width: 360
         });
+
+        if (active) {
+          setStatus('ready');
+        }
       } catch (error) {
-        console.error(error);
+        console.error('Google Sign-In init error:', error);
+        if (active) {
+          setStatus('error');
+          setErrorMessage('No se pudo inicializar Google Sign-In.');
+        }
       }
     };
 
@@ -94,7 +109,25 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
     };
   }, [loginWithGoogleCredential, navigate, redirectPath, redirectState]);
 
-  return <div className="w-full flex justify-center mb-6" ref={buttonRef} data-testid="google-auth-button" />;
+  if (status === 'missing_client' || status === 'error') {
+    return (
+      <div className="w-full mb-6">
+        <div className="w-full rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 text-center">
+          {errorMessage}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full mb-6 flex justify-center">
+      <div className="min-h-[44px] flex items-center justify-center" ref={buttonRef}>
+        {status === 'loading' && (
+          <div className="text-sm text-[#A3A3A3]">Cargando acceso con Google...</div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default GoogleSignInButton;
