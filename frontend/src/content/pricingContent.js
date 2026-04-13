@@ -23,13 +23,14 @@ const pricingContent = {
   entryOffer: {
     id: 'single_report',
     type: 'one_time_offer',
+    backendId: 'single_report',
     visible: true,
     name: 'Informe puntual',
     shortName: '6,99',
     badge: 'Primer paso real',
     price: 6.99,
     priceLabel: '6,99 €',
-    periodLabel: 'pago único',
+    periodLabel: 'PAGO ÚNICO',
     headline: 'Valida una oportunidad antes de escalar.',
     description:
       'Una microoferta transaccional para convertir una idea, una URL o una oportunidad real en una lectura más útil, más concreta y más accionable.',
@@ -64,12 +65,22 @@ const pricingContent = {
     },
     cta: {
       label: 'Comprar informe',
-      variant: 'bridge'
+      variant: 'bridge',
+      target: 'billing',
+      itemType: 'one_time_offer',
+      itemId: 'single_report'
     },
     conceptualGraphic: {
       type: 'progress_steps',
       steps: ['Explorar', 'Validar', 'Construir', 'Optimizar', 'Dirigir'],
       activeStep: 'Validar',
+      stepDetails: {
+        Explorar: 'Gratis',
+        Validar: '6,99 € ahora',
+        Construir: '29 € Pro',
+        Optimizar: '79 € Growth',
+        Dirigir: '199 € AI Master'
+      },
       note:
         'La gráfica debe ser conceptual, no estadística. No inventar métricas.'
     }
@@ -181,24 +192,25 @@ const pricingContent = {
       price: 79,
       priceLabel: '79 €',
       periodLabel: '/ mes',
-      headline: 'Optimiza rendimiento, crecimiento y secuencia de trabajo.',
+      headline: 'Optimiza rendimiento, conversión y secuencia de trabajo.',
       description:
         'Capa intermedia de optimización para proyectos que ya no están probando, pero todavía no necesitan intervención maestra completa.',
       bestFor:
-        'Usuario con proyecto en marcha que necesita más criterio de growth, CRO, priorización y sistema.',
+        'Usuario con proyecto en marcha que necesita más criterio de growth, CRO, priorización, mejora de oferta y estructura de sistema.',
       valuePromise:
-        'No es un Pro más caro. Es una capa de optimización real entre construcción continua y dirección estratégica.',
+        'No es un Pro más caro. Es una capa de optimización real para mejorar crecimiento, conversión, foco de ejecución y rendimiento del proyecto.',
       features: [
         'Todo lo del Pro',
+        'CRO y mejora de conversión',
+        'Growth y priorización táctica',
         'Continuidad más profunda',
-        'Lectura de growth y conversión',
-        'Mayor criterio de priorización',
-        'Prompts de optimización y sistema'
+        'Optimización de propuesta y sistema',
+        'Prompts de optimización'
       ],
       promptLayer: {
         label: 'Prompts de optimización',
         description:
-          'Secuencias y prompts para growth, CRO, mejora del proyecto, estructura y priorización.'
+          'Secuencias y prompts para CRO, growth, mejora del proyecto, estructura y priorización.'
       },
       prompts: [
         'Prompt de optimización de conversión',
@@ -207,7 +219,7 @@ const pricingContent = {
         'Prompt de priorización táctica'
       ],
       perceptionGoal:
-        'Hacer sentir al usuario que ha entrado en una capa más seria de mejora del rendimiento.',
+        'Hacer sentir al usuario que ha entrado en una capa más seria de mejora del rendimiento, no solo de continuidad.',
       cta: {
         label: 'Entrar en Growth',
         variant: 'accent'
@@ -232,19 +244,20 @@ const pricingContent = {
       periodLabel: '/ mes',
       headline: 'Dirección, auditoría y arquitectura senior del sistema.',
       description:
-        'Categoría superior para proyectos, negocios u oportunidades con suficiente peso comercial como para necesitar criterio fuerte y estructura de alto nivel.',
+        'Categoría superior para proyectos, negocios u oportunidades con suficiente peso comercial como para necesitar criterio fuerte, mejora de conversión y estructura de alto nivel.',
       bestFor:
-        'Usuario que necesita intervención senior en monetización, growth, CRO, prompts maestros, arquitectura de trabajo y decisiones críticas.',
+        'Usuario que necesita intervención senior en monetización, growth, CRO, auditoría, prompts maestros, arquitectura de trabajo y decisiones críticas.',
       valuePromise:
-        'No vende lujo. Vende criterio, protección del sistema, diseño de mejores decisiones y capacidad real de elevar proyectos.',
+        'No vende lujo. Vende criterio, protección del sistema, diseño de mejores decisiones y capacidad real de elevar proyectos, propuestas y operaciones.',
       features: [
         'Todo lo de Growth',
-        'Lógica CRO y growth senior',
+        'CRO estratégico',
+        'Growth y monetización senior',
         'Auditoría maestra del sistema',
         'AI Product Manager',
         'AI Assurance Leader',
         'AI Solutions Architect / Strategist',
-        'Prompts maestros y sistemas de trabajo'
+        'Prompt 99 y prompts maestros por rol'
       ],
       promptLayer: {
         label: 'Prompt 99 y capa maestra',
@@ -300,8 +313,7 @@ const pricingContent = {
         completedProjectsRequired: 1,
         oneTimeTrigger: true
       },
-      technicalStatus:
-        'frontend_narrative_only_for_now',
+      technicalStatus: 'frontend_narrative_only_for_now',
       note:
         'La narrativa queda preparada en frontend aunque backend todavía no tenga el milestone implementado.'
     }
@@ -401,7 +413,7 @@ const pricingContent = {
         single_report: 'Puntual',
         free: 'Inicial',
         blueprint: 'Estructural',
-        sistema: 'Growth / mejora',
+        sistema: 'Growth / CRO',
         premium: 'Estratégica senior'
       }
     }
