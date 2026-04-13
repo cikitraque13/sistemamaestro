@@ -13,6 +13,12 @@ import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
+import {
+  entryOffer,
+  pricingPlans,
+  pricingPlansMap,
+  pricingTrustSignals
+} from '../content/pricingContent';
 
 const API_BASE = '/api';
 
@@ -24,105 +30,119 @@ const FEATURE_LABELS = {
   continuity: 'Continuidad guiada',
   deployment: 'Activación y despliegue',
   support: 'Soporte prioritario',
-  opportunities: 'Oportunidades'
+  opportunities: 'Oportunidades',
+  premium_report_preview: 'Informe puntual mejorado'
 };
 
-const PLAN_CONTENT = [
-  {
-    id: 'free',
-    name: 'Gratis',
-    price: 0,
-    period: '',
-    headline: 'Entrada al sistema',
-    description:
-      'Pensado para detectar señales iniciales, validar el foco y entender si merece profundizar.',
-    bestFor:
-      'Útil cuando todavía estás explorando el problema y no necesitas una capa estructural.',
-    features: [
-      'Diagnóstico inicial',
-      'Ruta recomendada',
-      'Resultado resumido',
-      '2 oportunidades'
+const PLAN_VISUAL_META = {
+  free: {
+    borderClass: 'border-white/5',
+    badgeClass: 'bg-[#202020] text-[#D4D4D4]',
+    chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
+    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
+    compactLine: 'Entrada limpia para detectar si merece avanzar.',
+    capabilityTitle: 'Señales clave',
+    capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
+    featurePreview: ['Diagnóstico inicial', 'Ruta recomendada', 'Resultado resumido']
+  },
+  blueprint: {
+    borderClass: 'border-[#0F5257]',
+    badgeClass: 'bg-[#0F5257] text-white',
+    chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
+    ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
+    compactLine: 'La base correcta para empezar a construir de verdad.',
+    capabilityTitle: 'Base estructural',
+    capabilityItems: ['Blueprint', 'Prioridades', 'Monetización', 'Prompts'],
+    featurePreview: [
+      'Blueprint estructural',
+      'Prioridades claras',
+      'Base de monetización',
+      'Prompts estructurales'
     ]
   },
-  {
-    id: 'blueprint',
-    name: 'Blueprint',
-    price: 29,
-    period: '/mes',
-    headline: 'Claridad y foco inicial',
-    description:
-      'Convierte un diagnóstico inicial en una dirección más precisa, con prioridades y estructura básica.',
-    bestFor:
-      'Encaja cuando el cuello de botella es entender mejor qué está frenando el proyecto.',
-    features: [
-      'Todo de Gratis',
-      'Estructura completa',
-      'Prioridades',
-      'Arquitectura recomendada',
-      '4 oportunidades'
+  sistema: {
+    borderClass: 'border-[#2F455A]',
+    badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
+    chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
+    ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
+    compactLine: 'Optimiza conversión, growth y foco de ejecución.',
+    capabilityTitle: 'Growth + CRO',
+    capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Sistema'],
+    featurePreview: [
+      'CRO y mejora de conversión',
+      'Growth y priorización',
+      'Optimización de propuesta',
+      'Prompts de optimización'
     ]
   },
-  {
-    id: 'sistema',
-    name: 'Sistema',
-    price: 79,
-    period: '/mes',
-    headline: 'Plan accionable y continuidad',
-    description:
-      'Ordena prioridades, arquitectura y ejecución para proyectos que ya necesitan una capa seria de sistema.',
-    bestFor:
-      'Es el nivel central cuando detectar el problema ya no basta y hace falta ordenar qué tocar primero.',
-    features: [
-      'Todo de Blueprint',
-      'Continuidad guiada',
-      'Mayor profundidad',
-      'Activación y despliegue',
-      'Guardado y progreso'
-    ]
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    price: 199,
-    period: '/mes',
-    headline: 'Intervención estratégica completa',
-    description:
-      'Reservado para casos con complejidad alta, varios cuellos de botella y suficiente impacto económico en juego.',
-    bestFor:
-      'Encaja cuando ya no basta un blueprint simple y hace falta profundidad estratégica para decidir bien.',
-    features: [
-      'Todo de Sistema',
-      'Soporte prioritario',
-      'Personalización',
-      'Experiencia completa',
-      'Oportunidades ilimitadas'
+  premium: {
+    borderClass: 'border-[#4A3B61]',
+    badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
+    chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
+    ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
+    compactLine: 'La capa senior para criterio, marketing y dirección estratégica.',
+    capabilityTitle: 'Capa estratégica',
+    capabilityItems: [
+      'CRO',
+      'Growth',
+      'Auditoría',
+      'AI Product',
+      'Assurance',
+      'Arquitectura',
+      'Dirección de arte',
+      'Marketing visual'
+    ],
+    featurePreview: [
+      'CRO estratégico',
+      'Growth y monetización senior',
+      'Auditoría maestra',
+      'Prompt 99 y prompts maestros'
     ]
   }
-];
+};
 
 const PLAN_RECOMMENDATION_COPY = {
   blueprint: {
-    title: 'Plan sugerido para este caso: Blueprint',
+    title: 'Plan sugerido para este caso: Pro',
     summary:
-      'El siguiente cuello de botella no es todavía la complejidad del sistema, sino afinar mejor el diagnóstico y ordenar el foco.',
+      'Aquí ya no basta una lectura inicial. Lo correcto es entrar en una capa estructural para ordenar prioridades, monetización y base de trabajo.',
     unlocks:
-      'Desbloquea más precisión, prioridad inicial y una dirección accionable sin saltar aún a una capa estructural superior.'
+      'Desbloquea estructura, prompts base, prioridades y una forma más seria de avanzar.'
   },
   sistema: {
-    title: 'Plan sugerido para este caso: Sistema',
+    title: 'Plan sugerido para este caso: Growth',
     summary:
-      'Aquí el problema ya supera una mejora puntual. Lo importante ya no es solo detectar fallos, sino priorizar y estructurar.',
+      'El siguiente cuello de botella ya no es entender mejor el caso, sino optimizar rendimiento, growth, conversión y secuencia de trabajo.',
     unlocks:
-      'Desbloquea continuidad guiada, mayor profundidad y una secuencia clara para ejecutar con criterio.'
+      'Desbloquea continuidad más profunda, lectura de growth, mejora de oferta y optimización del proyecto.'
   },
   premium: {
-    title: 'Plan sugerido para este caso: Premium',
+    title: 'Plan sugerido para este caso: AI Master 199',
     summary:
-      'Este nivel solo tiene sentido cuando el caso presenta complejidad real, varios frentes conectados y suficiente impacto comercial.',
+      'Este nivel solo tiene sentido cuando el caso presenta suficiente peso comercial o necesita criterio senior en estrategia, marketing, conversión y dirección de proyecto.',
     unlocks:
-      'Desbloquea una intervención estratégica más completa para tomar mejores decisiones en monetización, crecimiento, conversión y sistema.'
+      'Desbloquea una capa superior de CRO, growth, auditoría, prompts maestros, arquitectura de trabajo y dirección de imagen o marketing cuando procede.'
   }
+};
+
+const getFeatureChipClass = (feature) => {
+  if (['diagnosis', 'route'].includes(feature)) {
+    return 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25';
+  }
+
+  if (['blueprint', 'priorities'].includes(feature)) {
+    return 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35';
+  }
+
+  if (['continuity', 'deployment'].includes(feature)) {
+    return 'bg-[#132015] text-[#D8F3DF] border border-[#2E5A39]/35';
+  }
+
+  if (['support', 'opportunities', 'premium_report_preview'].includes(feature)) {
+    return 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35';
+  }
+
+  return 'bg-[#262626] text-[#D4D4D4] border border-white/5';
 };
 
 const Billing = () => {
@@ -137,10 +157,16 @@ const Billing = () => {
 
   const suggestedPlanId = location.state?.suggestedPlan || null;
   const fromProjectId = location.state?.fromProjectId || null;
+  const entryOfferIntent = location.state?.entryOfferId || null;
 
   const suggestedPlan = useMemo(
-    () => PLAN_CONTENT.find((plan) => plan.id === suggestedPlanId) || null,
+    () => pricingPlans.find((plan) => plan.id === suggestedPlanId) || null,
     [suggestedPlanId]
+  );
+
+  const currentPlanContent = useMemo(
+    () => pricingPlansMap[user?.plan] || pricingPlansMap.free || null,
+    [user?.plan]
   );
 
   useEffect(() => {
@@ -225,6 +251,10 @@ const Billing = () => {
     }
   };
 
+  const handleEntryOfferClick = () => {
+    toast.info('El informe puntual quedará conectado a Stripe en el siguiente ajuste de backend.');
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       day: 'numeric',
@@ -233,7 +263,10 @@ const Billing = () => {
     });
   };
 
-  const currentPlanName = billingData?.current_plan?.name || 'Gratis';
+  const currentPlanName =
+    currentPlanContent?.visibleName ||
+    billingData?.current_plan?.name ||
+    'Gratis';
 
   if (loading) {
     return (
@@ -247,7 +280,7 @@ const Billing = () => {
 
   return (
     <DashboardLayout title="Facturación">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {checkingPayment && (
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
             <div className="bg-[#171717] border border-[#262626] rounded-2xl p-8 text-center">
@@ -272,17 +305,20 @@ const Billing = () => {
                 </div>
 
                 <h3 className="text-xl text-white font-medium mb-2">
-                  {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.title || `Plan sugerido: ${suggestedPlan.name}`}
+                  {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.title ||
+                    `Plan sugerido: ${suggestedPlan.visibleName}`}
                 </h3>
 
                 <p className="text-[#D4D4D4] mb-4">
-                  {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.summary}
+                  {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.summary ||
+                    suggestedPlan.description}
                 </p>
 
                 <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
                   <p className="text-sm text-[#A3A3A3] mb-1">Qué desbloquea</p>
                   <p className="text-white">
-                    {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.unlocks}
+                    {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.unlocks ||
+                      suggestedPlan.valuePromise}
                   </p>
                 </div>
 
@@ -298,16 +334,18 @@ const Billing = () => {
                 )}
               </div>
 
-              <div className="lg:w-[280px] bg-[#0A0A0A] border border-[#262626] rounded-xl p-5">
+              <div className="lg:w-[300px] bg-[#0A0A0A] border border-[#262626] rounded-xl p-5">
                 <p className="text-sm text-[#A3A3A3] mb-1">Nivel sugerido</p>
                 <h4 className="text-2xl text-white font-medium mb-1">
-                  {suggestedPlan.name}
+                  {suggestedPlan.visibleName}
                 </h4>
                 <p className="text-[#A3A3A3] mb-4">{suggestedPlan.headline}</p>
 
                 <div className="flex items-baseline gap-1 mb-5">
-                  <span className="text-4xl font-light text-white">€{suggestedPlan.price}</span>
-                  <span className="text-[#A3A3A3]">{suggestedPlan.period}</span>
+                  <span className="text-4xl font-light text-white">
+                    {suggestedPlan.priceLabel}
+                  </span>
+                  <span className="text-[#A3A3A3]">{suggestedPlan.periodLabel}</span>
                 </div>
 
                 {user?.plan !== suggestedPlan.id ? (
@@ -320,7 +358,7 @@ const Billing = () => {
                       <div className="spinner w-4 h-4"></div>
                     ) : (
                       <>
-                        Activar {suggestedPlan.name}
+                        Activar {suggestedPlan.visibleName}
                         <ArrowRight size={16} />
                       </>
                     )}
@@ -347,7 +385,7 @@ const Billing = () => {
             </div>
             <div>
               <p className="text-sm text-[#A3A3A3]">Plan actual</p>
-              <h3 className="text-xl text-white font-medium capitalize">{currentPlanName}</h3>
+              <h3 className="text-xl text-white font-medium">{currentPlanName}</h3>
             </div>
           </div>
 
@@ -356,7 +394,7 @@ const Billing = () => {
               {billingData.current_plan.features.map((feature) => (
                 <span
                   key={feature}
-                  className="px-3 py-1 bg-[#262626] text-[#A3A3A3] rounded-full text-sm"
+                  className={`px-3 py-1 rounded-full text-sm ${getFeatureChipClass(feature)}`}
                 >
                   {FEATURE_LABELS[feature] || feature}
                 </span>
@@ -368,79 +406,166 @@ const Billing = () => {
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03 }}
+          className="mb-8"
+          data-testid="billing-entry-offer"
+        >
+          <div className="bg-[#121212] border border-[#0F5257]/25 rounded-2xl p-6">
+            <div className="grid lg:grid-cols-[1.3fr_0.85fr] gap-6">
+              <div>
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257] text-white text-xs font-medium">
+                    {entryOffer.badge}
+                  </span>
+                  <span className="text-xs uppercase tracking-wider text-[#A3A3A3]">
+                    {entryOffer.priceLabel} · {entryOffer.periodLabel}
+                  </span>
+                </div>
+
+                <h3 className="text-2xl text-white font-medium mb-2">{entryOffer.name}</h3>
+                <p className="text-[#D4D4D4] mb-3">{entryOffer.description}</p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {entryOffer.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className="px-3 py-1 rounded-full text-xs bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="text-sm text-[#A3A3A3]">
+                  {entryOffer.promptLayer.description}
+                </div>
+              </div>
+
+              <div
+                className={`bg-[#0A0A0A] border rounded-xl p-5 flex flex-col justify-between ${
+                  entryOfferIntent ? 'border-[#0F5257]/35' : 'border-[#262626]'
+                }`}
+              >
+                <div>
+                  <p className="text-sm text-[#A3A3A3] mb-2">Mejor encaje</p>
+                  <p className="text-white text-sm mb-5">{entryOffer.bestFor}</p>
+
+                  <p className="text-xs text-[#737373] leading-relaxed">
+                    El bloque ya está integrado en el sistema. La conexión real con Stripe va en el siguiente ajuste de backend.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleEntryOfferClick}
+                  className="w-full mt-6 py-3 rounded-lg font-medium bg-[#0F5257] text-white hover:bg-[#136970] transition-all"
+                  data-testid="entry-offer-billing-cta"
+                >
+                  {entryOffer.cta.label}
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="mb-8"
         >
           <h3 className="text-lg font-medium text-white mb-4">Planes disponibles</h3>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PLAN_CONTENT.map((plan) => {
+            {pricingPlans.map((plan, index) => {
+              const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
               const isCurrentPlan = user?.plan === plan.id;
               const isSuggestedPlan = suggestedPlanId
                 ? suggestedPlanId === plan.id
-                : plan.id === 'sistema';
+                : plan.isPrimaryPlan;
 
               return (
-                <div
+                <motion.div
                   key={plan.id}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[560px] ${
-                    isSuggestedPlan
-                      ? 'border-[#0F5257]'
-                      : isCurrentPlan
-                        ? 'border-white/15'
-                        : 'border-white/5'
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[610px] ${
+                    isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
                 >
-                  <div className="flex items-start justify-between gap-3 min-h-[52px] mb-5">
+                  <div className="min-h-[36px] mb-4 flex items-start justify-between gap-3">
                     <div className="flex flex-wrap gap-2">
-                      {isSuggestedPlan && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257] text-white text-xs font-medium whitespace-nowrap">
-                          Recomendado
-                        </span>
-                      )}
-
-                      {isCurrentPlan && (
+                      {isCurrentPlan ? (
                         <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium whitespace-nowrap">
                           Actual
+                        </span>
+                      ) : (
+                        plan.badge && (
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}
+                          >
+                            {plan.badge}
+                          </span>
+                        )
+                      )}
+
+                      {isSuggestedPlan && !isCurrentPlan && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#0F5257] text-xs font-medium whitespace-nowrap">
+                          Recomendado
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="mb-5">
-                    <h4 className="text-2xl font-medium text-white mb-2">{plan.name}</h4>
-                    <p className="text-sm text-[#D4D4D4] mb-2">{plan.headline}</p>
-                    <p className="text-sm text-[#A3A3A3]">{plan.description}</p>
+                  <div className="min-h-[126px] mb-5">
+                    <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
+                    <p className="text-[#F0F0F0] text-base leading-snug mb-2">{plan.headline}</p>
+                    <p className="text-sm text-[#A3A3A3] leading-relaxed">{visual.compactLine}</p>
                   </div>
 
-                  <div className="flex items-baseline gap-1 mb-5">
-                    <span className="text-4xl font-light text-white">€{plan.price}</span>
-                    <span className="text-[#A3A3A3]">{plan.period}</span>
+                  <div className="min-h-[72px] flex items-end gap-2 mb-5">
+                    <span className="text-4xl lg:text-5xl font-light text-white">
+                      {plan.priceLabel}
+                    </span>
+                    <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[120px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                       Mejor encaje
                     </p>
-                    <p className="text-sm text-white">{plan.bestFor}</p>
+                    <p className="text-white text-sm leading-relaxed">{plan.bestFor}</p>
                   </div>
 
-                  <ul className="space-y-3 mb-6 flex-1">
-                    {plan.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2 text-sm text-[#D4D4D4]"
-                      >
-                        <CheckCircle
-                          size={16}
-                          weight="fill"
-                          className="text-[#0F5257] mt-0.5 flex-shrink-0"
-                        />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[142px]">
+                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
+                      {visual.capabilityTitle}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {visual.capabilityItems.map((item) => (
+                        <span
+                          key={item}
+                          className={`px-2.5 py-1 rounded-full text-xs ${visual.chipClass}`}
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      {visual.featurePreview.map((feature) => (
+                        <div key={feature} className="flex items-start gap-2 text-sm text-[#D4D4D4]">
+                          <CheckCircle
+                            size={14}
+                            weight="fill"
+                            className="text-[#0F5257] mt-0.5 flex-shrink-0"
+                          />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
                   <button
                     onClick={() => handleUpgrade(plan.id)}
@@ -454,9 +579,7 @@ const Billing = () => {
                         ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
                         : plan.id === 'free'
                           ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
-                          : isSuggestedPlan
-                            ? 'bg-[#0F5257] text-white hover:bg-[#136970]'
-                            : 'bg-[#262626] text-white hover:bg-[#363636]'
+                          : visual.ctaClass
                     } disabled:opacity-50`}
                     data-testid={`upgrade-btn-${plan.id}`}
                   >
@@ -468,14 +591,33 @@ const Billing = () => {
                       'Plan base'
                     ) : (
                       <>
-                        Activar {plan.name}
+                        {plan.cta.label}
                         <ArrowRight size={16} />
                       </>
                     )}
                   </button>
-                </div>
+                </motion.div>
               );
             })}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className="mb-8"
+        >
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {pricingTrustSignals.map((signal, index) => (
+              <div
+                key={signal}
+                className="bg-[#121212] border border-white/5 rounded-lg px-4 py-3 text-sm text-[#D4D4D4]"
+                data-testid={`billing-signal-${index}`}
+              >
+                {signal}
+              </div>
+            ))}
           </div>
         </motion.div>
 
@@ -492,49 +634,64 @@ const Billing = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#262626]">
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Fecha</th>
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Plan</th>
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Monto</th>
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Estado</th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
+                        Fecha
+                      </th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
+                        Concepto
+                      </th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
+                        Monto
+                      </th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
+                        Estado
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {billingData.transactions.map((tx) => (
-                      <tr
-                        key={tx.transaction_id}
-                        className="border-b border-[#262626] last:border-0"
-                      >
-                        <td className="px-6 py-4">
-                          <span className="text-white flex items-center gap-2">
-                            <Clock size={16} className="text-[#A3A3A3]" />
-                            {formatDate(tx.created_at)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-white capitalize">{tx.plan_id}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-white">€{tx.amount}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs ${
-                              tx.payment_status === 'paid'
-                                ? 'bg-green-500/20 text-green-400'
+                    {billingData.transactions.map((tx) => {
+                      const txId = tx.item_id || tx.plan_id;
+                      const txLabel =
+                        pricingPlansMap[txId]?.visibleName ||
+                        (txId === 'single_report' ? 'Informe puntual' : txId || 'Pago');
+
+                      return (
+                        <tr
+                          key={tx.transaction_id}
+                          className="border-b border-[#262626] last:border-0"
+                        >
+                          <td className="px-6 py-4">
+                            <span className="text-white flex items-center gap-2">
+                              <Clock size={16} className="text-[#A3A3A3]" />
+                              {formatDate(tx.created_at)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-white">{txLabel}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-white">€{tx.amount}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs ${
+                                tx.payment_status === 'paid'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : tx.payment_status === 'pending' || tx.payment_status === 'initiated'
+                                    ? 'bg-yellow-500/20 text-yellow-400'
+                                    : 'bg-red-500/20 text-red-400'
+                              }`}
+                            >
+                              {tx.payment_status === 'paid'
+                                ? 'Completado'
                                 : tx.payment_status === 'pending' || tx.payment_status === 'initiated'
-                                  ? 'bg-yellow-500/20 text-yellow-400'
-                                  : 'bg-red-500/20 text-red-400'
-                            }`}
-                          >
-                            {tx.payment_status === 'paid'
-                              ? 'Completado'
-                              : tx.payment_status === 'pending' || tx.payment_status === 'initiated'
-                                ? 'Pendiente'
-                                : 'Fallido'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                                  ? 'Pendiente'
+                                  : 'Fallido'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
