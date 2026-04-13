@@ -1107,19 +1107,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve React frontend static files
-STATIC_DIR = ROOT_DIR / "static"
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR / "static")), name="static")
-    
-    @app.get("/{full_path:path}")
-    async def serve_react(full_path: str):
-        """Serve React app for all non-API routes"""
-        file_path = STATIC_DIR / full_path
-        if file_path.exists() and file_path.is_file():
-            return FileResponse(str(file_path))
-        return FileResponse(str(STATIC_DIR / "index.html"))
+# Serve React frontend static files from Railway build output
+FRONTEND_BUILD_DIR = ROOT_DIR / "frontend" / "build"
+FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+if FRONTEND_STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_STATIC_DIR)), name="static")
+
+@app.get("/", include_in_schema=False)
+async def serve_root():
+    index_file = FRONTEND_BUILD_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"detail": "Frontend build not found"}
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_react(full_path: str):
+    """Serve React app for all non-API routes"""
+    if full_path.startswith("api") or full_path in {"docs", "redoc", "openapi.json", "health"}:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    requested_file = FRONTEND_BUILD_DIR / full_path
+    if requested_file.exists() and requested_file.is_file():
+        return FileResponse(str(requested_file))
+
+    index_file = FRONTEND_BUILD_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+
+    return {"detail": "Frontend build not found"}
