@@ -121,36 +121,55 @@ const PLAN_VISUAL_META = {
     badgeClass: 'bg-[#202020] text-[#D4D4D4]',
     chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
     ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
+    compactLine:
+      'Entrada limpia para detectar si merece avanzar.',
     capabilityTitle: 'Señales clave',
     capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
-    insight:
-      'Ideal para abrir posibilidad, detectar si merece avanzar y romper la inercia inicial.'
+    featurePreview: [
+      'Diagnóstico inicial',
+      'Ruta recomendada',
+      'Resultado resumido'
+    ]
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
     badgeClass: 'bg-[#0F5257] text-white',
     chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
     ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
+    compactLine:
+      'La base correcta para empezar a construir de verdad.',
     capabilityTitle: 'Base estructural',
-    capabilityItems: ['Blueprint', 'Prioridades', 'Base de monetización', 'Prompts'],
-    insight:
-      'Aquí empieza la decisión principal del sistema: construir con estructura y dejar atrás la lectura básica.'
+    capabilityItems: ['Blueprint', 'Prioridades', 'Monetización', 'Prompts'],
+    featurePreview: [
+      'Blueprint estructural',
+      'Prioridades claras',
+      'Base de monetización',
+      'Prompts estructurales'
+    ]
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
     badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
     chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
     ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
+    compactLine:
+      'Optimiza conversión, growth y foco de ejecución.',
     capabilityTitle: 'Growth + CRO',
-    capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Priorización', 'Sistema'],
-    insight:
-      'No solo acompaña. Mejora rendimiento, secuencia de trabajo y calidad de decisión sobre el proyecto.'
+    capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Sistema'],
+    featurePreview: [
+      'CRO y mejora de conversión',
+      'Growth y priorización',
+      'Optimización de propuesta',
+      'Prompts de optimización'
+    ]
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
     chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
     ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
+    compactLine:
+      'La capa senior para criterio, marketing y dirección estratégica.',
     capabilityTitle: 'Capa estratégica',
     capabilityItems: [
       'CRO',
@@ -162,8 +181,12 @@ const PLAN_VISUAL_META = {
       'Dirección de arte',
       'Marketing visual'
     ],
-    insight:
-      'Cuando hay decisiones críticas, imagen de marca, marketing visual o arquitectura senior, esta es la capa correcta.'
+    featurePreview: [
+      'CRO estratégico',
+      'Growth y monetización senior',
+      'Auditoría maestra',
+      'Prompt 99 y prompts maestros'
+    ]
   }
 };
 
