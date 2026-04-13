@@ -111,11 +111,70 @@ const FAQ = [
   },
   {
     q: '¿Qué diferencia hay entre Growth y AI Master 199?',
-    a: 'Growth optimiza rendimiento, growth y priorización. AI Master 199 añade una capa senior de CRO, auditoría, prompts maestros, arquitectura de trabajo y criterio estratégico.'
+    a: 'Growth entra para optimizar conversión, growth, oferta y priorización. AI Master 199 añade una capa senior de CRO, auditoría, prompts maestros, arquitectura de trabajo, criterio estratégico y dirección de imagen o marketing cuando el proyecto lo exige.'
   }
 ];
 
-// Cookie Banner Component
+const PLAN_VISUAL_META = {
+  free: {
+    borderClass: 'border-white/5',
+    badgeClass: 'bg-[#202020] text-[#D4D4D4]',
+    chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
+    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
+    capabilityTitle: 'Señales clave',
+    capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
+    insight:
+      'Ideal para abrir posibilidad, detectar si merece avanzar y romper la inercia inicial.'
+  },
+  blueprint: {
+    borderClass: 'border-[#0F5257]',
+    badgeClass: 'bg-[#0F5257] text-white',
+    chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
+    ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
+    capabilityTitle: 'Base estructural',
+    capabilityItems: ['Blueprint', 'Prioridades', 'Base de monetización', 'Prompts'],
+    insight:
+      'Aquí empieza la decisión principal del sistema: construir con estructura y dejar atrás la lectura básica.'
+  },
+  sistema: {
+    borderClass: 'border-[#2F455A]',
+    badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
+    chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
+    ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
+    capabilityTitle: 'Growth + CRO',
+    capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Priorización', 'Sistema'],
+    insight:
+      'No solo acompaña. Mejora rendimiento, secuencia de trabajo y calidad de decisión sobre el proyecto.'
+  },
+  premium: {
+    borderClass: 'border-[#4A3B61]',
+    badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
+    chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
+    ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
+    capabilityTitle: 'Capa estratégica',
+    capabilityItems: [
+      'CRO',
+      'Growth',
+      'Auditoría',
+      'AI Product',
+      'Assurance',
+      'Arquitectura',
+      'Dirección de arte',
+      'Marketing visual'
+    ],
+    insight:
+      'Cuando hay decisiones críticas, imagen de marca, marketing visual o arquitectura senior, esta es la capa correcta.'
+  }
+};
+
+const DEFAULT_STEP_DETAILS = {
+  Explorar: 'Gratis',
+  Validar: '6,99 € ahora',
+  Construir: '29 € Pro',
+  Optimizar: '79 € Growth',
+  Dirigir: '199 € AI Master'
+};
+
 const CookieBanner = ({ onAccept }) => {
   return (
     <motion.div
@@ -189,6 +248,32 @@ const Home = () => {
     }
   };
 
+  const handlePlanCta = (planId) => {
+    if (isAuthenticated) {
+      navigate('/dashboard/billing', { state: { suggestedPlan: planId } });
+    } else {
+      navigate('/register', { state: { selectedPlan: planId } });
+    }
+  };
+
+  const handleEntryOfferCta = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard/billing', {
+        state: {
+          entryOfferId: entryOffer.id,
+          checkoutIntent: entryOffer.type || 'one_time_offer'
+        }
+      });
+    } else {
+      navigate('/register', {
+        state: {
+          entryOfferId: entryOffer.id,
+          checkoutIntent: entryOffer.type || 'one_time_offer'
+        }
+      });
+    }
+  };
+
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
@@ -209,13 +294,15 @@ const Home = () => {
     }
   };
 
+  const conceptualStepDetails =
+    entryOffer?.conceptualGraphic?.stepDetails || DEFAULT_STEP_DETAILS;
+
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       <AnimatePresence>
         {showCookies && <CookieBanner onAccept={handleAcceptCookies} />}
       </AnimatePresence>
 
-      {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Logo size="large" />
@@ -256,7 +343,6 @@ const Home = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0F5257]/5 to-transparent"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -280,7 +366,6 @@ const Home = () => {
             monetizable y lista para convertirse en trabajo serio.
           </motion.p>
 
-          {/* Input Module */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -388,7 +473,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Routes Section */}
       <section id="routes" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <h2
@@ -434,7 +518,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* How it Works */}
       <section id="how" className="py-24 px-6 bg-[#0A0A0A]">
         <div className="max-w-6xl mx-auto">
           <h2
@@ -467,7 +550,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* What You Get */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <h2
@@ -499,7 +581,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Example Results */}
       <section className="py-24 px-6 bg-[#171717]/30">
         <div className="max-w-6xl mx-auto">
           <h2
@@ -531,7 +612,7 @@ const Home = () => {
                 type: 'Automatizar operación',
                 finding: 'El cuello de botella está en la gestión manual y en la falta de un flujo operativo claro.',
                 route: 'automate_operation',
-                next: 'Sube a Growth para priorizar automatización, continuidad y mejora del rendimiento.'
+                next: 'Sube a Growth para priorizar automatización, conversión y mejora del rendimiento.'
               },
               {
                 type: 'Idea a proyecto',
@@ -563,7 +644,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Differentiation */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2
@@ -603,9 +683,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Pricing */}
       <section id="pricing" className="py-24 px-6 bg-[#171717]/30">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#0F5257] text-xs font-medium uppercase tracking-wider mb-4">
               {pricingSection.eyebrow}
@@ -624,7 +703,6 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Entry Offer / Bridge Block */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -635,7 +713,7 @@ const Home = () => {
           >
             <div className="bg-[#121212] border border-[#0F5257]/30 rounded-2xl p-6 lg:p-8">
               <div className="grid lg:grid-cols-[1.35fr_0.9fr] gap-8">
-                <div>
+                <div className="flex flex-col">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257] text-white text-xs font-medium">
                       {entryOffer.badge}
@@ -645,17 +723,19 @@ const Home = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-2xl lg:text-3xl font-light text-white mb-3">
-                    {entryOffer.headline}
-                  </h3>
-                  <p className="text-[#D4D4D4] mb-4 max-w-2xl">{entryOffer.description}</p>
-                  <p className="text-sm text-[#A3A3A3] mb-6 max-w-2xl">{entryOffer.valuePromise}</p>
+                  <div className="min-h-[168px]">
+                    <h3 className="text-2xl lg:text-3xl font-light text-white mb-3">
+                      {entryOffer.headline}
+                    </h3>
+                    <p className="text-[#D4D4D4] mb-4 max-w-2xl">{entryOffer.description}</p>
+                    <p className="text-sm text-[#A3A3A3] mb-6 max-w-2xl">{entryOffer.valuePromise}</p>
+                  </div>
 
                   <div className="grid sm:grid-cols-2 gap-3 mb-6">
                     {entryOffer.features.map((feature) => (
                       <div
                         key={feature}
-                        className="flex items-start gap-2 bg-[#0A0A0A] border border-white/5 rounded-lg px-4 py-3"
+                        className="flex items-start gap-2 bg-[#0A0A0A] border border-white/5 rounded-lg px-4 py-4 min-h-[96px]"
                       >
                         <CheckCircle
                           size={18}
@@ -667,7 +747,7 @@ const Home = () => {
                     ))}
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 min-h-[124px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                       {entryOffer.promptLayer.label}
                     </p>
@@ -675,59 +755,61 @@ const Home = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-between bg-[#0A0A0A] border border-[#262626] rounded-2xl p-6">
-                  <div>
-                    <p className="text-sm text-[#A3A3A3] mb-2">Progresión conceptual</p>
+                <div className="flex flex-col bg-[#0A0A0A] border border-[#262626] rounded-2xl p-6">
+                  <div className="flex-1">
+                    <p className="text-sm text-[#A3A3A3] mb-3">Progresión conceptual</p>
                     <div className="space-y-3 mb-6">
                       {entryOffer.conceptualGraphic.steps.map((step) => {
                         const isActive = step === entryOffer.conceptualGraphic.activeStep;
+                        const detail = conceptualStepDetails[step] || '';
+
                         return (
                           <div
                             key={step}
-                            className={`flex items-center justify-between rounded-lg px-4 py-3 border ${
+                            className={`rounded-lg px-4 py-3 border ${
                               isActive
-                                ? 'bg-[#0F5257]/15 border-[#0F5257]/40'
+                                ? 'bg-[#052126] border-[#0F5257]/45'
                                 : 'bg-[#171717] border-white/5'
                             }`}
                           >
-                            <span
-                              className={`text-sm ${
-                                isActive ? 'text-white' : 'text-[#A3A3A3]'
-                              }`}
-                            >
-                              {step}
-                            </span>
-                            {isActive && (
-                              <span className="text-xs font-medium text-[#0F5257]">Ahora</span>
-                            )}
+                            <div className="flex items-center justify-between gap-3">
+                              <span className={`text-sm ${isActive ? 'text-white' : 'text-[#D4D4D4]'}`}>
+                                {step}
+                              </span>
+                              <span
+                                className={`text-xs ${
+                                  isActive ? 'text-[#0F9BA5]' : 'text-[#8A8A8A]'
+                                }`}
+                              >
+                                {detail}
+                              </span>
+                            </div>
                           </div>
                         );
                       })}
                     </div>
 
-                    <div className="mb-6">
+                    <div className="mb-6 min-h-[112px]">
                       <p className="text-sm text-[#A3A3A3] mb-1">Mejor encaje</p>
                       <p className="text-white text-sm">{entryOffer.bestFor}</p>
                     </div>
                   </div>
 
-                  <Link
-                    to={isAuthenticated ? '/dashboard/billing' : '/register'}
-                    className="block text-center py-3 rounded-lg font-medium bg-[#0F5257] text-white hover:bg-[#136970] transition-all"
+                  <button
+                    onClick={handleEntryOfferCta}
+                    className="w-full py-3 rounded-lg font-medium bg-[#0F5257] text-white hover:bg-[#136970] transition-all"
                     data-testid="entry-offer-cta"
                   >
                     {entryOffer.cta.label}
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Plans */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {pricingPlans.map((plan, index) => {
-              const isPrimary = plan.isPrimaryPlan || plan.highlight;
-              const isStrategic = plan.isStrategicPlan;
+              const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
 
               return (
                 <motion.div
@@ -736,64 +818,63 @@ const Home = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.08 }}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[640px] ${
-                    isPrimary
-                      ? 'border-[#0F5257] pricing-highlight'
-                      : isStrategic
-                        ? 'border-[#3A3A3A]'
-                        : 'border-white/5'
-                  }`}
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[860px] ${visual.borderClass}`}
                   data-testid={`plan-${plan.id}`}
                 >
-                  <div className="min-h-[32px] mb-4 flex items-start justify-between gap-3">
+                  <div className="min-h-[40px] mb-4 flex items-start justify-between gap-3">
                     <div className="flex flex-wrap gap-2">
                       {plan.badge && (
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            isPrimary
-                              ? 'bg-[#0F5257] text-white'
-                              : isStrategic
-                                ? 'bg-[#262626] text-white'
-                                : 'bg-[#202020] text-[#D4D4D4]'
-                          }`}
-                        >
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
                           {plan.badge}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="min-h-[112px] mb-5">
-                    <h3 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h3>
-                    <p className="text-sm text-[#D4D4D4] mb-2">{plan.headline}</p>
-                    <p className="text-sm text-[#A3A3A3]">{plan.description}</p>
+                  <div className="min-h-[180px] mb-5">
+                    <h3 className="text-2xl lg:text-[2rem] font-medium text-white mb-3">
+                      {plan.visibleName}
+                    </h3>
+                    <p className="text-[#F0F0F0] text-base leading-snug mb-3">{plan.headline}</p>
+                    <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
                   </div>
 
-                  <div className="min-h-[72px] flex items-baseline gap-1 mb-5">
-                    <span className="text-4xl font-light text-white">{plan.priceLabel}</span>
-                    <span className="text-[#A3A3A3]">{plan.periodLabel}</span>
+                  <div className="min-h-[84px] flex items-end gap-2 mb-6">
+                    <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
+                    <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[112px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[144px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                       Mejor encaje
                     </p>
-                    <p className="text-sm text-white">{plan.bestFor}</p>
+                    <p className="text-white text-sm leading-relaxed">{plan.bestFor}</p>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[104px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[126px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                       {plan.promptLayer.label}
                     </p>
-                    <p className="text-sm text-white">{plan.promptLayer.description}</p>
+                    <p className="text-white text-sm leading-relaxed">{plan.promptLayer.description}</p>
+                  </div>
+
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[152px]">
+                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
+                      {visual.capabilityTitle}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {visual.capabilityItems.map((item) => (
+                        <span key={item} className={`px-2.5 py-1 rounded-full text-xs ${visual.chipClass}`}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.insight}</p>
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-1">
                     {plan.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2 text-sm text-[#D4D4D4]"
-                      >
+                      <li key={feature} className="flex items-start gap-2 text-sm text-[#D4D4D4]">
                         <CheckCircle
                           size={16}
                           weight="fill"
@@ -804,25 +885,18 @@ const Home = () => {
                     ))}
                   </ul>
 
-                  <Link
-                    to={isAuthenticated ? '/dashboard/billing' : '/register'}
-                    className={`block text-center py-3 rounded-lg font-medium transition-all mt-auto ${
-                      isPrimary
-                        ? 'bg-[#0F5257] text-white hover:bg-[#136970]'
-                        : isStrategic
-                          ? 'bg-[#262626] text-white hover:bg-[#363636]'
-                          : 'bg-[#262626] text-white hover:bg-[#363636]'
-                    }`}
+                  <button
+                    onClick={() => handlePlanCta(plan.id)}
+                    className={`w-full text-center py-3 rounded-lg font-medium transition-all mt-auto ${visual.ctaClass}`}
                     data-testid={`plan-cta-${plan.id}`}
                   >
                     {plan.cta.label}
-                  </Link>
+                  </button>
                 </motion.div>
               );
             })}
           </div>
 
-          {/* Trust Signals */}
           <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {pricingTrustSignals.map((signal, index) => (
               <div
@@ -837,7 +911,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* FAQ */}
       <section id="faq" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <h2
@@ -877,7 +950,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
       <section className="py-16 px-6 bg-[#171717]/50">
         <div className="max-w-xl mx-auto text-center">
           <h3 className="text-xl font-medium text-white mb-3">Mantente informado</h3>
@@ -911,7 +983,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
       <section className="py-24 px-6 bg-gradient-to-b from-[#0F5257]/10 to-transparent">
         <div className="max-w-2xl mx-auto text-center">
           <h2
@@ -935,7 +1006,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
