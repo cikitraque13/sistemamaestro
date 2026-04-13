@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
+import {
   ArrowLeft,
   Lightning,
   CheckCircle,
@@ -16,9 +16,16 @@ import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_BASE = '/api';
 
 const ROUTE_NAMES = {
+  // contrato nuevo backend
+  improve: 'Mejorar algo existente',
+  sell: 'Vender y cobrar',
+  automate: 'Automatizar operación',
+  idea: 'Idea a proyecto',
+
+  // compatibilidad legado
   improve_existing: 'Mejorar algo existente',
   sell_and_charge: 'Vender y cobrar',
   automate_operation: 'Automatizar operación',
@@ -39,7 +46,9 @@ const ProjectDetail = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/projects/${id}`, { withCredentials: true });
+      const response = await axios.get(`${API_BASE}/projects/${id}`, {
+        withCredentials: true
+      });
       setProject(response.data);
     } catch (error) {
       toast.error('Proyecto no encontrado');
@@ -59,7 +68,7 @@ const ProjectDetail = () => {
     setGeneratingBlueprint(true);
     try {
       const response = await axios.post(
-        `${API_URL}/api/projects/${id}/blueprint`,
+        `${API_BASE}/projects/${id}/blueprint`,
         {},
         { withCredentials: true }
       );
@@ -82,6 +91,41 @@ const ProjectDetail = () => {
     });
   };
 
+  const normalizedDiagnosis = useMemo(() => {
+    const diagnosis = project?.diagnosis;
+    if (!diagnosis) return null;
+
+    const strengths = Array.isArray(diagnosis.strengths) ? diagnosis.strengths : [];
+    const weaknesses = Array.isArray(diagnosis.weaknesses) ? diagnosis.weaknesses : [];
+    const quickWins = Array.isArray(diagnosis.quick_wins) ? diagnosis.quick_wins : [];
+
+    const understanding =
+      diagnosis.understanding ||
+      diagnosis.summary ||
+      'Diagnóstico generado correctamente, pendiente de ampliar visualización.';
+
+    const mainFinding =
+      diagnosis.main_finding ||
+      weaknesses[0] ||
+      strengths[0] ||
+      diagnosis.summary ||
+      'Sin hallazgo principal disponible.';
+
+    const opportunity =
+      diagnosis.opportunity ||
+      quickWins[0] ||
+      'Sin oportunidad priorizada disponible.';
+
+    return {
+      understanding,
+      mainFinding,
+      opportunity,
+      strengths,
+      weaknesses,
+      quickWins
+    };
+  }, [project]);
+
   if (loading) {
     return (
       <DashboardLayout title="Proyecto">
@@ -97,7 +141,6 @@ const ProjectDetail = () => {
   return (
     <DashboardLayout title="Detalle del proyecto">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
         <Link
           to="/dashboard/projects"
           className="inline-flex items-center gap-2 text-[#A3A3A3] hover:text-white mb-6 transition-colors"
@@ -107,7 +150,6 @@ const ProjectDetail = () => {
           Volver a proyectos
         </Link>
 
-        {/* Project Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,22 +168,22 @@ const ProjectDetail = () => {
               <span className="text-xs text-[#0F5257] font-medium uppercase tracking-wider">
                 {project.input_type === 'url' ? 'Análisis de URL' : 'Descripción'}
               </span>
-              <p className="text-white mt-1">{project.input_content}</p>
+              <p className="text-white mt-1 break-words">{project.input_content}</p>
             </div>
           </div>
+
           <div className="flex flex-wrap items-center gap-4 text-sm text-[#A3A3A3]">
             <span className="flex items-center gap-1">
               <Clock size={16} />
               {formatDate(project.created_at)}
             </span>
             <span className="px-3 py-1 bg-[#0F5257]/20 text-[#0F5257] rounded-full">
-              {ROUTE_NAMES[project.route] || 'Sin clasificar'}
+              {ROUTE_NAMES[project.route] || project.route || 'Sin clasificar'}
             </span>
           </div>
         </motion.div>
 
-        {/* Diagnosis */}
-        {project.diagnosis && (
+        {normalizedDiagnosis && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -153,21 +195,86 @@ const ProjectDetail = () => {
               <Lightning weight="fill" className="text-[#0F5257]" />
               Diagnóstico
             </h3>
-            
+
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-[#A3A3A3] mb-1">Comprensión</p>
-                <p className="text-white">{project.diagnosis.understanding}</p>
+                <p className="text-white">{normalizedDiagnosis.understanding}</p>
               </div>
+
               <div>
                 <p className="text-sm text-[#A3A3A3] mb-1">Hallazgo principal</p>
-                <p className="text-white font-medium">{project.diagnosis.main_finding}</p>
+                <p className="text-white font-medium">{normalizedDiagnosis.mainFinding}</p>
               </div>
+
               <div>
                 <p className="text-sm text-[#A3A3A3] mb-1">Oportunidad</p>
-                <p className="text-white">{project.diagnosis.opportunity}</p>
+                <p className="text-white">{normalizedDiagnosis.opportunity}</p>
               </div>
             </div>
+
+            {(normalizedDiagnosis.strengths.length > 0 ||
+              normalizedDiagnosis.weaknesses.length > 0 ||
+              normalizedDiagnosis.quickWins.length > 0) && (
+              <div className="grid md:grid-cols-3 gap-4 mt-6">
+                <div className="bg-[#0A0A0A] rounded-lg p-4">
+                  <p className="text-sm text-[#A3A3A3] mb-3">Fortalezas</p>
+                  {normalizedDiagnosis.strengths.length > 0 ? (
+                    <ul className="space-y-2">
+                      {normalizedDiagnosis.strengths.map((item, index) => (
+                        <li
+                          key={`strength-${index}-${item.substring(0, 20)}`}
+                          className="text-white text-sm flex items-start gap-2"
+                        >
+                          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
+                  )}
+                </div>
+
+                <div className="bg-[#0A0A0A] rounded-lg p-4">
+                  <p className="text-sm text-[#A3A3A3] mb-3">Debilidades</p>
+                  {normalizedDiagnosis.weaknesses.length > 0 ? (
+                    <ul className="space-y-2">
+                      {normalizedDiagnosis.weaknesses.map((item, index) => (
+                        <li
+                          key={`weakness-${index}-${item.substring(0, 20)}`}
+                          className="text-white text-sm flex items-start gap-2"
+                        >
+                          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
+                  )}
+                </div>
+
+                <div className="bg-[#0A0A0A] rounded-lg p-4">
+                  <p className="text-sm text-[#A3A3A3] mb-3">Quick wins</p>
+                  {normalizedDiagnosis.quickWins.length > 0 ? (
+                    <ul className="space-y-2">
+                      {normalizedDiagnosis.quickWins.map((item, index) => (
+                        <li
+                          key={`quickwin-${index}-${item.substring(0, 20)}`}
+                          className="text-white text-sm flex items-start gap-2"
+                        >
+                          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {project.next_step && (
               <div className="mt-6 p-4 bg-[#0F5257]/10 border border-[#0F5257]/30 rounded-lg">
@@ -178,7 +285,6 @@ const ProjectDetail = () => {
           </motion.div>
         )}
 
-        {/* Refine Questions & Answers */}
         {project.refine_questions && project.refine_questions.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -200,6 +306,7 @@ const ProjectDetail = () => {
                 </div>
               ))}
             </div>
+
             {!project.refine_answers && (
               <Link
                 to={`/flow?project=${id}&step=refine`}
@@ -212,7 +319,6 @@ const ProjectDetail = () => {
           </motion.div>
         )}
 
-        {/* Blueprint */}
         {project.blueprint ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -237,7 +343,10 @@ const ProjectDetail = () => {
                   <p className="text-sm text-[#A3A3A3] mb-2">Prioridades</p>
                   <ul className="space-y-2">
                     {project.blueprint.priorities.map((priority, index) => (
-                      <li key={`priority-${index}-${priority.substring(0, 20)}`} className="flex items-start gap-2 text-white">
+                      <li
+                        key={`priority-${index}-${priority.substring(0, 20)}`}
+                        className="flex items-start gap-2 text-white"
+                      >
                         <span className="text-[#0F5257] font-medium">{index + 1}.</span>
                         {priority}
                       </li>
@@ -263,6 +372,7 @@ const ProjectDetail = () => {
                         </ul>
                       </div>
                     )}
+
                     {project.blueprint.architecture.tech_stack && (
                       <div className="bg-[#0A0A0A] rounded-lg p-4">
                         <p className="text-xs text-[#A3A3A3] mb-2">Tech Stack</p>
@@ -292,7 +402,10 @@ const ProjectDetail = () => {
                   <p className="text-sm text-[#A3A3A3] mb-2">Plan de despliegue</p>
                   <ol className="space-y-2">
                     {project.blueprint.deployment_steps.map((step, index) => (
-                      <li key={`deploy-${index}-${step.substring(0, 20)}`} className="flex items-start gap-3 text-white">
+                      <li
+                        key={`deploy-${index}-${step.substring(0, 20)}`}
+                        className="flex items-start gap-3 text-white"
+                      >
                         <span className="w-6 h-6 rounded-full bg-[#0F5257]/20 text-[#0F5257] text-sm flex items-center justify-center flex-shrink-0">
                           {index + 1}
                         </span>
@@ -322,10 +435,11 @@ const ProjectDetail = () => {
             <Lock size={48} className="text-[#A3A3A3] mx-auto mb-4" />
             <h3 className="text-lg text-white mb-2">Blueprint bloqueado</h3>
             <p className="text-[#A3A3A3] mb-6 max-w-md mx-auto">
-              {user?.plan === 'free' 
+              {user?.plan === 'free'
                 ? 'Actualiza al plan Blueprint o superior para desbloquear la estructura completa de tu proyecto.'
                 : 'Genera el blueprint completo con prioridades, arquitectura y plan de despliegue.'}
             </p>
+
             {user?.plan === 'free' ? (
               <Link to="/dashboard/billing" className="btn-primary inline-flex items-center gap-2">
                 Mejorar plan
