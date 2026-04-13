@@ -108,20 +108,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = ({ redirectPath = '/dashboard', redirectState = null } = {}) => {
-    const callbackUrl = `${window.location.origin}${window.location.pathname}`;
-
-    sessionStorage.setItem(
-      'google_auth_redirect',
-      JSON.stringify({
-        redirectPath,
-        redirectState
-      })
-    );
-
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(callbackUrl)}`;
+  const loginWithGoogleCredential = async (credential) => {
+    try {
+      const response = await api.post('/auth/google/session', { credential });
+      setUser(response.data);
+      return { success: true, user: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: formatApiErrorDetail(error.response?.data?.detail) || error.message
+      };
+    }
   };
 
+  // Legacy fallback: se conserva por compatibilidad, pero el flujo nuevo ya no lo usa
   const handleGoogleCallback = async (sessionId) => {
     try {
       const response = await api.post('/auth/google/session', { session_id: sessionId });
@@ -152,7 +152,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        loginWithGoogle,
+        loginWithGoogleCredential,
         handleGoogleCallback,
         refreshToken,
         checkAuth,
