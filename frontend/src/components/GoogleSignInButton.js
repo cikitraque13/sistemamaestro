@@ -68,38 +68,28 @@ const getGoogleClientId = async () => {
   }
 };
 
-const MATRIX_STRINGS = [
-  '101100101001',
-  'AUTH',
-  'ACCESS',
-  'TOKEN',
-  'SYS',
-  'NODE',
-  'LOGIN',
-  'FLOW',
-  'ID',
-  'OK',
-  '010101',
-  'VALID',
-  'SESSION',
-  'GRID'
+const MATRIX_CHARS = [
+  '0', '1', 'A', 'U', 'T', 'H', 'X', '9', 'K', 'Σ', 'Λ', '7', 'N', 'O', 'D', 'E',
+  'S', 'Y', 'S', 'Q', 'R', 'I', 'V', 'M', 'C', '8', '2', '5', 'F', 'P'
 ];
+
+const buildMatrixColumn = (length = 28) => {
+  return Array.from({ length }, (_, index) => ({
+    id: index,
+    char: MATRIX_CHARS[(index * 7 + length) % MATRIX_CHARS.length]
+  }));
+};
 
 const MatrixRain = () => {
   const columns = useMemo(
     () =>
-      Array.from({ length: 18 }, (_, index) => ({
+      Array.from({ length: 26 }, (_, index) => ({
         id: index,
-        left: `${index * 5.8}%`,
-        duration: 7 + (index % 5),
-        delay: (index % 6) * 0.7,
-        opacity: 0.12 + (index % 4) * 0.04,
-        text:
-          MATRIX_STRINGS[index % MATRIX_STRINGS.length] +
-          ' ' +
-          MATRIX_STRINGS[(index + 3) % MATRIX_STRINGS.length] +
-          ' ' +
-          MATRIX_STRINGS[(index + 6) % MATRIX_STRINGS.length]
+        left: `${index * 3.95}%`,
+        duration: 5.8 + (index % 7) * 0.65,
+        delay: (index % 9) * 0.28,
+        opacity: 0.14 + (index % 5) * 0.045,
+        chars: buildMatrixColumn(24 + (index % 8))
       })),
     []
   );
@@ -109,7 +99,7 @@ const MatrixRain = () => {
       {columns.map((column) => (
         <div
           key={column.id}
-          className="absolute top-[-30%] text-[10px] sm:text-xs font-mono tracking-[0.25em] text-[#34d399] whitespace-pre-line select-none"
+          className="absolute top-[-40%] select-none font-mono text-[11px] sm:text-xs tracking-[0.2em] text-[#39ff88]"
           style={{
             left: column.left,
             opacity: column.opacity,
@@ -117,7 +107,17 @@ const MatrixRain = () => {
             animationDelay: `${column.delay}s`
           }}
         >
-          {Array.from({ length: 10 }, () => column.text).join('\n')}
+          {column.chars.map((item, charIndex) => (
+            <div
+              key={item.id}
+              className={charIndex === 0 ? 'text-[#d1ffe5]' : ''}
+              style={{
+                opacity: Math.max(0.18, 1 - charIndex * 0.045)
+              }}
+            >
+              {item.char}
+            </div>
+          ))}
         </div>
       ))}
     </div>
@@ -126,92 +126,128 @@ const MatrixRain = () => {
 
 const GoogleConnectingOverlay = ({ stepText }) => {
   return (
-    <div className="fixed inset-0 z-[120] bg-[#020403] flex items-center justify-center px-6">
+    <div className="fixed inset-0 z-[120] bg-[#010302] flex items-center justify-center px-6">
       <style>{`
         @keyframes matrixDrop {
-          0% { transform: translateY(-20%); opacity: 0; }
-          10% { opacity: 1; }
-          100% { transform: translateY(140%); opacity: 0; }
+          0% { transform: translateY(-18%); opacity: 0; }
+          8% { opacity: 1; }
+          100% { transform: translateY(150%); opacity: 0; }
         }
         @keyframes matrixPulse {
           0%, 100% { opacity: 0.45; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.08); }
         }
-        @keyframes scanLine {
-          0% { transform: translateY(-120%); opacity: 0; }
-          20% { opacity: 0.35; }
-          100% { transform: translateY(120%); opacity: 0; }
+        @keyframes matrixScan {
+          0% { transform: translateY(-130%); opacity: 0; }
+          10% { opacity: 0.18; }
+          100% { transform: translateY(130%); opacity: 0; }
+        }
+        @keyframes terminalBlink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
         }
       `}</style>
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.08),transparent_55%)]"></div>
-      <div className="absolute inset-0 opacity-40">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(57,255,136,0.09),transparent_45%)]" />
+      <div className="absolute inset-0 opacity-55">
         <MatrixRain />
       </div>
+
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ animation: 'scanLine 2.8s linear infinite' }}
+        style={{ animation: 'matrixScan 2.4s linear infinite' }}
       >
-        <div className="h-24 w-full bg-gradient-to-b from-transparent via-[#34d399]/10 to-transparent" />
+        <div className="h-28 w-full bg-gradient-to-b from-transparent via-[#39ff88]/10 to-transparent" />
       </div>
 
-      <div className="relative w-full max-w-xl">
-        <div className="absolute inset-0 rounded-[28px] bg-[#10b981]/10 blur-3xl"></div>
+      <div className="relative w-full max-w-2xl">
+        <div className="absolute inset-0 rounded-[30px] bg-[#39ff88]/8 blur-3xl" />
 
-        <div className="relative overflow-hidden rounded-[28px] border border-[#1f7a5c]/35 bg-[#08110d]/92 shadow-[0_0_60px_rgba(16,185,129,0.10)]">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(52,211,153,0.06),transparent_22%,transparent_78%,rgba(52,211,153,0.04))]"></div>
+        <div className="relative overflow-hidden rounded-[30px] border border-[#1f7a4f]/35 bg-[#06100b]/92 shadow-[0_0_70px_rgba(57,255,136,0.09)]">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(57,255,136,0.05),transparent_22%,transparent_78%,rgba(57,255,136,0.03))]" />
+          <div className="absolute inset-0 bg-[repeating-linear-gradient(180deg,rgba(255,255,255,0.015)_0px,rgba(255,255,255,0.015)_1px,transparent_1px,transparent_4px)] opacity-20" />
 
-          <div className="relative px-8 py-10 sm:px-12 sm:py-12 text-center">
-            <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center gap-3 rounded-full border border-[#34d399]/20 bg-[#0b1712] px-4 py-2">
+          <div className="relative px-8 py-10 sm:px-12 sm:py-12">
+            <div className="flex items-center justify-between gap-4 mb-8">
+              <div className="inline-flex items-center gap-3 rounded-full border border-[#39ff88]/20 bg-[#0a1711] px-4 py-2">
                 <span
-                  className="h-2.5 w-2.5 rounded-full bg-[#34d399]"
+                  className="h-2.5 w-2.5 rounded-full bg-[#39ff88]"
                   style={{ animation: 'matrixPulse 1.2s ease-in-out infinite' }}
                 />
-                <span className="font-mono text-xs sm:text-sm tracking-[0.24em] text-[#a7f3d0] uppercase">
+                <span className="font-mono text-[11px] sm:text-xs tracking-[0.28em] text-[#b8ffd4] uppercase">
                   Sistema Maestro
                 </span>
               </div>
+
+              <div className="font-mono text-[11px] tracking-[0.22em] uppercase text-[#6ee7a8]">
+                AUTH / GOOGLE
+              </div>
             </div>
 
-            <h3 className="text-2xl sm:text-3xl font-light text-white mb-3">
-              Inicializando acceso
-            </h3>
+            <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-8 items-start">
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-light text-white mb-4">
+                  Inicializando acceso
+                </h3>
 
-            <p className="text-[#9ca3af] leading-relaxed mb-8 max-w-md mx-auto">
-              Validando identidad, cargando sesión y preparando el entorno de trabajo.
-            </p>
+                <p className="text-[#9aa4a0] leading-relaxed mb-8 max-w-xl">
+                  Verificando identidad, activando sesión segura y preparando el entorno de trabajo para entrar en tu dashboard.
+                </p>
 
-            <div className="mb-8 rounded-2xl border border-[#34d399]/15 bg-[#050b08] px-5 py-4">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="h-2 w-2 rounded-full bg-[#34d399] animate-pulse" />
-                <span className="h-2 w-2 rounded-full bg-[#34d399] animate-pulse [animation-delay:180ms]" />
-                <span className="h-2 w-2 rounded-full bg-[#34d399] animate-pulse [animation-delay:360ms]" />
+                <div className="rounded-2xl border border-[#39ff88]/14 bg-[#040a07] px-5 py-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="h-2 w-2 rounded-full bg-[#39ff88] animate-pulse" />
+                    <span className="h-2 w-2 rounded-full bg-[#39ff88] animate-pulse [animation-delay:180ms]" />
+                    <span className="h-2 w-2 rounded-full bg-[#39ff88] animate-pulse [animation-delay:360ms]" />
+                  </div>
+
+                  <p className="font-mono text-sm sm:text-base tracking-[0.16em] uppercase text-[#e9fff1]">
+                    {stepText}
+                    <span
+                      className="ml-1 inline-block text-[#39ff88]"
+                      style={{ animation: 'terminalBlink 1s step-end infinite' }}
+                    >
+                      _
+                    </span>
+                  </p>
+                </div>
               </div>
 
-              <p className="font-mono text-sm sm:text-base tracking-[0.18em] uppercase text-[#d1fae5]">
-                {stepText}
-              </p>
-            </div>
+              <div className="rounded-2xl border border-[#39ff88]/14 bg-[#040a07] px-5 py-5">
+                <div className="font-mono text-[11px] tracking-[0.22em] uppercase text-[#6ee7a8] mb-4">
+                  Estado de sistema
+                </div>
 
-            <div className="grid grid-cols-3 gap-3 text-left">
-              <div className="rounded-xl border border-[#34d399]/10 bg-[#07100c] px-3 py-3">
-                <div className="font-mono text-[10px] tracking-[0.20em] text-[#6ee7b7] uppercase mb-1">
-                  Auth
+                <div className="space-y-3 font-mono text-xs sm:text-[13px]">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[#9aa4a0]">Handshake</span>
+                    <span className="text-[#d7ffe7]">OK</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[#9aa4a0]">Token</span>
+                    <span className="text-[#d7ffe7]">ACTIVE</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[#9aa4a0]">Session</span>
+                    <span className="text-[#d7ffe7]">SECURE</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[#9aa4a0]">Workspace</span>
+                    <span className="text-[#d7ffe7]">LOADING</span>
+                  </div>
                 </div>
-                <div className="text-xs text-[#d1d5db]">Google handshake</div>
-              </div>
-              <div className="rounded-xl border border-[#34d399]/10 bg-[#07100c] px-3 py-3">
-                <div className="font-mono text-[10px] tracking-[0.20em] text-[#6ee7b7] uppercase mb-1">
-                  Session
+
+                <div className="mt-6 rounded-xl border border-white/5 bg-[#07110c] px-4 py-4">
+                  <div className="font-mono text-[11px] tracking-[0.20em] uppercase text-[#6ee7a8] mb-2">
+                    Log
+                  </div>
+                  <div className="space-y-1 font-mono text-[11px] text-[#b8c4be]">
+                    <div>&gt; identity.provider = google</div>
+                    <div>&gt; auth.channel = secure</div>
+                    <div>&gt; redirect.target = dashboard</div>
+                    <div>&gt; status = readying session</div>
+                  </div>
                 </div>
-                <div className="text-xs text-[#d1d5db]">Token activo</div>
-              </div>
-              <div className="rounded-xl border border-[#34d399]/10 bg-[#07100c] px-3 py-3">
-                <div className="font-mono text-[10px] tracking-[0.20em] text-[#6ee7b7] uppercase mb-1">
-                  Workspace
-                </div>
-                <div className="text-xs text-[#d1d5db]">Dashboard listo</div>
               </div>
             </div>
           </div>
@@ -223,6 +259,7 @@ const GoogleConnectingOverlay = ({ stepText }) => {
 
 const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null }) => {
   const containerRef = useRef(null);
+  const wrapperRef = useRef(null);
   const initializedRef = useRef(false);
   const mountedRef = useRef(false);
   const authRef = useRef({
@@ -238,6 +275,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   const [errorMessage, setErrorMessage] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [overlayStep, setOverlayStep] = useState('Validando acceso');
+  const [buttonWidth, setButtonWidth] = useState(340);
 
   useEffect(() => {
     authRef.current = {
@@ -246,6 +284,27 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
       redirectState
     };
   }, [loginWithGoogleCredential, redirectPath, redirectState]);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+
+    const updateWidth = () => {
+      if (!wrapperRef.current) return;
+      const width = wrapperRef.current.clientWidth;
+      const safeWidth = Math.max(220, Math.min(360, width));
+      setButtonWidth(safeWidth);
+    };
+
+    updateWidth();
+
+    const observer = new ResizeObserver(() => {
+      updateWidth();
+    });
+
+    observer.observe(wrapperRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -300,15 +359,18 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                   redirectState: nextState
                 } = authRef.current;
 
-                const result = await loginFn(response.credential);
+                const [result] = await Promise.all([
+                  loginFn(response.credential),
+                  wait(700)
+                ]);
 
                 if (!mountedRef.current) return;
 
                 if (result.success) {
                   setOverlayStep('Cargando sesión');
-                  await wait(280);
+                  await wait(420);
                   setOverlayStep('Preparando dashboard');
-                  await wait(320);
+                  await wait(520);
 
                   navigate(nextPath, {
                     replace: true,
@@ -341,7 +403,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           text: 'continue_with',
           shape: 'rectangular',
           logo_alignment: 'left',
-          width: 340
+          width: buttonWidth
         });
 
         if (mountedRef.current) {
@@ -356,12 +418,14 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
       }
     };
 
-    initGoogle();
+    if (buttonWidth >= 220) {
+      initGoogle();
+    }
 
     return () => {
       mountedRef.current = false;
     };
-  }, [navigate]);
+  }, [navigate, buttonWidth]);
 
   return (
     <>
@@ -382,7 +446,12 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           )}
 
           <div className="flex justify-center">
-            <div ref={containerRef} className="min-h-[44px]" />
+            <div
+              ref={wrapperRef}
+              className="w-full max-w-[360px] overflow-hidden rounded-xl"
+            >
+              <div ref={containerRef} className="min-h-[44px] flex justify-center" />
+            </div>
           </div>
         </div>
       )}
