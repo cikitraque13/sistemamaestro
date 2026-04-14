@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -68,42 +68,152 @@ const getGoogleClientId = async () => {
   }
 };
 
+const MATRIX_STRINGS = [
+  '101100101001',
+  'AUTH',
+  'ACCESS',
+  'TOKEN',
+  'SYS',
+  'NODE',
+  'LOGIN',
+  'FLOW',
+  'ID',
+  'OK',
+  '010101',
+  'VALID',
+  'SESSION',
+  'GRID'
+];
+
+const MatrixRain = () => {
+  const columns = useMemo(
+    () =>
+      Array.from({ length: 18 }, (_, index) => ({
+        id: index,
+        left: `${index * 5.8}%`,
+        duration: 7 + (index % 5),
+        delay: (index % 6) * 0.7,
+        opacity: 0.12 + (index % 4) * 0.04,
+        text:
+          MATRIX_STRINGS[index % MATRIX_STRINGS.length] +
+          ' ' +
+          MATRIX_STRINGS[(index + 3) % MATRIX_STRINGS.length] +
+          ' ' +
+          MATRIX_STRINGS[(index + 6) % MATRIX_STRINGS.length]
+      })),
+    []
+  );
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {columns.map((column) => (
+        <div
+          key={column.id}
+          className="absolute top-[-30%] text-[10px] sm:text-xs font-mono tracking-[0.25em] text-[#34d399] whitespace-pre-line select-none"
+          style={{
+            left: column.left,
+            opacity: column.opacity,
+            animation: `matrixDrop ${column.duration}s linear infinite`,
+            animationDelay: `${column.delay}s`
+          }}
+        >
+          {Array.from({ length: 10 }, () => column.text).join('\n')}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const GoogleConnectingOverlay = ({ stepText }) => {
   return (
-    <div className="fixed inset-0 z-[120] bg-[#0A0A0A]/96 backdrop-blur-sm flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <div className="bg-[#171717] border border-white/10 rounded-3xl px-8 py-10 text-center shadow-2xl">
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[#0F5257]/15 border border-[#0F5257]/20">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#0F5257] animate-pulse"></div>
-              <span className="text-[#CDECEE] text-sm font-medium tracking-wide">
-                Sistema Maestro
-              </span>
+    <div className="fixed inset-0 z-[120] bg-[#020403] flex items-center justify-center px-6">
+      <style>{`
+        @keyframes matrixDrop {
+          0% { transform: translateY(-20%); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translateY(140%); opacity: 0; }
+        }
+        @keyframes matrixPulse {
+          0%, 100% { opacity: 0.45; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.08); }
+        }
+        @keyframes scanLine {
+          0% { transform: translateY(-120%); opacity: 0; }
+          20% { opacity: 0.35; }
+          100% { transform: translateY(120%); opacity: 0; }
+        }
+      `}</style>
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.08),transparent_55%)]"></div>
+      <div className="absolute inset-0 opacity-40">
+        <MatrixRain />
+      </div>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ animation: 'scanLine 2.8s linear infinite' }}
+      >
+        <div className="h-24 w-full bg-gradient-to-b from-transparent via-[#34d399]/10 to-transparent" />
+      </div>
+
+      <div className="relative w-full max-w-xl">
+        <div className="absolute inset-0 rounded-[28px] bg-[#10b981]/10 blur-3xl"></div>
+
+        <div className="relative overflow-hidden rounded-[28px] border border-[#1f7a5c]/35 bg-[#08110d]/92 shadow-[0_0_60px_rgba(16,185,129,0.10)]">
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(52,211,153,0.06),transparent_22%,transparent_78%,rgba(52,211,153,0.04))]"></div>
+
+          <div className="relative px-8 py-10 sm:px-12 sm:py-12 text-center">
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex items-center gap-3 rounded-full border border-[#34d399]/20 bg-[#0b1712] px-4 py-2">
+                <span
+                  className="h-2.5 w-2.5 rounded-full bg-[#34d399]"
+                  style={{ animation: 'matrixPulse 1.2s ease-in-out infinite' }}
+                />
+                <span className="font-mono text-xs sm:text-sm tracking-[0.24em] text-[#a7f3d0] uppercase">
+                  Sistema Maestro
+                </span>
+              </div>
             </div>
-          </div>
 
-          <h3 className="text-2xl font-light text-white mb-3">
-            Conectando tu cuenta
-          </h3>
+            <h3 className="text-2xl sm:text-3xl font-light text-white mb-3">
+              Inicializando acceso
+            </h3>
 
-          <p className="text-[#A3A3A3] mb-8 leading-relaxed">
-            Estamos validando tu acceso con Google y preparando tu espacio de trabajo.
-          </p>
+            <p className="text-[#9ca3af] leading-relaxed mb-8 max-w-md mx-auto">
+              Validando identidad, cargando sesión y preparando el entorno de trabajo.
+            </p>
 
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0F5257] animate-pulse"></span>
-            <span
-              className="w-2.5 h-2.5 rounded-full bg-[#0F5257] animate-pulse"
-              style={{ animationDelay: '180ms' }}
-            ></span>
-            <span
-              className="w-2.5 h-2.5 rounded-full bg-[#0F5257] animate-pulse"
-              style={{ animationDelay: '360ms' }}
-            ></span>
-          </div>
+            <div className="mb-8 rounded-2xl border border-[#34d399]/15 bg-[#050b08] px-5 py-4">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="h-2 w-2 rounded-full bg-[#34d399] animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-[#34d399] animate-pulse [animation-delay:180ms]" />
+                <span className="h-2 w-2 rounded-full bg-[#34d399] animate-pulse [animation-delay:360ms]" />
+              </div>
 
-          <div className="rounded-2xl bg-[#0A0A0A] border border-white/5 px-4 py-4">
-            <p className="text-white text-sm font-medium">{stepText}</p>
+              <p className="font-mono text-sm sm:text-base tracking-[0.18em] uppercase text-[#d1fae5]">
+                {stepText}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 text-left">
+              <div className="rounded-xl border border-[#34d399]/10 bg-[#07100c] px-3 py-3">
+                <div className="font-mono text-[10px] tracking-[0.20em] text-[#6ee7b7] uppercase mb-1">
+                  Auth
+                </div>
+                <div className="text-xs text-[#d1d5db]">Google handshake</div>
+              </div>
+              <div className="rounded-xl border border-[#34d399]/10 bg-[#07100c] px-3 py-3">
+                <div className="font-mono text-[10px] tracking-[0.20em] text-[#6ee7b7] uppercase mb-1">
+                  Session
+                </div>
+                <div className="text-xs text-[#d1d5db]">Token activo</div>
+              </div>
+              <div className="rounded-xl border border-[#34d399]/10 bg-[#07100c] px-3 py-3">
+                <div className="font-mono text-[10px] tracking-[0.20em] text-[#6ee7b7] uppercase mb-1">
+                  Workspace
+                </div>
+                <div className="text-xs text-[#d1d5db]">Dashboard listo</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -195,7 +305,9 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                 if (!mountedRef.current) return;
 
                 if (result.success) {
-                  setOverlayStep('Preparando tu espacio');
+                  setOverlayStep('Cargando sesión');
+                  await wait(280);
+                  setOverlayStep('Preparando dashboard');
                   await wait(320);
 
                   navigate(nextPath, {
@@ -255,7 +367,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
     <>
       {isAuthenticating && <GoogleConnectingOverlay stepText={overlayStep} />}
 
-      {(status === 'missing_client' || status === 'error') ? (
+      {status === 'missing_client' || status === 'error' ? (
         <div className="w-full mb-6">
           <div className="w-full rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 text-center">
             {errorMessage}
