@@ -7,7 +7,8 @@ import {
   Clock,
   ArrowRight,
   Sparkle,
-  Lightning
+  Lightning,
+  FileText
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
@@ -15,9 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import {
   entryOffer,
-  pricingPlans,
-  pricingPlansMap,
-  pricingTrustSignals
+  pricingPlans
 } from '../content/pricingContent';
 
 const API_BASE = '/api';
@@ -30,21 +29,19 @@ const FEATURE_LABELS = {
   continuity: 'Continuidad guiada',
   deployment: 'Activación y despliegue',
   support: 'Soporte prioritario',
-  opportunities: 'Oportunidades',
-  premium_report_preview: 'Informe puntual mejorado'
+  opportunities: 'Oportunidades'
 };
 
 const PLAN_VISUAL_META = {
   free: {
-    borderClass: 'border-[#244244]',
-    badgeClass: 'bg-[#173133] text-[#D8F1F2]',
-    chipClass: 'bg-[#112528] text-[#D8F1F2] border border-[#2B5357]/35',
-    ctaClass: 'bg-[#213436] text-white hover:bg-[#2A4346]',
+    borderClass: 'border-white/5',
+    badgeClass: 'bg-[#202020] text-[#D4D4D4]',
+    chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
+    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
     capabilityTitle: 'Señales clave',
     capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
-    bodyCopy:
-      'Explora el sistema, detecta si merece avanzar y recibe una primera lectura útil para ordenar la oportunidad antes de entrar en una capa más estructural.',
-    summaryLine: 'Ideal para abrir posibilidad y romper la inercia inicial.'
+    insight:
+      'Ideal para abrir posibilidad, detectar si merece avanzar y romper la inercia inicial.'
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
@@ -52,10 +49,9 @@ const PLAN_VISUAL_META = {
     chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
     ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
     capabilityTitle: 'Base estructural',
-    capabilityItems: ['Blueprint', 'Prioridades', 'Monetización', 'Prompts'],
-    bodyCopy:
-      'Convierte una lectura inicial en estructura de trabajo, prioridades claras y una base seria para empezar a construir con más criterio y continuidad.',
-    summaryLine: 'Ordena la oportunidad y la convierte en base de trabajo real.'
+    capabilityItems: ['Blueprint', 'Prioridades', 'Base de monetización', 'Prompts'],
+    insight:
+      'Aquí empieza la decisión principal del sistema: construir con estructura y dejar atrás la lectura básica.'
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
@@ -63,10 +59,9 @@ const PLAN_VISUAL_META = {
     chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
     ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
     capabilityTitle: 'Growth + CRO',
-    capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Sistema'],
-    bodyCopy:
-      'Pensado para proyectos en marcha que ya necesitan más CRO, growth, mejora de oferta y foco de ejecución para optimizar mejor el rendimiento.',
-    summaryLine: 'Sube el nivel del proyecto cuando ya no basta una estructura base.'
+    capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Priorización', 'Sistema'],
+    insight:
+      'No solo acompaña. Mejora rendimiento, secuencia de trabajo y calidad de decisión sobre el proyecto.'
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
@@ -84,60 +79,20 @@ const PLAN_VISUAL_META = {
       'Dirección de arte',
       'Marketing visual'
     ],
-    bodyCopy:
-      'Pensado para casos con más peso comercial que requieren criterio senior en monetización, growth, CRO, auditoría, marketing y arquitectura de trabajo.',
-    summaryLine: 'Pensado para decisiones críticas, marketing visual y arquitectura senior.'
+    insight:
+      'Cuando hay decisiones críticas, imagen de marca, marketing visual o arquitectura senior, esta es la capa correcta.'
   }
 };
 
-const PLAN_RECOMMENDATION_COPY = {
-  blueprint: {
-    title: 'Plan sugerido para este caso: Pro',
-    summary:
-      'Aquí ya no basta una lectura inicial. Lo correcto es entrar en una capa estructural para ordenar prioridades, monetización y base de trabajo.',
-    unlocks:
-      'Desbloquea estructura, prioridades y una forma más seria de avanzar con el proyecto.'
-  },
-  sistema: {
-    title: 'Plan sugerido para este caso: Growth',
-    summary:
-      'El siguiente cuello de botella ya no es entender mejor el caso, sino optimizar rendimiento, growth, conversión y secuencia de trabajo.',
-    unlocks:
-      'Desbloquea una capa más fuerte de CRO, growth, mejora de oferta y foco de ejecución.'
-  },
-  premium: {
-    title: 'Plan sugerido para este caso: AI Master 199',
-    summary:
-      'Este nivel entra cuando el caso ya requiere criterio senior en estrategia, monetización, growth, marketing y arquitectura de trabajo.',
-    unlocks:
-      'Desbloquea una intervención más alta en CRO, growth, auditoría, prompts maestros y dirección estratégica.'
-  }
-};
-
-const getFeatureChipClass = (feature) => {
-  if (['diagnosis', 'route'].includes(feature)) {
-    return 'bg-[#112528] text-[#D8F1F2] border border-[#2B5357]/35';
-  }
-
-  if (['blueprint', 'priorities'].includes(feature)) {
-    return 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25';
-  }
-
-  if (['continuity', 'deployment'].includes(feature)) {
-    return 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35';
-  }
-
-  if (['support', 'opportunities', 'premium_report_preview'].includes(feature)) {
-    return 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35';
-  }
-
-  return 'bg-[#262626] text-[#D4D4D4] border border-white/5';
-};
-
-const getBadgeLabel = ({ plan, isSuggestedPlan, isCurrentPlan }) => {
-  if (isCurrentPlan) return 'Actual';
-  if (plan.id === 'blueprint' && isSuggestedPlan) return 'Plan principal · Recomendado';
-  return plan.badge || null;
+const CURRENT_PLAN_BADGE_STYLES = {
+  diagnosis: 'bg-[#0F5257]/15 text-[#8DE1D0]',
+  route: 'bg-[#0F5257]/15 text-[#8DE1D0]',
+  blueprint: 'bg-[#173329] text-[#8BE3A1]',
+  priorities: 'bg-[#173329] text-[#8BE3A1]',
+  continuity: 'bg-[#2A213C] text-[#D7C3FF]',
+  deployment: 'bg-[#2A213C] text-[#D7C3FF]',
+  support: 'bg-[#3A241A] text-[#FFC89A]',
+  opportunities: 'bg-[#3A241A] text-[#FFC89A]'
 };
 
 const Billing = () => {
@@ -147,22 +102,22 @@ const Billing = () => {
 
   const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [processingPlan, setProcessingPlan] = useState(null);
+  const [processingKey, setProcessingKey] = useState(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
 
   const suggestedPlanId = location.state?.suggestedPlan || null;
   const fromProjectId = location.state?.fromProjectId || null;
-  const entryOfferIntent = location.state?.entryOfferId || null;
+  const entryOfferId = location.state?.entryOfferId || null;
 
   const suggestedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.id === suggestedPlanId) || null,
     [suggestedPlanId]
   );
 
-  const currentPlanContent = useMemo(
-    () => pricingPlansMap[user?.plan] || pricingPlansMap.free || null,
-    [user?.plan]
-  );
+  const selectedEntryOffer = useMemo(() => {
+    if (entryOfferId && entryOffer?.id === entryOfferId) return entryOffer;
+    return entryOffer;
+  }, [entryOfferId]);
 
   useEffect(() => {
     fetchBillingData();
@@ -188,11 +143,11 @@ const Billing = () => {
   };
 
   const pollPaymentStatus = async (sessionId, attempts = 0) => {
-    const maxAttempts = 5;
+    const maxAttempts = 6;
     const pollInterval = 2000;
 
     if (attempts >= maxAttempts) {
-      toast.info('Verifica tu correo para confirmar el pago');
+      toast.info('Verifica tu correo o revisa el estado del pago en unos segundos.');
       return;
     }
 
@@ -203,8 +158,15 @@ const Billing = () => {
         withCredentials: true
       });
 
-      if (response.data.payment_status === 'paid') {
-        toast.success('Pago completado. Tu plan ha sido actualizado.');
+      const { payment_status, item_type, item_id, status } = response.data;
+
+      if (payment_status === 'paid') {
+        if (item_type === 'one_time_offer' && item_id === 'single_report') {
+          toast.success('Pago completado. Tu informe puntual ha quedado registrado.');
+        } else {
+          toast.success('Pago completado. Tu plan ha sido actualizado.');
+        }
+
         await checkAuth();
         await fetchBillingData();
         window.history.replaceState({}, '', window.location.pathname);
@@ -212,7 +174,7 @@ const Billing = () => {
         return;
       }
 
-      if (response.data.status === 'expired') {
+      if (status === 'expired') {
         toast.error('La sesión de pago expiró');
         setCheckingPayment(false);
         return;
@@ -224,10 +186,11 @@ const Billing = () => {
     }
   };
 
-  const handleUpgrade = async (planId) => {
+  const handlePlanCheckout = async (planId) => {
     if (planId === 'free' || planId === user?.plan) return;
 
-    setProcessingPlan(planId);
+    const processingId = `plan:${planId}`;
+    setProcessingKey(processingId);
 
     try {
       const response = await axios.post(
@@ -242,12 +205,30 @@ const Billing = () => {
       window.location.href = response.data.url;
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al procesar el pago');
-      setProcessingPlan(null);
+      setProcessingKey(null);
     }
   };
 
-  const handleEntryOfferClick = () => {
-    toast.info('El informe puntual se activará en el siguiente ajuste de backend.');
+  const handleEntryOfferCheckout = async () => {
+    const processingId = `offer:${selectedEntryOffer.id}`;
+    setProcessingKey(processingId);
+
+    try {
+      const response = await axios.post(
+        `${API_BASE}/payments/checkout`,
+        {
+          item_type: 'one_time_offer',
+          item_id: selectedEntryOffer.id,
+          origin_url: window.location.origin
+        },
+        { withCredentials: true }
+      );
+
+      window.location.href = response.data.url;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al procesar el pago');
+      setProcessingKey(null);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -258,10 +239,7 @@ const Billing = () => {
     });
   };
 
-  const currentPlanName =
-    currentPlanContent?.visibleName ||
-    billingData?.current_plan?.name ||
-    'Gratis';
+  const currentPlanName = billingData?.current_plan?.name || 'Gratis';
 
   if (loading) {
     return (
@@ -300,20 +278,17 @@ const Billing = () => {
                 </div>
 
                 <h3 className="text-xl text-white font-medium mb-2">
-                  {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.title ||
-                    `Plan sugerido: ${suggestedPlan.visibleName}`}
+                  Plan sugerido para este caso: {suggestedPlan.visibleName}
                 </h3>
 
                 <p className="text-[#D4D4D4] mb-4">
-                  {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.summary ||
-                    suggestedPlan.description}
+                  {suggestedPlan.valuePromise}
                 </p>
 
                 <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
                   <p className="text-sm text-[#A3A3A3] mb-1">Qué desbloquea</p>
                   <p className="text-white">
-                    {PLAN_RECOMMENDATION_COPY[suggestedPlan.id]?.unlocks ||
-                      suggestedPlan.valuePromise}
+                    {suggestedPlan.promptLayer?.description}
                   </p>
                 </div>
 
@@ -337,19 +312,17 @@ const Billing = () => {
                 <p className="text-[#A3A3A3] mb-4">{suggestedPlan.headline}</p>
 
                 <div className="flex items-baseline gap-1 mb-5">
-                  <span className="text-4xl font-light text-white">
-                    {suggestedPlan.priceLabel}
-                  </span>
+                  <span className="text-4xl font-light text-white">{suggestedPlan.priceLabel}</span>
                   <span className="text-[#A3A3A3]">{suggestedPlan.periodLabel}</span>
                 </div>
 
                 {user?.plan !== suggestedPlan.id ? (
                   <button
-                    onClick={() => handleUpgrade(suggestedPlan.id)}
-                    disabled={processingPlan === suggestedPlan.id}
+                    onClick={() => handlePlanCheckout(suggestedPlan.id)}
+                    disabled={processingKey === `plan:${suggestedPlan.id}`}
                     className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {processingPlan === suggestedPlan.id ? (
+                    {processingKey === `plan:${suggestedPlan.id}` ? (
                       <div className="spinner w-4 h-4"></div>
                     ) : (
                       <>
@@ -380,7 +353,7 @@ const Billing = () => {
             </div>
             <div>
               <p className="text-sm text-[#A3A3A3]">Plan actual</p>
-              <h3 className="text-xl text-white font-medium">{currentPlanName}</h3>
+              <h3 className="text-xl text-white font-medium capitalize">{currentPlanName}</h3>
             </div>
           </div>
 
@@ -389,7 +362,9 @@ const Billing = () => {
               {billingData.current_plan.features.map((feature) => (
                 <span
                   key={feature}
-                  className={`px-3 py-1 rounded-full text-sm ${getFeatureChipClass(feature)}`}
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    CURRENT_PLAN_BADGE_STYLES[feature] || 'bg-[#262626] text-[#A3A3A3]'
+                  }`}
                 >
                   {FEATURE_LABELS[feature] || feature}
                 </span>
@@ -401,61 +376,92 @@ const Billing = () => {
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.03 }}
-          className="mb-8"
-          data-testid="billing-entry-offer"
+          transition={{ delay: 0.04 }}
+          className="mb-10"
+          data-testid="entry-offer-card"
         >
-          <div className="bg-[#121212] border border-[#0F5257]/25 rounded-2xl p-6">
-            <div className="grid lg:grid-cols-[1.3fr_0.85fr] gap-6">
-              <div>
+          <div className="bg-[#121212] border border-[#0F5257]/30 rounded-2xl p-6 lg:p-8">
+            <div className="grid lg:grid-cols-[1.35fr_0.9fr] gap-8">
+              <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257] text-white text-xs font-medium">
-                    {entryOffer.badge}
+                    {selectedEntryOffer.badge}
                   </span>
                   <span className="text-xs uppercase tracking-wider text-[#A3A3A3]">
-                    {entryOffer.priceLabel} · {entryOffer.periodLabel}
+                    {selectedEntryOffer.priceLabel} · {selectedEntryOffer.periodLabel}
                   </span>
                 </div>
 
-                <h3 className="text-2xl text-white font-medium mb-2">{entryOffer.name}</h3>
-                <p className="text-[#D4D4D4] mb-4">{entryOffer.description}</p>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {entryOffer.features.map((feature) => (
-                    <span
-                      key={feature}
-                      className="px-3 py-1 rounded-full text-xs bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25"
-                    >
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="text-sm text-[#A3A3A3]">
-                  {entryOffer.promptLayer.description}
-                </p>
-              </div>
-
-              <div
-                className={`bg-[#0A0A0A] border rounded-xl p-5 flex flex-col justify-between ${
-                  entryOfferIntent ? 'border-[#0F5257]/35' : 'border-[#262626]'
-                }`}
-              >
-                <div>
-                  <p className="text-sm text-[#A3A3A3] mb-2">Mejor encaje</p>
-                  <p className="text-white text-sm mb-5">{entryOffer.bestFor}</p>
-
-                  <p className="text-xs text-[#737373] leading-relaxed">
-                    El pago puntual se activará en el siguiente ajuste de backend.
+                <div className="min-h-[160px]">
+                  <h3 className="text-2xl lg:text-3xl font-light text-white mb-3">
+                    {selectedEntryOffer.headline}
+                  </h3>
+                  <p className="text-[#D4D4D4] mb-4 max-w-2xl">{selectedEntryOffer.description}</p>
+                  <p className="text-sm text-[#A3A3A3] mb-6 max-w-2xl">
+                    {selectedEntryOffer.valuePromise}
                   </p>
                 </div>
 
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {selectedEntryOffer.features.map((feature) => (
+                    <div
+                      key={feature}
+                      className="flex items-start gap-2 bg-[#0A0A0A] border border-white/5 rounded-lg px-4 py-4 min-h-[92px]"
+                    >
+                      <CheckCircle
+                        size={18}
+                        weight="fill"
+                        className="text-[#0F5257] mt-0.5 flex-shrink-0"
+                      />
+                      <span className="text-sm text-[#D4D4D4]">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col bg-[#0A0A0A] border border-[#262626] rounded-2xl p-6">
+                <div className="flex-1">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium mb-4">
+                    <FileText size={14} weight="fill" />
+                    Compra puntual
+                  </div>
+
+                  <div className="flex items-baseline gap-2 mb-5">
+                    <span className="text-5xl font-light text-white">{selectedEntryOffer.priceLabel}</span>
+                    <span className="text-[#A3A3A3]">{selectedEntryOffer.periodLabel}</span>
+                  </div>
+
+                  <div className="bg-[#111111] border border-[#0F5257]/20 rounded-xl p-4 mb-5">
+                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                      Mejor encaje
+                    </p>
+                    <p className="text-sm text-white">{selectedEntryOffer.bestFor}</p>
+                  </div>
+
+                  <div className="bg-[#111111] border border-white/5 rounded-xl p-4 mb-6">
+                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                      Qué prepara
+                    </p>
+                    <p className="text-sm text-[#D4D4D4]">
+                      Valida la oportunidad, reduce dudas y deja el terreno preparado para subir con lógica al plan Pro.
+                    </p>
+                  </div>
+                </div>
+
                 <button
-                  onClick={handleEntryOfferClick}
-                  className="w-full mt-6 py-3 rounded-lg font-medium bg-[#0F5257] text-white hover:bg-[#136970] transition-all"
-                  data-testid="entry-offer-billing-cta"
+                  onClick={handleEntryOfferCheckout}
+                  disabled={processingKey === `offer:${selectedEntryOffer.id}`}
+                  className="w-full py-3 rounded-lg font-medium bg-[#0F5257] text-white hover:bg-[#136970] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  data-testid="entry-offer-cta"
                 >
-                  {entryOffer.cta.label}
+                  {processingKey === `offer:${selectedEntryOffer.id}` ? (
+                    <div className="spinner w-4 h-4"></div>
+                  ) : (
+                    <>
+                      {selectedEntryOffer.cta.label}
+                      <ArrowRight size={16} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -465,82 +471,88 @@ const Billing = () => {
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
+          transition={{ delay: 0.06 }}
           className="mb-8"
         >
           <h3 className="text-lg font-medium text-white mb-4">Planes disponibles</h3>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-            {pricingPlans.map((plan, index) => {
-              const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pricingPlans.map((plan) => {
               const isCurrentPlan = user?.plan === plan.id;
               const isSuggestedPlan = suggestedPlanId
                 ? suggestedPlanId === plan.id
-                : plan.isPrimaryPlan;
-              const badgeLabel = getBadgeLabel({ plan, isSuggestedPlan, isCurrentPlan });
+                : plan.id === 'blueprint';
+
+              const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
 
               return (
-                <motion.div
+                <div
                   key={plan.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col h-full min-h-[600px] ${
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[640px] ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
                 >
-                  <div className="min-h-[36px] mb-4 flex items-start justify-between gap-3">
+                  <div className="min-h-[40px] mb-4 flex items-start justify-between gap-3">
                     <div className="flex flex-wrap gap-2">
-                      {badgeLabel && (
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                            isCurrentPlan ? 'bg-[#262626] text-white' : visual.badgeClass
-                          }`}
-                        >
-                          {badgeLabel}
+                      {plan.badge && (
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
+                          {plan.badge}
+                        </span>
+                      )}
+
+                      {isSuggestedPlan && !isCurrentPlan && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium">
+                          Recomendado
+                        </span>
+                      )}
+
+                      {isCurrentPlan && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
+                          Actual
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="min-h-[252px] mb-5">
-                    <h4 className="text-2xl lg:text-[2rem] font-medium text-white mb-4 leading-[1.05]">
-                      {plan.visibleName}
-                    </h4>
-                    <p className="text-white text-[15px] leading-[1.75]">
-                      {visual.bodyCopy}
-                    </p>
+                  <div className="min-h-[170px] mb-5">
+                    <h4 className="text-2xl font-medium text-white mb-3">{plan.visibleName}</h4>
+                    <p className="text-[#F0F0F0] text-base leading-snug mb-3">{plan.headline}</p>
+                    <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
                   </div>
 
-                  <div className="min-h-[72px] flex items-end gap-2 mb-5">
-                    <span className="text-4xl lg:text-5xl font-light text-white">
-                      {plan.priceLabel}
-                    </span>
+                  <div className="min-h-[84px] flex items-end gap-2 mb-5">
+                    <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[154px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[130px]">
+                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                      Mejor encaje
+                    </p>
+                    <p className="text-sm text-white leading-relaxed">{plan.bestFor}</p>
+                  </div>
+
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[145px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
                       {visual.capabilityTitle}
                     </p>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {visual.capabilityItems.map((item) => (
-                        <span
-                          key={item}
-                          className={`px-2.5 py-1 rounded-full text-xs ${visual.chipClass}`}
-                        >
+                        <span key={item} className={`px-2.5 py-1 rounded-full text-xs ${visual.chipClass}`}>
                           {item}
                         </span>
                       ))}
                     </div>
-                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.summaryLine}</p>
+                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.insight}</p>
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-1">
-                    {plan.features.slice(0, 4).map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm text-[#D4D4D4]">
+                    {plan.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2 text-sm text-[#D4D4D4]"
+                      >
                         <CheckCircle
                           size={16}
                           weight="fill"
@@ -552,11 +564,11 @@ const Billing = () => {
                   </ul>
 
                   <button
-                    onClick={() => handleUpgrade(plan.id)}
+                    onClick={() => handlePlanCheckout(plan.id)}
                     disabled={
                       plan.id === 'free' ||
                       isCurrentPlan ||
-                      processingPlan === plan.id
+                      processingKey === `plan:${plan.id}`
                     }
                     className={`w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 mt-auto ${
                       isCurrentPlan
@@ -567,7 +579,7 @@ const Billing = () => {
                     } disabled:opacity-50`}
                     data-testid={`upgrade-btn-${plan.id}`}
                   >
-                    {processingPlan === plan.id ? (
+                    {processingKey === `plan:${plan.id}` ? (
                       <div className="spinner w-4 h-4"></div>
                     ) : isCurrentPlan ? (
                       'Plan actual'
@@ -580,7 +592,7 @@ const Billing = () => {
                       </>
                     )}
                   </button>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -589,35 +601,9 @@ const Billing = () => {
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08 }}
-          className="mb-8"
-        >
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {pricingTrustSignals.map((signal, index) => (
-              <div
-                key={signal}
-                className="bg-[#121212] border border-white/5 rounded-lg px-4 py-3 text-sm text-[#D4D4D4]"
-                data-testid={`billing-signal-${index}`}
-              >
-                {signal}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <h3 className="text-lg font-medium text-white">Historial de pagos</h3>
-            {user?.role === 'admin' && (
-              <div className="text-sm text-[#737373]">
-                El reinicio del historial de pruebas se activa en el siguiente ajuste de backend.
-              </div>
-            )}
-          </div>
+          <h3 className="text-lg font-medium text-white mb-4">Historial de pagos</h3>
 
           {billingData?.transactions && billingData.transactions.length > 0 ? (
             <div className="card overflow-hidden p-0">
@@ -625,26 +611,20 @@ const Billing = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#262626]">
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
-                        Fecha
-                      </th>
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
-                        Concepto
-                      </th>
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
-                        Monto
-                      </th>
-                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">
-                        Estado
-                      </th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Fecha</th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Concepto</th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Monto</th>
+                      <th className="text-left text-sm font-medium text-[#A3A3A3] px-6 py-4">Estado</th>
                     </tr>
                   </thead>
                   <tbody>
                     {billingData.transactions.map((tx) => {
-                      const txId = tx.item_id || tx.plan_id;
-                      const txLabel =
-                        pricingPlansMap[txId]?.visibleName ||
-                        (txId === 'single_report' ? 'Informe puntual' : txId || 'Pago');
+                      const isOneTimeOffer = tx.item_type === 'one_time_offer';
+                      const conceptLabel = isOneTimeOffer
+                        ? tx.offer_id === 'single_report'
+                          ? 'Informe puntual 6,99'
+                          : tx.offer_id || 'Oferta puntual'
+                        : tx.plan_id || tx.item_id || 'Plan';
 
                       return (
                         <tr
@@ -658,7 +638,7 @@ const Billing = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-white">{txLabel}</span>
+                            <span className="text-white capitalize">{conceptLabel}</span>
                           </td>
                           <td className="px-6 py-4">
                             <span className="text-white">€{tx.amount}</span>
