@@ -43,7 +43,7 @@ const PLAN_VISUAL_META = {
     capabilityTitle: 'Señales clave',
     capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
     bodyCopy:
-      'Explora el sistema, detecta si merece avanzar y recibe una primera lectura útil para ordenar la oportunidad sin entrar todavía en una capa estructural.',
+      'Explora el sistema, detecta si merece avanzar y recibe una primera lectura útil para ordenar la oportunidad antes de entrar en una capa más estructural.',
     summaryLine: 'Ideal para abrir posibilidad y romper la inercia inicial.'
   },
   blueprint: {
@@ -54,7 +54,7 @@ const PLAN_VISUAL_META = {
     capabilityTitle: 'Base estructural',
     capabilityItems: ['Blueprint', 'Prioridades', 'Monetización', 'Prompts'],
     bodyCopy:
-      'Convierte una lectura inicial en estructura de trabajo real, prioridades y una base seria para empezar a construir con más criterio.',
+      'Convierte una lectura inicial en estructura de trabajo, prioridades claras y una base seria para empezar a construir con más criterio y continuidad.',
     summaryLine: 'Ordena la oportunidad y la convierte en base de trabajo real.'
   },
   sistema: {
@@ -65,7 +65,7 @@ const PLAN_VISUAL_META = {
     capabilityTitle: 'Growth + CRO',
     capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Sistema'],
     bodyCopy:
-      'Pensado para proyectos en marcha que necesitan más CRO, growth, mejora de oferta y foco de ejecución para optimizar el rendimiento.',
+      'Pensado para proyectos en marcha que ya necesitan más CRO, growth, mejora de oferta y foco de ejecución para optimizar mejor el rendimiento.',
     summaryLine: 'Sube el nivel del proyecto cuando ya no basta una estructura base.'
   },
   premium: {
@@ -85,7 +85,7 @@ const PLAN_VISUAL_META = {
       'Marketing visual'
     ],
     bodyCopy:
-      'Pensado para casos con más peso comercial donde hace falta criterio senior en monetización, growth, CRO, auditoría, marketing y arquitectura.',
+      'Pensado para casos con más peso comercial que requieren criterio senior en monetización, growth, CRO, auditoría, marketing y arquitectura de trabajo.',
     summaryLine: 'Pensado para decisiones críticas, marketing visual y arquitectura senior.'
   }
 };
@@ -132,6 +132,12 @@ const getFeatureChipClass = (feature) => {
   }
 
   return 'bg-[#262626] text-[#D4D4D4] border border-white/5';
+};
+
+const getBadgeLabel = ({ plan, isSuggestedPlan, isCurrentPlan }) => {
+  if (isCurrentPlan) return 'Actual';
+  if (plan.id === 'blueprint' && isSuggestedPlan) return 'Plan principal · Recomendado';
+  return plan.badge || null;
 };
 
 const Billing = () => {
@@ -471,6 +477,7 @@ const Billing = () => {
               const isSuggestedPlan = suggestedPlanId
                 ? suggestedPlanId === plan.id
                 : plan.isPrimaryPlan;
+              const badgeLabel = getBadgeLabel({ plan, isSuggestedPlan, isCurrentPlan });
 
               return (
                 <motion.div
@@ -486,30 +493,20 @@ const Billing = () => {
                 >
                   <div className="min-h-[36px] mb-4 flex items-start justify-between gap-3">
                     <div className="flex flex-wrap gap-2">
-                      {isCurrentPlan ? (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium whitespace-nowrap">
-                          Actual
-                        </span>
-                      ) : (
-                        plan.badge && (
-                          <span
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}
-                          >
-                            {plan.badge}
-                          </span>
-                        )
-                      )}
-
-                      {isSuggestedPlan && !isCurrentPlan && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#0F5257] text-xs font-medium whitespace-nowrap">
-                          Recomendado
+                      {badgeLabel && (
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                            isCurrentPlan ? 'bg-[#262626] text-white' : visual.badgeClass
+                          }`}
+                        >
+                          {badgeLabel}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="min-h-[220px] mb-5">
-                    <h4 className="text-2xl lg:text-[2rem] font-medium text-white mb-4">
+                  <div className="min-h-[252px] mb-5">
+                    <h4 className="text-2xl lg:text-[2rem] font-medium text-white mb-4 leading-[1.05]">
                       {plan.visibleName}
                     </h4>
                     <p className="text-white text-[15px] leading-[1.75]">
