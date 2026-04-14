@@ -5,6 +5,7 @@ import { ArrowRight } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -62,8 +63,14 @@ const Login = () => {
               Accede a tu cuenta para continuar
             </p>
 
-            <div className="mb-6 rounded-lg border border-[#0F5257]/20 bg-[#0F5257]/10 px-4 py-3 text-sm text-[#CDECEE] text-center">
-              El acceso con Google está temporalmente en revisión. Usa tu email y contraseña.
+            <GoogleSignInButton
+              redirectPath={location.state?.from?.pathname || '/dashboard'}
+            />
+
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-px bg-white/10"></div>
+              <span className="text-[#A3A3A3] text-sm">o</span>
+              <div className="flex-1 h-px bg-white/10"></div>
             </div>
 
             <form onSubmit={handleSubmit}>
