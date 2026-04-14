@@ -8,7 +8,8 @@ import {
   ArrowRight,
   Sparkle,
   Lightning,
-  FileText
+  FileText,
+  WarningCircle
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
@@ -95,6 +96,23 @@ const CURRENT_PLAN_BADGE_STYLES = {
   opportunities: 'bg-[#3A241A] text-[#FFC89A]'
 };
 
+const getErrorMessage = (error, fallback) => {
+  const detail = error?.response?.data?.detail;
+  if (typeof detail === 'string' && detail.trim()) return detail;
+  return fallback;
+};
+
+const isValidCheckoutUrl = (value) => {
+  if (typeof value !== 'string' || !value.trim()) return false;
+
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+};
+
 const Billing = () => {
   const { user, checkAuth } = useAuth();
   const location = useLocation();
@@ -104,6 +122,7 @@ const Billing = () => {
   const [loading, setLoading] = useState(true);
   const [processingKey, setProcessingKey] = useState(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
 
   const suggestedPlanId = location.state?.suggestedPlan || null;
   const fromProjectId = location.state?.fromProjectId || null;
@@ -148,6 +167,7 @@ const Billing = () => {
 
     if (attempts >= maxAttempts) {
       toast.info('Verifica tu correo o revisa el estado del pago en unos segundos.');
+      setCheckingPayment(false);
       return;
     }
 
@@ -158,7 +178,7 @@ const Billing = () => {
         withCredentials: true
       });
 
-      const { payment_status, item_type, item_id, status } = response.data;
+      const { payment_status, item_type, item_id, status } = response.data || {};
 
       if (payment_status === 'paid') {
         if (item_type === 'one_time_offer' && item_id === 'single_report') {
@@ -180,10 +200,19 @@ const Billing = () => {
         return;
       }
 
-      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+      setTimeout(() => {
+        pollPaymentStatus(sessionId, attempts + 1);
+      }, pollInterval);
     } catch (error) {
       setCheckingPayment(false);
     }
+  };
+
+  const redirectToCheckout = (url) => {
+    if (!isValidCheckoutUrl(url)) {
+      throw new Error('La URL de checkout no es válida');
+    }
+    window.location.assign(url);
   };
 
   const handlePlanCheckout = async (planId) => {
@@ -191,6 +220,7 @@ const Billing = () => {
 
     const processingId = `plan:${planId}`;
     setProcessingKey(processingId);
+    setCheckoutError('');
 
     try {
       const response = await axios.post(
@@ -202,31 +232,57 @@ const Billing = () => {
         { withCredentials: true }
       );
 
-      window.location.href = response.data.url;
+      const checkoutUrl = response?.data?.url;
+
+      if (!isValidCheckoutUrl(checkoutUrl)) {
+        throw new Error('Stripe no devolvió una URL de checkout válida');
+      }
+
+      redirectToCheckout(checkoutUrl);
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al procesar el pago');
+      const message = getErrorMessage(error, 'No se pudo iniciar el checkout del plan.');
+      setCheckoutError(message);
+      toast.error(message);
       setProcessingKey(null);
     }
   };
 
   const handleEntryOfferCheckout = async () => {
-    const processingId = `offer:${selectedEntryOffer.id}`;
+    const offerId = selectedEntryOffer?.id;
+
+    if (!offerId) {
+      const message = 'La oferta puntual no está bien configurada.';
+      setCheckoutError(message);
+      toast.error(message);
+      return;
+    }
+
+    const processingId = `offer:${offerId}`;
     setProcessingKey(processingId);
+    setCheckoutError('');
 
     try {
       const response = await axios.post(
         `${API_BASE}/payments/checkout`,
         {
           item_type: 'one_time_offer',
-          item_id: selectedEntryOffer.id,
+          item_id: offerId,
           origin_url: window.location.origin
         },
         { withCredentials: true }
       );
 
-      window.location.href = response.data.url;
+      const checkoutUrl = response?.data?.url;
+
+      if (!isValidCheckoutUrl(checkoutUrl)) {
+        throw new Error('Stripe no devolvió una URL de checkout válida');
+      }
+
+      redirectToCheckout(checkoutUrl);
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al procesar el pago');
+      const message = getErrorMessage(error, 'No se pudo iniciar el checkout del informe puntual.');
+      setCheckoutError(message);
+      toast.error(message);
       setProcessingKey(null);
     }
   };
@@ -240,6 +296,7 @@ const Billing = () => {
   };
 
   const currentPlanName = billingData?.current_plan?.name || 'Gratis';
+  const transactions = Array.isArray(billingData?.transactions) ? billingData.transactions : [];
 
   if (loading) {
     return (
@@ -263,6 +320,22 @@ const Billing = () => {
           </div>
         )}
 
+        {checkoutError && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4"
+          >
+            <div className="flex items-start gap-3">
+              <WarningCircle size={20} className="text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-red-300 font-medium mb-1">No se pudo abrir el checkout</p>
+                <p className="text-red-200/90 text-sm">{checkoutError}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {suggestedPlan && (
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -281,15 +354,11 @@ const Billing = () => {
                   Plan sugerido para este caso: {suggestedPlan.visibleName}
                 </h3>
 
-                <p className="text-[#D4D4D4] mb-4">
-                  {suggestedPlan.valuePromise}
-                </p>
+                <p className="text-[#D4D4D4] mb-4">{suggestedPlan.valuePromise}</p>
 
                 <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
                   <p className="text-sm text-[#A3A3A3] mb-1">Qué desbloquea</p>
-                  <p className="text-white">
-                    {suggestedPlan.promptLayer?.description}
-                  </p>
+                  <p className="text-white">{suggestedPlan.promptLayer?.description}</p>
                 </div>
 
                 {fromProjectId && (
@@ -605,7 +674,7 @@ const Billing = () => {
         >
           <h3 className="text-lg font-medium text-white mb-4">Historial de pagos</h3>
 
-          {billingData?.transactions && billingData.transactions.length > 0 ? (
+          {transactions.length > 0 ? (
             <div className="card overflow-hidden p-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -618,12 +687,12 @@ const Billing = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {billingData.transactions.map((tx) => {
+                    {transactions.map((tx) => {
                       const isOneTimeOffer = tx.item_type === 'one_time_offer';
                       const conceptLabel = isOneTimeOffer
                         ? tx.offer_id === 'single_report'
                           ? 'Informe puntual 6,99'
-                          : tx.offer_id || 'Oferta puntual'
+                          : tx.offer_id || tx.item_id || 'Oferta puntual'
                         : tx.plan_id || tx.item_id || 'Plan';
 
                       return (
