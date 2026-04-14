@@ -5,7 +5,6 @@ import { ArrowRight } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
-import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -78,20 +77,16 @@ const Register = () => {
               Empieza gratis, sin tarjeta de crédito
             </p>
 
-            <GoogleSignInButton
-              redirectPath={inputData.inputContent ? '/flow' : '/dashboard'}
-              redirectState={inputData.inputContent ? inputData : null}
-            />
-
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-white/10"></div>
-              <span className="text-[#A3A3A3] text-sm">o</span>
-              <div className="flex-1 h-px bg-white/10"></div>
+            <div className="mb-6 rounded-lg border border-[#0F5257]/20 bg-[#0F5257]/10 px-4 py-3 text-sm text-[#CDECEE] text-center">
+              El acceso con Google está temporalmente en revisión. Regístrate con email y contraseña.
             </div>
 
             <form onSubmit={handleSubmit}>
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm" data-testid="register-error">
+                <div
+                  className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm"
+                  data-testid="register-error"
+                >
                   {error}
                 </div>
               )}
@@ -155,7 +150,11 @@ const Register = () => {
 
             <p className="text-center text-[#A3A3A3] text-sm mt-6">
               ¿Ya tienes cuenta?{' '}
-              <Link to="/login" className="text-[#0F5257] hover:text-[#136970] transition-colors" data-testid="login-link">
+              <Link
+                to="/login"
+                className="text-[#0F5257] hover:text-[#136970] transition-colors"
+                data-testid="login-link"
+              >
                 Inicia sesión
               </Link>
             </p>
