@@ -5,21 +5,31 @@ import { useAuth } from '../context/AuthContext';
 
 const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 
-const loadGoogleScript = () =>
-  new Promise((resolve, reject) => {
+let googleScriptPromise = null;
+
+const loadGoogleScriptOnce = () => {
+  if (window.google?.accounts?.id) {
+    return Promise.resolve();
+  }
+
+  if (googleScriptPromise) {
+    return googleScriptPromise;
+  }
+
+  googleScriptPromise = new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
 
     if (existing) {
+      const onLoad = () => resolve();
+      const onError = () => reject(new Error('No se pudo cargar Google Sign-In'));
+
+      existing.addEventListener('load', onLoad, { once: true });
+      existing.addEventListener('error', onError, { once: true });
+
       if (window.google?.accounts?.id) {
         resolve();
-        return;
       }
 
-      const handleLoad = () => resolve();
-      const handleError = () => reject(new Error('No se pudo cargar Google Sign-In'));
-
-      existing.addEventListener('load', handleLoad, { once: true });
-      existing.addEventListener('error', handleError, { once: true });
       return;
     }
 
@@ -32,7 +42,10 @@ const loadGoogleScript = () =>
     document.head.appendChild(script);
   });
 
-const fetchGoogleClientId = async () => {
+  return googleScriptPromise;
+};
+
+const getGoogleClientId = async () => {
   try {
     const response = await fetch('/api/public/config', {
       method: 'GET',
@@ -42,20 +55,24 @@ const fetchGoogleClientId = async () => {
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`Public config error: ${response.status}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.google_client_id) {
+        return data.google_client_id;
+      }
     }
-
-    const data = await response.json();
-    return data?.google_client_id || '';
   } catch (error) {
-    console.error('Error obteniendo google_client_id:', error);
-    return '';
+    console.error('Error loading Google public config:', error);
   }
+
+  return process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 };
 
 const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null }) => {
   const buttonRef = useRef(null);
+  const initializedRef = useRef(false);
+  const mountedRef = useRef(true);
+
   const navigate = useNavigate();
   const { loginWithGoogleCredential } = useAuth();
 
@@ -63,33 +80,29 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    let active = true;
+    mountedRef.current = true;
 
-    const initGoogleButton = async () => {
+    const init = async () => {
       try {
         setStatus('loading');
         setErrorMessage('');
 
-        const clientId = await fetchGoogleClientId();
+        const clientId = await getGoogleClientId();
 
         if (!clientId) {
-          if (active) {
+          if (mountedRef.current) {
             setStatus('missing_client');
             setErrorMessage('Google Sign-In no está disponible temporalmente.');
           }
           return;
         }
 
-        await loadGoogleScript();
+        await loadGoogleScriptOnce();
 
-        if (!active) return;
+        if (!mountedRef.current) return;
 
         const googleId = window.google?.accounts?.id;
-        if (
-          !googleId ||
-          typeof googleId.initialize !== 'function' ||
-          typeof googleId.renderButton !== 'function'
-        ) {
+        if (!googleId) {
           throw new Error('Google Identity Services no está disponible');
         }
 
@@ -97,36 +110,40 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           throw new Error('No existe el contenedor del botón de Google');
         }
 
-        buttonRef.current.innerHTML = '';
+        if (!initializedRef.current) {
+          googleId.initialize({
+            client_id: clientId,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+            callback: async (response) => {
+              try {
+                if (!response?.credential) {
+                  throw new Error('Google no devolvió credencial');
+                }
 
-        googleId.initialize({
-          client_id: clientId,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-          callback: async (response) => {
-            try {
-              if (!response?.credential) {
-                throw new Error('Google no devolvió credencial');
+                const result = await loginWithGoogleCredential(response.credential);
+
+                if (result.success) {
+                  toast.success('Sesión iniciada correctamente');
+                  navigate(redirectPath, {
+                    replace: true,
+                    state: redirectState
+                  });
+                  return;
+                }
+
+                toast.error(result.error || 'Error al iniciar sesión con Google');
+              } catch (callbackError) {
+                console.error('Google callback error:', callbackError);
+                toast.error('Error al completar el acceso con Google');
               }
-
-              const result = await loginWithGoogleCredential(response.credential);
-
-              if (result.success) {
-                toast.success('Sesión iniciada correctamente');
-                navigate(redirectPath, {
-                  replace: true,
-                  state: redirectState
-                });
-                return;
-              }
-
-              toast.error(result.error || 'Error al iniciar sesión con Google');
-            } catch (callbackError) {
-              console.error('Google callback error:', callbackError);
-              toast.error('Error al completar el acceso con Google');
             }
-          }
-        });
+          });
+
+          initializedRef.current = true;
+        }
+
+        buttonRef.current.innerHTML = '';
 
         googleId.renderButton(buttonRef.current, {
           type: 'standard',
@@ -135,30 +152,33 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           text: 'continue_with',
           shape: 'rectangular',
           logo_alignment: 'left',
-          width: 360
+          width: 340
         });
 
-        if (active) {
+        window.setTimeout(() => {
+          if (!mountedRef.current) return;
+
+          if (!buttonRef.current || buttonRef.current.childElementCount === 0) {
+            setStatus('error');
+            setErrorMessage('No se pudo renderizar el acceso con Google.');
+            return;
+          }
+
           setStatus('ready');
-        }
+        }, 300);
       } catch (error) {
         console.error('Google Sign-In init error:', error);
-        if (active) {
+        if (mountedRef.current) {
           setStatus('error');
           setErrorMessage('No se pudo inicializar Google Sign-In.');
         }
       }
     };
 
-    initGoogleButton();
+    init();
 
     return () => {
-      active = false;
-      try {
-        window.google?.accounts?.id?.cancel?.();
-      } catch (error) {
-        console.error('Google cancel cleanup error:', error);
-      }
+      mountedRef.current = false;
     };
   }, [loginWithGoogleCredential, navigate, redirectPath, redirectState]);
 
