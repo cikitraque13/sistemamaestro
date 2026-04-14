@@ -241,7 +241,7 @@ const Billing = () => {
   };
 
   const handleEntryOfferClick = () => {
-    toast.info('El informe puntual quedará conectado a Stripe en el siguiente ajuste de backend.');
+    toast.info('El informe puntual se activará en el siguiente ajuste de backend.');
   };
 
   const formatDate = (dateString) => {
@@ -412,7 +412,7 @@ const Billing = () => {
                 </div>
 
                 <h3 className="text-2xl text-white font-medium mb-2">{entryOffer.name}</h3>
-                <p className="text-[#D4D4D4] mb-3">{entryOffer.description}</p>
+                <p className="text-[#D4D4D4] mb-4">{entryOffer.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {entryOffer.features.map((feature) => (
@@ -425,9 +425,9 @@ const Billing = () => {
                   ))}
                 </div>
 
-                <div className="text-sm text-[#A3A3A3]">
+                <p className="text-sm text-[#A3A3A3]">
                   {entryOffer.promptLayer.description}
-                </div>
+                </p>
               </div>
 
               <div
@@ -440,7 +440,7 @@ const Billing = () => {
                   <p className="text-white text-sm mb-5">{entryOffer.bestFor}</p>
 
                   <p className="text-xs text-[#737373] leading-relaxed">
-                    El bloque ya está integrado en el sistema. La conexión real con Stripe va en el siguiente ajuste de backend.
+                    El pago puntual se activará en el siguiente ajuste de backend.
                   </p>
                 </div>
 
@@ -613,7 +613,14 @@ const Billing = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <h3 className="text-lg font-medium text-white mb-4">Historial de pagos</h3>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <h3 className="text-lg font-medium text-white">Historial de pagos</h3>
+            {user?.role === 'admin' && (
+              <div className="text-sm text-[#737373]">
+                El reinicio del historial de pruebas se activa en el siguiente ajuste de backend.
+              </div>
+            )}
+          </div>
 
           {billingData?.transactions && billingData.transactions.length > 0 ? (
             <div className="card overflow-hidden p-0">
