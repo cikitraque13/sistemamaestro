@@ -20,16 +20,17 @@ const loadGoogleScriptOnce = () => {
     const existing = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
 
     if (existing) {
-      const onLoad = () => resolve();
-      const onError = () => reject(new Error('No se pudo cargar Google Sign-In'));
-
-      existing.addEventListener('load', onLoad, { once: true });
-      existing.addEventListener('error', onError, { once: true });
-
       if (window.google?.accounts?.id) {
         resolve();
+        return;
       }
 
+      existing.addEventListener('load', () => resolve(), { once: true });
+      existing.addEventListener(
+        'error',
+        () => reject(new Error('No se pudo cargar Google Sign-In')),
+        { once: true }
+      );
       return;
     }
 
@@ -50,9 +51,7 @@ const getGoogleClientId = async () => {
     const response = await fetch('/api/public/config', {
       method: 'GET',
       credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
+      headers: { Accept: 'application/json' }
     });
 
     if (!response.ok) {
@@ -62,18 +61,19 @@ const getGoogleClientId = async () => {
     const data = await response.json();
     return data?.google_client_id || '';
   } catch (error) {
-    console.error('Error loading Google public config:', error);
+    console.error('Error cargando /api/public/config:', error);
     return '';
   }
 };
 
 const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null }) => {
-  const buttonRef = useRef(null);
+  const containerRef = useRef(null);
+  const initializedRef = useRef(false);
   const mountedRef = useRef(false);
-  const authFlowRef = useRef({
-    redirectPath,
-    redirectState,
-    loginWithGoogleCredential: null
+  const authRef = useRef({
+    loginWithGoogleCredential: null,
+    redirectPath: '/dashboard',
+    redirectState: null
   });
 
   const navigate = useNavigate();
@@ -83,23 +83,22 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    authFlowRef.current = {
+    authRef.current = {
+      loginWithGoogleCredential,
       redirectPath,
-      redirectState,
-      loginWithGoogleCredential
+      redirectState
     };
-  }, [redirectPath, redirectState, loginWithGoogleCredential]);
+  }, [loginWithGoogleCredential, redirectPath, redirectState]);
 
   useEffect(() => {
     mountedRef.current = true;
 
-    const initGoogleButton = async () => {
+    const initGoogle = async () => {
       try {
         setStatus('loading');
         setErrorMessage('');
 
         const clientId = await getGoogleClientId();
-
         if (!clientId) {
           if (mountedRef.current) {
             setStatus('missing_client');
@@ -117,48 +116,53 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           throw new Error('Google Identity Services no está disponible');
         }
 
-        if (!buttonRef.current) {
+        if (!containerRef.current) {
           throw new Error('No existe el contenedor del botón de Google');
         }
 
-        buttonRef.current.innerHTML = '';
+        if (!initializedRef.current) {
+          googleId.initialize({
+            client_id: clientId,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+            callback: async (response) => {
+              try {
+                if (!response?.credential) {
+                  throw new Error('Google no devolvió credencial');
+                }
 
-        googleId.initialize({
-          client_id: clientId,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-          callback: async (response) => {
-            try {
-              if (!response?.credential) {
-                throw new Error('Google no devolvió credencial');
+                const {
+                  loginWithGoogleCredential: loginFn,
+                  redirectPath: nextPath,
+                  redirectState: nextState
+                } = authRef.current;
+
+                const result = await loginFn(response.credential);
+
+                if (result.success) {
+                  toast.success('Sesión iniciada correctamente');
+                  navigate(nextPath, {
+                    replace: true,
+                    state: nextState
+                  });
+                  return;
+                }
+
+                toast.error(result.error || 'Error al iniciar sesión con Google');
+              } catch (callbackError) {
+                console.error('Google callback error:', callbackError);
+                toast.error('Error al completar el acceso con Google');
               }
-
-              const {
-                loginWithGoogleCredential: loginFn,
-                redirectPath: currentRedirectPath,
-                redirectState: currentRedirectState
-              } = authFlowRef.current;
-
-              const result = await loginFn(response.credential);
-
-              if (result.success) {
-                toast.success('Sesión iniciada correctamente');
-                navigate(currentRedirectPath, {
-                  replace: true,
-                  state: currentRedirectState
-                });
-                return;
-              }
-
-              toast.error(result.error || 'Error al iniciar sesión con Google');
-            } catch (callbackError) {
-              console.error('Google callback error:', callbackError);
-              toast.error('Error al completar el acceso con Google');
             }
-          }
-        });
+          });
 
-        googleId.renderButton(buttonRef.current, {
+          initializedRef.current = true;
+        }
+
+        // Este nodo debe permanecer vacío para React.
+        containerRef.current.innerHTML = '';
+
+        googleId.renderButton(containerRef.current, {
           type: 'standard',
           theme: 'outline',
           size: 'large',
@@ -180,7 +184,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
       }
     };
 
-    initGoogleButton();
+    initGoogle();
 
     return () => {
       mountedRef.current = false;
@@ -198,14 +202,18 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   }
 
   return (
-    <div className="w-full mb-6 flex justify-center">
-      <div
-        ref={buttonRef}
-        className="min-h-[44px] flex items-center justify-center"
-      >
-        {status === 'loading' && (
-          <div className="text-sm text-[#A3A3A3]">Cargando acceso con Google...</div>
-        )}
+    <div className="w-full mb-6">
+      {status === 'loading' && (
+        <div className="mb-3 text-sm text-[#A3A3A3] text-center">
+          Cargando acceso con Google...
+        </div>
+      )}
+
+      <div className="flex justify-center">
+        <div
+          ref={containerRef}
+          className="min-h-[44px]"
+        />
       </div>
     </div>
   );
