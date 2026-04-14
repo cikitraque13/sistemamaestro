@@ -5,7 +5,6 @@ import { ArrowRight } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../components/Logo';
-import GoogleSignInButton from '../components/GoogleSignInButton';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -63,19 +62,16 @@ const Login = () => {
               Accede a tu cuenta para continuar
             </p>
 
-            <GoogleSignInButton
-              redirectPath={location.state?.from?.pathname || '/dashboard'}
-            />
-
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-white/10"></div>
-              <span className="text-[#A3A3A3] text-sm">o</span>
-              <div className="flex-1 h-px bg-white/10"></div>
+            <div className="mb-6 rounded-lg border border-[#0F5257]/20 bg-[#0F5257]/10 px-4 py-3 text-sm text-[#CDECEE] text-center">
+              El acceso con Google está temporalmente en revisión. Usa tu email y contraseña.
             </div>
 
             <form onSubmit={handleSubmit}>
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm" data-testid="login-error">
+                <div
+                  className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm"
+                  data-testid="login-error"
+                >
                   {error}
                 </div>
               )}
@@ -125,7 +121,11 @@ const Login = () => {
 
             <p className="text-center text-[#A3A3A3] text-sm mt-6">
               ¿No tienes cuenta?{' '}
-              <Link to="/register" className="text-[#0F5257] hover:text-[#136970] transition-colors" data-testid="register-link">
+              <Link
+                to="/register"
+                className="text-[#0F5257] hover:text-[#136970] transition-colors"
+                data-testid="register-link"
+              >
                 Regístrate
               </Link>
             </p>
