@@ -16,9 +16,11 @@ const loadGoogleScript = () =>
       }
 
       existing.addEventListener('load', () => resolve(), { once: true });
-      existing.addEventListener('error', () => reject(new Error('No se pudo cargar Google Sign-In')), {
-        once: true
-      });
+      existing.addEventListener(
+        'error',
+        () => reject(new Error('No se pudo cargar Google Sign-In')),
+        { once: true }
+      );
       return;
     }
 
@@ -30,6 +32,26 @@ const loadGoogleScript = () =>
     script.onerror = () => reject(new Error('No se pudo cargar Google Sign-In'));
     document.head.appendChild(script);
   });
+
+const getGoogleClientId = async () => {
+  try {
+    const response = await fetch('/api/public/config', {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.google_client_id) {
+        return data.google_client_id;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading public config:', error);
+  }
+
+  return process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
+};
 
 const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null }) => {
   const buttonRef = useRef(null);
@@ -43,18 +65,17 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
     let active = true;
 
     const initGoogle = async () => {
-      const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-
-      if (!clientId) {
-        console.error('Falta REACT_APP_GOOGLE_CLIENT_ID');
-        if (active) {
-          setStatus('missing_client');
-          setErrorMessage('Falta configurar Google Sign-In en producción.');
-        }
-        return;
-      }
-
       try {
+        const clientId = await getGoogleClientId();
+
+        if (!clientId) {
+          if (active) {
+            setStatus('missing_client');
+            setErrorMessage('Google Sign-In no está disponible temporalmente en producción.');
+          }
+          return;
+        }
+
         await loadGoogleScript();
 
         if (!active || !window.google?.accounts?.id || !buttonRef.current) return;
