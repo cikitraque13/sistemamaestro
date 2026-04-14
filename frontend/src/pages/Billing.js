@@ -36,51 +36,43 @@ const FEATURE_LABELS = {
 
 const PLAN_VISUAL_META = {
   free: {
-    borderClass: 'border-white/5',
-    badgeClass: 'bg-[#202020] text-[#D4D4D4]',
-    chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
-    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
-    compactLine: 'Entrada limpia para detectar si merece avanzar.',
+    borderClass: 'border-[#244244]',
+    badgeClass: 'bg-[#173133] text-[#D8F1F2]',
+    chipClass: 'bg-[#112528] text-[#D8F1F2] border border-[#2B5357]/35',
+    ctaClass: 'bg-[#213436] text-white hover:bg-[#2A4346]',
     capabilityTitle: 'Señales clave',
     capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
-    featurePreview: ['Diagnóstico inicial', 'Ruta recomendada', 'Resultado resumido']
+    bodyCopy:
+      'Explora el sistema, detecta si merece avanzar y recibe una primera lectura útil para ordenar la oportunidad sin entrar todavía en una capa estructural.',
+    summaryLine: 'Ideal para abrir posibilidad y romper la inercia inicial.'
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
     badgeClass: 'bg-[#0F5257] text-white',
     chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
     ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
-    compactLine: 'La base correcta para empezar a construir de verdad.',
     capabilityTitle: 'Base estructural',
     capabilityItems: ['Blueprint', 'Prioridades', 'Monetización', 'Prompts'],
-    featurePreview: [
-      'Blueprint estructural',
-      'Prioridades claras',
-      'Base de monetización',
-      'Prompts estructurales'
-    ]
+    bodyCopy:
+      'Convierte una lectura inicial en estructura de trabajo real, prioridades y una base seria para empezar a construir con más criterio.',
+    summaryLine: 'Ordena la oportunidad y la convierte en base de trabajo real.'
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
     badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
     chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
     ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
-    compactLine: 'Optimiza conversión, growth y foco de ejecución.',
     capabilityTitle: 'Growth + CRO',
     capabilityItems: ['CRO', 'Growth', 'Conversión', 'Oferta', 'Sistema'],
-    featurePreview: [
-      'CRO y mejora de conversión',
-      'Growth y priorización',
-      'Optimización de propuesta',
-      'Prompts de optimización'
-    ]
+    bodyCopy:
+      'Pensado para proyectos en marcha que necesitan más CRO, growth, mejora de oferta y foco de ejecución para optimizar el rendimiento.',
+    summaryLine: 'Sube el nivel del proyecto cuando ya no basta una estructura base.'
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
     chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
     ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
-    compactLine: 'La capa senior para criterio, marketing y dirección estratégica.',
     capabilityTitle: 'Capa estratégica',
     capabilityItems: [
       'CRO',
@@ -92,12 +84,9 @@ const PLAN_VISUAL_META = {
       'Dirección de arte',
       'Marketing visual'
     ],
-    featurePreview: [
-      'CRO estratégico',
-      'Growth y monetización senior',
-      'Auditoría maestra',
-      'Prompt 99 y prompts maestros'
-    ]
+    bodyCopy:
+      'Pensado para casos con más peso comercial donde hace falta criterio senior en monetización, growth, CRO, auditoría, marketing y arquitectura.',
+    summaryLine: 'Pensado para decisiones críticas, marketing visual y arquitectura senior.'
   }
 };
 
@@ -107,35 +96,35 @@ const PLAN_RECOMMENDATION_COPY = {
     summary:
       'Aquí ya no basta una lectura inicial. Lo correcto es entrar en una capa estructural para ordenar prioridades, monetización y base de trabajo.',
     unlocks:
-      'Desbloquea estructura, prompts base, prioridades y una forma más seria de avanzar.'
+      'Desbloquea estructura, prioridades y una forma más seria de avanzar con el proyecto.'
   },
   sistema: {
     title: 'Plan sugerido para este caso: Growth',
     summary:
       'El siguiente cuello de botella ya no es entender mejor el caso, sino optimizar rendimiento, growth, conversión y secuencia de trabajo.',
     unlocks:
-      'Desbloquea continuidad más profunda, lectura de growth, mejora de oferta y optimización del proyecto.'
+      'Desbloquea una capa más fuerte de CRO, growth, mejora de oferta y foco de ejecución.'
   },
   premium: {
     title: 'Plan sugerido para este caso: AI Master 199',
     summary:
-      'Este nivel solo tiene sentido cuando el caso presenta suficiente peso comercial o necesita criterio senior en estrategia, marketing, conversión y dirección de proyecto.',
+      'Este nivel entra cuando el caso ya requiere criterio senior en estrategia, monetización, growth, marketing y arquitectura de trabajo.',
     unlocks:
-      'Desbloquea una capa superior de CRO, growth, auditoría, prompts maestros, arquitectura de trabajo y dirección de imagen o marketing cuando procede.'
+      'Desbloquea una intervención más alta en CRO, growth, auditoría, prompts maestros y dirección estratégica.'
   }
 };
 
 const getFeatureChipClass = (feature) => {
   if (['diagnosis', 'route'].includes(feature)) {
-    return 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25';
+    return 'bg-[#112528] text-[#D8F1F2] border border-[#2B5357]/35';
   }
 
   if (['blueprint', 'priorities'].includes(feature)) {
-    return 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35';
+    return 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25';
   }
 
   if (['continuity', 'deployment'].includes(feature)) {
-    return 'bg-[#132015] text-[#D8F3DF] border border-[#2E5A39]/35';
+    return 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35';
   }
 
   if (['support', 'opportunities', 'premium_report_preview'].includes(feature)) {
@@ -475,7 +464,7 @@ const Billing = () => {
         >
           <h3 className="text-lg font-medium text-white mb-4">Planes disponibles</h3>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {pricingPlans.map((plan, index) => {
               const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
               const isCurrentPlan = user?.plan === plan.id;
@@ -490,7 +479,7 @@ const Billing = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[610px] ${
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col h-full min-h-[600px] ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
@@ -519,10 +508,13 @@ const Billing = () => {
                     </div>
                   </div>
 
-                  <div className="min-h-[126px] mb-5">
-                    <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
-                    <p className="text-[#F0F0F0] text-base leading-snug mb-2">{plan.headline}</p>
-                    <p className="text-sm text-[#A3A3A3] leading-relaxed">{visual.compactLine}</p>
+                  <div className="min-h-[220px] mb-5">
+                    <h4 className="text-2xl lg:text-[2rem] font-medium text-white mb-4">
+                      {plan.visibleName}
+                    </h4>
+                    <p className="text-white text-[15px] leading-[1.75]">
+                      {visual.bodyCopy}
+                    </p>
                   </div>
 
                   <div className="min-h-[72px] flex items-end gap-2 mb-5">
@@ -532,14 +524,7 @@ const Billing = () => {
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[120px]">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                      Mejor encaje
-                    </p>
-                    <p className="text-white text-sm leading-relaxed">{plan.bestFor}</p>
-                  </div>
-
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[142px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-5 min-h-[154px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
                       {visual.capabilityTitle}
                     </p>
@@ -553,19 +538,21 @@ const Billing = () => {
                         </span>
                       ))}
                     </div>
-                    <div className="space-y-2">
-                      {visual.featurePreview.map((feature) => (
-                        <div key={feature} className="flex items-start gap-2 text-sm text-[#D4D4D4]">
-                          <CheckCircle
-                            size={14}
-                            weight="fill"
-                            className="text-[#0F5257] mt-0.5 flex-shrink-0"
-                          />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.summaryLine}</p>
                   </div>
+
+                  <ul className="space-y-3 mb-6 flex-1">
+                    {plan.features.slice(0, 4).map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-sm text-[#D4D4D4]">
+                        <CheckCircle
+                          size={16}
+                          weight="fill"
+                          className="text-[#0F5257] mt-0.5 flex-shrink-0"
+                        />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
 
                   <button
                     onClick={() => handleUpgrade(plan.id)}
