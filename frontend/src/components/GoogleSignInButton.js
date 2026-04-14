@@ -15,12 +15,11 @@ const loadGoogleScript = () =>
         return;
       }
 
-      existing.addEventListener('load', () => resolve(), { once: true });
-      existing.addEventListener(
-        'error',
-        () => reject(new Error('No se pudo cargar Google Sign-In')),
-        { once: true }
-      );
+      const handleLoad = () => resolve();
+      const handleError = () => reject(new Error('No se pudo cargar Google Sign-In'));
+
+      existing.addEventListener('load', handleLoad, { once: true });
+      existing.addEventListener('error', handleError, { once: true });
       return;
     }
 
@@ -33,24 +32,26 @@ const loadGoogleScript = () =>
     document.head.appendChild(script);
   });
 
-const getGoogleClientId = async () => {
+const fetchGoogleClientId = async () => {
   try {
     const response = await fetch('/api/public/config', {
       method: 'GET',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
     });
 
-    if (response.ok) {
-      const data = await response.json();
-      if (data?.google_client_id) {
-        return data.google_client_id;
-      }
+    if (!response.ok) {
+      throw new Error(`Public config error: ${response.status}`);
     }
-  } catch (error) {
-    console.error('Error loading public config:', error);
-  }
 
-  return process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
+    const data = await response.json();
+    return data?.google_client_id || '';
+  } catch (error) {
+    console.error('Error obteniendo google_client_id:', error);
+    return '';
+  }
 };
 
 const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null }) => {
@@ -64,44 +65,70 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   useEffect(() => {
     let active = true;
 
-    const initGoogle = async () => {
+    const initGoogleButton = async () => {
       try {
-        const clientId = await getGoogleClientId();
+        setStatus('loading');
+        setErrorMessage('');
+
+        const clientId = await fetchGoogleClientId();
 
         if (!clientId) {
           if (active) {
             setStatus('missing_client');
-            setErrorMessage('Google Sign-In no está disponible temporalmente en producción.');
+            setErrorMessage('Google Sign-In no está disponible temporalmente.');
           }
           return;
         }
 
         await loadGoogleScript();
 
-        if (!active || !window.google?.accounts?.id || !buttonRef.current) return;
+        if (!active) return;
+
+        const googleId = window.google?.accounts?.id;
+        if (
+          !googleId ||
+          typeof googleId.initialize !== 'function' ||
+          typeof googleId.renderButton !== 'function'
+        ) {
+          throw new Error('Google Identity Services no está disponible');
+        }
+
+        if (!buttonRef.current) {
+          throw new Error('No existe el contenedor del botón de Google');
+        }
 
         buttonRef.current.innerHTML = '';
 
-        window.google.accounts.id.initialize({
+        googleId.initialize({
           client_id: clientId,
-          callback: async (response) => {
-            const result = await loginWithGoogleCredential(response.credential);
-
-            if (result.success) {
-              toast.success('Sesión iniciada correctamente');
-              navigate(redirectPath, {
-                replace: true,
-                state: redirectState
-              });
-            } else {
-              toast.error(result.error || 'Error al iniciar sesión con Google');
-            }
-          },
           auto_select: false,
-          cancel_on_tap_outside: true
+          cancel_on_tap_outside: true,
+          callback: async (response) => {
+            try {
+              if (!response?.credential) {
+                throw new Error('Google no devolvió credencial');
+              }
+
+              const result = await loginWithGoogleCredential(response.credential);
+
+              if (result.success) {
+                toast.success('Sesión iniciada correctamente');
+                navigate(redirectPath, {
+                  replace: true,
+                  state: redirectState
+                });
+                return;
+              }
+
+              toast.error(result.error || 'Error al iniciar sesión con Google');
+            } catch (callbackError) {
+              console.error('Google callback error:', callbackError);
+              toast.error('Error al completar el acceso con Google');
+            }
+          }
         });
 
-        window.google.accounts.id.renderButton(buttonRef.current, {
+        googleId.renderButton(buttonRef.current, {
           type: 'standard',
           theme: 'outline',
           size: 'large',
@@ -123,10 +150,15 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
       }
     };
 
-    initGoogle();
+    initGoogleButton();
 
     return () => {
       active = false;
+      try {
+        window.google?.accounts?.id?.cancel?.();
+      } catch (error) {
+        console.error('Google cancel cleanup error:', error);
+      }
     };
   }, [loginWithGoogleCredential, navigate, redirectPath, redirectState]);
 
@@ -142,7 +174,10 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 
   return (
     <div className="w-full mb-6 flex justify-center">
-      <div className="min-h-[44px] flex items-center justify-center" ref={buttonRef}>
+      <div
+        ref={buttonRef}
+        className="min-h-[44px] flex items-center justify-center"
+      >
         {status === 'loading' && (
           <div className="text-sm text-[#A3A3A3]">Cargando acceso con Google...</div>
         )}
