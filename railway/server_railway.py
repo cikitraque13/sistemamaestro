@@ -27,9 +27,9 @@ import json
 ROOT_DIR = Path(__file__).parent
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'sistemamaestro')]
+db = client[os.environ.get("DB_NAME", "sistemamaestro")]
 
 # JWT Configuration
 JWT_ALGORITHM = "HS256"
@@ -49,6 +49,10 @@ def get_stripe_key():
         raise ValueError("Missing STRIPE_SECRET_KEY in environment")
     return key
 
+# Google config
+def get_google_client_id():
+    return os.environ.get("REACT_APP_GOOGLE_CLIENT_ID") or os.environ.get("GOOGLE_CLIENT_ID") or ""
+
 # Plan Configuration
 PLANS = {
     "free": {"name": "Gratis", "price": 0.0, "features": ["diagnosis", "route"]},
@@ -62,7 +66,7 @@ app = FastAPI(title="Sistema Maestro API", description="Plataforma guiada de tra
 api_router = APIRouter(prefix="/api")
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # ==================== MODELS ====================
@@ -101,11 +105,11 @@ class CheckoutCreate(BaseModel):
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 def verify_password(password: str, hashed: str) -> bool:
     try:
-        return bcrypt.checkpw(password.encode(), hashed.encode())
+        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
     except Exception:
         return False
 
@@ -129,23 +133,81 @@ def create_refresh_token(user_id: str):
     }
     return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
+def normalize_datetime(value: Any) -> Optional[datetime]:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value)
+        except ValueError:
+            return None
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
+    return None
+
+def should_use_secure_cookies(request: Optional[Request] = None) -> bool:
+    explicit = os.environ.get("COOKIE_SECURE")
+    if explicit is not None:
+        return explicit.strip().lower() in {"1", "true", "yes", "on"}
+
+    if os.environ.get("RAILWAY_PUBLIC_DOMAIN") or os.environ.get("RAILWAY_ENVIRONMENT_NAME") == "production":
+        return True
+
+    if request is not None:
+        return request.url.scheme == "https"
+
+    return False
+
+def set_auth_cookies(response: Response, access_token: str, refresh_token: str, request: Optional[Request] = None):
+    secure = should_use_secure_cookies(request)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=secure,
+        samesite="lax",
+        max_age=900,
+        path="/"
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=secure,
+        samesite="lax",
+        max_age=604800,
+        path="/"
+    )
+
+def clear_auth_cookies(response: Response):
+    response.delete_cookie(key="access_token", path="/")
+    response.delete_cookie(key="refresh_token", path="/")
+    response.delete_cookie(key="session_token", path="/")
+
 async def get_current_user(request: Request):
-    # Try session token first (Google OAuth)
+    # Try Google session token first
     session_token = request.cookies.get("session_token")
     if session_token:
         session = await db.user_sessions.find_one({"session_token": session_token})
         if session:
-            expires_at = session.get("expires_at")
-            if expires_at:
-                if isinstance(expires_at, str):
-                    expires_at = datetime.fromisoformat(expires_at)
-                if expires_at > datetime.now(timezone.utc):
-                    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0, "password_hash": 0})
-                    if user:
-                        return user
+            expires_at = normalize_datetime(session.get("expires_at"))
+            if expires_at and expires_at > datetime.now(timezone.utc):
+                user = await db.users.find_one(
+                    {"user_id": session["user_id"]},
+                    {"_id": 0, "password_hash": 0}
+                )
+                if user:
+                    return user
 
     # Try JWT access token
     access_token = request.cookies.get("access_token")
+    if not access_token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            access_token = auth_header[7:]
+
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
@@ -153,9 +215,11 @@ async def get_current_user(request: Request):
         payload = jwt.decode(access_token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
         if payload.get("type") != "access":
             raise HTTPException(status_code=401, detail="Invalid token type")
+
         user = await db.users.find_one({"user_id": payload["sub"]}, {"_id": 0, "password_hash": 0})
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
+
         return user
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
@@ -166,19 +230,18 @@ async def get_current_user(request: Request):
 async def check_brute_force(identifier: str):
     attempts = await db.login_attempts.find_one({"identifier": identifier})
     if attempts and attempts.get("count", 0) >= 5:
-        last = attempts.get("last_attempt")
-        if last:
-            if isinstance(last, str):
-                last = datetime.fromisoformat(last)
-            if datetime.now(timezone.utc) - last < timedelta(minutes=15):
-                raise HTTPException(status_code=429, detail="Too many failed attempts. Try again later.")
-            else:
-                await db.login_attempts.delete_one({"identifier": identifier})
+        last = normalize_datetime(attempts.get("last_attempt"))
+        if last and datetime.now(timezone.utc) - last < timedelta(minutes=15):
+            raise HTTPException(status_code=429, detail="Too many failed attempts. Try again later.")
+        await db.login_attempts.delete_one({"identifier": identifier})
 
 async def record_failed_attempt(identifier: str):
     await db.login_attempts.update_one(
         {"identifier": identifier},
-        {"$inc": {"count": 1}, "$set": {"last_attempt": datetime.now(timezone.utc).isoformat()}},
+        {
+            "$inc": {"count": 1},
+            "$set": {"last_attempt": datetime.now(timezone.utc).isoformat()}
+        },
         upsert=True
     )
 
@@ -188,8 +251,8 @@ async def clear_failed_attempts(identifier: str):
 # ==================== URL ANALYSIS ====================
 
 async def fetch_and_analyze_url(url: str) -> Dict[str, Any]:
-    if not url.startswith(('http://', 'https://')):
-        url = 'https://' + url
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
 
     parsed = urlparse(url)
     if not parsed.netloc:
@@ -197,16 +260,16 @@ async def fetch_and_analyze_url(url: str) -> Dict[str, Any]:
 
     try:
         async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as http_client:
-            resp = await http_client.get(url, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            })
+            resp = await http_client.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            )
 
             if resp.status_code >= 400:
                 return {"success": False, "error": f"No se pudo acceder a la web (código {resp.status_code})"}
 
-            soup = BeautifulSoup(resp.text, 'html.parser')
+            soup = BeautifulSoup(resp.text, "html.parser")
 
-            # Extract content
             title = soup.title.string.strip() if soup.title and soup.title.string else "Sin título"
             meta_desc = ""
             meta_tag = soup.find("meta", attrs={"name": "description"})
@@ -216,7 +279,11 @@ async def fetch_and_analyze_url(url: str) -> Dict[str, Any]:
             h1 = [tag.get_text(strip=True) for tag in soup.find_all("h1")][:5]
             h2 = [tag.get_text(strip=True) for tag in soup.find_all("h2")][:10]
 
-            paragraphs = [p.get_text(strip=True) for p in soup.find_all("p") if len(p.get_text(strip=True)) > 30][:5]
+            paragraphs = [
+                p.get_text(strip=True)
+                for p in soup.find_all("p")
+                if len(p.get_text(strip=True)) > 30
+            ][:5]
 
             ctas = []
             for a in soup.find_all("a", href=True):
@@ -266,13 +333,6 @@ async def analyze_with_ai(input_type: str, input_content: str, url_analysis: Opt
         }
 
     client_ai = openai.AsyncOpenAI(api_key=api_key)
-
-    route_names = {
-        "improve": "Mejorar algo existente",
-        "sell": "Vender y cobrar",
-        "automate": "Automatizar operación",
-        "idea": "Idea a proyecto"
-    }
 
     system_prompt = """Eres el motor de análisis de Sistema Maestro, una plataforma de transformación digital.
 
@@ -536,7 +596,6 @@ def build_plan_recommendation(
     h2_count = len(url_content.get("h2", []) or [])
     forms_count = int(url_content.get("forms_count", 0) or 0)
 
-    # Eje A — Complejidad
     complexity = {
         "idea": 1,
         "improve": 2,
@@ -552,7 +611,6 @@ def build_plan_recommendation(
         complexity += 1
     complexity = clamp_score(complexity)
 
-    # Eje B — Impacto económico
     economic_impact = {
         "idea": 1,
         "improve": 2,
@@ -568,7 +626,6 @@ def build_plan_recommendation(
         economic_impact += 1
     economic_impact = clamp_score(economic_impact)
 
-    # Eje C — Urgencia
     urgency = {
         "idea": 0,
         "improve": 1,
@@ -584,7 +641,6 @@ def build_plan_recommendation(
         urgency += 1
     urgency = clamp_score(urgency)
 
-    # Eje D — Necesidad de estructura
     structure_need = {
         "idea": 1,
         "improve": 2,
@@ -598,7 +654,6 @@ def build_plan_recommendation(
         structure_need += 1
     structure_need = clamp_score(structure_need)
 
-    # Eje E — Necesidad de continuidad
     continuity_need = {
         "idea": 1,
         "improve": 1,
@@ -687,18 +742,44 @@ def build_plan_recommendation(
 # ==================== AUTH ROUTES ====================
 
 @api_router.post("/auth/register")
-async def register(user_data: UserCreate, response: Response):
-    email = user_data.email.lower()
-    existing = await db.users.find_one({"email": email})
+async def register(user_data: UserCreate, request: Request, response: Response):
+    email = user_data.email.lower().strip()
+    name = user_data.name.strip() if user_data.name else "User"
+    password = user_data.password
+
+    existing = await db.users.find_one({"email": email}, {"_id": 0})
+
     if existing:
+        # Si la cuenta existe pero venía de Google y no tiene password_hash,
+        # permitimos completar acceso por contraseña con el mismo email.
+        if not existing.get("password_hash"):
+            await db.users.update_one(
+                {"user_id": existing["user_id"]},
+                {
+                    "$set": {
+                        "password_hash": hash_password(password),
+                        "name": name or existing.get("name", "User"),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+
+            updated_user = await db.users.find_one({"user_id": existing["user_id"]}, {"_id": 0})
+            access_token = create_access_token(updated_user["user_id"], updated_user["email"])
+            refresh_token = create_refresh_token(updated_user["user_id"])
+            set_auth_cookies(response, access_token, refresh_token, request)
+
+            updated_user.pop("password_hash", None)
+            return updated_user
+
         raise HTTPException(status_code=400, detail="Email already registered")
 
     user_id = f"user_{uuid.uuid4().hex[:12]}"
     user_doc = {
         "user_id": user_id,
         "email": email,
-        "password_hash": hash_password(user_data.password),
-        "name": user_data.name,
+        "password_hash": hash_password(password),
+        "name": name or "User",
         "role": "user",
         "plan": "free",
         "created_at": datetime.now(timezone.utc).isoformat()
@@ -707,22 +788,36 @@ async def register(user_data: UserCreate, response: Response):
 
     access_token = create_access_token(user_id, email)
     refresh_token = create_refresh_token(user_id)
+    set_auth_cookies(response, access_token, refresh_token, request)
 
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=900, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="lax", max_age=604800, path="/")
-
-    return {"user_id": user_id, "email": email, "name": user_data.name, "role": "user", "plan": "free"}
+    return {
+        "user_id": user_id,
+        "email": email,
+        "name": name or "User",
+        "role": "user",
+        "plan": "free"
+    }
 
 @api_router.post("/auth/login")
 async def login(user_data: UserLogin, request: Request, response: Response):
-    email = user_data.email.lower()
+    email = user_data.email.lower().strip()
     ip = request.client.host if request.client else "unknown"
     identifier = f"{ip}:{email}"
 
     await check_brute_force(identifier)
 
     user = await db.users.find_one({"email": email}, {"_id": 0})
-    if not user or not verify_password(user_data.password, user.get("password_hash", "")):
+    if not user:
+        await record_failed_attempt(identifier)
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    if not user.get("password_hash"):
+        raise HTTPException(
+            status_code=400,
+            detail="Esta cuenta usa acceso con Google. Continúa con Google o crea una contraseña desde registro."
+        )
+
+    if not verify_password(user_data.password, user.get("password_hash", "")):
         await record_failed_attempt(identifier)
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
@@ -730,18 +825,14 @@ async def login(user_data: UserLogin, request: Request, response: Response):
 
     access_token = create_access_token(user["user_id"], email)
     refresh_token = create_refresh_token(user["user_id"])
-
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=900, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="lax", max_age=604800, path="/")
+    set_auth_cookies(response, access_token, refresh_token, request)
 
     user.pop("password_hash", None)
     return user
 
 @api_router.post("/auth/logout")
 async def logout(response: Response):
-    response.delete_cookie(key="access_token", path="/")
-    response.delete_cookie(key="refresh_token", path="/")
-    response.delete_cookie(key="session_token", path="/")
+    clear_auth_cookies(response)
     return {"message": "Logged out successfully"}
 
 @api_router.get("/auth/me")
@@ -765,7 +856,16 @@ async def refresh_token_endpoint(request: Request, response: Response):
             raise HTTPException(status_code=401, detail="User not found")
 
         new_access_token = create_access_token(user["user_id"], user["email"])
-        response.set_cookie(key="access_token", value=new_access_token, httponly=True, secure=True, samesite="lax", max_age=900, path="/")
+        secure = should_use_secure_cookies(request)
+        response.set_cookie(
+            key="access_token",
+            value=new_access_token,
+            httponly=True,
+            secure=secure,
+            samesite="lax",
+            max_age=900,
+            path="/"
+        )
 
         return {"message": "Token refreshed"}
     except jwt.ExpiredSignatureError:
@@ -773,28 +873,35 @@ async def refresh_token_endpoint(request: Request, response: Response):
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
-# ==================== GOOGLE OAUTH (Direct Google) ====================
+# ==================== GOOGLE OAUTH ====================
 
 @api_router.post("/auth/google/session")
 async def google_session(request: Request, response: Response):
     body = await request.json()
 
-    # Support both Emergent Auth and direct Google token
     session_id = body.get("session_id")
     google_token = body.get("credential")
 
     google_data = None
 
     if google_token:
-        # Direct Google OAuth - verify token
+        expected_client_id = get_google_client_id()
+
         async with httpx.AsyncClient() as http_client:
-            resp = await http_client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={google_token}")
+            resp = await http_client.get(
+                f"https://oauth2.googleapis.com/tokeninfo?id_token={google_token}"
+            )
             if resp.status_code != 200:
                 raise HTTPException(status_code=401, detail="Invalid Google token")
+
             google_data = resp.json()
-            google_data["name"] = google_data.get("name", google_data.get("given_name", "User"))
+
+        if expected_client_id and google_data.get("aud") != expected_client_id:
+            raise HTTPException(status_code=401, detail="Invalid Google token")
+
+        google_data["name"] = google_data.get("name", google_data.get("given_name", "User"))
+
     elif session_id:
-        # Emergent Auth fallback
         async with httpx.AsyncClient() as http_client:
             resp = await http_client.get(
                 "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
@@ -806,14 +913,24 @@ async def google_session(request: Request, response: Response):
     else:
         raise HTTPException(status_code=400, detail="Missing authentication data")
 
-    email = google_data["email"].lower()
+    email = (google_data.get("email") or "").lower().strip()
+    if not email:
+        raise HTTPException(status_code=400, detail="Google account has no email")
+
     existing_user = await db.users.find_one({"email": email}, {"_id": 0})
 
     if existing_user:
         user_id = existing_user["user_id"]
         await db.users.update_one(
             {"user_id": user_id},
-            {"$set": {"name": google_data.get("name", existing_user.get("name")), "picture": google_data.get("picture")}}
+            {
+                "$set": {
+                    "name": google_data.get("name", existing_user.get("name", "User")),
+                    "picture": google_data.get("picture"),
+                    "google_id": google_data.get("id") or google_data.get("sub") or existing_user.get("google_id"),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
         )
     else:
         user_id = f"user_{uuid.uuid4().hex[:12]}"
@@ -840,12 +957,13 @@ async def google_session(request: Request, response: Response):
         "created_at": datetime.now(timezone.utc).isoformat()
     })
 
+    secure = should_use_secure_cookies(request)
     response.set_cookie(
         key="session_token",
         value=session_token,
         httponly=True,
-        secure=True,
-        samesite="none",
+        secure=secure,
+        samesite="lax",
         max_age=604800,
         path="/"
     )
@@ -1139,7 +1257,7 @@ async def create_checkout(checkout_data: CheckoutCreate, request: Request):
         raise HTTPException(status_code=400, detail="Invalid plan")
 
     plan = PLANS[checkout_data.plan_id]
-    amount = int(plan["price"] * 100)  # cents
+    amount = int(plan["price"] * 100)
 
     stripe_key = get_stripe_key()
     stripe.api_key = stripe_key
@@ -1326,7 +1444,7 @@ async def get_user_stats(request: Request):
 @api_router.get("/public/config")
 async def get_public_config():
     return {
-        "google_client_id": os.environ.get("REACT_APP_GOOGLE_CLIENT_ID", "")
+        "google_client_id": get_google_client_id()
     }
 
 # ==================== STARTUP ====================
@@ -1343,7 +1461,6 @@ async def startup_event():
     await db.login_attempts.create_index("identifier")
     await db.newsletter_subscribers.create_index("email", unique=True)
 
-    # Seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@sistemamaestro.com")
     admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
 
@@ -1371,7 +1488,7 @@ async def health():
 # Include router
 app.include_router(api_router)
 
-# CORS - configure for your domain in production
+# CORS
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -1397,7 +1514,6 @@ async def serve_root():
 
 @app.get("/{full_path:path}", include_in_schema=False)
 async def serve_react(full_path: str):
-    """Serve React app for all non-API routes"""
     if full_path.startswith("api") or full_path in {"docs", "redoc", "openapi.json", "health"}:
         raise HTTPException(status_code=404, detail="Not Found")
 
