@@ -1,5 +1,7 @@
 from fastapi import APIRouter
-from app.core.config import get_google_client_id
+from backend.app.core.config import get_google_client_id
+
+router = APIRouter(prefix="/api", tags=["public"])
 
 router = APIRouter(prefix="/api", tags=["public"])
 
