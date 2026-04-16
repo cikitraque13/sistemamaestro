@@ -70,12 +70,7 @@ const PLAN_VISUAL_META = {
     chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
     ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
     capabilityTitle: 'Activación avanzada',
-    capabilityItems: [
-      'Criterio',
-      'Complejidad',
-      'Operador',
-      'Salida seria'
-    ],
+    capabilityItems: ['Criterio', 'Complejidad', 'Operador', 'Salida seria'],
     insight:
       'Es la capa superior para casos complejos, criterio maestro, trabajo sobre activos de terceros y preparación seria de salida.'
   }
@@ -120,6 +115,9 @@ const EXPORT_ACCESS_LABELS = {
 const OPERATIONAL_NOTE =
   'La economía de créditos y la exportación se activarán progresivamente en la siguiente fase del sistema.';
 
+const CREDIT_NOTE =
+  'Esta capa ya muestra saldo y créditos incluidos por plan. El consumo automático, las recargas y el builder con coste se activarán en la siguiente microfase.';
+
 const getErrorMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
   if (typeof detail === 'string' && detail.trim()) return detail;
@@ -138,6 +136,11 @@ const isValidCheckoutUrl = (value) => {
 };
 
 const isPlannedFeature = (feature) => /créditos|exportación|salida/i.test(feature);
+
+const formatCredits = (value) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 'No definido';
+  return `${value} créditos`;
+};
 
 const Billing = () => {
   const { user, checkAuth } = useAuth();
@@ -170,6 +173,9 @@ const Billing = () => {
     () => pricingPlans.find((plan) => plan.id === currentPlanId) || null,
     [currentPlanId]
   );
+
+  const creditSummary = billingData?.credit_summary || null;
+  const currentPlanIncludedCredits = billingData?.current_plan?.included_credits;
 
   useEffect(() => {
     fetchBillingData();
@@ -462,6 +468,9 @@ const Billing = () => {
                     <p className="text-white">
                       Exportación: {EXPORT_ACCESS_LABELS[suggestedPlan.exportAccess] || 'No definida'}
                     </p>
+                    <p className="text-white">
+                      Créditos: {suggestedPlan.creditsLabel || 'Pendiente de fijar'}
+                    </p>
                   </div>
                 </div>
 
@@ -534,7 +543,7 @@ const Billing = () => {
               <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
                 Marco operativo previsto
               </p>
-              <div className="grid md:grid-cols-3 gap-3 text-sm">
+              <div className="grid md:grid-cols-4 gap-3 text-sm">
                 <p className="text-white">
                   Activación: {ACTIVATION_LABELS[currentPlanDefinition.activationLevel] || 'No definida'}
                 </p>
@@ -544,6 +553,9 @@ const Billing = () => {
                 <p className="text-white">
                   Exportación: {EXPORT_ACCESS_LABELS[currentPlanDefinition.exportAccess] || 'No definida'}
                 </p>
+                <p className="text-white">
+                  Créditos incluidos: {formatCredits(currentPlanIncludedCredits)}
+                </p>
               </div>
               <p className="text-xs text-[#A3A3A3] mt-3">
                 {OPERATIONAL_NOTE}
@@ -551,6 +563,76 @@ const Billing = () => {
             </div>
           )}
         </motion.div>
+
+        {creditSummary?.enabled && (
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.03 }}
+            className="card mb-8 border border-[#0F5257]/20"
+            data-testid="credit-summary-card"
+          >
+            <div className="flex items-center gap-4 mb-5">
+              <div className="p-3 bg-[#0F5257]/20 rounded-lg">
+                <CreditCard size={24} className="text-[#0F5257]" />
+              </div>
+              <div>
+                <p className="text-sm text-[#A3A3A3]">Créditos del sistema</p>
+                <h3 className="text-xl text-white font-medium">Lectura operativa activa</h3>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-4 mb-5">
+              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
+                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                  Saldo actual
+                </p>
+                <p className="text-2xl font-medium text-white">
+                  {formatCredits(creditSummary.balance)}
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
+                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                  Incluidos por tu plan
+                </p>
+                <p className="text-2xl font-medium text-white">
+                  {formatCredits(creditSummary.included_credits_for_current_plan)}
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
+                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                  Históricos concedidos
+                </p>
+                <p className="text-2xl font-medium text-white">
+                  {formatCredits(creditSummary.lifetime_granted)}
+                </p>
+              </div>
+
+              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
+                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                  Históricos consumidos
+                </p>
+                <p className="text-2xl font-medium text-white">
+                  {formatCredits(creditSummary.lifetime_used)}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#111111] border border-white/5 rounded-xl p-4">
+              <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                Estado de esta microfase
+              </p>
+              <p className="text-sm text-white mb-2">
+                Saldo y créditos incluidos ya visibles en sistema.
+              </p>
+              <p className="text-sm text-[#A3A3A3] leading-relaxed">
+                {CREDIT_NOTE}
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -572,7 +654,7 @@ const Billing = () => {
               return (
                 <div
                   key={plan.id}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[720px] ${
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[760px] ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
@@ -631,7 +713,7 @@ const Billing = () => {
                     <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.insight}</p>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[160px]">
+                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[180px]">
                     <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
                       Marco operativo previsto
                     </p>
@@ -644,6 +726,9 @@ const Billing = () => {
                       </p>
                       <p className="text-white">
                         Exportación: {EXPORT_ACCESS_LABELS[plan.exportAccess] || 'No definida'}
+                      </p>
+                      <p className="text-white">
+                        Créditos: {plan.creditsLabel || 'Pendiente de fijar'}
                       </p>
                     </div>
                     {plan.id !== 'free' && (
