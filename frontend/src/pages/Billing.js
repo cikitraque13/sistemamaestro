@@ -9,7 +9,8 @@ import {
   Sparkle,
   Lightning,
   FileText,
-  WarningCircle
+  WarningCircle,
+  DiamondsFour
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
@@ -38,41 +39,25 @@ const PLAN_VISUAL_META = {
     borderClass: 'border-white/5',
     badgeClass: 'bg-[#202020] text-[#D4D4D4]',
     chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
-    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
-    capabilityTitle: 'Exploración inicial',
-    capabilityItems: ['Entrada', 'Claridad', 'Ruta', 'Primer criterio'],
-    insight:
-      'Ideal para abrir posibilidad, detectar si merece avanzar y romper la inercia inicial.'
+    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]'
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
     badgeClass: 'bg-[#0F5257] text-white',
     chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
-    ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
-    capabilityTitle: 'Activación base',
-    capabilityItems: ['Blueprint', 'Activación', 'Ruta', 'Prompts'],
-    insight:
-      'Aquí empieza la entrada seria al sistema: base estructural, activación inicial y primera lógica real de trabajo.'
+    ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]'
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
     badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
     chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
-    ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
-    capabilityTitle: 'Continuidad operativa',
-    capabilityItems: ['Continuidad', 'Builder', 'Optimización', 'Criterio'],
-    insight:
-      'Es el núcleo operativo del sistema: más continuidad, más recorrido de construcción y más capacidad para seguir trabajando dentro.'
+    ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]'
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
     chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
-    ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
-    capabilityTitle: 'Activación avanzada',
-    capabilityItems: ['Criterio', 'Complejidad', 'Operador', 'Salida seria'],
-    insight:
-      'Es la capa superior para casos complejos, criterio maestro, trabajo sobre activos de terceros y preparación seria de salida.'
+    ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]'
   }
 };
 
@@ -89,16 +74,16 @@ const CURRENT_PLAN_BADGE_STYLES = {
 
 const ACTIVATION_LABELS = {
   exploration: 'Exploración',
-  puntual: 'Validación puntual',
-  base: 'Activación base',
-  operational: 'Continuidad operativa',
-  advanced: 'Activación avanzada'
+  puntual: 'Puntual',
+  base: 'Base',
+  operational: 'Operativa',
+  advanced: 'Avanzada'
 };
 
 const BUILDER_ACCESS_LABELS = {
   none: 'Sin builder',
   base: 'Builder base',
-  operational: 'Builder con continuidad',
+  operational: 'Builder continuo',
   advanced: 'Builder avanzado'
 };
 
@@ -106,17 +91,17 @@ const EXPORT_ACCESS_LABELS = {
   not_included: 'No incluida',
   not_available: 'No disponible',
   quote_only_future: 'Valoración futura',
-  quote_priority_future: 'Valoración prioritaria futura',
+  quote_priority_future: 'Valoración prioritaria',
   advanced_quote_priority: 'Preparación seria',
-  separate_quote: 'Valoración separada',
+  separate_quote: 'Valoración aparte',
   quoted_and_prioritized: 'Valoración priorizada'
 };
 
 const OPERATIONAL_NOTE =
-  'La economía de créditos y la exportación se activarán progresivamente en la siguiente fase del sistema.';
+  'Créditos = capacidad operativa interna del sistema. El consumo automático, las recargas y la exportación con coste se activarán en la siguiente microfase.';
 
 const CREDIT_NOTE =
-  'Esta capa ya muestra saldo y créditos incluidos por plan. El consumo automático, las recargas y el builder con coste se activarán en la siguiente microfase.';
+  'Saldo e incluidos por plan ya visibles. Esta capa prepara el terreno para consumo, recargas y builder con coste sin abrir todavía esa lógica.';
 
 const getErrorMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
@@ -135,11 +120,10 @@ const isValidCheckoutUrl = (value) => {
   }
 };
 
-const isPlannedFeature = (feature) => /créditos|exportación|salida/i.test(feature);
-
 const formatCredits = (value) => {
   if (typeof value !== 'number' || Number.isNaN(value)) return 'No definido';
-  return `${value} créditos`;
+  if (value === 0) return '0';
+  return new Intl.NumberFormat('es-ES').format(value);
 };
 
 const Billing = () => {
@@ -355,6 +339,42 @@ const Billing = () => {
 
   const transactions = Array.isArray(billingData?.transactions) ? billingData.transactions : [];
 
+  const getCreditsLabel = (plan) => {
+    if (typeof plan?.creditsIncluded === 'number') {
+      if (plan.creditsIncluded === 0) return 'Sin créditos';
+      return `${formatCredits(plan.creditsIncluded)} incluidos`;
+    }
+    return plan?.creditsLabel || 'Pendiente';
+  };
+
+  const renderOperationalItems = (plan, includedCreditsOverride = null) => {
+    const creditText =
+      typeof includedCreditsOverride === 'number'
+        ? includedCreditsOverride === 0
+          ? 'Sin créditos'
+          : `${formatCredits(includedCreditsOverride)} incluidos`
+        : getCreditsLabel(plan);
+
+    return [
+      {
+        label: 'Activación',
+        value: ACTIVATION_LABELS[plan?.activationLevel] || 'No definida'
+      },
+      {
+        label: 'Builder',
+        value: BUILDER_ACCESS_LABELS[plan?.builderAccess] || 'No definido'
+      },
+      {
+        label: 'Exportación',
+        value: EXPORT_ACCESS_LABELS[plan?.exportAccess] || 'No definida'
+      },
+      {
+        label: 'Créditos',
+        value: creditText
+      }
+    ];
+  };
+
   if (loading) {
     return (
       <DashboardLayout title="Facturación">
@@ -400,37 +420,31 @@ const Billing = () => {
             className="card mb-8 border border-[#0F5257]/30"
             data-testid="suggested-plan-banner"
           >
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-              <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#0F5257] text-sm font-medium mb-4">
+            <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-sm font-medium mb-4">
                   <Lightning weight="fill" />
                   Recomendación contextual
                 </div>
 
                 <h3 className="text-xl text-white font-medium mb-2">
-                  Plan sugerido para este caso: {suggestedPlan.visibleName}
+                  Plan sugerido: {suggestedPlan.visibleName}
                 </h3>
 
                 <p className="text-[#D4D4D4] mb-4">{suggestedPlan.valuePromise}</p>
 
-                <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                      Intensidad
-                    </p>
-                    <p className="text-white">
-                      {ACTIVATION_LABELS[suggestedPlan.activationLevel] || 'No definida'}
-                    </p>
-                  </div>
-
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                      Qué abre ahora
-                    </p>
-                    <p className="text-white">
-                      {suggestedPlan.promptLayer?.description || suggestedPlan.headline}
-                    </p>
-                  </div>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {renderOperationalItems(suggestedPlan).slice(0, 3).map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-xl border border-white/5 bg-[#0A0A0A] px-4 py-4"
+                    >
+                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                        {item.label}
+                      </p>
+                      <p className="text-sm text-white">{item.value}</p>
+                    </div>
+                  ))}
                 </div>
 
                 {fromProjectId && (
@@ -445,59 +459,114 @@ const Billing = () => {
                 )}
               </div>
 
-              <div className="lg:w-[320px] bg-[#0A0A0A] border border-[#262626] rounded-xl p-5">
+              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-5 flex flex-col">
                 <p className="text-sm text-[#A3A3A3] mb-1">Nivel sugerido</p>
                 <h4 className="text-2xl text-white font-medium mb-1">
                   {suggestedPlan.visibleName}
                 </h4>
                 <p className="text-[#A3A3A3] mb-4">{suggestedPlan.headline}</p>
 
-                <div className="flex items-baseline gap-1 mb-5">
+                <div className="flex items-baseline gap-1 mb-4">
                   <span className="text-4xl font-light text-white">{suggestedPlan.priceLabel}</span>
                   <span className="text-[#A3A3A3]">{suggestedPlan.periodLabel}</span>
                 </div>
 
-                <div className="bg-[#111111] border border-white/5 rounded-xl p-4 mb-5">
-                  <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                    Marco operativo previsto
+                <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-4">
+                  <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                    Créditos previstos
                   </p>
-                  <div className="space-y-2 text-sm">
-                    <p className="text-white">
-                      Builder: {BUILDER_ACCESS_LABELS[suggestedPlan.builderAccess] || 'No definido'}
-                    </p>
-                    <p className="text-white">
-                      Exportación: {EXPORT_ACCESS_LABELS[suggestedPlan.exportAccess] || 'No definida'}
-                    </p>
-                    <p className="text-white">
-                      Créditos: {suggestedPlan.creditsLabel || 'Pendiente de fijar'}
-                    </p>
-                  </div>
+                  <p className="text-sm text-white">{getCreditsLabel(suggestedPlan)}</p>
                 </div>
 
-                <p className="text-xs text-[#A3A3A3] leading-relaxed mb-5">
-                  {OPERATIONAL_NOTE}
-                </p>
+                <button
+                  onClick={() => handlePlanCheckout(suggestedPlan.id)}
+                  disabled={user?.plan === suggestedPlan.id || processingKey === `plan:${suggestedPlan.id}`}
+                  className={`w-full mt-auto py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                    user?.plan === suggestedPlan.id
+                      ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
+                      : 'btn-primary'
+                  } disabled:opacity-50`}
+                >
+                  {processingKey === `plan:${suggestedPlan.id}` ? (
+                    <div className="spinner w-4 h-4"></div>
+                  ) : user?.plan === suggestedPlan.id ? (
+                    'Plan actual'
+                  ) : (
+                    <>
+                      Activar {suggestedPlan.visibleName}
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
-                {user?.plan !== suggestedPlan.id ? (
-                  <button
-                    onClick={() => handlePlanCheckout(suggestedPlan.id)}
-                    disabled={processingKey === `plan:${suggestedPlan.id}`}
-                    className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {processingKey === `plan:${suggestedPlan.id}` ? (
-                      <div className="spinner w-4 h-4"></div>
-                    ) : (
-                      <>
-                        Activar {suggestedPlan.visibleName}
-                        <ArrowRight size={16} />
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <button className="w-full py-3 rounded-lg font-medium bg-[#262626] text-[#A3A3A3] cursor-default">
-                    Plan actual
-                  </button>
-                )}
+        {creditSummary?.enabled && (
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.02 }}
+            className="mb-8 rounded-2xl border border-amber-500/20 bg-[linear-gradient(180deg,#171717_0%,#14110a_100%)] px-6 py-6"
+            data-testid="credit-summary-card"
+          >
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-5">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                  <DiamondsFour size={24} className="text-amber-300" weight="fill" />
+                </div>
+                <div>
+                  <p className="text-sm text-amber-200/80 mb-1">Créditos del sistema</p>
+                  <h3 className="text-2xl text-white font-medium mb-1">Capacidad operativa activa</h3>
+                  <p className="text-[#C8C8C8] max-w-2xl">
+                    Los créditos dejan de ser una nota secundaria y pasan a mostrarse como recurso operativo central del sistema.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-amber-500/15 bg-[#0F0D08] px-4 py-4 min-w-[240px]">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                  Estado de microfase
+                </p>
+                <p className="text-sm text-white mb-2">Lectura visible ya integrada.</p>
+                <p className="text-xs text-[#A3A3A3] leading-relaxed">{CREDIT_NOTE}</p>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">Saldo actual</p>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-light text-white">{formatCredits(creditSummary.balance)}</span>
+                  <span className="text-sm text-amber-300 mb-1">créditos</span>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">Incluidos por plan</p>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-light text-white">
+                    {formatCredits(creditSummary.included_credits_for_current_plan)}
+                  </span>
+                  <span className="text-sm text-amber-300 mb-1">incluidos</span>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">Históricos concedidos</p>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-light text-white">{formatCredits(creditSummary.lifetime_granted)}</span>
+                  <span className="text-sm text-[#A3A3A3] mb-1">total</span>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">Históricos consumidos</p>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-light text-white">{formatCredits(creditSummary.lifetime_used)}</span>
+                  <span className="text-sm text-[#A3A3A3] mb-1">total</span>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -509,140 +578,83 @@ const Billing = () => {
           className="card mb-8"
           data-testid="current-plan"
         >
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-[#0F5257]/20 rounded-lg">
-              <Sparkle size={24} className="text-[#0F5257]" />
-            </div>
+          <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-6">
             <div>
-              <p className="text-sm text-[#A3A3A3]">Plan actual</p>
-              <h3 className="text-xl text-white font-medium capitalize">{currentPlanName}</h3>
-            </div>
-          </div>
-
-          {currentPlanDefinition?.headline && (
-            <p className="text-[#D4D4D4] mb-5">{currentPlanDefinition.headline}</p>
-          )}
-
-          {billingData?.current_plan?.features && (
-            <div className="flex flex-wrap gap-2 mb-5">
-              {billingData.current_plan.features.map((feature) => (
-                <span
-                  key={feature}
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    CURRENT_PLAN_BADGE_STYLES[feature] || 'bg-[#262626] text-[#A3A3A3]'
-                  }`}
-                >
-                  {FEATURE_LABELS[feature] || feature}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {currentPlanDefinition && currentPlanDefinition.id !== 'free' && (
-            <div className="bg-[#111111] border border-white/5 rounded-xl p-4">
-              <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                Marco operativo previsto
-              </p>
-              <div className="grid md:grid-cols-4 gap-3 text-sm">
-                <p className="text-white">
-                  Activación: {ACTIVATION_LABELS[currentPlanDefinition.activationLevel] || 'No definida'}
-                </p>
-                <p className="text-white">
-                  Builder: {BUILDER_ACCESS_LABELS[currentPlanDefinition.builderAccess] || 'No definido'}
-                </p>
-                <p className="text-white">
-                  Exportación: {EXPORT_ACCESS_LABELS[currentPlanDefinition.exportAccess] || 'No definida'}
-                </p>
-                <p className="text-white">
-                  Créditos incluidos: {formatCredits(currentPlanIncludedCredits)}
-                </p>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-[#0F5257]/20 rounded-lg">
+                  <Sparkle size={24} className="text-[#0F5257]" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#A3A3A3]">Plan actual</p>
+                  <h3 className="text-2xl text-white font-medium capitalize">{currentPlanName}</h3>
+                </div>
               </div>
-              <p className="text-xs text-[#A3A3A3] mt-3">
+
+              {currentPlanDefinition?.headline && (
+                <p className="text-[#D4D4D4] mb-4">{currentPlanDefinition.headline}</p>
+              )}
+
+              {billingData?.current_plan?.features && (
+                <div className="flex flex-wrap gap-2">
+                  {billingData.current_plan.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        CURRENT_PLAN_BADGE_STYLES[feature] || 'bg-[#262626] text-[#A3A3A3]'
+                      }`}
+                    >
+                      {FEATURE_LABELS[feature] || feature}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-white/5 bg-[#111111] px-5 py-5">
+              <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-4">
+                Marco operativo del plan
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                {renderOperationalItems(currentPlanDefinition, currentPlanIncludedCredits).map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4"
+                  >
+                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                      {item.label}
+                    </p>
+                    <p className="text-sm text-white">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-xs text-[#A3A3A3] mt-4 leading-relaxed">
                 {OPERATIONAL_NOTE}
               </p>
             </div>
-          )}
+          </div>
         </motion.div>
-
-        {creditSummary?.enabled && (
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.03 }}
-            className="card mb-8 border border-[#0F5257]/20"
-            data-testid="credit-summary-card"
-          >
-            <div className="flex items-center gap-4 mb-5">
-              <div className="p-3 bg-[#0F5257]/20 rounded-lg">
-                <CreditCard size={24} className="text-[#0F5257]" />
-              </div>
-              <div>
-                <p className="text-sm text-[#A3A3A3]">Créditos del sistema</p>
-                <h3 className="text-xl text-white font-medium">Lectura operativa activa</h3>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-4 mb-5">
-              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
-                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                  Saldo actual
-                </p>
-                <p className="text-2xl font-medium text-white">
-                  {formatCredits(creditSummary.balance)}
-                </p>
-              </div>
-
-              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
-                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                  Incluidos por tu plan
-                </p>
-                <p className="text-2xl font-medium text-white">
-                  {formatCredits(creditSummary.included_credits_for_current_plan)}
-                </p>
-              </div>
-
-              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
-                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                  Históricos concedidos
-                </p>
-                <p className="text-2xl font-medium text-white">
-                  {formatCredits(creditSummary.lifetime_granted)}
-                </p>
-              </div>
-
-              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4">
-                <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                  Históricos consumidos
-                </p>
-                <p className="text-2xl font-medium text-white">
-                  {formatCredits(creditSummary.lifetime_used)}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-[#111111] border border-white/5 rounded-xl p-4">
-              <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                Estado de esta microfase
-              </p>
-              <p className="text-sm text-white mb-2">
-                Saldo y créditos incluidos ya visibles en sistema.
-              </p>
-              <p className="text-sm text-[#A3A3A3] leading-relaxed">
-                {CREDIT_NOTE}
-              </p>
-            </div>
-          </motion.div>
-        )}
 
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.06 }}
+          transition={{ delay: 0.05 }}
           className="mb-8"
         >
-          <h3 className="text-lg font-medium text-white mb-4">Planes disponibles</h3>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-4">
+            <div>
+              <h3 className="text-xl font-medium text-white">Planes disponibles</h3>
+              <p className="text-sm text-[#A3A3A3] mt-1">
+                Comparación compacta: nivel, capacidad operativa y créditos incluidos.
+              </p>
+            </div>
+            <p className="text-xs text-[#A3A3A3] max-w-xl">
+              La nota operativa se centraliza aquí. No se repite dentro de cada tarjeta para reducir fricción visual.
+            </p>
+          </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {pricingPlans.map((plan) => {
               const isCurrentPlan = user?.plan === plan.id;
               const isSuggestedPlan = suggestedPlanId
@@ -650,11 +662,14 @@ const Billing = () => {
                 : plan.id === 'blueprint';
 
               const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
+              const highlights = Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
+                ? plan.billingHighlights
+                : (plan.features || []).slice(0, 4);
 
               return (
                 <div
                   key={plan.id}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[760px] ${
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[640px] ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
@@ -681,90 +696,59 @@ const Billing = () => {
                     </div>
                   </div>
 
-                  <div className="min-h-[170px] mb-5">
-                    <h4 className="text-2xl font-medium text-white mb-3">{plan.visibleName}</h4>
+                  <div className="min-h-[122px] mb-5">
+                    <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
                     <p className="text-[#F0F0F0] text-base leading-snug mb-3">{plan.headline}</p>
                     <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
                   </div>
 
-                  <div className="min-h-[84px] flex items-end gap-2 mb-5">
+                  <div className="min-h-[76px] flex items-end gap-2 mb-5">
                     <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[130px]">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
+                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4">
+                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
                       Mejor encaje
                     </p>
-                    <p className="text-sm text-white leading-relaxed">{plan.bestFor}</p>
+                    <p className="text-sm text-white leading-relaxed">
+                      {plan.bestForShort || plan.bestFor}
+                    </p>
                   </div>
 
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[145px]">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
-                      {visual.capabilityTitle}
+                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4">
+                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-3">
+                      Marco operativo
                     </p>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {visual.capabilityItems.map((item) => (
-                        <span key={item} className={`px-2.5 py-1 rounded-full text-xs ${visual.chipClass}`}>
-                          {item}
-                        </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      {renderOperationalItems(plan).map((item) => (
+                        <div
+                          key={item.label}
+                          className="rounded-lg border border-white/5 bg-[#101010] px-3 py-3"
+                        >
+                          <p className="text-[10px] uppercase tracking-wide text-[#7F7F7F] mb-1">
+                            {item.label}
+                          </p>
+                          <p className="text-xs text-white leading-snug">{item.value}</p>
+                        </div>
                       ))}
                     </div>
-                    <p className="text-sm text-[#BEBEBE] leading-relaxed">{visual.insight}</p>
-                  </div>
-
-                  <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-4 mb-4 min-h-[180px]">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-3">
-                      Marco operativo previsto
-                    </p>
-                    <div className="space-y-2 text-sm">
-                      <p className="text-white">
-                        Activación: {ACTIVATION_LABELS[plan.activationLevel] || 'No definida'}
-                      </p>
-                      <p className="text-white">
-                        Builder: {BUILDER_ACCESS_LABELS[plan.builderAccess] || 'No definido'}
-                      </p>
-                      <p className="text-white">
-                        Exportación: {EXPORT_ACCESS_LABELS[plan.exportAccess] || 'No definida'}
-                      </p>
-                      <p className="text-white">
-                        Créditos: {plan.creditsLabel || 'Pendiente de fijar'}
-                      </p>
-                    </div>
-                    {plan.id !== 'free' && (
-                      <p className="text-xs text-[#A3A3A3] mt-3">
-                        {OPERATIONAL_NOTE}
-                      </p>
-                    )}
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-1">
-                    {plan.features.map((feature) => {
-                      const plannedFeature = isPlannedFeature(feature);
-
-                      return (
-                        <li
-                          key={feature}
-                          className="flex items-start gap-2 text-sm text-[#D4D4D4]"
-                        >
-                          <CheckCircle
-                            size={16}
-                            weight="fill"
-                            className={`mt-0.5 flex-shrink-0 ${
-                              plannedFeature ? 'text-[#A3A3A3]' : 'text-[#0F5257]'
-                            }`}
-                          />
-                          <div>
-                            <span>{feature}</span>
-                            {plannedFeature && (
-                              <div className="text-[11px] text-[#A3A3A3] mt-1">
-                                Próxima capa operativa
-                              </div>
-                            )}
-                          </div>
-                        </li>
-                      );
-                    })}
+                    {highlights.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2 text-sm text-[#D4D4D4]"
+                      >
+                        <CheckCircle
+                          size={16}
+                          weight="fill"
+                          className="text-[#0F5257] mt-0.5 flex-shrink-0"
+                        />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
                   </ul>
 
                   <button
@@ -800,6 +784,12 @@ const Billing = () => {
               );
             })}
           </div>
+
+          <div className="mt-4 rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
+            <p className="text-xs text-[#A3A3A3] leading-relaxed">
+              {OPERATIONAL_NOTE}
+            </p>
+          </div>
         </motion.div>
 
         <motion.div
@@ -809,8 +799,8 @@ const Billing = () => {
           className="mb-10"
           data-testid="entry-offer-card"
         >
-          <div className="bg-[#121212] border border-white/5 rounded-2xl p-6 lg:p-7">
-            <div className="grid lg:grid-cols-[1.45fr_0.75fr] gap-6">
+          <div className="bg-[#121212] border border-white/5 rounded-2xl p-6">
+            <div className="grid lg:grid-cols-[1.35fr_0.65fr] gap-6 items-start">
               <div>
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
@@ -821,16 +811,15 @@ const Billing = () => {
                   </span>
                 </div>
 
-                <h3 className="text-xl lg:text-2xl font-light text-white mb-3">
+                <h3 className="text-xl font-medium text-white mb-2">
                   {selectedEntryOffer.headline}
                 </h3>
-                <p className="text-[#D4D4D4] mb-3 max-w-2xl">{selectedEntryOffer.description}</p>
-                <p className="text-sm text-[#A3A3A3] max-w-2xl mb-5">
-                  {selectedEntryOffer.valuePromise}
+                <p className="text-[#D4D4D4] mb-3 max-w-2xl">
+                  {selectedEntryOffer.description}
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                  {selectedEntryOffer.features.map((feature) => (
+                  {(selectedEntryOffer.billingHighlights || selectedEntryOffer.features).map((feature) => (
                     <span
                       key={feature}
                       className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-white/5 text-[#D4D4D4]"
@@ -841,32 +830,30 @@ const Billing = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col bg-[#0A0A0A] border border-[#262626] rounded-2xl p-5">
-                <div className="flex-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium mb-4">
-                    <FileText size={14} weight="fill" />
-                    Compra puntual
-                  </div>
+              <div className="bg-[#0A0A0A] border border-[#262626] rounded-2xl p-5 flex flex-col">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium mb-4">
+                  <FileText size={14} weight="fill" />
+                  Compra puntual
+                </div>
 
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-4xl font-light text-white">{selectedEntryOffer.priceLabel}</span>
-                    <span className="text-[#A3A3A3]">{selectedEntryOffer.periodLabel}</span>
-                  </div>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-4xl font-light text-white">{selectedEntryOffer.priceLabel}</span>
+                  <span className="text-[#A3A3A3]">{selectedEntryOffer.periodLabel}</span>
+                </div>
 
-                  <div className="bg-[#111111] border border-white/5 rounded-xl p-4 mb-5">
-                    <p className="text-xs text-[#A3A3A3] uppercase tracking-wide mb-2">
-                      Rol dentro del sistema
-                    </p>
-                    <p className="text-sm text-white">
-                      Bloque puente para validar antes de entrar en continuidad.
-                    </p>
-                  </div>
+                <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-5">
+                  <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                    Rol dentro del sistema
+                  </p>
+                  <p className="text-sm text-white">
+                    Puente transaccional antes de entrar en continuidad.
+                  </p>
                 </div>
 
                 <button
                   onClick={handleEntryOfferCheckout}
                   disabled={processingKey === `offer:${selectedEntryOffer.id}`}
-                  className="w-full py-3 rounded-lg font-medium bg-[#262626] text-white hover:bg-[#363636] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3 rounded-lg font-medium bg-[#262626] text-white hover:bg-[#363636] transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto"
                   data-testid="entry-offer-cta"
                 >
                   {processingKey === `offer:${selectedEntryOffer.id}` ? (
