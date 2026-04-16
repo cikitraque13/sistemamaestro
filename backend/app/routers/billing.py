@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 
 from app.core.security import get_current_user
 from app.db.mongodb import db
-from app.domain.plans import PLANS
+from app.domain.plans import ONE_TIME_OFFERS, PLANS
 
 router = APIRouter(prefix="/api/user", tags=["billing"])
 
@@ -29,6 +29,10 @@ async def get_billing(request: Request):
         "available_plans": [
             {"id": k, "name": v["name"], "price": v["price"], "features": v["features"]}
             for k, v in PLANS.items()
+        ],
+        "available_one_time_offers": [
+            {"id": k, "name": v["name"], "price": v["price"], "description": v["description"]}
+            for k, v in ONE_TIME_OFFERS.items()
         ]
     }
 
