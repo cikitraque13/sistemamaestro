@@ -1,4 +1,4 @@
-# Railway Deployment
+# Frontend build
 FROM node:22-alpine AS frontend-build
 
 WORKDIR /app/frontend
@@ -15,14 +15,15 @@ RUN npm run build
 FROM python:3.11-slim
 
 WORKDIR /app
-COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/ ./
-COPY railway/server_railway.py ./server.py
-COPY --from=frontend-build /app/frontend/build ./frontend/build
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
+COPY backend/ /app/backend/
+COPY --from=frontend-build /app/frontend/build /app/frontend/build
+
+ENV PYTHONPATH=/app
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
