@@ -85,6 +85,32 @@ const formatDate = (value) => {
 
 const ensureArray = (value) => (Array.isArray(value) ? value : []);
 
+const PdfSection = ({ page, title, icon, children, noBorder = false }) => (
+  <section
+    className={`px-8 py-8 sm:px-10 sm:py-9 ${noBorder ? '' : 'border-b border-white/5'}`}
+    style={{ pageBreakInside: 'avoid' }}
+  >
+    {(page || title) && (
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          {icon}
+          <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
+            {title}
+          </h2>
+        </div>
+
+        {page && (
+          <div className="inline-flex items-center self-start px-3 py-1 rounded-full bg-[#141414] border border-white/5 text-[11px] uppercase tracking-wide text-[#A3A3A3]">
+            {page}
+          </div>
+        )}
+      </div>
+    )}
+
+    {children}
+  </section>
+);
+
 const SnapshotCard = ({ eyebrow, value, accent = 'default' }) => {
   const accentMap = {
     teal: 'border-[#0F5257]/20 bg-[#0F5257]/8 text-[#8DE1D0]',
@@ -96,7 +122,7 @@ const SnapshotCard = ({ eyebrow, value, accent = 'default' }) => {
   const accentClass = accentMap[accent] || accentMap.default;
 
   return (
-    <div className={`rounded-xl border p-5 ${accentClass}`}>
+    <div className={`rounded-xl border p-5 ${accentClass}`} style={{ pageBreakInside: 'avoid' }}>
       <p className="text-[11px] uppercase tracking-wide mb-2 opacity-80">{eyebrow}</p>
       <p className="text-white font-medium leading-relaxed">{value}</p>
     </div>
@@ -104,7 +130,10 @@ const SnapshotCard = ({ eyebrow, value, accent = 'default' }) => {
 };
 
 const SignalList = ({ title, items }) => (
-  <div className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5">
+  <div
+    className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5"
+    style={{ pageBreakInside: 'avoid' }}
+  >
     <p className="text-sm text-[#A3A3A3] mb-3">{title}</p>
     {items.length > 0 ? (
       <ul className="space-y-2">
@@ -239,160 +268,159 @@ const PremiumReportPdfTemplate = ({
 
   if (!project || !reportView) {
     return (
-      <div className="rounded-2xl border border-white/5 bg-[#111111] p-8 text-white">
+      <div className="max-w-[920px] mx-auto rounded-2xl border border-white/5 bg-[#111111] p-8 text-white">
         No hay datos suficientes para renderizar el informe.
       </div>
     );
   }
 
   return (
-    <div className="bg-[#0A0A0A] text-white rounded-[28px] overflow-hidden border border-white/5">
-      <div className="px-8 py-8 sm:px-10 sm:py-10 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.16),transparent_35%)]">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-sm font-medium mb-4">
-              <Sparkle weight="fill" />
-              {documentTitle}
+    <div className="max-w-[920px] mx-auto">
+      <div className="bg-[#0A0A0A] text-white rounded-[28px] overflow-hidden border border-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+        <PdfSection page="Página 1" noBorder>
+          <div className="pb-8 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.16),transparent_35%)] -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-sm font-medium mb-4">
+                  <Sparkle weight="fill" />
+                  {documentTitle}
+                </div>
+
+                <h1 className="text-3xl sm:text-[2.3rem] font-light text-white mb-3 leading-tight">
+                  Lectura premium estructurada
+                </h1>
+
+                <p className="text-[#CFCFCF] max-w-3xl leading-relaxed">
+                  Validación breve y accionable para entender el caso, detectar la fricción principal
+                  y ordenar el siguiente paso correcto dentro del sistema.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5 min-w-[260px]">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                  Documento
+                </p>
+                <p className="text-white font-medium mb-3">{brandName}</p>
+
+                <div className="space-y-2 text-sm">
+                  <p className="text-[#D4D4D4]">
+                    <span className="text-[#A3A3A3]">Fecha:</span> {issueDate || 'Sin fecha'}
+                  </p>
+                  <p className="text-[#D4D4D4]">
+                    <span className="text-[#A3A3A3]">Ruta:</span> {routeLabel}
+                  </p>
+                  <p className="text-[#D4D4D4]">
+                    <span className="text-[#A3A3A3]">Entrada:</span>{' '}
+                    {project.input_type === 'url' ? 'URL' : 'Descripción'}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-light text-white mb-3">
-              Lectura premium estructurada
-            </h1>
-
-            <p className="text-[#CFCFCF] max-w-3xl leading-relaxed">
-              Validación breve y accionable para entender el caso, detectar la fricción principal
-              y ordenar el siguiente paso correcto dentro del sistema.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5 min-w-[260px]">
-            <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-              Documento
-            </p>
-            <p className="text-white font-medium mb-3">{brandName}</p>
-
-            <div className="space-y-2 text-sm">
-              <p className="text-[#D4D4D4]">
-                <span className="text-[#A3A3A3]">Fecha:</span> {issueDate || 'Sin fecha'}
+            <div
+              className="rounded-2xl border border-white/5 bg-[#0A0A0A] p-5 mb-6"
+              style={{ pageBreakInside: 'avoid' }}
+            >
+              <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
+                Contexto analizado
               </p>
-              <p className="text-[#D4D4D4]">
-                <span className="text-[#A3A3A3]">Ruta:</span> {routeLabel}
-              </p>
-              <p className="text-[#D4D4D4]">
-                <span className="text-[#A3A3A3]">Entrada:</span>{' '}
-                {project.input_type === 'url' ? 'URL' : 'Descripción'}
-              </p>
+              <p className="text-white leading-relaxed break-words">{project.input_content}</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <SnapshotCard
+                eyebrow="Hallazgo principal"
+                value={reportView.coreDiagnosis.mainFinding}
+                accent="teal"
+              />
+              <SnapshotCard
+                eyebrow="Palanca principal"
+                value={reportView.coreDiagnosis.mainLeverage}
+                accent="amber"
+              />
+              <SnapshotCard
+                eyebrow="Continuidad recomendada"
+                value={continuityMeta.label}
+                accent="violet"
+              />
             </div>
           </div>
-        </div>
+        </PdfSection>
 
-        <div className="rounded-2xl border border-white/5 bg-[#0A0A0A] p-5">
-          <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-            Contexto analizado
-          </p>
-          <p className="text-white leading-relaxed break-words">{project.input_content}</p>
-        </div>
+        <PdfSection
+          page="Página 2"
+          title="Resumen ejecutivo"
+          icon={<DiamondsFour size={18} className="text-amber-300" weight="fill" />}
+        >
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                Comprensión
+              </p>
+              <p className="text-white">{reportView.executiveSummary.understanding}</p>
+            </div>
 
-        <div className="grid lg:grid-cols-3 gap-4 mt-6">
-          <SnapshotCard
-            eyebrow="Hallazgo principal"
-            value={reportView.coreDiagnosis.mainFinding}
-            accent="teal"
-          />
-          <SnapshotCard
-            eyebrow="Palanca principal"
-            value={reportView.coreDiagnosis.mainLeverage}
-            accent="amber"
-          />
-          <SnapshotCard
-            eyebrow="Continuidad recomendada"
-            value={continuityMeta.label}
-            accent="violet"
-          />
-        </div>
-      </div>
+            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                Tensión principal
+              </p>
+              <p className="text-white">{reportView.executiveSummary.mainTension}</p>
+            </div>
 
-      <div className="px-8 py-8 sm:px-10 sm:py-10 border-b border-white/5">
-        <div className="flex items-center gap-2 mb-4">
-          <DiamondsFour size={18} className="text-amber-300" weight="fill" />
-          <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
-            Resumen ejecutivo
-          </h2>
-        </div>
+            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                Importancia comercial
+              </p>
+              <p className="text-white">{reportView.executiveSummary.commercialImportance}</p>
+            </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-            <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-              Comprensión
-            </p>
-            <p className="text-white">{reportView.executiveSummary.understanding}</p>
+            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                Conclusión ejecutiva
+              </p>
+              <p className="text-white">{reportView.executiveSummary.bottomLine}</p>
+            </div>
           </div>
 
-          <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-            <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-              Tensión principal
-            </p>
-            <p className="text-white">{reportView.executiveSummary.mainTension}</p>
+          <div className="mt-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Lightning size={18} className="text-[#8DE1D0]" weight="fill" />
+              <h3 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
+                Diagnóstico central
+              </h3>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="rounded-xl p-5 border border-[#0F5257]/20 bg-[#0F5257]/8">
+                <p className="text-xs text-[#8DE1D0] mb-2 uppercase tracking-wide">
+                  Hallazgo principal
+                </p>
+                <p className="text-white font-medium">{reportView.coreDiagnosis.mainFinding}</p>
+              </div>
+
+              <div className="rounded-xl p-5 border border-white/5 bg-[#0A0A0A]">
+                <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                  Debilidad principal
+                </p>
+                <p className="text-white">{reportView.coreDiagnosis.mainWeakness}</p>
+              </div>
+
+              <div className="rounded-xl p-5 border border-amber-500/20 bg-amber-500/8">
+                <p className="text-xs text-amber-300 mb-2 uppercase tracking-wide">
+                  Palanca principal
+                </p>
+                <p className="text-white">{reportView.coreDiagnosis.mainLeverage}</p>
+              </div>
+            </div>
           </div>
+        </PdfSection>
 
-          <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-            <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-              Importancia comercial
-            </p>
-            <p className="text-white">{reportView.executiveSummary.commercialImportance}</p>
-          </div>
-
-          <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-            <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-              Conclusión ejecutiva
-            </p>
-            <p className="text-white">{reportView.executiveSummary.bottomLine}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-8 py-8 sm:px-10 sm:py-10 border-b border-white/5">
-        <div className="flex items-center gap-2 mb-4">
-          <Lightning size={18} className="text-[#8DE1D0]" weight="fill" />
-          <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
-            Diagnóstico central
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="rounded-xl p-5 border border-[#0F5257]/20 bg-[#0F5257]/8">
-            <p className="text-xs text-[#8DE1D0] mb-2 uppercase tracking-wide">
-              Hallazgo principal
-            </p>
-            <p className="text-white font-medium">{reportView.coreDiagnosis.mainFinding}</p>
-          </div>
-
-          <div className="rounded-xl p-5 border border-white/5 bg-[#0A0A0A]">
-            <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-              Debilidad principal
-            </p>
-            <p className="text-white">{reportView.coreDiagnosis.mainWeakness}</p>
-          </div>
-
-          <div className="rounded-xl p-5 border border-amber-500/20 bg-amber-500/8">
-            <p className="text-xs text-amber-300 mb-2 uppercase tracking-wide">
-              Palanca principal
-            </p>
-            <p className="text-white">{reportView.coreDiagnosis.mainLeverage}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-8 py-8 sm:px-10 sm:py-10 border-b border-white/5">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2">
-            <Flag size={18} className="text-[#8DE1D0]" weight="fill" />
-            <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
-              Lectura por dimensiones
-            </h2>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
+        <PdfSection
+          page="Página 3"
+          title="Lectura por dimensiones"
+          icon={<Flag size={18} className="text-[#8DE1D0]" weight="fill" />}
+        >
+          <div className="flex flex-wrap gap-2 mb-4">
             <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.strong.badgeClass}`}>
               {dimensionCounters.strong} fuertes
             </span>
@@ -403,80 +431,78 @@ const PremiumReportPdfTemplate = ({
               {dimensionCounters.priority} prioritarias
             </span>
           </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
-          {reportView.dimensionReview.map((dimension) => {
-            const statusMeta =
-              DIMENSION_STATUS_META[dimension.status] || DIMENSION_STATUS_META.improvable;
-            const priorityMeta =
-              PRIORITY_META[dimension.priority] || PRIORITY_META.medium;
+          <div className="grid md:grid-cols-2 gap-4">
+            {reportView.dimensionReview.map((dimension) => {
+              const statusMeta =
+                DIMENSION_STATUS_META[dimension.status] || DIMENSION_STATUS_META.improvable;
+              const priorityMeta =
+                PRIORITY_META[dimension.priority] || PRIORITY_META.medium;
 
-            return (
-              <div
-                key={dimension.id}
-                className={`rounded-xl border p-4 ${statusMeta.cardClass}`}
-              >
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <p className="text-white font-medium">{dimension.label}</p>
-                  <span className={`px-2 py-1 rounded-full text-[11px] ${statusMeta.badgeClass}`}>
-                    {statusMeta.label}
-                  </span>
-                </div>
-
-                <p className="text-sm text-[#D4D4D4] leading-relaxed mb-4">
-                  {dimension.reading}
-                </p>
-
-                <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] ${priorityMeta.badgeClass}`}>
-                  Prioridad {priorityMeta.label.toLowerCase()}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="px-8 py-8 sm:px-10 sm:py-10 border-b border-white/5">
-        <div className="flex items-center gap-2 mb-4">
-          <CheckCircle size={18} className="text-[#8DE1D0]" weight="fill" />
-          <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
-            Acciones prioritarias
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          {reportView.priorityActions.map((action, index) => {
-            const intensityMeta =
-              PRIORITY_META[action.intensity] || PRIORITY_META.medium;
-
-            return (
-              <div
-                key={action.id}
-                className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
-              >
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] flex items-center justify-center text-sm font-medium">
-                    {index + 1}
+              return (
+                <div
+                  key={dimension.id}
+                  className={`rounded-xl border p-4 ${statusMeta.cardClass}`}
+                  style={{ pageBreakInside: 'avoid' }}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <p className="text-white font-medium">{dimension.label}</p>
+                    <span className={`px-2 py-1 rounded-full text-[11px] ${statusMeta.badgeClass}`}>
+                      {statusMeta.label}
+                    </span>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-full text-[11px] ${intensityMeta.badgeClass}`}>
-                    {intensityMeta.label}
+
+                  <p className="text-sm text-[#D4D4D4] leading-relaxed mb-4">
+                    {dimension.reading}
+                  </p>
+
+                  <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] ${priorityMeta.badgeClass}`}>
+                    Prioridad {priorityMeta.label.toLowerCase()}
                   </span>
                 </div>
+              );
+            })}
+          </div>
+        </PdfSection>
 
-                <p className="text-white font-medium mb-2">{action.title}</p>
-                <p className="text-sm text-[#D4D4D4] leading-relaxed">
-                  {action.why_it_matters}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+        <PdfSection
+          page="Página 4"
+          title="Acciones prioritarias"
+          icon={<CheckCircle size={18} className="text-[#8DE1D0]" weight="fill" />}
+        >
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            {reportView.priorityActions.map((action, index) => {
+              const intensityMeta =
+                PRIORITY_META[action.intensity] || PRIORITY_META.medium;
 
-      <div className="px-8 py-8 sm:px-10 sm:py-10 border-b border-white/5">
-        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-4">
-          <div className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5">
+              return (
+                <div
+                  key={action.id}
+                  className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                  style={{ pageBreakInside: 'avoid' }}
+                >
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] flex items-center justify-center text-sm font-medium">
+                      {index + 1}
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[11px] ${intensityMeta.badgeClass}`}>
+                      {intensityMeta.label}
+                    </span>
+                  </div>
+
+                  <p className="text-white font-medium mb-2">{action.title}</p>
+                  <p className="text-sm text-[#D4D4D4] leading-relaxed">
+                    {action.why_it_matters}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div
+            className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+            style={{ pageBreakInside: 'avoid' }}
+          >
             <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
               Acción inmediata
             </p>
@@ -494,64 +520,78 @@ const PremiumReportPdfTemplate = ({
               <p className="text-[#A3A3A3]">Sin acción inmediata disponible.</p>
             )}
           </div>
+        </PdfSection>
 
-          <div className="rounded-xl border border-[#0F5257]/20 bg-[#0F5257]/8 p-5">
-            <p className="text-sm uppercase tracking-wide text-[#8DE1D0] mb-3">
-              Recomendación de continuidad
-            </p>
+        <PdfSection
+          page="Página 5"
+          title="Continuidad recomendada"
+          icon={<Sparkle size={18} className="text-[#8DE1D0]" weight="fill" />}
+        >
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-4 mb-6">
+            <div
+              className="rounded-xl border border-[#0F5257]/20 bg-[#0F5257]/8 p-5"
+              style={{ pageBreakInside: 'avoid' }}
+            >
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                <span className={`px-3 py-1 rounded-full text-sm ${continuityMeta.badgeClass}`}>
+                  {continuityMeta.label}
+                </span>
+              </div>
 
-            {reportView.continuityRecommendation ? (
-              <>
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className={`px-3 py-1 rounded-full text-sm ${continuityMeta.badgeClass}`}>
-                    {continuityMeta.label}
-                  </span>
-                </div>
+              <p className="text-white leading-relaxed mb-4">
+                {reportView.continuityRecommendation?.reason || 'Sin recomendación de continuidad disponible.'}
+              </p>
 
-                <p className="text-white mb-4 leading-relaxed">
-                  {reportView.continuityRecommendation.reason}
+              <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                  CTA de continuidad
                 </p>
+                <p className="text-white">
+                  {reportView.continuityRecommendation?.cta_label || continuityMeta.label}
+                </p>
+              </div>
+            </div>
 
-                <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
-                  <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                    CTA de continuidad
-                  </p>
-                  <p className="text-white">
-                    {reportView.continuityRecommendation.cta_label || continuityMeta.label}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <p className="text-[#A3A3A3]">Sin recomendación de continuidad disponible.</p>
-            )}
+            <div
+              className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+              style={{ pageBreakInside: 'avoid' }}
+            >
+              <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                Señales complementarias
+              </p>
+
+              <div className="grid gap-4">
+                <SignalList title="Fortalezas" items={reportView.strengths} />
+                <SignalList title="Debilidades" items={reportView.weaknesses} />
+                <SignalList title="Quick wins" items={reportView.quickWins} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="px-8 py-8 sm:px-10 sm:py-10">
-        <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-4">
-          Señales complementarias
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-4">
-          <SignalList title="Fortalezas" items={reportView.strengths} />
-          <SignalList title="Debilidades" items={reportView.weaknesses} />
-          <SignalList title="Quick wins" items={reportView.quickWins} />
-        </div>
-      </div>
-
-      {showSystemFooter && (
-        <div className="px-8 py-5 sm:px-10 border-t border-white/5 bg-[#0B0B0B]">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
-            <p className="text-[#D4D4D4]">
-              Con esta lectura ya puedes ver el caso con más claridad.
-            </p>
-            <p className="text-[#A3A3A3]">
-              {brandName} · Validación breve y accionable
+          <div
+            className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5"
+            style={{ pageBreakInside: 'avoid' }}
+          >
+            <p className="text-white leading-relaxed">
+              Con esta lectura ya puedes ver el caso con más claridad. Si quieres activarlo dentro del sistema,
+              el siguiente paso correcto es <span className="text-[#8DE1D0] font-medium">{continuityMeta.label}</span>.
             </p>
           </div>
-        </div>
-      )}
+        </PdfSection>
+
+        {showSystemFooter && (
+          <div className="px-8 py-5 sm:px-10 border-t border-white/5 bg-[#0B0B0B]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
+              <p className="text-[#D4D4D4]">
+                {brandName} · Validación breve y accionable
+              </p>
+              <p className="text-[#A3A3A3]">
+                Documento preparado para vista premium y futura exportación PDF
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
