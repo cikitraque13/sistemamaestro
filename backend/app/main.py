@@ -41,6 +41,8 @@ app.include_router(opportunities_router)
 async def startup_event():
     await db.users.create_index("email", unique=True)
     await db.users.create_index("user_id", unique=True)
+    await db.projects.create_index("user_id")
+    await db.projects.create_index("project_id", unique=True)
     await db.user_sessions.create_index("session_token")
     await db.user_sessions.create_index("user_id")
     await db.login_attempts.create_index("identifier")
