@@ -6,8 +6,8 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from app.core.config import get_google_client_id
-from app.core.security import (
+from backend.app.core.config import get_google_client_id
+from backend.app.core.security import (
     hash_password,
     verify_password,
     create_access_token,
@@ -20,7 +20,7 @@ from app.core.security import (
     clear_failed_attempts,
     should_use_secure_cookies,
 )
-from app.db.mongodb import db
+from backend.app.db.mongodb import db
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
