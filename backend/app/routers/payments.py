@@ -6,11 +6,11 @@ from datetime import datetime, timezone
 import stripe
 from fastapi import APIRouter, HTTPException, Request
 
-from app.core.config import STRIPE_SECRET_KEY
-from app.core.security import get_current_user
-from app.db.mongodb import db
-from app.domain.plans import ONE_TIME_OFFERS, PLANS
-from app.schemas.payments import CheckoutCreate
+from backend.app.core.config import STRIPE_SECRET_KEY
+from backend.app.core.security import get_current_user
+from backend.app.db.mongodb import db
+from backend.app.domain.plans import ONE_TIME_OFFERS, PLANS
+from backend.app.schemas.payments import CheckoutCreate
 
 logger = logging.getLogger(__name__)
 
