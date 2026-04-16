@@ -70,6 +70,19 @@ const CONTINUITY_META = {
   }
 };
 
+const PLACEHOLDER_PATTERNS = [
+  /^sin .*disponible/i,
+  /^sin .*datos/i,
+  /^sin recomendaci[oó]n/i,
+  /^sin acci[oó]n/i,
+  /^no se ha/i,
+  /^no hay/i,
+  /^lectura pendiente/i,
+  /^pendiente/i
+];
+
+const ensureArray = (value) => (Array.isArray(value) ? value : []);
+
 const formatDate = (value) => {
   if (!value) return '';
   try {
@@ -83,7 +96,108 @@ const formatDate = (value) => {
   }
 };
 
-const ensureArray = (value) => (Array.isArray(value) ? value : []);
+const normalizeText = (value) => {
+  if (typeof value !== 'string') return '';
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9ñ\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const isMeaningfulText = (value) => {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (trimmed.length < 12) return false;
+
+  return !PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(trimmed));
+};
+
+const tokenSet = (value) => {
+  const stopwords = new Set([
+    'de', 'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'o', 'u',
+    'a', 'ante', 'bajo', 'con', 'contra', 'desde', 'durante', 'en', 'entre',
+    'hacia', 'hasta', 'para', 'por', 'segun', 'sin', 'sobre', 'tras',
+    'que', 'como', 'del', 'al', 'se', 'su', 'sus', 'es', 'son', 'ha', 'han',
+    'muy', 'mas', 'menos', 'ya', 'hoy', 'real', 'principal', 'importante',
+    'caso', 'lectura', 'sistema', 'proyecto', 'negocio', 'usuario', 'usuarios',
+    'web', 'pagina', 'sitio', 'mensaje', 'landing', 'propuesta', 'valor',
+    'conversion', 'captacion', 'claridad', 'estructura', 'continuidad',
+    'mejora', 'oportunidad', 'accion', 'principal', 'comercial'
+  ]);
+
+  return new Set(
+    normalizeText(value)
+      .split(' ')
+      .filter((token) => token.length > 2 && !stopwords.has(token))
+  );
+};
+
+const areTooSimilar = (a, b) => {
+  if (!isMeaningfulText(a) || !isMeaningfulText(b)) return false;
+
+  const normA = normalizeText(a);
+  const normB = normalizeText(b);
+
+  if (normA === normB) return true;
+  if (normA.length > 32 && normB.length > 32 && (normA.includes(normB) || normB.includes(normA))) {
+    return true;
+  }
+
+  const tokensA = tokenSet(a);
+  const tokensB = tokenSet(b);
+  if (!tokensA.size || !tokensB.size) return false;
+
+  const intersection = [...tokensA].filter((token) => tokensB.has(token)).length;
+  const union = new Set([...tokensA, ...tokensB]).size;
+  if (!union) return false;
+
+  return intersection / union >= 0.72;
+};
+
+const dedupeTexts = (items, avoid = [], maxItems = null) => {
+  const result = [];
+
+  for (const item of items) {
+    if (!isMeaningfulText(item)) continue;
+    if (avoid.some((blocked) => areTooSimilar(item, blocked))) continue;
+    if (result.some((existing) => areTooSimilar(item, existing))) continue;
+
+    result.push(item);
+
+    if (maxItems && result.length >= maxItems) {
+      break;
+    }
+  }
+
+  return result;
+};
+
+const dedupeKeyValueBlocks = (items, maxItems = null) => {
+  const result = [];
+
+  for (const item of items) {
+    if (!item || !isMeaningfulText(item.value)) continue;
+    if (result.some((existing) => areTooSimilar(item.value, existing.value))) continue;
+
+    result.push(item);
+
+    if (maxItems && result.length >= maxItems) {
+      break;
+    }
+  }
+
+  return result;
+};
+
+const getGridClass = (count) => {
+  if (count <= 1) return 'grid-cols-1';
+  if (count === 2) return 'md:grid-cols-2';
+  return 'md:grid-cols-3';
+};
 
 const PdfSection = ({ page, title, icon, children, noBorder = false }) => (
   <section
@@ -135,21 +249,17 @@ const SignalList = ({ title, items }) => (
     style={{ pageBreakInside: 'avoid' }}
   >
     <p className="text-sm text-[#A3A3A3] mb-3">{title}</p>
-    {items.length > 0 ? (
-      <ul className="space-y-2">
-        {items.map((item, index) => (
-          <li
-            key={`${title}-${index}-${String(item).substring(0, 24)}`}
-            className="text-white text-sm flex items-start gap-2"
-          >
-            <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
-    )}
+    <ul className="space-y-2">
+      {items.map((item, index) => (
+        <li
+          key={`${title}-${index}-${String(item).substring(0, 24)}`}
+          className="text-white text-sm flex items-start gap-2"
+        >
+          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
   </div>
 );
 
@@ -171,15 +281,15 @@ const normalizeReportView = (project) => {
       ? diagnosis.core_diagnosis
       : {};
 
-  const dimensionReview = ensureArray(diagnosis.dimension_review);
-  const priorityActions = ensureArray(diagnosis.priority_actions);
+  const rawDimensionReview = ensureArray(diagnosis.dimension_review);
+  const rawPriorityActions = ensureArray(diagnosis.priority_actions);
 
-  const immediateAction =
+  const immediateActionRaw =
     diagnosis.immediate_action && typeof diagnosis.immediate_action === 'object'
       ? diagnosis.immediate_action
       : null;
 
-  const continuityRecommendation =
+  const continuityRecommendationRaw =
     diagnosis.continuity_recommendation && typeof diagnosis.continuity_recommendation === 'object'
       ? diagnosis.continuity_recommendation
       : null;
@@ -188,7 +298,7 @@ const normalizeReportView = (project) => {
     diagnosis.understanding ||
     diagnosis.summary ||
     executiveSummaryRaw.understanding ||
-    'Diagnóstico generado correctamente, pendiente de ampliar visualización.';
+    '';
 
   const mainFinding =
     diagnosis.main_finding ||
@@ -196,43 +306,134 @@ const normalizeReportView = (project) => {
     weaknesses[0] ||
     strengths[0] ||
     diagnosis.summary ||
-    'Sin hallazgo principal disponible.';
+    '';
 
-  const opportunity =
+  const mainWeakness =
+    coreDiagnosisRaw.main_weakness ||
+    weaknesses[0] ||
+    '';
+
+  const mainLeverage =
     diagnosis.opportunity ||
     coreDiagnosisRaw.main_leverage ||
     quickWins[0] ||
-    'Sin oportunidad priorizada disponible.';
+    '';
+
+  const executiveCards = dedupeKeyValueBlocks([
+    {
+      key: 'understanding',
+      label: 'Comprensión',
+      value: executiveSummaryRaw.understanding || understanding
+    },
+    {
+      key: 'main_tension',
+      label: 'Tensión principal',
+      value: executiveSummaryRaw.main_tension || weaknesses[0] || ''
+    },
+    {
+      key: 'commercial_importance',
+      label: 'Importancia comercial',
+      value: executiveSummaryRaw.commercial_importance || ''
+    },
+    {
+      key: 'bottom_line',
+      label: 'Conclusión ejecutiva',
+      value: executiveSummaryRaw.bottom_line || quickWins[0] || ''
+    }
+  ]);
+
+  const coreDiagnosisCards = dedupeKeyValueBlocks([
+    {
+      key: 'main_finding',
+      label: 'Hallazgo principal',
+      value: coreDiagnosisRaw.main_finding || mainFinding,
+      accent: 'teal'
+    },
+    {
+      key: 'main_weakness',
+      label: 'Debilidad principal',
+      value: coreDiagnosisRaw.main_weakness || mainWeakness,
+      accent: 'default'
+    },
+    {
+      key: 'main_leverage',
+      label: 'Palanca principal',
+      value: coreDiagnosisRaw.main_leverage || mainLeverage,
+      accent: 'amber'
+    }
+  ]);
+
+  const dimensionReview = rawDimensionReview.filter((dimension) => {
+    if (!dimension || typeof dimension !== 'object') return false;
+    return isMeaningfulText(dimension.reading);
+  });
+
+  const priorityActions = rawPriorityActions
+    .filter((action) => action && typeof action === 'object')
+    .filter((action) => isMeaningfulText(action.title) || isMeaningfulText(action.why_it_matters))
+    .filter((action, index, list) =>
+      list.findIndex((candidate) => {
+        const sameTitle = areTooSimilar(candidate.title, action.title);
+        const sameWhy = areTooSimilar(candidate.why_it_matters, action.why_it_matters);
+        return sameTitle || sameWhy;
+      }) === index
+    );
+
+  let immediateAction = null;
+
+  if (
+    immediateActionRaw &&
+    (isMeaningfulText(immediateActionRaw.title) || isMeaningfulText(immediateActionRaw.description))
+  ) {
+    immediateAction = {
+      title: isMeaningfulText(immediateActionRaw.title)
+        ? immediateActionRaw.title
+        : 'Siguiente acción inmediata',
+      description: isMeaningfulText(immediateActionRaw.description)
+        ? immediateActionRaw.description
+        : ''
+    };
+  } else if (priorityActions.length > 0) {
+    immediateAction = {
+      title: priorityActions[0].title || 'Aplicar acción prioritaria',
+      description: priorityActions[0].why_it_matters || ''
+    };
+  } else if (quickWins.length > 0 && isMeaningfulText(quickWins[0])) {
+    immediateAction = {
+      title: 'Aplicar quick win prioritario',
+      description: quickWins[0]
+    };
+  }
+
+  let continuityRecommendation = null;
+  if (
+    continuityRecommendationRaw &&
+    (
+      isMeaningfulText(continuityRecommendationRaw.reason) ||
+      (continuityRecommendationRaw.recommended_path &&
+        continuityRecommendationRaw.recommended_path !== 'stay')
+    )
+  ) {
+    continuityRecommendation = continuityRecommendationRaw;
+  }
+
+  const avoidSignals = [
+    ...executiveCards.map((item) => item.value),
+    ...coreDiagnosisCards.map((item) => item.value),
+    immediateAction?.title || '',
+    immediateAction?.description || ''
+  ];
+
+  const filteredStrengths = dedupeTexts(strengths, avoidSignals, 3);
+  const filteredWeaknesses = dedupeTexts(weaknesses, avoidSignals, 4);
+  const filteredQuickWins = dedupeTexts(quickWins, avoidSignals, 4);
 
   return {
-    understanding,
-    mainFinding,
-    opportunity,
-    strengths,
-    weaknesses,
-    quickWins,
-    executiveSummary: {
-      understanding: executiveSummaryRaw.understanding || understanding,
-      mainTension:
-        executiveSummaryRaw.main_tension ||
-        weaknesses[0] ||
-        'No se ha precisado aún la tensión principal.',
-      commercialImportance:
-        executiveSummaryRaw.commercial_importance ||
-        'La lectura debe conectar con captación, conversión, monetización o continuidad.',
-      bottomLine:
-        executiveSummaryRaw.bottom_line ||
-        quickWins[0] ||
-        'Hace falta priorizar la siguiente acción con más claridad.'
-    },
-    coreDiagnosis: {
-      mainFinding: coreDiagnosisRaw.main_finding || mainFinding,
-      mainWeakness:
-        coreDiagnosisRaw.main_weakness ||
-        weaknesses[0] ||
-        'Sin debilidad principal disponible.',
-      mainLeverage: coreDiagnosisRaw.main_leverage || opportunity
-    },
+    strengths: filteredStrengths,
+    weaknesses: filteredWeaknesses,
+    quickWins: filteredQuickWins,
+    executiveCards,
+    coreDiagnosisCards,
     dimensionReview,
     priorityActions,
     immediateAction,
@@ -250,8 +451,6 @@ const PremiumReportPdfTemplate = ({
 
   const routeLabel = ROUTE_NAMES[project?.route] || project?.route || 'Sin clasificar';
   const issueDate = formatDate(project?.created_at);
-  const continuityPath = reportView?.continuityRecommendation?.recommended_path || 'stay';
-  const continuityMeta = CONTINUITY_META[continuityPath] || CONTINUITY_META.stay;
 
   const dimensionCounters = useMemo(() => {
     const counters = { strong: 0, improvable: 0, priority: 0 };
@@ -266,6 +465,90 @@ const PremiumReportPdfTemplate = ({
     return counters;
   }, [reportView]);
 
+  const continuityPath = reportView?.continuityRecommendation?.recommended_path || null;
+  const continuityMeta = continuityPath
+    ? (CONTINUITY_META[continuityPath] || CONTINUITY_META.stay)
+    : null;
+
+  const heroCards = useMemo(() => {
+    const cards = [];
+
+    if (reportView?.coreDiagnosisCards?.[0]?.value) {
+      cards.push({
+        eyebrow: reportView.coreDiagnosisCards[0].label,
+        value: reportView.coreDiagnosisCards[0].value,
+        accent: 'teal'
+      });
+    }
+
+    const leverageCard = reportView?.coreDiagnosisCards?.find((item) => item.key === 'main_leverage');
+    if (leverageCard?.value) {
+      cards.push({
+        eyebrow: leverageCard.label,
+        value: leverageCard.value,
+        accent: 'amber'
+      });
+    }
+
+    if (continuityMeta?.label) {
+      cards.push({
+        eyebrow: 'Continuidad recomendada',
+        value: continuityMeta.label,
+        accent: 'violet'
+      });
+    }
+
+    return cards;
+  }, [reportView, continuityMeta]);
+
+  const signalGroups = useMemo(() => {
+    const groups = [];
+
+    if (reportView?.strengths?.length > 0) {
+      groups.push({ title: 'Fortalezas', items: reportView.strengths });
+    }
+    if (reportView?.weaknesses?.length > 0) {
+      groups.push({ title: 'Debilidades', items: reportView.weaknesses });
+    }
+    if (reportView?.quickWins?.length > 0) {
+      groups.push({ title: 'Quick wins', items: reportView.quickWins });
+    }
+
+    return groups;
+  }, [reportView]);
+
+  const visibleSections = useMemo(() => {
+    const sections = ['hero'];
+
+    const hasSummary =
+      (reportView?.executiveCards?.length || 0) > 0 ||
+      (reportView?.coreDiagnosisCards?.length || 0) > 0;
+    if (hasSummary) sections.push('summary');
+
+    const hasDimensions = (reportView?.dimensionReview?.length || 0) > 0;
+    if (hasDimensions) sections.push('dimensions');
+
+    const hasActions =
+      (reportView?.priorityActions?.length || 0) > 0 ||
+      !!reportView?.immediateAction;
+    if (hasActions) sections.push('actions');
+
+    const hasContinuityOrSignals =
+      !!reportView?.continuityRecommendation ||
+      signalGroups.length > 0;
+    if (hasContinuityOrSignals) sections.push('closing');
+
+    return sections;
+  }, [reportView, signalGroups]);
+
+  const pageMap = useMemo(() => {
+    const map = {};
+    visibleSections.forEach((section, index) => {
+      map[section] = `Página ${index + 1}`;
+    });
+    return map;
+  }, [visibleSections]);
+
   if (!project || !reportView) {
     return (
       <div className="max-w-[920px] mx-auto rounded-2xl border border-white/5 bg-[#111111] p-8 text-white">
@@ -277,7 +560,7 @@ const PremiumReportPdfTemplate = ({
   return (
     <div className="max-w-[920px] mx-auto">
       <div className="bg-[#0A0A0A] text-white rounded-[28px] overflow-hidden border border-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
-        <PdfSection page="Página 1" noBorder>
+        <PdfSection page={pageMap.hero} noBorder>
           <div className="pb-8 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.16),transparent_35%)] -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
               <div>
@@ -327,257 +610,277 @@ const PremiumReportPdfTemplate = ({
               <p className="text-white leading-relaxed break-words">{project.input_content}</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              <SnapshotCard
-                eyebrow="Hallazgo principal"
-                value={reportView.coreDiagnosis.mainFinding}
-                accent="teal"
-              />
-              <SnapshotCard
-                eyebrow="Palanca principal"
-                value={reportView.coreDiagnosis.mainLeverage}
-                accent="amber"
-              />
-              <SnapshotCard
-                eyebrow="Continuidad recomendada"
-                value={continuityMeta.label}
-                accent="violet"
-              />
-            </div>
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          page="Página 2"
-          title="Resumen ejecutivo"
-          icon={<DiamondsFour size={18} className="text-amber-300" weight="fill" />}
-        >
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-                Comprensión
-              </p>
-              <p className="text-white">{reportView.executiveSummary.understanding}</p>
-            </div>
-
-            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-                Tensión principal
-              </p>
-              <p className="text-white">{reportView.executiveSummary.mainTension}</p>
-            </div>
-
-            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-                Importancia comercial
-              </p>
-              <p className="text-white">{reportView.executiveSummary.commercialImportance}</p>
-            </div>
-
-            <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-              <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-                Conclusión ejecutiva
-              </p>
-              <p className="text-white">{reportView.executiveSummary.bottomLine}</p>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Lightning size={18} className="text-[#8DE1D0]" weight="fill" />
-              <h3 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
-                Diagnóstico central
-              </h3>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="rounded-xl p-5 border border-[#0F5257]/20 bg-[#0F5257]/8">
-                <p className="text-xs text-[#8DE1D0] mb-2 uppercase tracking-wide">
-                  Hallazgo principal
-                </p>
-                <p className="text-white font-medium">{reportView.coreDiagnosis.mainFinding}</p>
+            {heroCards.length > 0 && (
+              <div className={`grid gap-4 ${getGridClass(heroCards.length)}`}>
+                {heroCards.map((card) => (
+                  <SnapshotCard
+                    key={`${card.eyebrow}-${card.value.substring(0, 24)}`}
+                    eyebrow={card.eyebrow}
+                    value={card.value}
+                    accent={card.accent}
+                  />
+                ))}
               </div>
-
-              <div className="rounded-xl p-5 border border-white/5 bg-[#0A0A0A]">
-                <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
-                  Debilidad principal
-                </p>
-                <p className="text-white">{reportView.coreDiagnosis.mainWeakness}</p>
-              </div>
-
-              <div className="rounded-xl p-5 border border-amber-500/20 bg-amber-500/8">
-                <p className="text-xs text-amber-300 mb-2 uppercase tracking-wide">
-                  Palanca principal
-                </p>
-                <p className="text-white">{reportView.coreDiagnosis.mainLeverage}</p>
-              </div>
-            </div>
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          page="Página 3"
-          title="Lectura por dimensiones"
-          icon={<Flag size={18} className="text-[#8DE1D0]" weight="fill" />}
-        >
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.strong.badgeClass}`}>
-              {dimensionCounters.strong} fuertes
-            </span>
-            <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.improvable.badgeClass}`}>
-              {dimensionCounters.improvable} mejorables
-            </span>
-            <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.priority.badgeClass}`}>
-              {dimensionCounters.priority} prioritarias
-            </span>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            {reportView.dimensionReview.map((dimension) => {
-              const statusMeta =
-                DIMENSION_STATUS_META[dimension.status] || DIMENSION_STATUS_META.improvable;
-              const priorityMeta =
-                PRIORITY_META[dimension.priority] || PRIORITY_META.medium;
-
-              return (
-                <div
-                  key={dimension.id}
-                  className={`rounded-xl border p-4 ${statusMeta.cardClass}`}
-                  style={{ pageBreakInside: 'avoid' }}
-                >
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <p className="text-white font-medium">{dimension.label}</p>
-                    <span className={`px-2 py-1 rounded-full text-[11px] ${statusMeta.badgeClass}`}>
-                      {statusMeta.label}
-                    </span>
-                  </div>
-
-                  <p className="text-sm text-[#D4D4D4] leading-relaxed mb-4">
-                    {dimension.reading}
-                  </p>
-
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] ${priorityMeta.badgeClass}`}>
-                    Prioridad {priorityMeta.label.toLowerCase()}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          page="Página 4"
-          title="Acciones prioritarias"
-          icon={<CheckCircle size={18} className="text-[#8DE1D0]" weight="fill" />}
-        >
-          <div className="grid md:grid-cols-2 gap-4 mb-6">
-            {reportView.priorityActions.map((action, index) => {
-              const intensityMeta =
-                PRIORITY_META[action.intensity] || PRIORITY_META.medium;
-
-              return (
-                <div
-                  key={action.id}
-                  className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
-                  style={{ pageBreakInside: 'avoid' }}
-                >
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] flex items-center justify-center text-sm font-medium">
-                      {index + 1}
-                    </div>
-                    <span className={`px-2.5 py-1 rounded-full text-[11px] ${intensityMeta.badgeClass}`}>
-                      {intensityMeta.label}
-                    </span>
-                  </div>
-
-                  <p className="text-white font-medium mb-2">{action.title}</p>
-                  <p className="text-sm text-[#D4D4D4] leading-relaxed">
-                    {action.why_it_matters}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div
-            className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
-            style={{ pageBreakInside: 'avoid' }}
-          >
-            <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
-              Acción inmediata
-            </p>
-
-            {reportView.immediateAction ? (
-              <>
-                <p className="text-white font-medium mb-2">
-                  {reportView.immediateAction.title}
-                </p>
-                <p className="text-[#D4D4D4] leading-relaxed">
-                  {reportView.immediateAction.description}
-                </p>
-              </>
-            ) : (
-              <p className="text-[#A3A3A3]">Sin acción inmediata disponible.</p>
             )}
           </div>
         </PdfSection>
 
-        <PdfSection
-          page="Página 5"
-          title="Continuidad recomendada"
-          icon={<Sparkle size={18} className="text-[#8DE1D0]" weight="fill" />}
-        >
-          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-4 mb-6">
-            <div
-              className="rounded-xl border border-[#0F5257]/20 bg-[#0F5257]/8 p-5"
-              style={{ pageBreakInside: 'avoid' }}
-            >
-              <div className="flex flex-wrap items-center gap-3 mb-3">
-                <span className={`px-3 py-1 rounded-full text-sm ${continuityMeta.badgeClass}`}>
-                  {continuityMeta.label}
-                </span>
-              </div>
-
-              <p className="text-white leading-relaxed mb-4">
-                {reportView.continuityRecommendation?.reason || 'Sin recomendación de continuidad disponible.'}
-              </p>
-
-              <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                  CTA de continuidad
-                </p>
-                <p className="text-white">
-                  {reportView.continuityRecommendation?.cta_label || continuityMeta.label}
-                </p>
-              </div>
-            </div>
-
-            <div
-              className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
-              style={{ pageBreakInside: 'avoid' }}
-            >
-              <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
-                Señales complementarias
-              </p>
-
-              <div className="grid gap-4">
-                <SignalList title="Fortalezas" items={reportView.strengths} />
-                <SignalList title="Debilidades" items={reportView.weaknesses} />
-                <SignalList title="Quick wins" items={reportView.quickWins} />
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5"
-            style={{ pageBreakInside: 'avoid' }}
+        {visibleSections.includes('summary') && (
+          <PdfSection
+            page={pageMap.summary}
+            title="Resumen ejecutivo"
+            icon={<DiamondsFour size={18} className="text-amber-300" weight="fill" />}
           >
-            <p className="text-white leading-relaxed">
-              Con esta lectura ya puedes ver el caso con más claridad. Si quieres activarlo dentro del sistema,
-              el siguiente paso correcto es <span className="text-[#8DE1D0] font-medium">{continuityMeta.label}</span>.
-            </p>
-          </div>
-        </PdfSection>
+            {reportView.executiveCards.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-4">
+                {reportView.executiveCards.map((item) => (
+                  <div key={item.key} className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+                    <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                      {item.label}
+                    </p>
+                    <p className="text-white">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {reportView.coreDiagnosisCards.length > 0 && (
+              <div className={`${reportView.executiveCards.length > 0 ? 'mt-6' : ''}`}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Lightning size={18} className="text-[#8DE1D0]" weight="fill" />
+                  <h3 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
+                    Diagnóstico central
+                  </h3>
+                </div>
+
+                <div className={`grid gap-4 ${getGridClass(reportView.coreDiagnosisCards.length)}`}>
+                  {reportView.coreDiagnosisCards.map((item) => {
+                    const accentClass =
+                      item.accent === 'teal'
+                        ? 'border-[#0F5257]/20 bg-[#0F5257]/8'
+                        : item.accent === 'amber'
+                          ? 'border-amber-500/20 bg-amber-500/8'
+                          : 'border-white/5 bg-[#0A0A0A]';
+
+                    const eyebrowClass =
+                      item.accent === 'teal'
+                        ? 'text-[#8DE1D0]'
+                        : item.accent === 'amber'
+                          ? 'text-amber-300'
+                          : 'text-[#A3A3A3]';
+
+                    return (
+                      <div key={item.key} className={`rounded-xl p-5 border ${accentClass}`}>
+                        <p className={`text-xs mb-2 uppercase tracking-wide ${eyebrowClass}`}>
+                          {item.label}
+                        </p>
+                        <p className="text-white font-medium">{item.value}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </PdfSection>
+        )}
+
+        {visibleSections.includes('dimensions') && (
+          <PdfSection
+            page={pageMap.dimensions}
+            title="Lectura por dimensiones"
+            icon={<Flag size={18} className="text-[#8DE1D0]" weight="fill" />}
+          >
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.strong.badgeClass}`}>
+                {dimensionCounters.strong} fuertes
+              </span>
+              <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.improvable.badgeClass}`}>
+                {dimensionCounters.improvable} mejorables
+              </span>
+              <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.priority.badgeClass}`}>
+                {dimensionCounters.priority} prioritarias
+              </span>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {reportView.dimensionReview.map((dimension) => {
+                const statusMeta =
+                  DIMENSION_STATUS_META[dimension.status] || DIMENSION_STATUS_META.improvable;
+                const priorityMeta =
+                  PRIORITY_META[dimension.priority] || PRIORITY_META.medium;
+
+                return (
+                  <div
+                    key={dimension.id}
+                    className={`rounded-xl border p-4 ${statusMeta.cardClass}`}
+                    style={{ pageBreakInside: 'avoid' }}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <p className="text-white font-medium">{dimension.label}</p>
+                      <span className={`px-2 py-1 rounded-full text-[11px] ${statusMeta.badgeClass}`}>
+                        {statusMeta.label}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-[#D4D4D4] leading-relaxed mb-4">
+                      {dimension.reading}
+                    </p>
+
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] ${priorityMeta.badgeClass}`}>
+                      Prioridad {priorityMeta.label.toLowerCase()}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </PdfSection>
+        )}
+
+        {visibleSections.includes('actions') && (
+          <PdfSection
+            page={pageMap.actions}
+            title="Acciones prioritarias"
+            icon={<CheckCircle size={18} className="text-[#8DE1D0]" weight="fill" />}
+          >
+            {reportView.priorityActions.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                {reportView.priorityActions.map((action, index) => {
+                  const intensityMeta =
+                    PRIORITY_META[action.intensity] || PRIORITY_META.medium;
+
+                  return (
+                    <div
+                      key={action.id || `${action.title}-${index}`}
+                      className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                      style={{ pageBreakInside: 'avoid' }}
+                    >
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] flex items-center justify-center text-sm font-medium">
+                          {index + 1}
+                        </div>
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] ${intensityMeta.badgeClass}`}>
+                          {intensityMeta.label}
+                        </span>
+                      </div>
+
+                      <p className="text-white font-medium mb-2">{action.title}</p>
+                      {isMeaningfulText(action.why_it_matters) && (
+                        <p className="text-sm text-[#D4D4D4] leading-relaxed">
+                          {action.why_it_matters}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {reportView.immediateAction && (
+              <div
+                className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                style={{ pageBreakInside: 'avoid' }}
+              >
+                <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                  Acción inmediata
+                </p>
+
+                <p className="text-white font-medium mb-2">
+                  {reportView.immediateAction.title}
+                </p>
+
+                {isMeaningfulText(reportView.immediateAction.description) && (
+                  <p className="text-[#D4D4D4] leading-relaxed">
+                    {reportView.immediateAction.description}
+                  </p>
+                )}
+              </div>
+            )}
+          </PdfSection>
+        )}
+
+        {visibleSections.includes('closing') && (
+          <PdfSection
+            page={pageMap.closing}
+            title={
+              reportView.continuityRecommendation && signalGroups.length > 0
+                ? 'Continuidad y señales complementarias'
+                : reportView.continuityRecommendation
+                  ? 'Continuidad recomendada'
+                  : 'Señales complementarias'
+            }
+            icon={<Sparkle size={18} className="text-[#8DE1D0]" weight="fill" />}
+          >
+            <div className={`grid gap-4 ${reportView.continuityRecommendation && signalGroups.length > 0 ? 'lg:grid-cols-[1.05fr_0.95fr]' : 'grid-cols-1'}`}>
+              {reportView.continuityRecommendation && (
+                <div
+                  className="rounded-xl border border-[#0F5257]/20 bg-[#0F5257]/8 p-5"
+                  style={{ pageBreakInside: 'avoid' }}
+                >
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <span className={`px-3 py-1 rounded-full text-sm ${continuityMeta.badgeClass}`}>
+                      {continuityMeta.label}
+                    </span>
+                  </div>
+
+                  {isMeaningfulText(reportView.continuityRecommendation.reason) && (
+                    <p className="text-white leading-relaxed mb-4">
+                      {reportView.continuityRecommendation.reason}
+                    </p>
+                  )}
+
+                  {isMeaningfulText(reportView.continuityRecommendation.cta_label) && (
+                    <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
+                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                        CTA de continuidad
+                      </p>
+                      <p className="text-white">
+                        {reportView.continuityRecommendation.cta_label}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {signalGroups.length > 0 && (
+                <div
+                  className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                  style={{ pageBreakInside: 'avoid' }}
+                >
+                  <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                    Señales complementarias
+                  </p>
+
+                  <div className="grid gap-4">
+                    {signalGroups.map((group) => (
+                      <SignalList key={group.title} title={group.title} items={group.items} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {continuityMeta?.label && (
+              <div
+                className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5 mt-6"
+                style={{ pageBreakInside: 'avoid' }}
+              >
+                <p className="text-white leading-relaxed">
+                  Con esta lectura ya puedes ver el caso con más claridad.
+                  {reportView.continuityRecommendation ? (
+                    <>
+                      {' '}Si quieres activarlo dentro del sistema, el siguiente paso correcto es{' '}
+                      <span className="text-[#8DE1D0] font-medium">{continuityMeta.label}</span>.
+                    </>
+                  ) : (
+                    <>
+                      {' '}El siguiente paso correcto es reforzar la parte más débil del caso antes de ampliar intensidad.
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
+          </PdfSection>
+        )}
 
         {showSystemFooter && (
           <div className="px-8 py-5 sm:px-10 border-t border-white/5 bg-[#0B0B0B]">
