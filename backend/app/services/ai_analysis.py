@@ -9,7 +9,6 @@ from backend.app.core.config import OPENAI_API_KEY
 logger = logging.getLogger(__name__)
 
 
-
 async def analyze_with_ai(
     input_type: str,
     input_content: str,
@@ -142,8 +141,8 @@ Devuelve un diagnóstico específico y útil, evitando generalidades."""
 
         return json.loads(response_text.strip())
 
-    except Exception as e:
-        logger.error(f"AI analysis error: {e}")
+    except Exception:
+        logger.exception("AI analysis error")
         return {
             "route": "idea",
             "diagnosis": {
