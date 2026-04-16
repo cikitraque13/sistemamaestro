@@ -11,6 +11,7 @@ from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.domain.plans import ONE_TIME_OFFERS, PLANS
 from backend.app.schemas.payments import CheckoutCreate
+from backend.app.services.credits import grant_plan_credits
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,41 @@ def resolve_checkout_item(checkout_data: CheckoutCreate):
         "price": plan["price"],
         "description": f"Acceso al plan {plan['name']}"
     }
+
+
+async def finalize_paid_transaction(transaction: dict, session_id: str):
+    tx_updates = {
+        "status": "complete",
+        "payment_status": "paid"
+    }
+
+    if transaction.get("item_type", "plan") == "plan":
+        plan_id = transaction.get("item_id") or transaction.get("plan_id")
+
+        if plan_id:
+            await db.users.update_one(
+                {"user_id": transaction["user_id"]},
+                {"$set": {"plan": plan_id}}
+            )
+
+            grant_result = await grant_plan_credits(
+                user_id=transaction["user_id"],
+                plan_id=plan_id,
+                source_ref=session_id,
+                source_type="plan_payment"
+            )
+
+            grant_status = "granted" if grant_result.get("effective") else grant_result.get("reason", "unknown")
+            tx_updates["credits_grant_status"] = grant_status
+            tx_updates["credits_grant_delta"] = grant_result.get("credits_delta", 0)
+
+            if grant_result.get("created_at"):
+                tx_updates["credits_granted_at"] = grant_result["created_at"]
+
+    await db.payment_transactions.update_one(
+        {"stripe_session_id": session_id},
+        {"$set": tx_updates}
+    )
 
 
 @router.post("/checkout")
@@ -99,6 +135,7 @@ async def create_checkout(checkout_data: CheckoutCreate, request: Request):
             "stripe_session_id": session.id,
             "status": "pending",
             "payment_status": "initiated",
+            "credits_grant_status": "not_applicable" if item["item_type"] != "plan" else "pending",
             "created_at": datetime.now(timezone.utc).isoformat()
         }
 
@@ -130,6 +167,9 @@ async def get_payment_status(session_id: str, request: Request):
         raise HTTPException(status_code=404, detail="Transaction not found")
 
     if transaction.get("payment_status") == "paid":
+        if transaction.get("item_type", "plan") == "plan" and transaction.get("credits_grant_status") != "granted":
+            await finalize_paid_transaction(transaction, session_id)
+
         return {
             "status": "complete",
             "payment_status": "paid",
@@ -150,17 +190,8 @@ async def get_payment_status(session_id: str, request: Request):
     try:
         session = stripe.checkout.Session.retrieve(session_id)
 
-        if session.payment_status == "paid" and transaction.get("payment_status") != "paid":
-            await db.payment_transactions.update_one(
-                {"stripe_session_id": session_id},
-                {"$set": {"status": "complete", "payment_status": "paid"}}
-            )
-
-            if transaction.get("item_type", "plan") == "plan":
-                await db.users.update_one(
-                    {"user_id": user["user_id"]},
-                    {"$set": {"plan": transaction["item_id"]}}
-                )
+        if session.payment_status == "paid":
+            await finalize_paid_transaction(transaction, session_id)
 
         return {
             "status": session.status,
@@ -203,19 +234,10 @@ async def stripe_webhook(request: Request):
             session_id = session["id"]
 
             if session.get("payment_status") == "paid":
-                transaction = await db.payment_transactions.find_one({"stripe_session_id": session_id})
+                transaction = await db.payment_transactions.find_one({"stripe_session_id": session_id}, {"_id": 0})
 
-                if transaction and transaction.get("payment_status") != "paid":
-                    await db.payment_transactions.update_one(
-                        {"stripe_session_id": session_id},
-                        {"$set": {"status": "complete", "payment_status": "paid"}}
-                    )
-
-                    if transaction.get("item_type", "plan") == "plan":
-                        await db.users.update_one(
-                            {"user_id": transaction["user_id"]},
-                            {"$set": {"plan": transaction["item_id"]}}
-                        )
+                if transaction:
+                    await finalize_paid_transaction(transaction, session_id)
 
         return {"received": True}
 
