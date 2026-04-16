@@ -4,7 +4,7 @@ from typing import Dict
 
 import openai
 
-from app.core.config import OPENAI_API_KEY
+from backend.app.core.config import OPENAI_API_KEY
 
 logger = logging.getLogger(__name__)
 
