@@ -38,25 +38,21 @@ const PLAN_VISUAL_META = {
   free: {
     borderClass: 'border-white/5',
     badgeClass: 'bg-[#202020] text-[#D4D4D4]',
-    chipClass: 'bg-[#111111] text-[#D4D4D4] border border-white/5',
     ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]'
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
     badgeClass: 'bg-[#0F5257] text-white',
-    chipClass: 'bg-[#0D1D1F] text-[#CDECEE] border border-[#0F5257]/25',
     ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]'
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
     badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
-    chipClass: 'bg-[#111A22] text-[#D6E6F5] border border-[#2F455A]/35',
     ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]'
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
-    chipClass: 'bg-[#17121F] text-[#E4D8F7] border border-[#4A3B61]/35',
     ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]'
   }
 };
@@ -98,10 +94,10 @@ const EXPORT_ACCESS_LABELS = {
 };
 
 const OPERATIONAL_NOTE =
-  'Créditos = capacidad operativa interna del sistema. El consumo automático, las recargas y la exportación con coste se activarán en la siguiente microfase.';
+  'Créditos = capacidad operativa del sistema. Consumo, recargas y exportación con coste se activarán en la siguiente microfase.';
 
 const CREDIT_NOTE =
-  'Saldo e incluidos por plan ya visibles. Esta capa prepara el terreno para consumo, recargas y builder con coste sin abrir todavía esa lógica.';
+  'Saldo e incluidos por plan ya visibles. Esta capa prepara builder con coste, consumo y recargas sin abrir todavía esa lógica.';
 
 const getErrorMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
@@ -122,8 +118,47 @@ const isValidCheckoutUrl = (value) => {
 
 const formatCredits = (value) => {
   if (typeof value !== 'number' || Number.isNaN(value)) return 'No definido';
-  if (value === 0) return '0';
   return new Intl.NumberFormat('es-ES').format(value);
+};
+
+const getOperationalAccentClasses = (label) => {
+  if (label === 'Créditos') {
+    return {
+      wrap: 'border-amber-500/20 bg-amber-500/5',
+      label: 'text-amber-200/70',
+      value: 'text-amber-300'
+    };
+  }
+
+  if (label === 'Activación') {
+    return {
+      wrap: 'border-[#0F5257]/20 bg-[#0F5257]/5',
+      label: 'text-[#8DE1D0]/75',
+      value: 'text-white'
+    };
+  }
+
+  if (label === 'Builder') {
+    return {
+      wrap: 'border-sky-500/15 bg-sky-500/5',
+      label: 'text-sky-200/70',
+      value: 'text-white'
+    };
+  }
+
+  if (label === 'Exportación') {
+    return {
+      wrap: 'border-white/5 bg-[#101010]',
+      label: 'text-[#8D8D8D]',
+      value: 'text-white'
+    };
+  }
+
+  return {
+    wrap: 'border-white/5 bg-[#101010]',
+    label: 'text-[#8D8D8D]',
+    value: 'text-white'
+  };
 };
 
 const Billing = () => {
@@ -177,7 +212,7 @@ const Billing = () => {
         withCredentials: true
       });
       setBillingData(response.data);
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar datos de facturación');
     } finally {
       setLoading(false);
@@ -226,7 +261,7 @@ const Billing = () => {
       setTimeout(() => {
         pollPaymentStatus(sessionId, attempts + 1);
       }, pollInterval);
-    } catch (error) {
+    } catch {
       setCheckingPayment(false);
     }
   };
@@ -434,17 +469,20 @@ const Billing = () => {
                 <p className="text-[#D4D4D4] mb-4">{suggestedPlan.valuePromise}</p>
 
                 <div className="grid sm:grid-cols-3 gap-3">
-                  {renderOperationalItems(suggestedPlan).slice(0, 3).map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-xl border border-white/5 bg-[#0A0A0A] px-4 py-4"
-                    >
-                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                        {item.label}
-                      </p>
-                      <p className="text-sm text-white">{item.value}</p>
-                    </div>
-                  ))}
+                  {renderOperationalItems(suggestedPlan).slice(0, 3).map((item) => {
+                    const accent = getOperationalAccentClasses(item.label);
+                    return (
+                      <div
+                        key={item.label}
+                        className={`rounded-xl border px-4 py-4 ${accent.wrap}`}
+                      >
+                        <p className={`text-[11px] uppercase tracking-wide mb-1 ${accent.label}`}>
+                          {item.label}
+                        </p>
+                        <p className={`text-sm ${accent.value}`}>{item.value}</p>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {fromProjectId && (
@@ -471,11 +509,11 @@ const Billing = () => {
                   <span className="text-[#A3A3A3]">{suggestedPlan.periodLabel}</span>
                 </div>
 
-                <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-4">
-                  <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                <div className="rounded-xl border border-amber-500/15 bg-[#111008] px-4 py-4 mb-4">
+                  <p className="text-[11px] uppercase tracking-wide text-amber-200/70 mb-1">
                     Créditos previstos
                   </p>
-                  <p className="text-sm text-white">{getCreditsLabel(suggestedPlan)}</p>
+                  <p className="text-sm text-amber-300">{getCreditsLabel(suggestedPlan)}</p>
                 </div>
 
                 <button
@@ -520,7 +558,7 @@ const Billing = () => {
                   <p className="text-sm text-amber-200/80 mb-1">Créditos del sistema</p>
                   <h3 className="text-2xl text-white font-medium mb-1">Capacidad operativa activa</h3>
                   <p className="text-[#C8C8C8] max-w-2xl">
-                    Los créditos dejan de ser una nota secundaria y pasan a mostrarse como recurso operativo central del sistema.
+                    Los créditos pasan a mostrarse como recurso operativo central del sistema, no como nota secundaria.
                   </p>
                 </div>
               </div>
@@ -616,17 +654,20 @@ const Billing = () => {
               </p>
 
               <div className="grid sm:grid-cols-2 gap-3">
-                {renderOperationalItems(currentPlanDefinition, currentPlanIncludedCredits).map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4"
-                  >
-                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                      {item.label}
-                    </p>
-                    <p className="text-sm text-white">{item.value}</p>
-                  </div>
-                ))}
+                {renderOperationalItems(currentPlanDefinition, currentPlanIncludedCredits).map((item) => {
+                  const accent = getOperationalAccentClasses(item.label);
+                  return (
+                    <div
+                      key={item.label}
+                      className={`rounded-xl border px-4 py-4 ${accent.wrap}`}
+                    >
+                      <p className={`text-[11px] uppercase tracking-wide mb-1 ${accent.label}`}>
+                        {item.label}
+                      </p>
+                      <p className={`text-sm ${accent.value}`}>{item.value}</p>
+                    </div>
+                  );
+                })}
               </div>
 
               <p className="text-xs text-[#A3A3A3] mt-4 leading-relaxed">
@@ -646,12 +687,9 @@ const Billing = () => {
             <div>
               <h3 className="text-xl font-medium text-white">Planes disponibles</h3>
               <p className="text-sm text-[#A3A3A3] mt-1">
-                Comparación compacta: nivel, capacidad operativa y créditos incluidos.
+                Compara nivel, capacidad operativa y créditos incluidos.
               </p>
             </div>
-            <p className="text-xs text-[#A3A3A3] max-w-xl">
-              La nota operativa se centraliza aquí. No se repite dentro de cada tarjeta para reducir fricción visual.
-            </p>
           </div>
 
           <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -663,18 +701,18 @@ const Billing = () => {
 
               const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
               const highlights = Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
-                ? plan.billingHighlights
-                : (plan.features || []).slice(0, 4);
+                ? plan.billingHighlights.slice(0, 3)
+                : (plan.features || []).slice(0, 3);
 
               return (
                 <div
                   key={plan.id}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[640px] ${
+                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[620px] ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
                 >
-                  <div className="min-h-[40px] mb-4 flex items-start justify-between gap-3">
+                  <div className="min-h-[74px] mb-5 flex items-start">
                     <div className="flex flex-wrap gap-2">
                       {plan.badge && (
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
@@ -696,18 +734,18 @@ const Billing = () => {
                     </div>
                   </div>
 
-                  <div className="min-h-[122px] mb-5">
+                  <div className="min-h-[170px] mb-5">
                     <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
-                    <p className="text-[#F0F0F0] text-base leading-snug mb-3">{plan.headline}</p>
+                    <p className="text-[#F0F0F0] text-[15px] leading-snug mb-3">{plan.headline}</p>
                     <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
                   </div>
 
-                  <div className="min-h-[76px] flex items-end gap-2 mb-5">
+                  <div className="min-h-[82px] flex items-end gap-2 mb-5">
                     <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4">
+                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4 min-h-[116px]">
                     <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
                       Mejor encaje
                     </p>
@@ -720,18 +758,21 @@ const Billing = () => {
                     <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-3">
                       Marco operativo
                     </p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {renderOperationalItems(plan).map((item) => (
-                        <div
-                          key={item.label}
-                          className="rounded-lg border border-white/5 bg-[#101010] px-3 py-3"
-                        >
-                          <p className="text-[10px] uppercase tracking-wide text-[#7F7F7F] mb-1">
-                            {item.label}
-                          </p>
-                          <p className="text-xs text-white leading-snug">{item.value}</p>
-                        </div>
-                      ))}
+                    <div className="flex flex-wrap gap-2">
+                      {renderOperationalItems(plan).map((item) => {
+                        const accent = getOperationalAccentClasses(item.label);
+                        return (
+                          <div
+                            key={item.label}
+                            className={`rounded-full border px-3 py-2 ${accent.wrap}`}
+                          >
+                            <p className={`text-[10px] uppercase tracking-wide ${accent.label}`}>
+                              {item.label}
+                            </p>
+                            <p className={`text-xs ${accent.value}`}>{item.value}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -785,10 +826,15 @@ const Billing = () => {
             })}
           </div>
 
-          <div className="mt-4 rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
-            <p className="text-xs text-[#A3A3A3] leading-relaxed">
-              {OPERATIONAL_NOTE}
-            </p>
+          <div className="mt-4 rounded-xl border border-amber-500/10 bg-[#12110c] px-4 py-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5">
+                <DiamondsFour size={18} className="text-amber-300" weight="fill" />
+              </div>
+              <p className="text-sm text-[#D5D5D5] leading-relaxed">
+                {OPERATIONAL_NOTE}
+              </p>
+            </div>
           </div>
         </motion.div>
 
@@ -800,8 +846,8 @@ const Billing = () => {
           data-testid="entry-offer-card"
         >
           <div className="bg-[#121212] border border-white/5 rounded-2xl p-6">
-            <div className="grid lg:grid-cols-[1.35fr_0.65fr] gap-6 items-start">
-              <div>
+            <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch">
+              <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
                     {selectedEntryOffer.badge}
@@ -811,15 +857,15 @@ const Billing = () => {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-medium text-white mb-2">
+                <h3 className="text-2xl font-medium text-white mb-2">
                   {selectedEntryOffer.headline}
                 </h3>
-                <p className="text-[#D4D4D4] mb-3 max-w-2xl">
+                <p className="text-[#D4D4D4] mb-4 max-w-2xl">
                   {selectedEntryOffer.description}
                 </p>
 
-                <div className="flex flex-wrap gap-2">
-                  {(selectedEntryOffer.billingHighlights || selectedEntryOffer.features).map((feature) => (
+                <div className="flex flex-wrap gap-2 mt-auto">
+                  {(selectedEntryOffer.billingHighlights || selectedEntryOffer.features).slice(0, 4).map((feature) => (
                     <span
                       key={feature}
                       className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-white/5 text-[#D4D4D4]"
@@ -831,13 +877,13 @@ const Billing = () => {
               </div>
 
               <div className="bg-[#0A0A0A] border border-[#262626] rounded-2xl p-5 flex flex-col">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium mb-4 self-start">
                   <FileText size={14} weight="fill" />
                   Compra puntual
                 </div>
 
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-4xl font-light text-white">{selectedEntryOffer.priceLabel}</span>
+                <div className="flex items-baseline gap-2 mb-5">
+                  <span className="text-5xl font-light text-white">{selectedEntryOffer.priceLabel}</span>
                   <span className="text-[#A3A3A3]">{selectedEntryOffer.periodLabel}</span>
                 </div>
 
