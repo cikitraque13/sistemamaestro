@@ -4,9 +4,10 @@ from typing import Any, Dict, Optional
 
 import openai
 
-from app.core.config import OPENAI_API_KEY
+from backend.app.core.config import OPENAI_API_KEY
 
 logger = logging.getLogger(__name__)
+
 
 
 async def analyze_with_ai(
