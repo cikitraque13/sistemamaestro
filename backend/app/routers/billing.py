@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request
 from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.domain.plans import ONE_TIME_OFFERS, PLANS
+from backend.app.services.credits import get_plan_included_credits, get_user_credit_summary
 
 router = APIRouter(prefix="/api/user", tags=["billing"])
 
@@ -16,18 +17,35 @@ async def get_billing(request: Request):
         {"_id": 0}
     ).sort("created_at", -1).to_list(50)
 
-    current_plan = PLANS.get(user.get("plan", "free"), PLANS["free"])
+    current_plan_id = user.get("plan", "free")
+    current_plan = PLANS.get(current_plan_id, PLANS["free"])
+    credit_summary = await get_user_credit_summary(user["user_id"])
 
     return {
         "current_plan": {
-            "id": user.get("plan", "free"),
+            "id": current_plan_id,
             "name": current_plan["name"],
             "price": current_plan["price"],
-            "features": current_plan["features"]
+            "features": current_plan["features"],
+            "included_credits": get_plan_included_credits(current_plan_id)
+        },
+        "credit_summary": {
+            "enabled": True,
+            "balance": credit_summary["credit_balance"],
+            "lifetime_granted": credit_summary["credit_lifetime_granted"],
+            "lifetime_used": credit_summary["credit_lifetime_used"],
+            "included_credits_for_current_plan": get_plan_included_credits(current_plan_id),
+            "next_phase": "topups_and_consumption_pending"
         },
         "transactions": transactions,
         "available_plans": [
-            {"id": k, "name": v["name"], "price": v["price"], "features": v["features"]}
+            {
+                "id": k,
+                "name": v["name"],
+                "price": v["price"],
+                "features": v["features"],
+                "included_credits": get_plan_included_credits(k)
+            }
             for k, v in PLANS.items()
         ],
         "available_one_time_offers": [
@@ -66,9 +84,11 @@ async def get_user_stats(request: Request):
     blueprint_count = await db.projects.count_documents(
         {"user_id": user["user_id"], "status": "blueprint_generated"}
     )
+    credit_summary = await get_user_credit_summary(user["user_id"])
 
     return {
         "total_projects": project_count,
         "blueprints_generated": blueprint_count,
-        "plan": user.get("plan", "free")
+        "plan": user.get("plan", "free"),
+        "credit_balance": credit_summary["credit_balance"]
     }
