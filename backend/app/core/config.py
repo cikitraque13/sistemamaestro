@@ -22,6 +22,15 @@ ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
 FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
 
+CREDIT_LEDGER_COLLECTION = os.environ.get("CREDIT_LEDGER_COLLECTION", "credit_ledger")
+
+PLAN_INCLUDED_CREDITS = {
+    "free": int(os.environ.get("CREDITS_FREE", "0")),
+    "blueprint": int(os.environ.get("CREDITS_BLUEPRINT", "60")),
+    "sistema": int(os.environ.get("CREDITS_SISTEMA", "220")),
+    "premium": int(os.environ.get("CREDITS_PREMIUM", "600"))
+}
+
 
 def get_google_client_id():
     return os.environ.get("REACT_APP_GOOGLE_CLIENT_ID") or os.environ.get("GOOGLE_CLIENT_ID") or ""
