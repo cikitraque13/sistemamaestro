@@ -23,8 +23,6 @@ const ROUTE_NAMES = {
   sell: 'Vender y cobrar',
   automate: 'Automatizar operación',
   idea: 'Idea a proyecto',
-
-  // Compatibilidad legado
   improve_existing: 'Mejorar algo existente',
   sell_and_charge: 'Vender y cobrar',
   automate_operation: 'Automatizar operación',
@@ -35,7 +33,7 @@ const PLAN_VISUALS = {
   blueprint: {
     label: '29',
     name: 'Blueprint',
-    badgeClass: 'bg-[#0F5257]/20 text-[#0F5257]',
+    badgeClass: 'bg-[#0F5257]/20 text-[#8DE1D0]',
     borderClass: 'border-[#0F5257]/30',
     boxClass: 'bg-[#0F5257]/10'
   },
@@ -53,6 +51,61 @@ const PLAN_VISUALS = {
     borderClass: 'border-fuchsia-500/30',
     boxClass: 'bg-fuchsia-500/10'
   }
+};
+
+const DIMENSION_STATUS_META = {
+  strong: {
+    label: 'Fuerte',
+    badgeClass: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20'
+  },
+  improvable: {
+    label: 'Mejorable',
+    badgeClass: 'bg-sky-500/10 text-sky-300 border border-sky-500/20'
+  },
+  priority: {
+    label: 'Prioritario',
+    badgeClass: 'bg-amber-500/15 text-amber-300 border border-amber-500/20'
+  }
+};
+
+const PRIORITY_META = {
+  high: {
+    label: 'Alta',
+    badgeClass: 'bg-amber-500/15 text-amber-300'
+  },
+  medium: {
+    label: 'Media',
+    badgeClass: 'bg-[#262626] text-[#D4D4D4]'
+  },
+  low: {
+    label: 'Baja',
+    badgeClass: 'bg-[#1B2A20] text-[#8BE3A1]'
+  }
+};
+
+const CONTINUITY_PATH_META = {
+  stay: {
+    label: 'Seguir analizando',
+    cta: null
+  },
+  blueprint: {
+    label: 'Entrar en Pro',
+    cta: 'Entrar en Pro'
+  },
+  sistema: {
+    label: 'Entrar en Growth',
+    cta: 'Entrar en Growth'
+  },
+  premium: {
+    label: 'Acceder a AI Master 199',
+    cta: 'Acceder a AI Master 199'
+  }
+};
+
+const CONTINUITY_PATH_TO_PLAN = {
+  blueprint: 'blueprint',
+  sistema: 'sistema',
+  premium: 'premium'
 };
 
 const ProjectDetail = () => {
@@ -73,7 +126,7 @@ const ProjectDetail = () => {
         withCredentials: true
       });
       setProject(response.data);
-    } catch (error) {
+    } catch {
       toast.error('Proyecto no encontrado');
       navigate('/dashboard/projects');
     } finally {
@@ -114,7 +167,7 @@ const ProjectDetail = () => {
     });
   };
 
-  const normalizedDiagnosis = useMemo(() => {
+  const reportView = useMemo(() => {
     const diagnosis = project?.diagnosis;
     if (!diagnosis) return null;
 
@@ -122,13 +175,43 @@ const ProjectDetail = () => {
     const weaknesses = Array.isArray(diagnosis.weaknesses) ? diagnosis.weaknesses : [];
     const quickWins = Array.isArray(diagnosis.quick_wins) ? diagnosis.quick_wins : [];
 
+    const executiveSummaryRaw =
+      diagnosis.executive_summary && typeof diagnosis.executive_summary === 'object'
+        ? diagnosis.executive_summary
+        : {};
+
+    const coreDiagnosisRaw =
+      diagnosis.core_diagnosis && typeof diagnosis.core_diagnosis === 'object'
+        ? diagnosis.core_diagnosis
+        : {};
+
+    const dimensionReview = Array.isArray(diagnosis.dimension_review)
+      ? diagnosis.dimension_review
+      : [];
+
+    const priorityActions = Array.isArray(diagnosis.priority_actions)
+      ? diagnosis.priority_actions
+      : [];
+
+    const immediateAction =
+      diagnosis.immediate_action && typeof diagnosis.immediate_action === 'object'
+        ? diagnosis.immediate_action
+        : null;
+
+    const continuityRecommendation =
+      diagnosis.continuity_recommendation && typeof diagnosis.continuity_recommendation === 'object'
+        ? diagnosis.continuity_recommendation
+        : null;
+
     const understanding =
       diagnosis.understanding ||
       diagnosis.summary ||
+      executiveSummaryRaw.understanding ||
       'Diagnóstico generado correctamente, pendiente de ampliar visualización.';
 
     const mainFinding =
       diagnosis.main_finding ||
+      coreDiagnosisRaw.main_finding ||
       weaknesses[0] ||
       strengths[0] ||
       diagnosis.summary ||
@@ -136,6 +219,7 @@ const ProjectDetail = () => {
 
     const opportunity =
       diagnosis.opportunity ||
+      coreDiagnosisRaw.main_leverage ||
       quickWins[0] ||
       'Sin oportunidad priorizada disponible.';
 
@@ -145,7 +229,37 @@ const ProjectDetail = () => {
       opportunity,
       strengths,
       weaknesses,
-      quickWins
+      quickWins,
+      executiveSummary: {
+        understanding: executiveSummaryRaw.understanding || understanding,
+        mainTension:
+          executiveSummaryRaw.main_tension ||
+          weaknesses[0] ||
+          'No se ha precisado aún la tensión principal.',
+        commercialImportance:
+          executiveSummaryRaw.commercial_importance ||
+          'La lectura debe conectar con captación, conversión, monetización o continuidad.',
+        bottomLine:
+          executiveSummaryRaw.bottom_line ||
+          quickWins[0] ||
+          'Hace falta priorizar la siguiente acción con más claridad.'
+      },
+      coreDiagnosis: {
+        mainFinding:
+          coreDiagnosisRaw.main_finding ||
+          mainFinding,
+        mainWeakness:
+          coreDiagnosisRaw.main_weakness ||
+          weaknesses[0] ||
+          'Sin debilidad principal disponible.',
+        mainLeverage:
+          coreDiagnosisRaw.main_leverage ||
+          opportunity
+      },
+      dimensionReview,
+      priorityActions,
+      immediateAction,
+      continuityRecommendation
     };
   }, [project]);
 
@@ -185,9 +299,14 @@ const ProjectDetail = () => {
 
   if (!project) return null;
 
+  const continuityPath =
+    reportView?.continuityRecommendation?.recommended_path || 'stay';
+  const continuityMeta = CONTINUITY_PATH_META[continuityPath] || CONTINUITY_PATH_META.stay;
+  const continuityPlanId = CONTINUITY_PATH_TO_PLAN[continuityPath] || null;
+
   return (
     <DashboardLayout title="Detalle del proyecto">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <Link
           to="/dashboard/projects"
           className="inline-flex items-center gap-2 text-[#A3A3A3] hover:text-white mb-6 transition-colors"
@@ -224,109 +343,309 @@ const ProjectDetail = () => {
               <Clock size={16} />
               {formatDate(project.created_at)}
             </span>
-            <span className="px-3 py-1 bg-[#0F5257]/20 text-[#0F5257] rounded-full">
+            <span className="px-3 py-1 bg-[#0F5257]/20 text-[#8DE1D0] rounded-full">
               {ROUTE_NAMES[project.route] || project.route || 'Sin clasificar'}
             </span>
           </div>
         </motion.div>
 
-        {normalizedDiagnosis && (
+        {reportView && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.08 }}
             className="card mb-6"
-            data-testid="diagnosis-section"
+            data-testid="premium-report-section"
           >
-            <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-              <Lightning weight="fill" className="text-[#0F5257]" />
-              Diagnóstico
-            </h3>
-
-            <div className="space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
               <div>
-                <p className="text-sm text-[#A3A3A3] mb-1">Comprensión</p>
-                <p className="text-white">{normalizedDiagnosis.understanding}</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-sm font-medium mb-3">
+                  <Lightning weight="fill" />
+                  Informe del caso
+                </div>
+                <h3 className="text-2xl text-white font-medium mb-2">
+                  Lectura premium estructurada
+                </h3>
+                <p className="text-[#A3A3A3] max-w-3xl">
+                  Esta vista ya sigue la arquitectura canónica del informe: comprensión, diagnóstico central,
+                  lectura por dimensiones, prioridades y continuidad.
+                </p>
               </div>
 
-              <div>
-                <p className="text-sm text-[#A3A3A3] mb-1">Hallazgo principal</p>
-                <p className="text-white font-medium">{normalizedDiagnosis.mainFinding}</p>
-              </div>
-
-              <div>
-                <p className="text-sm text-[#A3A3A3] mb-1">Oportunidad</p>
-                <p className="text-white">{normalizedDiagnosis.opportunity}</p>
+              <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 min-w-[260px]">
+                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                  Estado del informe
+                </p>
+                <p className="text-white">Base premium activa en proyecto</p>
               </div>
             </div>
 
-            {(normalizedDiagnosis.strengths.length > 0 ||
-              normalizedDiagnosis.weaknesses.length > 0 ||
-              normalizedDiagnosis.quickWins.length > 0) && (
-              <div className="grid md:grid-cols-3 gap-4 mt-6">
-                <div className="bg-[#0A0A0A] rounded-lg p-4">
-                  <p className="text-sm text-[#A3A3A3] mb-3">Fortalezas</p>
-                  {normalizedDiagnosis.strengths.length > 0 ? (
-                    <ul className="space-y-2">
-                      {normalizedDiagnosis.strengths.map((item, index) => (
-                        <li
-                          key={`strength-${index}-${item.substring(0, 20)}`}
-                          className="text-white text-sm flex items-start gap-2"
-                        >
-                          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
-                  )}
+            <div className="mb-6">
+              <h4 className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                Resumen ejecutivo
+              </h4>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+                  <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                    Comprensión
+                  </p>
+                  <p className="text-white">{reportView.executiveSummary.understanding}</p>
                 </div>
 
-                <div className="bg-[#0A0A0A] rounded-lg p-4">
-                  <p className="text-sm text-[#A3A3A3] mb-3">Debilidades</p>
-                  {normalizedDiagnosis.weaknesses.length > 0 ? (
-                    <ul className="space-y-2">
-                      {normalizedDiagnosis.weaknesses.map((item, index) => (
-                        <li
-                          key={`weakness-${index}-${item.substring(0, 20)}`}
-                          className="text-white text-sm flex items-start gap-2"
-                        >
-                          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
-                  )}
+                <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+                  <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                    Tensión principal
+                  </p>
+                  <p className="text-white">{reportView.executiveSummary.mainTension}</p>
                 </div>
 
-                <div className="bg-[#0A0A0A] rounded-lg p-4">
-                  <p className="text-sm text-[#A3A3A3] mb-3">Quick wins</p>
-                  {normalizedDiagnosis.quickWins.length > 0 ? (
-                    <ul className="space-y-2">
-                      {normalizedDiagnosis.quickWins.map((item, index) => (
-                        <li
-                          key={`quickwin-${index}-${item.substring(0, 20)}`}
-                          className="text-white text-sm flex items-start gap-2"
-                        >
-                          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
-                  )}
+                <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+                  <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                    Importancia comercial
+                  </p>
+                  <p className="text-white">{reportView.executiveSummary.commercialImportance}</p>
+                </div>
+
+                <div className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
+                  <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                    Conclusión ejecutiva
+                  </p>
+                  <p className="text-white">{reportView.executiveSummary.bottomLine}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                Diagnóstico central
+              </h4>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="rounded-xl p-5 border border-[#0F5257]/20 bg-[#0F5257]/8">
+                  <p className="text-xs text-[#8DE1D0] mb-2 uppercase tracking-wide">
+                    Hallazgo principal
+                  </p>
+                  <p className="text-white font-medium">{reportView.coreDiagnosis.mainFinding}</p>
+                </div>
+
+                <div className="rounded-xl p-5 border border-white/5 bg-[#0A0A0A]">
+                  <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                    Debilidad principal
+                  </p>
+                  <p className="text-white">{reportView.coreDiagnosis.mainWeakness}</p>
+                </div>
+
+                <div className="rounded-xl p-5 border border-amber-500/20 bg-amber-500/8">
+                  <p className="text-xs text-amber-300 mb-2 uppercase tracking-wide">
+                    Palanca principal
+                  </p>
+                  <p className="text-white">{reportView.coreDiagnosis.mainLeverage}</p>
+                </div>
+              </div>
+            </div>
+
+            {reportView.dimensionReview.length > 0 && (
+              <div className="mb-6">
+                <h4 className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                  Lectura por dimensiones
+                </h4>
+
+                <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
+                  {reportView.dimensionReview.map((dimension) => {
+                    const statusMeta =
+                      DIMENSION_STATUS_META[dimension.status] || DIMENSION_STATUS_META.improvable;
+                    const priorityMeta =
+                      PRIORITY_META[dimension.priority] || PRIORITY_META.medium;
+
+                    return (
+                      <div
+                        key={dimension.id}
+                        className="rounded-xl border border-white/5 bg-[#0A0A0A] p-4"
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <p className="text-white font-medium">{dimension.label}</p>
+                          <span className={`px-2 py-1 rounded-full text-[11px] ${statusMeta.badgeClass}`}>
+                            {statusMeta.label}
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-[#D4D4D4] leading-relaxed mb-4">
+                          {dimension.reading}
+                        </p>
+
+                        <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] ${priorityMeta.badgeClass}`}>
+                          Prioridad {priorityMeta.label.toLowerCase()}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {project.next_step && (
-              <div className="mt-6 p-4 bg-[#0F5257]/10 border border-[#0F5257]/30 rounded-lg">
-                <p className="text-sm text-[#0F5257] mb-1">Siguiente paso recomendado</p>
-                <p className="text-white">{project.next_step}</p>
+            {reportView.priorityActions.length > 0 && (
+              <div className="mb-6">
+                <h4 className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                  Acciones prioritarias
+                </h4>
+
+                <div className="grid md:grid-cols-3 gap-4">
+                  {reportView.priorityActions.map((action) => {
+                    const intensityMeta =
+                      PRIORITY_META[action.intensity] || PRIORITY_META.medium;
+
+                    return (
+                      <div
+                        key={action.id}
+                        className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                      >
+                        <div className="flex items-center justify-between gap-3 mb-3">
+                          <p className="text-white font-medium">{action.title}</p>
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] ${intensityMeta.badgeClass}`}>
+                            {intensityMeta.label}
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-[#D4D4D4] leading-relaxed">
+                          {action.why_it_matters}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-4">
+              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5">
+                <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                  Acción inmediata
+                </p>
+
+                {reportView.immediateAction ? (
+                  <>
+                    <p className="text-white font-medium mb-2">
+                      {reportView.immediateAction.title}
+                    </p>
+                    <p className="text-[#D4D4D4] leading-relaxed">
+                      {reportView.immediateAction.description}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-[#A3A3A3]">Sin acción inmediata disponible.</p>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-[#0F5257]/20 bg-[#0F5257]/8 p-5">
+                <p className="text-sm uppercase tracking-wide text-[#8DE1D0] mb-3">
+                  Recomendación de continuidad
+                </p>
+
+                {reportView.continuityRecommendation ? (
+                  <>
+                    <div className="flex flex-wrap items-center gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-full bg-[#0F5257]/20 text-[#8DE1D0] text-sm">
+                        {continuityMeta.label}
+                      </span>
+                    </div>
+
+                    <p className="text-white mb-5 leading-relaxed">
+                      {reportView.continuityRecommendation.reason}
+                    </p>
+
+                    {continuityPlanId ? (
+                      <Link
+                        to="/dashboard/billing"
+                        state={{
+                          suggestedPlan: continuityPlanId,
+                          fromProjectId: project.project_id
+                        }}
+                        className="btn-primary inline-flex items-center gap-2"
+                      >
+                        {reportView.continuityRecommendation.cta_label || continuityMeta.cta}
+                        <ArrowRight size={16} />
+                      </Link>
+                    ) : (
+                      <div className="rounded-lg border border-white/5 bg-[#111111] px-4 py-3">
+                        <p className="text-sm text-[#D4D4D4]">
+                          Este caso todavía conviene seguir analizándolo antes de ampliar intensidad.
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-[#A3A3A3]">Sin recomendación de continuidad disponible.</p>
+                )}
+              </div>
+            </div>
+
+            {(reportView.strengths.length > 0 ||
+              reportView.weaknesses.length > 0 ||
+              reportView.quickWins.length > 0) && (
+              <div className="mt-6">
+                <h4 className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                  Señales complementarias
+                </h4>
+
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5">
+                    <p className="text-sm text-[#A3A3A3] mb-3">Fortalezas</p>
+                    {reportView.strengths.length > 0 ? (
+                      <ul className="space-y-2">
+                        {reportView.strengths.map((item, index) => (
+                          <li
+                            key={`strength-${index}-${item.substring(0, 20)}`}
+                            className="text-white text-sm flex items-start gap-2"
+                          >
+                            <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
+                    )}
+                  </div>
+
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5">
+                    <p className="text-sm text-[#A3A3A3] mb-3">Debilidades</p>
+                    {reportView.weaknesses.length > 0 ? (
+                      <ul className="space-y-2">
+                        {reportView.weaknesses.map((item, index) => (
+                          <li
+                            key={`weakness-${index}-${item.substring(0, 20)}`}
+                            className="text-white text-sm flex items-start gap-2"
+                          >
+                            <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
+                    )}
+                  </div>
+
+                  <div className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5">
+                    <p className="text-sm text-[#A3A3A3] mb-3">Quick wins</p>
+                    {reportView.quickWins.length > 0 ? (
+                      <ul className="space-y-2">
+                        {reportView.quickWins.map((item, index) => (
+                          <li
+                            key={`quickwin-${index}-${item.substring(0, 20)}`}
+                            className="text-white text-sm flex items-start gap-2"
+                          >
+                            <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-[#A3A3A3] text-sm">Sin datos.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </motion.div>
@@ -336,7 +655,7 @@ const ProjectDetail = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
+            transition={{ delay: 0.14 }}
             className={`card mb-6 border ${normalizedPlanRecommendation.borderClass}`}
             data-testid="plan-recommendation-section"
           >
@@ -427,10 +746,11 @@ const ProjectDetail = () => {
             data-testid="refine-section"
           >
             <h3 className="text-lg font-medium text-white mb-4">Preguntas de afinado</h3>
+
             <div className="space-y-4">
               {project.refine_questions.map((q, index) => (
-                <div key={q.id || index}>
-                  <p className="text-[#A3A3A3] text-sm mb-1">{q.question}</p>
+                <div key={q.id || index} className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5">
+                  <p className="text-[#A3A3A3] text-sm mb-2">{q.question}</p>
                   {project.refine_answers?.[q.id] ? (
                     <p className="text-white">{project.refine_answers[q.id]}</p>
                   ) : (
@@ -456,7 +776,7 @@ const ProjectDetail = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.28 }}
             className="card"
             data-testid="blueprint-section"
           >
@@ -561,7 +881,7 @@ const ProjectDetail = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.28 }}
             className="card text-center py-8"
             data-testid="blueprint-locked"
           >
