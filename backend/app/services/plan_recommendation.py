@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
 
-from app.domain.plans import PLANS
+from backend.app.domain.plans import PLANS
 
 
 def clamp_score(value: int) -> int:
