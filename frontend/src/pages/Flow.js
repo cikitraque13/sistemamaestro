@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -12,8 +12,7 @@ import {
   Lock,
   Microphone,
   Stop,
-  SpeakerHigh,
-  SpeakerSlash
+  SpeakerHigh
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -89,6 +88,27 @@ const formatApiErrorDetail = (detail) => {
   }
   if (detail && typeof detail.msg === 'string') return detail.msg;
   return String(detail);
+};
+
+const buildFlowUrl = (step, projectId) => {
+  if (!projectId) return `/flow/${step}`;
+  return `/flow/${step}?project=${encodeURIComponent(projectId)}`;
+};
+
+const resolveStepFromProject = (projectData) => {
+  if (!projectData) return 'input';
+  if (projectData.blueprint || projectData.status === 'blueprint_generated') return 'blueprint';
+  return 'result';
+};
+
+const resolveRestoredStep = (requestedStep, projectData) => {
+  const fallbackStep = resolveStepFromProject(projectData);
+
+  if (!requestedStep) return fallbackStep;
+  if (requestedStep === 'blueprint' && !projectData?.blueprint) return fallbackStep;
+  if (requestedStep === 'refine' && !(projectData?.refine_questions?.length > 0)) return fallbackStep;
+
+  return requestedStep;
 };
 
 const buildMatrixColumn = (length = 28) => {
@@ -279,7 +299,10 @@ const Flow = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { step: urlStep } = useParams();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
+
+  const projectIdFromQuery = searchParams.get('project');
 
   const [step, setStep] = useState(urlStep || 'input');
   const [inputType, setInputType] = useState(location.state?.inputType || 'text');
@@ -380,6 +403,7 @@ const Flow = () => {
         );
 
         setProject(response.data);
+        setRefineAnswers(response.data.refine_answers || {});
 
         await wait(950);
 
@@ -407,29 +431,71 @@ const Flow = () => {
   }, []);
 
   useEffect(() => {
+    if (location.state?.inputContent) return;
+    if (!projectIdFromQuery) return;
+    if (project) return;
+
+    const loadProjectFromQuery = async () => {
+      setLoading(true);
+
+      try {
+        const response = await axios.get(
+          `${API_BASE}/projects/${projectIdFromQuery}`,
+          { withCredentials: true }
+        );
+
+        const loadedProject = response.data;
+        setProject(loadedProject);
+        setRefineAnswers(loadedProject.refine_answers || {});
+
+        const restoredStep = resolveRestoredStep(urlStep, loadedProject);
+        setStep(restoredStep);
+      } catch (error) {
+        toast.error('No se pudo recuperar el proyecto.');
+        navigate('/dashboard/projects');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjectFromQuery();
+  }, [location.state?.inputContent, navigate, project, projectIdFromQuery, urlStep]);
+
+  useEffect(() => {
     if (voice.transcript && inputType === 'text') {
       setInputContent(voice.transcript);
     }
   }, [voice.transcript, inputType]);
 
   useEffect(() => {
-    if (step === 'result' && normalizedDiagnosis && voice.voiceEnabled) {
-      const textToSpeak = `${normalizedDiagnosis.understanding}. Hallazgo principal: ${normalizedDiagnosis.mainFinding}. Oportunidad: ${normalizedDiagnosis.opportunity}.`;
-      const timeout = setTimeout(() => voice.speak(textToSpeak), 500);
-      return () => clearTimeout(timeout);
+    if (step !== 'result' && voice.isSpeaking) {
+      voice.stopSpeaking();
     }
-  }, [step, normalizedDiagnosis, voice]);
+  }, [step, voice]);
 
   useEffect(() => {
-    if (step !== 'input') {
-      window.history.replaceState(null, '', `/flow/${step}`);
-    }
-  }, [step]);
+    return () => {
+      if (voice.isSpeaking) {
+        voice.stopSpeaking();
+      }
+    };
+  }, [voice]);
+
+  useEffect(() => {
+    if (step === 'input') return;
+
+    const effectiveProjectId = project?.project_id || projectIdFromQuery;
+    window.history.replaceState(null, '', buildFlowUrl(step, effectiveProjectId));
+  }, [step, project?.project_id, projectIdFromQuery]);
 
   const handleAnalyze = async () => {
     if (!inputContent.trim()) {
       toast.error('Por favor, ingresa una descripción o URL');
       return;
+    }
+
+    if (voice.isSpeaking) {
+      voice.stopSpeaking();
     }
 
     setLoading(true);
@@ -452,6 +518,7 @@ const Flow = () => {
       );
 
       setProject(response.data);
+      setRefineAnswers(response.data.refine_answers || {});
 
       await wait(950);
 
@@ -477,6 +544,10 @@ const Flow = () => {
   const handleRefineSubmit = async () => {
     if (!project) return;
 
+    if (voice.isSpeaking) {
+      voice.stopSpeaking();
+    }
+
     setLoading(true);
     setTransitionOverlay({
       visible: true,
@@ -495,6 +566,7 @@ const Flow = () => {
       );
 
       setProject(response.data);
+      setRefineAnswers(response.data.refine_answers || {});
       await wait(800);
       toast.success('Afinado guardado correctamente');
       setStep('result');
@@ -523,6 +595,10 @@ const Flow = () => {
         }
       });
       return;
+    }
+
+    if (voice.isSpeaking) {
+      voice.stopSpeaking();
     }
 
     setLoading(true);
@@ -562,6 +638,18 @@ const Flow = () => {
     } else {
       navigate('/dashboard/projects');
     }
+  };
+
+  const handlePlayDiagnosis = () => {
+    if (!normalizedDiagnosis) return;
+
+    if (voice.isSpeaking) {
+      voice.stopSpeaking();
+      return;
+    }
+
+    const textToSpeak = `${normalizedDiagnosis.understanding}. Hallazgo principal: ${normalizedDiagnosis.mainFinding}. Oportunidad: ${normalizedDiagnosis.opportunity}.`;
+    voice.speak(textToSpeak);
   };
 
   return (
@@ -754,7 +842,7 @@ const Flow = () => {
               </motion.div>
             )}
 
-            {step === 'refine' && project?.refine_questions && (
+            {step === 'refine' && project?.refine_questions?.length > 0 && (
               <motion.div
                 key="refine"
                 initial={{ opacity: 0, y: 20 }}
@@ -839,14 +927,7 @@ const Flow = () => {
                   {voice.isSupported && (
                     <div className="flex items-center justify-center gap-2 mt-3">
                       <button
-                        onClick={() => {
-                          if (voice.isSpeaking) {
-                            voice.stopSpeaking();
-                          } else if (normalizedDiagnosis) {
-                            const textToSpeak = `${normalizedDiagnosis.understanding}. Hallazgo principal: ${normalizedDiagnosis.mainFinding}. Oportunidad: ${normalizedDiagnosis.opportunity}.`;
-                            voice.speak(textToSpeak);
-                          }
-                        }}
+                        onClick={handlePlayDiagnosis}
                         className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all ${
                           voice.isSpeaking
                             ? 'bg-[#0F5257] text-white'
@@ -865,17 +946,6 @@ const Flow = () => {
                             Escuchar diagnóstico
                           </>
                         )}
-                      </button>
-                      <button
-                        onClick={voice.toggleVoice}
-                        className={`p-2 rounded-lg transition-all ${
-                          voice.voiceEnabled
-                            ? 'bg-[#262626] text-[#0F5257]'
-                            : 'bg-[#262626] text-[#A3A3A3]'
-                        }`}
-                        title={voice.voiceEnabled ? 'Voz automática activada' : 'Voz automática desactivada'}
-                      >
-                        {voice.voiceEnabled ? <SpeakerHigh size={18} /> : <SpeakerSlash size={18} />}
                       </button>
                     </div>
                   )}
