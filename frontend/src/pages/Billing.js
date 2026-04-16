@@ -69,6 +69,25 @@ const PLAN_VISUAL_META = {
   }
 };
 
+const PLAN_SIGNAL_META = {
+  free: {
+    chips: ['Entrada', 'Claridad'],
+    chipClass: 'bg-white/5 text-[#D4D4D4] border border-white/10'
+  },
+  blueprint: {
+    chips: ['Activación', 'Blueprint', 'Prioridades'],
+    chipClass: 'bg-[#0F5257]/10 text-[#8DE1D0] border border-[#0F5257]/20'
+  },
+  sistema: {
+    chips: ['Growth', 'Optimización', 'Builder', 'Continuidad'],
+    chipClass: 'bg-[#2F455A]/12 text-[#D6E6F5] border border-[#2F455A]/22'
+  },
+  premium: {
+    chips: ['CRO', 'Auditoría IA', 'Arquitectura', 'Criterio'],
+    chipClass: 'bg-[#4A3B61]/12 text-[#E4D8F7] border border-[#4A3B61]/22'
+  }
+};
+
 const CURRENT_PLAN_BADGE_STYLES = {
   diagnosis: 'bg-[#0F5257]/15 text-[#8DE1D0]',
   route: 'bg-[#0F5257]/15 text-[#8DE1D0]',
@@ -180,7 +199,7 @@ const OperationalGrid = ({ items }) => (
       return (
         <div
           key={item.label}
-          className={`rounded-xl border px-3 py-3 ${accent.wrap}`}
+          className={`rounded-xl border px-3 py-3 min-h-[88px] h-full ${accent.wrap}`}
         >
           <p className={`text-[10px] uppercase tracking-wide mb-1 ${accent.label}`}>
             {item.label}
@@ -718,6 +737,11 @@ const Billing = () => {
                 : plan.id === 'blueprint';
 
               const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
+              const planSignals = PLAN_SIGNAL_META[plan.id]?.chips || [];
+              const planSignalClass =
+                PLAN_SIGNAL_META[plan.id]?.chipClass ||
+                'bg-white/5 text-[#D4D4D4] border border-white/10';
+
               const highlights = Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
                 ? plan.billingHighlights.slice(0, 3)
                 : (plan.features || []).slice(0, 3);
@@ -725,14 +749,14 @@ const Billing = () => {
               return (
                 <div
                   key={plan.id}
-                  className={`relative overflow-hidden border rounded-2xl p-6 h-full ${visual.surfaceClass} ${
+                  className={`relative overflow-hidden border rounded-2xl p-6 h-full min-h-[920px] ${visual.surfaceClass} ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
                 >
                   <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`} />
 
-                  <div className="grid h-full grid-rows-[92px_176px_88px_122px_192px_1fr_auto] gap-y-4">
+                  <div className="grid h-full grid-rows-[92px_176px_88px_122px_244px_1fr_auto] gap-y-4">
                     <div className="flex items-start">
                       <div className="flex flex-wrap gap-2">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
@@ -787,21 +811,36 @@ const Billing = () => {
                       <OperationalGrid items={renderOperationalItems(plan)} />
                     </div>
 
-                    <ul className="space-y-3">
-                      {highlights.map((feature) => (
-                        <li
-                          key={feature}
-                          className="flex items-start gap-2 text-sm text-[#D4D4D4]"
-                        >
-                          <CheckCircle
-                            size={16}
-                            weight="fill"
-                            className="text-[#0F5257] mt-0.5 flex-shrink-0"
-                          />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="flex flex-col gap-4">
+                      <div className="min-h-[46px]">
+                        <div className="flex flex-wrap gap-2">
+                          {planSignals.map((signal) => (
+                            <span
+                              key={`${plan.id}-${signal}`}
+                              className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium ${planSignalClass}`}
+                            >
+                              {signal}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <ul className="space-y-3">
+                        {highlights.map((feature) => (
+                          <li
+                            key={feature}
+                            className="flex items-start gap-2 text-sm text-[#D4D4D4]"
+                          >
+                            <CheckCircle
+                              size={16}
+                              weight="fill"
+                              className="text-[#0F5257] mt-0.5 flex-shrink-0"
+                            />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
                     <button
                       onClick={() => handlePlanCheckout(plan.id)}
