@@ -173,6 +173,25 @@ const getOperationalAccentClasses = (label) => {
   };
 };
 
+const OperationalGrid = ({ items }) => (
+  <div className="grid grid-cols-2 gap-3">
+    {items.map((item) => {
+      const accent = getOperationalAccentClasses(item.label);
+      return (
+        <div
+          key={item.label}
+          className={`rounded-xl border px-3 py-3 ${accent.wrap}`}
+        >
+          <p className={`text-[10px] uppercase tracking-wide mb-1 ${accent.label}`}>
+            {item.label}
+          </p>
+          <p className={`text-xs leading-relaxed ${accent.value}`}>{item.value}</p>
+        </div>
+      );
+    })}
+  </div>
+);
+
 const Billing = () => {
   const { user, checkAuth } = useAuth();
   const location = useLocation();
@@ -665,22 +684,9 @@ const Billing = () => {
                 Marco operativo del plan
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-3">
-                {renderOperationalItems(currentPlanDefinition, currentPlanIncludedCredits).map((item) => {
-                  const accent = getOperationalAccentClasses(item.label);
-                  return (
-                    <div
-                      key={item.label}
-                      className={`rounded-xl border px-4 py-4 ${accent.wrap}`}
-                    >
-                      <p className={`text-[11px] uppercase tracking-wide mb-1 ${accent.label}`}>
-                        {item.label}
-                      </p>
-                      <p className={`text-sm ${accent.value}`}>{item.value}</p>
-                    </div>
-                  );
-                })}
-              </div>
+              <OperationalGrid
+                items={renderOperationalItems(currentPlanDefinition, currentPlanIncludedCredits)}
+              />
 
               <p className="text-xs text-[#A3A3A3] mt-4 leading-relaxed">
                 {OPERATIONAL_NOTE}
@@ -704,7 +710,7 @@ const Billing = () => {
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
             {pricingPlans.map((plan) => {
               const isCurrentPlan = user?.plan === plan.id;
               const isSuggestedPlan = suggestedPlanId
@@ -719,127 +725,114 @@ const Billing = () => {
               return (
                 <div
                   key={plan.id}
-                  className={`relative overflow-hidden border rounded-2xl p-6 flex flex-col min-h-[680px] ${visual.surfaceClass} ${
+                  className={`relative overflow-hidden border rounded-2xl p-6 h-full ${visual.surfaceClass} ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
                 >
                   <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`} />
 
-                  <div className="min-h-[92px] mb-5 flex items-start">
-                    <div className="flex flex-wrap gap-2">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
-                        {plan.badge || visual.eyebrow}
-                      </span>
-
-                      {isSuggestedPlan && !isCurrentPlan && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium">
-                          Recomendado
+                  <div className="grid h-full grid-rows-[92px_176px_88px_122px_192px_1fr_auto] gap-y-4">
+                    <div className="flex items-start">
+                      <div className="flex flex-wrap gap-2">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
+                          {plan.badge || visual.eyebrow}
                         </span>
-                      )}
 
-                      {isCurrentPlan && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
-                          Actual
-                        </span>
-                      )}
+                        {isSuggestedPlan && !isCurrentPlan && (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium">
+                            Recomendado
+                          </span>
+                        )}
 
-                      {plan.id === 'blueprint' && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/10 text-[#8DE1D0] text-xs font-medium">
-                          Entrada principal
-                        </span>
-                      )}
+                        {isCurrentPlan && (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
+                            Actual
+                          </span>
+                        )}
+
+                        {plan.id === 'blueprint' && (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/10 text-[#8DE1D0] text-xs font-medium">
+                            Entrada principal
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="min-h-[176px] mb-5">
-                    <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
-                    <p className="text-[#F0F0F0] text-[15px] leading-snug mb-3">{plan.headline}</p>
-                    <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
-                  </div>
-
-                  <div className="min-h-[88px] flex items-end gap-2 mb-5">
-                    <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
-                    <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
-                  </div>
-
-                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4 min-h-[122px]">
-                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-                      Mejor encaje
-                    </p>
-                    <p className="text-sm text-white leading-relaxed">
-                      {plan.bestForShort || plan.bestFor}
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4 min-h-[192px]">
-                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-3">
-                      Marco operativo
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {renderOperationalItems(plan).map((item) => {
-                        const accent = getOperationalAccentClasses(item.label);
-                        return (
-                          <div
-                            key={item.label}
-                            className={`rounded-xl border px-3 py-3 ${accent.wrap}`}
-                          >
-                            <p className={`text-[10px] uppercase tracking-wide mb-1 ${accent.label}`}>
-                              {item.label}
-                            </p>
-                            <p className={`text-xs leading-relaxed ${accent.value}`}>{item.value}</p>
-                          </div>
-                        );
-                      })}
+                    <div>
+                      <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
+                      <p className="text-[#F0F0F0] text-[15px] leading-snug mb-3">{plan.headline}</p>
+                      <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
                     </div>
-                  </div>
 
-                  <ul className="space-y-3 mb-6 flex-1">
-                    {highlights.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2 text-sm text-[#D4D4D4]"
-                      >
-                        <CheckCircle
-                          size={16}
-                          weight="fill"
-                          className="text-[#0F5257] mt-0.5 flex-shrink-0"
-                        />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                    <div className="flex items-end gap-2">
+                      <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
+                      <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
+                    </div>
 
-                  <button
-                    onClick={() => handlePlanCheckout(plan.id)}
-                    disabled={
-                      plan.id === 'free' ||
-                      isCurrentPlan ||
-                      processingKey === `plan:${plan.id}`
-                    }
-                    className={`w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 mt-auto ${
-                      isCurrentPlan
-                        ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
-                        : plan.id === 'free'
+                    <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4">
+                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
+                        Mejor encaje
+                      </p>
+                      <p className="text-sm text-white leading-relaxed">
+                        {plan.bestForShort || plan.bestFor}
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4">
+                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-3">
+                        Marco operativo
+                      </p>
+
+                      <OperationalGrid items={renderOperationalItems(plan)} />
+                    </div>
+
+                    <ul className="space-y-3">
+                      {highlights.map((feature) => (
+                        <li
+                          key={feature}
+                          className="flex items-start gap-2 text-sm text-[#D4D4D4]"
+                        >
+                          <CheckCircle
+                            size={16}
+                            weight="fill"
+                            className="text-[#0F5257] mt-0.5 flex-shrink-0"
+                          />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => handlePlanCheckout(plan.id)}
+                      disabled={
+                        plan.id === 'free' ||
+                        isCurrentPlan ||
+                        processingKey === `plan:${plan.id}`
+                      }
+                      className={`w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                        isCurrentPlan
                           ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
-                          : visual.ctaClass
-                    } disabled:opacity-50`}
-                    data-testid={`upgrade-btn-${plan.id}`}
-                  >
-                    {processingKey === `plan:${plan.id}` ? (
-                      <div className="spinner w-4 h-4"></div>
-                    ) : isCurrentPlan ? (
-                      'Plan actual'
-                    ) : plan.id === 'free' ? (
-                      'Plan base'
-                    ) : (
-                      <>
-                        {plan.cta.label}
-                        <ArrowRight size={16} />
-                      </>
-                    )}
-                  </button>
+                          : plan.id === 'free'
+                            ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
+                            : visual.ctaClass
+                      } disabled:opacity-50`}
+                      data-testid={`upgrade-btn-${plan.id}`}
+                    >
+                      {processingKey === `plan:${plan.id}` ? (
+                        <div className="spinner w-4 h-4"></div>
+                      ) : isCurrentPlan ? (
+                        'Plan actual'
+                      ) : plan.id === 'free' ? (
+                        'Plan base'
+                      ) : (
+                        <>
+                          {plan.cta.label}
+                          <ArrowRight size={16} />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -864,25 +857,29 @@ const Billing = () => {
           className="mb-10"
           data-testid="entry-offer-card"
         >
-          <div className="bg-[linear-gradient(180deg,#121212_0%,#111111_100%)] border border-white/5 rounded-2xl p-6">
-            <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch">
+          <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_28%),linear-gradient(180deg,#141311_0%,#0F0F0F_100%)] p-6">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/0 via-amber-500/40 to-amber-500/0" />
+
+            <div className="grid lg:grid-cols-[1.18fr_0.82fr] gap-6 items-stretch">
               <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-3 mb-4">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-xs font-medium border border-amber-500/20">
                     {selectedEntryOffer.badge}
                   </span>
-                  <span className="text-xs uppercase tracking-wider text-[#A3A3A3]">
+                  <span className="text-xs uppercase tracking-wider text-[#C8B898]">
                     {selectedEntryOffer.priceLabel} · {selectedEntryOffer.periodLabel}
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-medium text-white mb-2">
+                <h3 className="text-[2rem] leading-tight font-medium text-white mb-3">
                   {selectedEntryOffer.headline}
                 </h3>
-                <p className="text-[#D4D4D4] mb-4 max-w-2xl">
+
+                <p className="text-[#ECE7DD] text-lg leading-relaxed mb-4 max-w-2xl">
                   {selectedEntryOffer.description}
                 </p>
-                <p className="text-sm text-[#A3A3A3] mb-5 max-w-2xl">
+
+                <p className="text-sm text-[#B9B1A3] mb-6 max-w-2xl">
                   {selectedEntryOffer.valuePromise}
                 </p>
 
@@ -890,7 +887,7 @@ const Billing = () => {
                   {(selectedEntryOffer.billingHighlights || selectedEntryOffer.features).slice(0, 4).map((feature) => (
                     <span
                       key={feature}
-                      className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-white/5 text-[#D4D4D4]"
+                      className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-amber-500/10 text-[#E7DED0]"
                     >
                       {feature}
                     </span>
@@ -898,15 +895,15 @@ const Billing = () => {
                 </div>
               </div>
 
-              <div className="bg-[#0A0A0A] border border-[#262626] rounded-2xl p-5 flex flex-col">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium mb-4 self-start">
+              <div className="bg-[#090909] border border-amber-500/15 rounded-2xl p-5 flex flex-col shadow-[0_0_0_1px_rgba(245,158,11,0.04)]">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-100 text-xs font-medium border border-amber-500/20 mb-4 self-start">
                   <FileText size={14} weight="fill" />
                   Compra puntual
                 </div>
 
                 <div className="flex items-baseline gap-2 mb-5">
                   <span className="text-5xl font-light text-white">{selectedEntryOffer.priceLabel}</span>
-                  <span className="text-[#A3A3A3]">{selectedEntryOffer.periodLabel}</span>
+                  <span className="text-amber-100/75">{selectedEntryOffer.periodLabel}</span>
                 </div>
 
                 <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-4">
@@ -918,11 +915,11 @@ const Billing = () => {
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-amber-500/10 bg-[#111008] px-4 py-4 mb-5">
-                  <p className="text-[11px] uppercase tracking-wide text-amber-200/70 mb-1">
+                <div className="rounded-xl border border-amber-500/20 bg-[linear-gradient(180deg,#181308_0%,#120F07_100%)] px-4 py-4 mb-5">
+                  <p className="text-[11px] uppercase tracking-wide text-amber-200/75 mb-1">
                     Qué activa
                   </p>
-                  <p className="text-sm text-[#E8E8E8]">
+                  <p className="text-sm text-[#F2E7D1]">
                     Informe premium inicial, lectura más útil y primer paso accionable.
                   </p>
                 </div>
@@ -930,7 +927,7 @@ const Billing = () => {
                 <button
                   onClick={handleEntryOfferCheckout}
                   disabled={processingKey === `offer:${selectedEntryOffer.id}`}
-                  className="w-full py-3 rounded-lg font-medium bg-[#262626] text-white hover:bg-[#363636] transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto"
+                  className="w-full py-3 rounded-lg font-medium bg-[linear-gradient(180deg,#3A3327_0%,#2E2921_100%)] text-white hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto border border-amber-500/15"
                   data-testid="entry-offer-cta"
                 >
                   {processingKey === `offer:${selectedEntryOffer.id}` ? (
