@@ -1,5 +1,7 @@
 import json
 import logging
+import re
+import unicodedata
 from typing import Any, Dict, List, Optional
 
 import openai
@@ -19,6 +21,17 @@ CANONICAL_DIMENSIONS = [
 ALLOWED_DIMENSION_STATUS = {"strong", "improvable", "priority"}
 ALLOWED_PRIORITY_LEVELS = {"high", "medium", "low"}
 ALLOWED_CONTINUITY_PATHS = {"stay", "blueprint", "sistema", "premium"}
+
+COMPARISON_STOPWORDS = {
+    "de", "la", "el", "los", "las", "un", "una", "unos", "unas", "y", "o", "u",
+    "a", "ante", "bajo", "con", "contra", "desde", "durante", "en", "entre",
+    "hacia", "hasta", "para", "por", "segun", "sin", "sobre", "tras",
+    "que", "como", "del", "al", "se", "su", "sus", "es", "son", "ha", "han",
+    "muy", "mas", "menos", "ya", "hoy", "real", "principal", "importante",
+    "caso", "lectura", "sistema", "proyecto", "negocio", "usuario", "usuarios",
+    "web", "pagina", "sitio", "propuesta", "valor", "conversion", "captacion",
+    "claridad", "estructura", "continuidad", "mejora", "oportunidad"
+}
 
 
 def _clean_json_text(text: str) -> str:
@@ -52,6 +65,63 @@ def _ensure_string(value: Any, fallback: str) -> str:
     return fallback
 
 
+def _normalize_text_key(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+
+    text = value.strip().lower()
+    if not text:
+        return ""
+
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    text = re.sub(r"[^a-z0-9áéíóúñü\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def _comparison_tokens(value: Any) -> set:
+    normalized = _normalize_text_key(value)
+    if not normalized:
+        return set()
+
+    tokens = {
+        token
+        for token in normalized.split()
+        if len(token) > 2 and token not in COMPARISON_STOPWORDS
+    }
+    return tokens
+
+
+def _are_too_similar(a: Any, b: Any) -> bool:
+    text_a = _normalize_text_key(a)
+    text_b = _normalize_text_key(b)
+
+    if not text_a or not text_b:
+        return False
+
+    if text_a == text_b:
+        return True
+
+    if len(text_a) > 36 and len(text_b) > 36:
+        if text_a in text_b or text_b in text_a:
+            return True
+
+    tokens_a = _comparison_tokens(a)
+    tokens_b = _comparison_tokens(b)
+
+    if not tokens_a or not tokens_b:
+        return False
+
+    intersection = tokens_a & tokens_b
+    union = tokens_a | tokens_b
+    if not union:
+        return False
+
+    score = len(intersection) / len(union)
+    return score >= 0.72
+
+
 def _ensure_string_list(value: Any, fallback: Optional[List[str]] = None) -> List[str]:
     if not isinstance(value, list):
         return fallback or []
@@ -66,8 +136,47 @@ def _ensure_string_list(value: Any, fallback: Optional[List[str]] = None) -> Lis
     return cleaned if cleaned else (fallback or [])
 
 
+def _dedupe_string_list(items: List[str], max_items: Optional[int] = None) -> List[str]:
+    deduped: List[str] = []
+
+    for item in items:
+        if any(_are_too_similar(item, existing) for existing in deduped):
+            continue
+        deduped.append(item)
+        if max_items and len(deduped) >= max_items:
+            break
+
+    return deduped
+
+
+def _filter_redundant_strings(items: List[str], avoid: List[str]) -> List[str]:
+    filtered: List[str] = []
+
+    for item in items:
+        if any(_are_too_similar(item, blocked) for blocked in avoid if blocked):
+            continue
+        if any(_are_too_similar(item, existing) for existing in filtered):
+            continue
+        filtered.append(item)
+
+    return filtered
+
+
+def _pick_distinct(candidates: List[Any], avoid: List[str], fallback: str) -> str:
+    for candidate in candidates:
+        value = _ensure_string(candidate, "")
+        if not value:
+            continue
+
+        if all(not _are_too_similar(value, blocked) for blocked in avoid if blocked):
+            return value
+
+    return fallback
+
+
 def _normalize_dimension_review(items: Any) -> List[Dict[str, str]]:
     raw_items = items if isinstance(items, list) else []
+    allowed_ids = {d["id"] for d in CANONICAL_DIMENSIONS}
     by_id: Dict[str, Dict[str, str]] = {}
 
     for item in raw_items:
@@ -80,7 +189,7 @@ def _normalize_dimension_review(items: Any) -> List[Dict[str, str]]:
         raw_priority = str(item.get("priority", "")).strip().lower()
         reading = _ensure_string(item.get("reading"), "Lectura pendiente de concretar.")
 
-        if raw_id not in {d["id"] for d in CANONICAL_DIMENSIONS}:
+        if raw_id not in allowed_ids:
             continue
 
         by_id[raw_id] = {
@@ -107,6 +216,15 @@ def _normalize_dimension_review(items: Any) -> List[Dict[str, str]]:
         )
 
     return normalized
+
+
+def _find_dimension_reading(items: List[Dict[str, str]], *dimension_ids: str) -> str:
+    for item in items:
+        if item.get("id") in dimension_ids:
+            reading = _ensure_string(item.get("reading"), "")
+            if reading:
+                return reading
+    return ""
 
 
 def _normalize_priority_actions(items: Any) -> List[Dict[str, str]]:
@@ -271,51 +389,18 @@ def _normalize_analysis_payload(parsed: Dict[str, Any]) -> Dict[str, Any]:
         "Sin resumen disponible.",
     )
 
-    strengths = _ensure_string_list(diagnosis_raw.get("strengths"), [])
-    weaknesses = _ensure_string_list(diagnosis_raw.get("weaknesses"), [])
-    quick_wins = _ensure_string_list(diagnosis_raw.get("quick_wins"), [])
-
-    executive_summary_raw = diagnosis_raw.get("executive_summary", {})
-    if not isinstance(executive_summary_raw, dict):
-        executive_summary_raw = {}
-
-    executive_summary = {
-        "understanding": _ensure_string(
-            executive_summary_raw.get("understanding"),
-            diagnosis_raw.get("understanding") or summary,
-        ),
-        "main_tension": _ensure_string(
-            executive_summary_raw.get("main_tension"),
-            weaknesses[0] if weaknesses else "No se ha precisado aún la tensión principal.",
-        ),
-        "commercial_importance": _ensure_string(
-            executive_summary_raw.get("commercial_importance"),
-            "La lectura debe conectar con captación, conversión, monetización o continuidad.",
-        ),
-        "bottom_line": _ensure_string(
-            executive_summary_raw.get("bottom_line"),
-            quick_wins[0] if quick_wins else "Hace falta priorizar la siguiente acción con más claridad.",
-        ),
-    }
-
-    core_diagnosis_raw = diagnosis_raw.get("core_diagnosis", {})
-    if not isinstance(core_diagnosis_raw, dict):
-        core_diagnosis_raw = {}
-
-    core_diagnosis = {
-        "main_finding": _ensure_string(
-            core_diagnosis_raw.get("main_finding"),
-            diagnosis_raw.get("main_finding") or weaknesses[0] if weaknesses else "Sin hallazgo principal disponible.",
-        ),
-        "main_weakness": _ensure_string(
-            core_diagnosis_raw.get("main_weakness"),
-            weaknesses[0] if weaknesses else "Sin debilidad principal disponible.",
-        ),
-        "main_leverage": _ensure_string(
-            core_diagnosis_raw.get("main_leverage"),
-            diagnosis_raw.get("opportunity") or quick_wins[0] if quick_wins else "Sin palanca principal disponible.",
-        ),
-    }
+    strengths = _dedupe_string_list(
+        _ensure_string_list(diagnosis_raw.get("strengths"), []),
+        max_items=3,
+    )
+    weaknesses = _dedupe_string_list(
+        _ensure_string_list(diagnosis_raw.get("weaknesses"), []),
+        max_items=4,
+    )
+    quick_wins = _dedupe_string_list(
+        _ensure_string_list(diagnosis_raw.get("quick_wins"), []),
+        max_items=4,
+    )
 
     dimension_review = _normalize_dimension_review(diagnosis_raw.get("dimension_review"))
     priority_actions = _normalize_priority_actions(diagnosis_raw.get("priority_actions"))
@@ -324,25 +409,111 @@ def _normalize_analysis_payload(parsed: Dict[str, Any]) -> Dict[str, Any]:
         diagnosis_raw.get("continuity_recommendation")
     )
 
+    executive_summary_raw = diagnosis_raw.get("executive_summary", {})
+    if not isinstance(executive_summary_raw, dict):
+        executive_summary_raw = {}
+
+    core_diagnosis_raw = diagnosis_raw.get("core_diagnosis", {})
+    if not isinstance(core_diagnosis_raw, dict):
+        core_diagnosis_raw = {}
+
+    understanding = _pick_distinct(
+        [
+            diagnosis_raw.get("understanding"),
+            executive_summary_raw.get("understanding"),
+            summary,
+            _find_dimension_reading(dimension_review, "clarity", "proposal"),
+        ],
+        [],
+        "Se ha generado una lectura inicial del caso, pendiente de mayor especificidad.",
+    )
+
+    main_tension = _pick_distinct(
+        [
+            executive_summary_raw.get("main_tension"),
+            _find_dimension_reading(dimension_review, "clarity", "proposal"),
+            weaknesses[0] if weaknesses else "",
+            summary,
+        ],
+        [understanding],
+        "La principal tensión todavía no está descrita con la suficiente precisión.",
+    )
+
+    commercial_importance = _pick_distinct(
+        [
+            executive_summary_raw.get("commercial_importance"),
+            _find_dimension_reading(dimension_review, "conversion", "continuity"),
+            "La fricción detectada afecta captación, conversión, monetización o continuidad del caso.",
+        ],
+        [understanding, main_tension],
+        "La fricción detectada afecta captación, conversión, monetización o continuidad del caso.",
+    )
+
+    main_finding = _pick_distinct(
+        [
+            core_diagnosis_raw.get("main_finding"),
+            diagnosis_raw.get("main_finding"),
+            _find_dimension_reading(dimension_review, "conversion", "structure", "proposal"),
+            weaknesses[0] if weaknesses else "",
+            summary,
+        ],
+        [understanding, main_tension],
+        "Sin hallazgo principal disponible.",
+    )
+
+    main_weakness = _pick_distinct(
+        [
+            core_diagnosis_raw.get("main_weakness"),
+            weaknesses[0] if weaknesses else "",
+            weaknesses[1] if len(weaknesses) > 1 else "",
+            _find_dimension_reading(dimension_review, "structure", "conversion", "continuity"),
+        ],
+        [understanding, main_tension, main_finding],
+        "Sin debilidad principal disponible.",
+    )
+
+    main_leverage = _pick_distinct(
+        [
+            core_diagnosis_raw.get("main_leverage"),
+            diagnosis_raw.get("opportunity"),
+            quick_wins[0] if quick_wins else "",
+            priority_actions[0]["title"] if priority_actions else "",
+            immediate_action.get("title"),
+        ],
+        [understanding, main_tension, main_finding, main_weakness],
+        "Sin palanca principal disponible.",
+    )
+
+    bottom_line = _pick_distinct(
+        [
+            executive_summary_raw.get("bottom_line"),
+            quick_wins[0] if quick_wins else "",
+            immediate_action.get("title"),
+            main_leverage,
+        ],
+        [understanding, main_tension, main_finding, main_weakness],
+        "Hace falta priorizar la siguiente acción con más claridad.",
+    )
+
     diagnosis = {
         "summary": summary,
-        "understanding": _ensure_string(
-            diagnosis_raw.get("understanding"),
-            executive_summary["understanding"],
-        ),
-        "main_finding": _ensure_string(
-            diagnosis_raw.get("main_finding"),
-            core_diagnosis["main_finding"],
-        ),
-        "opportunity": _ensure_string(
-            diagnosis_raw.get("opportunity"),
-            core_diagnosis["main_leverage"],
-        ),
-        "strengths": strengths,
-        "weaknesses": weaknesses,
-        "quick_wins": quick_wins,
-        "executive_summary": executive_summary,
-        "core_diagnosis": core_diagnosis,
+        "understanding": understanding,
+        "main_finding": main_finding,
+        "opportunity": main_leverage,
+        "strengths": _filter_redundant_strings(strengths, [understanding, main_finding]),
+        "weaknesses": _filter_redundant_strings(weaknesses, [main_tension, main_finding, main_weakness]),
+        "quick_wins": _filter_redundant_strings(quick_wins, [main_leverage, bottom_line, immediate_action.get("title", "")]),
+        "executive_summary": {
+            "understanding": understanding,
+            "main_tension": main_tension,
+            "commercial_importance": commercial_importance,
+            "bottom_line": bottom_line,
+        },
+        "core_diagnosis": {
+            "main_finding": main_finding,
+            "main_weakness": main_weakness,
+            "main_leverage": main_leverage,
+        },
         "dimension_review": dimension_review,
         "priority_actions": priority_actions,
         "immediate_action": immediate_action,
@@ -460,12 +631,24 @@ Debes devolver SOLO un JSON válido con esta estructura exacta:
   ]
 }
 
+Definición funcional estricta de cada bloque:
+- summary = síntesis breve del caso, sin repetir listas ni CTAs
+- understanding = lectura global del caso en una frase distinta del summary
+- main_finding = el descubrimiento más importante
+- opportunity = la principal palanca o vía de mejora, no una reformulación de la debilidad
+- main_tension = el conflicto principal que bloquea claridad, captación, monetización o continuidad
+- main_weakness = la fricción más concreta y operativa
+- main_leverage = la palanca más prometedora o accionable
+- bottom_line = conclusión ejecutiva final, distinta de los bloques anteriores
+- quick_wins = acciones rápidas, escritas como acciones, no como diagnósticos repetidos
+- immediate_action = una sola acción inmediata, concreta y ejecutable
+- continuity_recommendation = una sola vía principal de continuidad
+
 Reglas:
 - Responde SOLO con JSON válido, sin markdown
 - Selecciona la ruta más adecuada automáticamente
 - Sé directo, profesional y específico
 - El diagnóstico debe sentirse personalizado, no genérico
-- El resumen debe identificar el cuello de botella principal y por qué importa comercialmente
 - No prometas resultados garantizados ni cifras inventadas
 - strengths = activos reales ya aprovechables
 - weaknesses = fricciones concretas que hoy limitan captación, conversión, autoridad o monetización
@@ -474,7 +657,10 @@ Reglas:
 - priority_actions = máximo 3 acciones
 - refine_questions = máximo 3 preguntas
 - Si es una URL, analiza el contenido real proporcionado y no inventes elementos no visibles
-- continuity_recommendation debe recomendar solo una vía principal"""
+- continuity_recommendation debe recomendar solo una vía principal
+- PROHIBIDO repetir la misma idea con palabras parecidas entre understanding, main_tension, main_finding, main_weakness, main_leverage, bottom_line, quick_wins e immediate_action
+- Si un mismo problema domina el caso, exprésalo en niveles distintos: lectura global, conflicto, fricción concreta, palanca y acción
+- Si no puedes aportar una idea distinta en un bloque, elige el segundo ángulo más relevante del caso en vez de parafrasear"""
 
     if input_type == "url" and url_analysis and url_analysis.get("content"):
         content = url_analysis["content"]
@@ -509,7 +695,8 @@ FORMULARIOS: {content['forms_count']}
 
 NAVEGACIÓN: {', '.join(content['navigation']) if content['navigation'] else 'No encontrada'}
 
-Proporciona un diagnóstico comercial y estratégico basado SOLO en este contenido real."""
+Devuelve un diagnóstico comercial y estratégico basado SOLO en este contenido real.
+No repitas la misma idea entre bloques distintos."""
     else:
         user_prompt = f"""El usuario describe una idea, necesidad o problema digital.
 
@@ -525,7 +712,8 @@ Analiza el caso con enfoque en:
 Entrada del usuario:
 {input_content}
 
-Devuelve un diagnóstico específico, útil y accionable, evitando generalidades."""
+Devuelve un diagnóstico específico, útil y accionable.
+No repitas la misma idea entre bloques distintos y evita generalidades."""
 
     try:
         response = await client_ai.chat.completions.create(
@@ -535,7 +723,7 @@ Devuelve un diagnóstico específico, útil y accionable, evitando generalidades
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=0.2,
+            temperature=0.15,
             max_tokens=2600,
         )
 
