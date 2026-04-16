@@ -72,19 +72,23 @@ const PLAN_VISUAL_META = {
 const PLAN_SIGNAL_META = {
   free: {
     chips: ['Entrada', 'Claridad'],
-    chipClass: 'bg-white/5 text-[#D4D4D4] border border-white/10'
+    chipClass:
+      'bg-[rgba(255,255,255,0.035)] text-[#DCE7E4] border border-[#0F5257]/14'
   },
   blueprint: {
     chips: ['Activación', 'Blueprint', 'Prioridades'],
-    chipClass: 'bg-[#0F5257]/10 text-[#8DE1D0] border border-[#0F5257]/20'
+    chipClass:
+      'bg-[#0F5257]/10 text-[#8DE1D0] border border-[#0F5257]/20'
   },
   sistema: {
     chips: ['Growth', 'Optimización', 'Builder', 'Continuidad'],
-    chipClass: 'bg-[#2F455A]/12 text-[#D6E6F5] border border-[#2F455A]/22'
+    chipClass:
+      'bg-[#2F455A]/12 text-[#D6E6F5] border border-[#2F455A]/22'
   },
   premium: {
-    chips: ['CRO', 'Auditoría IA', 'Arquitectura', 'Criterio'],
-    chipClass: 'bg-[#4A3B61]/12 text-[#E4D8F7] border border-[#4A3B61]/22'
+    chips: ['CRO', 'AI Auditor', 'Architecture', 'Criterio'],
+    chipClass:
+      'bg-[#4A3B61]/12 text-[#E4D8F7] border border-[#4A3B61]/22'
   }
 };
 
@@ -193,18 +197,21 @@ const getOperationalAccentClasses = (label) => {
 };
 
 const OperationalGrid = ({ items }) => (
-  <div className="grid grid-cols-2 gap-3">
+  <div className="grid grid-cols-2 gap-3 auto-rows-fr">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
+
       return (
         <div
           key={item.label}
-          className={`rounded-xl border px-3 py-3 min-h-[88px] h-full ${accent.wrap}`}
+          className={`rounded-xl border px-3 py-3 min-h-[96px] h-full flex flex-col justify-between ${accent.wrap}`}
         >
-          <p className={`text-[10px] uppercase tracking-wide mb-1 ${accent.label}`}>
+          <p className={`text-[10px] uppercase tracking-wide min-h-[18px] ${accent.label}`}>
             {item.label}
           </p>
-          <p className={`text-xs leading-relaxed ${accent.value}`}>{item.value}</p>
+          <div className="flex-1 flex items-end">
+            <p className={`text-xs leading-relaxed ${accent.value}`}>{item.value}</p>
+          </div>
         </div>
       );
     })}
@@ -812,7 +819,7 @@ const Billing = () => {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                      <div className="min-h-[46px]">
+                      <div className="min-h-[60px]">
                         <div className="flex flex-wrap gap-2">
                           {planSignals.map((signal) => (
                             <span
@@ -918,6 +925,10 @@ const Billing = () => {
                   {selectedEntryOffer.description}
                 </p>
 
+                <p className="text-sm text-[#D9C8A2] mb-4 max-w-2xl">
+                  Reduce dudas, ordena el caso y prepara el siguiente paso.
+                </p>
+
                 <p className="text-sm text-[#B9B1A3] mb-6 max-w-2xl">
                   {selectedEntryOffer.valuePromise}
                 </p>
@@ -926,7 +937,7 @@ const Billing = () => {
                   {(selectedEntryOffer.billingHighlights || selectedEntryOffer.features).slice(0, 4).map((feature) => (
                     <span
                       key={feature}
-                      className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-amber-500/10 text-[#E7DED0]"
+                      className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-amber-500/14 text-[#F0E2C5]"
                     >
                       {feature}
                     </span>
@@ -966,7 +977,7 @@ const Billing = () => {
                 <button
                   onClick={handleEntryOfferCheckout}
                   disabled={processingKey === `offer:${selectedEntryOffer.id}`}
-                  className="w-full py-3 rounded-lg font-medium bg-[linear-gradient(180deg,#3A3327_0%,#2E2921_100%)] text-white hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto border border-amber-500/15"
+                  className="w-full py-3 rounded-lg font-medium bg-[linear-gradient(180deg,#3F3728_0%,#30291F_100%)] text-white hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto border border-amber-500/15"
                   data-testid="entry-offer-cta"
                 >
                   {processingKey === `offer:${selectedEntryOffer.id}` ? (
