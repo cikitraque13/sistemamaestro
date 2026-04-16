@@ -1,11 +1,11 @@
 const pricingContent = {
   section: {
     eyebrow: 'Planes y acceso',
-    title: 'Empieza con claridad. Construye con continuidad.',
+    title: 'Empieza con claridad. Escala con continuidad.',
     description:
-      'La estructura de precios no debe vender por ruido. Debe acompañar una progresión lógica: explorar, validar, activar, construir, continuar y, si conviene, sacar el proyecto fuera del sistema.',
+      'La estructura de precios no debe vender por ruido. Debe acompañar una progresión real: explorar, validar, activar, continuar y, cuando convenga, preparar salida.',
     microNote:
-      'Cada nivel responde a una intensidad distinta de intervención. La suscripción da acceso al sistema, la construcción intensiva se apoya en créditos y la exportación se valora aparte.'
+      'La suscripción da acceso al sistema. La capacidad operativa se apoya en créditos. La exportación se valora aparte.'
   },
 
   architecture: {
@@ -33,21 +33,27 @@ const pricingContent = {
     periodLabel: 'PAGO ÚNICO',
     headline: 'Valida una oportunidad antes de entrar al sistema.',
     description:
-      'Compra puntual para convertir una idea, una URL o una oportunidad en una lectura más seria y una primera dirección útil.',
+      'Compra puntual para convertir una idea, una URL o una oportunidad en una lectura útil y una primera dirección seria.',
     bestFor:
-      'Encaja cuando el usuario todavía no necesita continuidad, pero sí una validación mejor enfocada antes de decidir si sube al sistema.',
+      'Usuario que aún no necesita continuidad, pero sí una validación mejor enfocada.',
     valuePromise:
-      'No compras una suscripción. Compras una validación breve y útil que reduce dudas y prepara el siguiente paso.',
+      'Reduce dudas, ordena el caso y prepara el siguiente paso.',
     features: [
-      'Informe breve con más criterio',
-      'Lectura más concreta de la oportunidad',
-      'Enfoque inicial de mejora o monetización',
-      '1 prompt accionable de avance'
+      'Informe breve con criterio',
+      'Lectura más concreta',
+      'Enfoque inicial de mejora',
+      '1 prompt accionable'
+    ],
+    billingHighlights: [
+      'Validación puntual',
+      'Lectura más útil',
+      'Primer foco de mejora',
+      '1 prompt de avance'
     ],
     promptLayer: {
       label: 'Prompt de avance',
       description:
-        'Incluye un prompt práctico para seguir trabajando la idea o el activo analizado con una dirección mejor.'
+        'Incluye un prompt práctico para seguir trabajando la idea o el activo analizado.'
     },
     psychology: {
       role: 'micro_bridge',
@@ -106,22 +112,30 @@ const pricingContent = {
       builderAccess: 'none',
       exportAccess: 'not_included',
       creditsIncluded: 0,
-      creditsLabel: 'Sin créditos incluidos',
+      creditsLabel: 'Sin créditos',
       price: 0,
       priceLabel: 'Gratis',
       periodLabel: '',
-      headline: 'Explora el sistema y detecta si merece avanzar.',
+      headline: 'Explora el caso y decide si merece avanzar.',
       description:
-        'Puerta de entrada para entender tu necesidad, clasificarla bien y recibir una primera lectura sin fricción.',
+        'Entrada sin fricción para clasificar necesidad, URL u oportunidad y obtener una primera lectura útil.',
       bestFor:
-        'Usuario que aún está explorando una idea, una URL o una oportunidad y no necesita todavía una capa seria de activación.',
+        'Usuario que solo necesita claridad inicial.',
+      bestForShort:
+        'Exploración inicial sin continuidad.',
       valuePromise:
-        'Rompe la inercia, abre claridad y permite probar el sistema sin entrar aún en continuidad.',
+        'Abre claridad y rompe la inercia inicial.',
       features: [
         'Diagnóstico inicial',
         'Ruta recomendada',
         'Resultado resumido',
         'Primer marco de decisión'
+      ],
+      billingHighlights: [
+        'Diagnóstico inicial',
+        'Ruta recomendada',
+        'Resultado resumido',
+        'Primer criterio'
       ],
       promptLayer: {
         label: 'Mini prompt base',
@@ -160,26 +174,31 @@ const pricingContent = {
       activationLevel: 'base',
       builderAccess: 'base',
       exportAccess: 'quote_only_future',
-      creditsIncluded: null,
-      creditsLabel: 'Bolsa inicial de créditos incluida',
+      creditsIncluded: 60,
+      creditsLabel: '60 incluidos',
       price: 29,
       priceLabel: '29 €',
       periodLabel: '/ mes',
-      headline: 'Pasa del análisis a una base real de activación.',
+      headline: 'Activa una base real de trabajo.',
       description:
-        'Es la entrada seria al sistema para quien ya no solo quiere entender mejor su caso, sino empezar a trabajar con una base estructural y una primera lógica de ejecución.',
+        'Entrada seria al sistema para pasar del análisis a una base estructural con primera capacidad operativa.',
       bestFor:
-        'Usuario que ya detecta una oportunidad y quiere una activación base, una estructura clara y una primera experiencia real dentro del sistema.',
+        'Usuario que ya ve una oportunidad y quiere empezar a trabajarla dentro del sistema.',
+      bestForShort:
+        'Primera activación seria dentro del sistema.',
       valuePromise:
-        'Aquí empieza la transición importante del producto: activación base, blueprint, ruta de trabajo y una primera bolsa de capacidad operativa.',
+        'Activa blueprint, ruta, prompts y una bolsa inicial de capacidad.',
       features: [
         'Todo lo del nivel Gratis',
         'Blueprint estructural',
-        'Activación base del proyecto',
         'Prioridades claras',
-        'Stack y ruta inicial sugeridos',
-        'Prompts estructurales iniciales',
         'Bolsa inicial de créditos'
+      ],
+      billingHighlights: [
+        'Blueprint estructural',
+        'Prioridades claras',
+        'Builder base',
+        '60 créditos incluidos'
       ],
       promptLayer: {
         label: 'Prompts estructurales base',
@@ -193,7 +212,7 @@ const pricingContent = {
         'Prompt de blueprint inicial'
       ],
       perceptionGoal:
-        'Hacer sentir al usuario que ya no solo entiende mejor su caso: ahora tiene una base real para empezar.',
+        'Hacer sentir al usuario que ya no solo entiende mejor su caso: ahora puede empezar.',
       cta: {
         label: 'Entrar en Pro',
         variant: 'primary'
@@ -202,10 +221,10 @@ const pricingContent = {
       isPrimaryPlan: true,
       unlocksNext: 'sistema',
       upgradeNarrative:
-        'Este es el bloque que más conviene empujar visualmente. Debe ser la decisión natural para la mayoría de usuarios serios.',
+        'Debe ser la decisión natural para la mayoría de usuarios serios.',
       visualRole: 'primary',
       strategicRole: {
-        includedCredits: 'pending_numeric_lock',
+        includedCredits: 60,
         builderMode: 'base',
         exportPolicy: 'separate_quote'
       }
@@ -223,31 +242,36 @@ const pricingContent = {
       activationLevel: 'operational',
       builderAccess: 'operational',
       exportAccess: 'quote_priority_future',
-      creditsIncluded: null,
-      creditsLabel: 'Bolsa superior de créditos incluida',
+      creditsIncluded: 220,
+      creditsLabel: '220 incluidos',
       price: 79,
       priceLabel: '79 €',
       periodLabel: '/ mes',
-      headline: 'Convierte el sistema en continuidad operativa real.',
+      headline: 'Convierte el sistema en continuidad operativa.',
       description:
-        'Capa central para proyectos que ya no están probando. Aquí el sistema pasa de activación base a continuidad seria, construcción con más recorrido y mejora operativa real.',
+        'Capa central para proyectos que ya no están probando y necesitan más recorrido, iteración y capacidad real.',
       bestFor:
-        'Usuario con proyecto en marcha o con intención clara de construir, iterar y mejorar con más continuidad dentro del sistema.',
+        'Usuario con proyecto en marcha que necesita continuidad y más construcción dentro del sistema.',
+      bestForShort:
+        'Continuidad seria y trabajo con más recorrido.',
       valuePromise:
-        'No es un Pro más caro. Es el núcleo operativo del producto: más activación, más continuidad, más ejecución visible y más capacidad para seguir construyendo.',
+        'No es un Pro más caro. Es la capa donde el sistema acompaña ejecución, continuidad y mejora.',
       features: [
         'Todo lo del Pro',
-        'Activación operativa',
-        'Continuidad más profunda',
-        'Construcción visible con más recorrido',
-        'CRO y mejora de propuesta',
-        'Growth y priorización táctica',
+        'Continuidad operativa',
+        'Construcción con más recorrido',
         'Bolsa superior de créditos'
+      ],
+      billingHighlights: [
+        'Continuidad operativa',
+        'Builder con continuidad',
+        'Optimización y mejora',
+        '220 créditos incluidos'
       ],
       promptLayer: {
         label: 'Prompts de continuidad y optimización',
         description:
-          'Secuencias y prompts para CRO, growth, mejora de propuesta, continuidad del proyecto y trabajo más serio dentro del sistema.'
+          'Secuencias y prompts para CRO, growth, continuidad del proyecto y mejora más seria.'
       },
       prompts: [
         'Prompt de optimización de conversión',
@@ -256,7 +280,7 @@ const pricingContent = {
         'Prompt de priorización táctica'
       ],
       perceptionGoal:
-        'Hacer sentir al usuario que ha entrado en la capa donde el sistema ya no solo orienta: ahora acompaña construcción, continuidad y mejora real.',
+        'Hacer sentir al usuario que el sistema ya no solo orienta: ahora sostiene trabajo real.',
       cta: {
         label: 'Entrar en Growth',
         variant: 'accent'
@@ -264,10 +288,10 @@ const pricingContent = {
       highlight: false,
       unlocksNext: 'premium',
       upgradeNarrative:
-        'Puede comprarse directamente, pero también debe presentarse como ascenso natural desde el Pro cuando el usuario quiere continuidad operativa real.',
+        'Debe presentarse como ascenso natural cuando el usuario pide continuidad operativa real.',
       visualRole: 'operational',
       strategicRole: {
-        includedCredits: 'pending_numeric_lock',
+        includedCredits: 220,
         builderMode: 'operational',
         exportPolicy: 'separate_quote'
       }
@@ -285,31 +309,36 @@ const pricingContent = {
       activationLevel: 'advanced',
       builderAccess: 'advanced',
       exportAccess: 'advanced_quote_priority',
-      creditsIncluded: null,
-      creditsLabel: 'Mayor capacidad operativa incluida',
+      creditsIncluded: 600,
+      creditsLabel: '600 incluidos',
       price: 199,
       priceLabel: '199 €',
       periodLabel: '/ mes',
-      headline: 'Activa la capa maestra para casos complejos y salidas serias.',
+      headline: 'Activa la capa maestra para casos complejos.',
       description:
-        'Categoría superior para proyectos, negocios u oportunidades que necesitan criterio fuerte, profundidad estratégica, activación avanzada y capacidad real para transformar un caso complejo en algo activable y lanzable.',
+        'Nivel superior para casos de más complejidad, criterio fuerte, activación avanzada y preparación seria de salida.',
       bestFor:
-        'Usuario que necesita intervención superior en monetización, growth, CRO, arquitectura, operadores de terceros o preparación seria de salida y transferencia.',
+        'Usuario que necesita criterio superior, operador serio o preparación real de transferencia.',
+      bestForShort:
+        'Casos complejos, operador serio y salida preparada.',
       valuePromise:
-        'No vende lujo ni más soporte. Vende una capa maestra de criterio, protección del sistema, activación avanzada y capacidad real para elevar proyectos complejos.',
+        'No vende lujo. Vende criterio, activación avanzada y mayor capacidad operativa.',
       features: [
         'Todo lo de Growth',
         'Activación avanzada',
-        'CRO, growth y monetización senior',
-        'Capacidad superior para operador o consultor',
-        'Preparación seria de salida o exportación',
-        'Prompt 99 y prompts maestros por rol',
-        'Mayor capacidad operativa dentro del sistema'
+        'Prompt 99 y capa maestra',
+        'Mayor capacidad operativa'
+      ],
+      billingHighlights: [
+        'Criterio maestro',
+        'Builder avanzado',
+        'Preparación de salida',
+        '600 créditos incluidos'
       ],
       promptLayer: {
         label: 'Prompt 99 y capa maestra',
         description:
-          'Desbloquea prompts maestros, estructuras por roles, criterio superior de sistema y una capa más fuerte de activación avanzada.'
+          'Desbloquea prompts maestros, estructuras por roles y criterio superior de sistema.'
       },
       prompts: [
         'Prompt 99',
@@ -327,7 +356,7 @@ const pricingContent = {
         'AI Solutions Architect / Strategist'
       ],
       perceptionGoal:
-        'Hacer sentir al usuario que entra en una capa de criterio fuerte, activación avanzada y capacidad superior, no en un premium decorativo.',
+        'Hacer sentir al usuario que entra en una capa de criterio fuerte y capacidad superior.',
       cta: {
         label: 'Acceder a AI Master 199',
         variant: 'strategic'
@@ -336,7 +365,7 @@ const pricingContent = {
       isStrategicPlan: true,
       visualRole: 'strategic',
       strategicRole: {
-        includedCredits: 'pending_numeric_lock',
+        includedCredits: 600,
         builderMode: 'advanced',
         exportPolicy: 'quoted_and_prioritized'
       }
@@ -350,16 +379,16 @@ const pricingContent = {
     strategicPlanId: 'premium',
     progressionModel: 'earned_or_direct',
     principle:
-      'El sistema debe ayudar al usuario a entrar, activar, construir, continuar y, si conviene, exportar.',
+      'El sistema debe ayudar al usuario a entrar, activar, continuar y, si conviene, preparar salida.',
     proToGrowth: {
       from: 'blueprint',
       to: 'sistema',
       narrative:
-        'El usuario puede entrar directamente a Growth, pero la narrativa principal debe mostrar que también puede llegar por madurez y necesidad de continuidad operativa real.',
+        'El usuario puede entrar directamente a Growth, pero la narrativa principal debe mostrar que también puede llegar por madurez y necesidad real de continuidad.',
       exactHandoffRuleV1: {
         ruleName: 'first_project_closed',
         description:
-          'La invitación principal al 79 € se activa cuando el usuario cierra su primera fase seria dentro del Pro y necesita más continuidad, construcción y créditos.',
+          'La invitación principal al 79 € se activa cuando el usuario cierra su primera fase seria dentro del Pro y necesita más continuidad y créditos.',
         stateWhenUnlocked: 'eligible_for_upgrade',
         activePlanRequired: 'blueprint',
         completedProjectsRequired: 1,
@@ -373,7 +402,7 @@ const pricingContent = {
 
   outputDoctrine: {
     principle:
-      'La IA no debe devolver informes blandos. Debe elevar percepción, detectar potencial real, activar una base de trabajo y preparar continuidad dentro del sistema.',
+      'La IA no debe devolver informes blandos. Debe detectar potencial real, activar base de trabajo y preparar continuidad dentro del sistema.',
     ideaAnalysis: {
       goals: [
         'Detectar potencial real',
@@ -398,7 +427,7 @@ const pricingContent = {
     },
     localBusinessUseCases: {
       principle:
-        'El sistema también debe servir para detectar oportunidades reales en negocios locales y convertirlas en propuestas accionables rápidas o en bases de reconstrucción vendibles.',
+        'El sistema también debe servir para detectar oportunidades reales en negocios locales y convertirlas en propuestas accionables rápidas o bases de reconstrucción vendibles.',
       examples: [
         'Restaurantes',
         'Peluquerías',
@@ -421,11 +450,11 @@ const pricingContent = {
 
   messagingRules: {
     free: 'Reducir fricción y abrir posibilidad.',
-    single_report: 'Convertir curiosidad en primera compra útil, sin darle protagonismo de sistema completo.',
-    blueprint: 'Presentarse como la entrada seria al sistema y a la activación base.',
-    sistema: 'Transmitir continuidad operativa, construcción con más recorrido y mejora real.',
+    single_report: 'Convertir curiosidad en primera compra útil.',
+    blueprint: 'Presentarse como la entrada seria al sistema.',
+    sistema: 'Transmitir continuidad operativa y construcción real.',
     premium:
-      'Transmitir activación avanzada, criterio maestro, complejidad superior y capacidad real para operador o salida seria.'
+      'Transmitir activación avanzada, criterio maestro y capacidad superior.'
   },
 
   comparisonRows: [
@@ -464,9 +493,9 @@ const pricingContent = {
       values: {
         single_report: 'No incluidos',
         free: 'No incluidos',
-        blueprint: 'Bolsa inicial',
-        sistema: 'Bolsa superior',
-        premium: 'Mayor capacidad'
+        blueprint: '60 incluidos',
+        sistema: '220 incluidos',
+        premium: '600 incluidos'
       }
     },
     {
@@ -475,7 +504,7 @@ const pricingContent = {
         single_report: 'No incluida',
         free: 'No incluida',
         blueprint: 'Valoración futura',
-        sistema: 'Valoración futura',
+        sistema: 'Valoración prioritaria',
         premium: 'Preparación seria'
       }
     }
@@ -484,9 +513,9 @@ const pricingContent = {
   trustSignals: [
     'Escalera de valor clara',
     'Activación como capa real del producto',
-    'Créditos preparados como economía operativa',
+    'Créditos visibles como capacidad operativa',
     'De idea o URL a base de trabajo accionable',
-    'Útil tanto para proyectos propios como para oportunidades de negocio real'
+    'Útil para proyecto propio u oportunidad real'
   ]
 };
 
