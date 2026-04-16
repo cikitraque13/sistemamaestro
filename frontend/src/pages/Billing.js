@@ -38,22 +38,34 @@ const PLAN_VISUAL_META = {
   free: {
     borderClass: 'border-white/5',
     badgeClass: 'bg-[#202020] text-[#D4D4D4]',
-    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]'
+    ctaClass: 'bg-[#262626] text-white hover:bg-[#363636]',
+    surfaceClass: 'bg-[#171717]',
+    eyebrow: 'Entrada',
+    accentLineClass: 'from-white/0 via-white/10 to-white/0'
   },
   blueprint: {
     borderClass: 'border-[#0F5257]',
     badgeClass: 'bg-[#0F5257] text-white',
-    ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]'
+    ctaClass: 'bg-[#0F5257] text-white hover:bg-[#136970]',
+    surfaceClass: 'bg-[linear-gradient(180deg,#171717_0%,#131a1b_100%)]',
+    eyebrow: 'Entrada seria',
+    accentLineClass: 'from-[#0F5257]/0 via-[#0F5257]/40 to-[#0F5257]/0'
   },
   sistema: {
     borderClass: 'border-[#2F455A]',
     badgeClass: 'bg-[#1A2430] text-[#D6E6F5]',
-    ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]'
+    ctaClass: 'bg-[#2A3F55] text-white hover:bg-[#355169]',
+    surfaceClass: 'bg-[linear-gradient(180deg,#171717_0%,#151a22_100%)]',
+    eyebrow: 'Continuidad operativa',
+    accentLineClass: 'from-[#2F455A]/0 via-[#2F455A]/35 to-[#2F455A]/0'
   },
   premium: {
     borderClass: 'border-[#4A3B61]',
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
-    ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]'
+    ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
+    surfaceClass: 'bg-[linear-gradient(180deg,#171717_0%,#181320_100%)]',
+    eyebrow: 'Capa superior',
+    accentLineClass: 'from-[#4A3B61]/0 via-[#4A3B61]/35 to-[#4A3B61]/0'
   }
 };
 
@@ -707,18 +719,18 @@ const Billing = () => {
               return (
                 <div
                   key={plan.id}
-                  className={`bg-[#171717] border rounded-2xl p-6 relative flex flex-col min-h-[620px] ${
+                  className={`relative overflow-hidden border rounded-2xl p-6 flex flex-col min-h-[680px] ${visual.surfaceClass} ${
                     isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
                   }`}
                   data-testid={`plan-card-${plan.id}`}
                 >
-                  <div className="min-h-[74px] mb-5 flex items-start">
+                  <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`} />
+
+                  <div className="min-h-[92px] mb-5 flex items-start">
                     <div className="flex flex-wrap gap-2">
-                      {plan.badge && (
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
-                          {plan.badge}
-                        </span>
-                      )}
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}>
+                        {plan.badge || visual.eyebrow}
+                      </span>
 
                       {isSuggestedPlan && !isCurrentPlan && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium">
@@ -731,21 +743,27 @@ const Billing = () => {
                           Actual
                         </span>
                       )}
+
+                      {plan.id === 'blueprint' && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/10 text-[#8DE1D0] text-xs font-medium">
+                          Entrada principal
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="min-h-[170px] mb-5">
+                  <div className="min-h-[176px] mb-5">
                     <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
                     <p className="text-[#F0F0F0] text-[15px] leading-snug mb-3">{plan.headline}</p>
                     <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
                   </div>
 
-                  <div className="min-h-[82px] flex items-end gap-2 mb-5">
+                  <div className="min-h-[88px] flex items-end gap-2 mb-5">
                     <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
                     <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
                   </div>
 
-                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4 min-h-[116px]">
+                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4 min-h-[122px]">
                     <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
                       Mejor encaje
                     </p>
@@ -754,22 +772,23 @@ const Billing = () => {
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4">
+                  <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4 mb-4 min-h-[192px]">
                     <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-3">
                       Marco operativo
                     </p>
-                    <div className="flex flex-wrap gap-2">
+
+                    <div className="grid grid-cols-2 gap-3">
                       {renderOperationalItems(plan).map((item) => {
                         const accent = getOperationalAccentClasses(item.label);
                         return (
                           <div
                             key={item.label}
-                            className={`rounded-full border px-3 py-2 ${accent.wrap}`}
+                            className={`rounded-xl border px-3 py-3 ${accent.wrap}`}
                           >
-                            <p className={`text-[10px] uppercase tracking-wide ${accent.label}`}>
+                            <p className={`text-[10px] uppercase tracking-wide mb-1 ${accent.label}`}>
                               {item.label}
                             </p>
-                            <p className={`text-xs ${accent.value}`}>{item.value}</p>
+                            <p className={`text-xs leading-relaxed ${accent.value}`}>{item.value}</p>
                           </div>
                         );
                       })}
@@ -845,7 +864,7 @@ const Billing = () => {
           className="mb-10"
           data-testid="entry-offer-card"
         >
-          <div className="bg-[#121212] border border-white/5 rounded-2xl p-6">
+          <div className="bg-[linear-gradient(180deg,#121212_0%,#111111_100%)] border border-white/5 rounded-2xl p-6">
             <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch">
               <div className="flex flex-col">
                 <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -862,6 +881,9 @@ const Billing = () => {
                 </h3>
                 <p className="text-[#D4D4D4] mb-4 max-w-2xl">
                   {selectedEntryOffer.description}
+                </p>
+                <p className="text-sm text-[#A3A3A3] mb-5 max-w-2xl">
+                  {selectedEntryOffer.valuePromise}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-auto">
@@ -887,12 +909,21 @@ const Billing = () => {
                   <span className="text-[#A3A3A3]">{selectedEntryOffer.periodLabel}</span>
                 </div>
 
-                <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-5">
+                <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-4">
                   <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
                     Rol dentro del sistema
                   </p>
                   <p className="text-sm text-white">
                     Puente transaccional antes de entrar en continuidad.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-amber-500/10 bg-[#111008] px-4 py-4 mb-5">
+                  <p className="text-[11px] uppercase tracking-wide text-amber-200/70 mb-1">
+                    Qué activa
+                  </p>
+                  <p className="text-sm text-[#E8E8E8]">
+                    Informe premium inicial, lectura más útil y primer paso accionable.
                   </p>
                 </div>
 
