@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Request
 
-from app.core.security import get_current_user
-from app.db.mongodb import db
-from app.domain.plans import ONE_TIME_OFFERS, PLANS
+from backend.app.core.security import get_current_user
+from backend.app.db.mongodb import db
+from backend.app.domain.plans import ONE_TIME_OFFERS, PLANS
 
 router = APIRouter(prefix="/api/user", tags=["billing"])
 
