@@ -20,3 +20,11 @@ PLANS = {
         "features": ["diagnosis", "route", "blueprint", "priorities", "continuity", "deployment", "support", "opportunities"]
     }
 }
+
+ONE_TIME_OFFERS = {
+    "single_report": {
+        "name": "Informe puntual",
+        "price": 6.99,
+        "description": "Informe inicial de validación y orientación"
+    }
+}
