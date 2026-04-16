@@ -12,7 +12,8 @@ import {
   TextAlignLeft,
   DiamondsFour,
   Flag,
-  Sparkle
+  Sparkle,
+  FileText
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
@@ -143,7 +144,7 @@ const SignalList = ({ title, items }) => (
       <ul className="space-y-2">
         {items.map((item, index) => (
           <li
-            key={`${title}-${index}-${item.substring(0, 24)}`}
+            key={`${title}-${index}-${String(item).substring(0, 24)}`}
             className="text-white text-sm flex items-start gap-2"
           >
             <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
@@ -434,14 +435,24 @@ const ProjectDetail = () => {
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 min-w-[270px]">
-                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                      Estado del informe
-                    </p>
-                    <p className="text-white">Base premium activa en proyecto</p>
-                    <p className="text-sm text-[#A3A3A3] mt-2">
-                      Preparado para evolucionar a PDF sin rehacer arquitectura.
-                    </p>
+                  <div className="flex flex-col gap-3 min-w-[270px]">
+                    <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
+                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                        Estado del informe
+                      </p>
+                      <p className="text-white">Base premium activa en proyecto</p>
+                      <p className="text-sm text-[#A3A3A3] mt-2">
+                        Preparado para evolucionar a PDF sin rehacer arquitectura.
+                      </p>
+                    </div>
+
+                    <Link
+                      to={`/dashboard/project/${project.project_id}/report-preview`}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#0F5257]/25 bg-[#0F5257]/10 px-4 py-3 text-[#8DE1D0] hover:bg-[#0F5257]/15 transition-colors"
+                    >
+                      <FileText size={18} />
+                      Vista previa PDF premium
+                    </Link>
                   </div>
                 </div>
 
