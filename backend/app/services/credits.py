@@ -25,7 +25,7 @@ async def ensure_user_credit_profile(user_id: str) -> Dict[str, int]:
         }
     )
 
-    if not user:
+    if user is None:
         raise ValueError("User not found")
 
     credit_balance = int(user.get("credit_balance", 0) or 0)
