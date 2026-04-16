@@ -3,18 +3,18 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from app.core.config import (
+from backend.app.core.config import (
     ALLOWED_ORIGINS,
     FRONTEND_BUILD_DIR,
     FRONTEND_STATIC_DIR,
 )
-from app.db.mongodb import client, db
-from app.routers.auth import router as auth_router
-from app.routers.projects import router as projects_router
-from app.routers.payments import router as payments_router
-from app.routers.billing import router as billing_router
-from app.routers.public import router as public_router
-from app.routers.opportunities import router as opportunities_router
+from backend.app.db.mongodb import client, db
+from backend.app.routers.auth import router as auth_router
+from backend.app.routers.projects import router as projects_router
+from backend.app.routers.payments import router as payments_router
+from backend.app.routers.billing import router as billing_router
+from backend.app.routers.public import router as public_router
+from backend.app.routers.opportunities import router as opportunities_router
 
 app = FastAPI(
     title="Sistema Maestro API",
