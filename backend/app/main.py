@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -15,6 +17,11 @@ from backend.app.routers.payments import router as payments_router
 from backend.app.routers.billing import router as billing_router
 from backend.app.routers.public import router as public_router
 from backend.app.routers.opportunities import router as opportunities_router
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI(
     title="Sistema Maestro API",
