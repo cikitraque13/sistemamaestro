@@ -9,6 +9,29 @@ from backend.app.core.config import OPENAI_API_KEY
 logger = logging.getLogger(__name__)
 
 
+def _clean_json_text(text: str) -> str:
+    cleaned = (text or "").strip()
+
+    if cleaned.startswith("```json"):
+        cleaned = cleaned[7:]
+    if cleaned.startswith("```"):
+        cleaned = cleaned[3:]
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+
+    return cleaned.strip()
+
+
+def _parse_ai_json(text: str) -> Dict[str, Any]:
+    cleaned = _clean_json_text(text)
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        logger.error("AI raw response was not valid JSON: %s", cleaned[:3000])
+        raise
+
+
 async def analyze_with_ai(
     input_type: str,
     input_content: str,
@@ -122,34 +145,37 @@ Devuelve un diagnóstico específico y útil, evitando generalidades."""
     try:
         response = await client_ai.chat.completions.create(
             model="gpt-4o",
+            response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=0.7,
+            temperature=0.2,
             max_tokens=2000,
         )
 
-        response_text = response.choices[0].message.content.strip()
+        response_text = response.choices[0].message.content or "{}"
+        parsed = _parse_ai_json(response_text)
 
-        if response_text.startswith("```json"):
-            response_text = response_text[7:]
-        if response_text.startswith("```"):
-            response_text = response_text[3:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
+        parsed.setdefault("route", "idea")
+        parsed.setdefault("diagnosis", {})
+        parsed["diagnosis"].setdefault("summary", "Sin resumen disponible.")
+        parsed["diagnosis"].setdefault("strengths", [])
+        parsed["diagnosis"].setdefault("weaknesses", [])
+        parsed["diagnosis"].setdefault("quick_wins", [])
+        parsed.setdefault("refine_questions", [])
 
-        return json.loads(response_text.strip())
+        return parsed
 
     except Exception:
         logger.exception("AI analysis error")
         return {
             "route": "idea",
             "diagnosis": {
-                "summary": "No se pudo completar el análisis automático. Revisa tu configuración de OpenAI.",
+                "summary": "No se pudo completar el análisis automático en este momento.",
                 "strengths": [],
                 "weaknesses": [],
-                "quick_wins": ["Verifica tu OPENAI_API_KEY"],
+                "quick_wins": ["Intenta de nuevo en unos minutos"],
             },
             "refine_questions": [],
         }
