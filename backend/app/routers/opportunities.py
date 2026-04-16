@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, Request
 
-from app.core.security import get_current_user
-from app.db.mongodb import db
-from app.domain.opportunities import OPPORTUNITIES
-from app.domain.plans import PLANS
+from backend.app.core.security import get_current_user
+from backend.app.domain.opportunities import OPPORTUNITIES
+from backend.app.domain.plans import PLANS
 
 router = APIRouter(prefix="/api/opportunities", tags=["opportunities"])
 
