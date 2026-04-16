@@ -3,13 +3,13 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Request
 
-from app.core.security import get_current_user
-from app.db.mongodb import db
-from app.schemas.projects import ProjectCreate, RefineInput
-from app.services.ai_analysis import analyze_with_ai
-from app.services.blueprint import generate_blueprint
-from app.services.plan_recommendation import build_plan_recommendation
-from app.services.url_analysis import fetch_and_analyze_url
+from backend.app.core.security import get_current_user
+from backend.app.db.mongodb import db
+from backend.app.schemas.projects import ProjectCreate, RefineInput
+from backend.app.services.ai_analysis import analyze_with_ai
+from backend.app.services.blueprint import generate_blueprint
+from backend.app.services.plan_recommendation import build_plan_recommendation
+from backend.app.services.url_analysis import fetch_and_analyze_url
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
