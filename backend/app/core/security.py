@@ -6,8 +6,8 @@ import bcrypt
 import jwt
 from fastapi import HTTPException, Request, Response
 
-from app.core.config import JWT_ALGORITHM, JWT_SECRET
-from app.db.mongodb import db
+from backend.app.core.config import JWT_ALGORITHM, JWT_SECRET
+from backend.app.db.mongodb import db
 
 
 def hash_password(password: str) -> str:
