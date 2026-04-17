@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -8,8 +7,6 @@ import {
   CreditCard,
   DiamondsFour,
   FileText,
-  Lightning,
-  Sparkle,
   WarningCircle
 } from '@phosphor-icons/react';
 import axios from 'axios';
@@ -21,9 +18,6 @@ import { entryOffer, pricingPlans } from '../../content/pricingContent';
 
 import {
   API_BASE,
-  CREDIT_NOTE,
-  CURRENT_PLAN_BADGE_STYLES,
-  FEATURE_LABELS,
   OPERATIONAL_NOTE,
   PLAN_SIGNAL_META,
   PLAN_VISUAL_META
@@ -32,15 +26,16 @@ import {
 import {
   buildOperationalItems,
   formatBillingDate,
-  formatCredits,
   getConceptLabel,
-  getCreditsLabel,
   getErrorMessage,
-  getOperationalAccentClasses,
   isValidCheckoutUrl
 } from './billing.utils';
 
-const OperationalGrid = ({ items }) => (
+import SuggestedPlanBanner from './components/SuggestedPlanBanner';
+import CreditSummaryCard from './components/CreditSummaryCard';
+import CurrentPlanCard from './components/CurrentPlanCard';
+
+const OperationalGrid = ({ items, getOperationalAccentClasses }) => (
   <div className="grid grid-cols-2 gap-3 auto-rows-fr">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
@@ -62,10 +57,49 @@ const OperationalGrid = ({ items }) => (
   </div>
 );
 
+const getOperationalAccentClasses = (label) => {
+  if (label === 'Créditos') {
+    return {
+      wrap: 'border-amber-500/20 bg-amber-500/5',
+      label: 'text-amber-200/70',
+      value: 'text-amber-300'
+    };
+  }
+
+  if (label === 'Activación') {
+    return {
+      wrap: 'border-[#0F5257]/20 bg-[#0F5257]/5',
+      label: 'text-[#8DE1D0]/75',
+      value: 'text-white'
+    };
+  }
+
+  if (label === 'Builder') {
+    return {
+      wrap: 'border-sky-500/15 bg-sky-500/5',
+      label: 'text-sky-200/70',
+      value: 'text-white'
+    };
+  }
+
+  if (label === 'Exportación') {
+    return {
+      wrap: 'border-white/5 bg-[#101010]',
+      label: 'text-[#8D8D8D]',
+      value: 'text-white'
+    };
+  }
+
+  return {
+    wrap: 'border-white/5 bg-[#101010]',
+    label: 'text-[#8D8D8D]',
+    value: 'text-white'
+  };
+};
+
 const BillingPage = () => {
   const { user, checkAuth } = useAuth();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams] = useState(() => new URLSearchParams(window.location.search));
 
   const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,9 +107,9 @@ const BillingPage = () => {
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
-  const suggestedPlanId = location.state?.suggestedPlan || null;
-  const fromProjectId = location.state?.fromProjectId || null;
-  const entryOfferId = location.state?.entryOfferId || null;
+  const suggestedPlanId = history.state?.usr?.suggestedPlan || null;
+  const fromProjectId = history.state?.usr?.fromProjectId || null;
+  const entryOfferId = history.state?.usr?.entryOfferId || null;
 
   const suggestedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.id === suggestedPlanId) || null,
@@ -257,7 +291,7 @@ const BillingPage = () => {
       pollPaymentStatus(sessionId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
   if (loading) {
     return (
@@ -297,252 +331,22 @@ const BillingPage = () => {
           </motion.div>
         )}
 
-        {suggestedPlan && (
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="card mb-8 border border-[#0F5257]/30"
-            data-testid="suggested-plan-banner"
-          >
-            <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-sm font-medium mb-4">
-                  <Lightning weight="fill" />
-                  Recomendación contextual
-                </div>
+        <SuggestedPlanBanner
+          suggestedPlan={suggestedPlan}
+          fromProjectId={fromProjectId}
+          userPlan={user?.plan}
+          processingKey={processingKey}
+          onPlanCheckout={handlePlanCheckout}
+        />
 
-                <h3 className="text-xl text-white font-medium mb-2">
-                  Plan sugerido: {suggestedPlan.visibleName}
-                </h3>
+        <CreditSummaryCard creditSummary={creditSummary} />
 
-                <p className="text-[#D4D4D4] mb-4">{suggestedPlan.valuePromise}</p>
-
-                <div className="grid sm:grid-cols-3 gap-3">
-                  {buildOperationalItems(suggestedPlan)
-                    .slice(0, 3)
-                    .map((item) => {
-                      const accent = getOperationalAccentClasses(item.label);
-
-                      return (
-                        <div
-                          key={item.label}
-                          className={`rounded-xl border px-4 py-4 ${accent.wrap}`}
-                        >
-                          <p className={`text-[11px] uppercase tracking-wide mb-1 ${accent.label}`}>
-                            {item.label}
-                          </p>
-                          <p className={`text-sm ${accent.value}`}>{item.value}</p>
-                        </div>
-                      );
-                    })}
-                </div>
-
-                {fromProjectId && (
-                  <div className="mt-4">
-                    <Link
-                      to={`/dashboard/project/${fromProjectId}`}
-                      className="text-[#0F5257] hover:text-[#1a7a80] text-sm transition-colors"
-                    >
-                      Volver al informe del proyecto
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-[#0A0A0A] border border-[#262626] rounded-xl p-5 flex flex-col">
-                <p className="text-sm text-[#A3A3A3] mb-1">Nivel sugerido</p>
-                <h4 className="text-2xl text-white font-medium mb-1">
-                  {suggestedPlan.visibleName}
-                </h4>
-                <p className="text-[#A3A3A3] mb-4">{suggestedPlan.headline}</p>
-
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-4xl font-light text-white">{suggestedPlan.priceLabel}</span>
-                  <span className="text-[#A3A3A3]">{suggestedPlan.periodLabel}</span>
-                </div>
-
-                <div className="rounded-xl border border-amber-500/15 bg-[#111008] px-4 py-4 mb-4">
-                  <p className="text-[11px] uppercase tracking-wide text-amber-200/70 mb-1">
-                    Créditos previstos
-                  </p>
-                  <p className="text-sm text-amber-300">
-                    {getCreditsLabel(suggestedPlan)}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => handlePlanCheckout(suggestedPlan.id)}
-                  disabled={
-                    user?.plan === suggestedPlan.id ||
-                    processingKey === `plan:${suggestedPlan.id}`
-                  }
-                  className={`w-full mt-auto py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                    user?.plan === suggestedPlan.id
-                      ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
-                      : 'btn-primary'
-                  } disabled:opacity-50`}
-                >
-                  {processingKey === `plan:${suggestedPlan.id}` ? (
-                    <div className="spinner w-4 h-4"></div>
-                  ) : user?.plan === suggestedPlan.id ? (
-                    'Plan actual'
-                  ) : (
-                    <>
-                      Activar {suggestedPlan.visibleName}
-                      <ArrowRight size={16} />
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {creditSummary?.enabled && (
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.02 }}
-            className="mb-8 rounded-2xl border border-amber-500/20 bg-[linear-gradient(180deg,#171717_0%,#14110a_100%)] px-6 py-6"
-            data-testid="credit-summary-card"
-          >
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-5">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                  <DiamondsFour size={24} className="text-amber-300" weight="fill" />
-                </div>
-                <div>
-                  <p className="text-sm text-amber-200/80 mb-1">Créditos del sistema</p>
-                  <h3 className="text-2xl text-white font-medium mb-1">
-                    Capacidad operativa activa
-                  </h3>
-                  <p className="text-[#C8C8C8] max-w-2xl">
-                    Los créditos pasan a mostrarse como recurso operativo central del sistema,
-                    no como nota secundaria.
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-amber-500/15 bg-[#0F0D08] px-4 py-4 min-w-[240px]">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                  Estado de microfase
-                </p>
-                <p className="text-sm text-white mb-2">Lectura visible ya integrada.</p>
-                <p className="text-xs text-[#A3A3A3] leading-relaxed">{CREDIT_NOTE}</p>
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-                  Saldo actual
-                </p>
-                <div className="flex items-end gap-2">
-                  <span className="text-4xl font-light text-white">
-                    {formatCredits(creditSummary.balance)}
-                  </span>
-                  <span className="text-sm text-amber-300 mb-1">créditos</span>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-                  Incluidos por plan
-                </p>
-                <div className="flex items-end gap-2">
-                  <span className="text-4xl font-light text-white">
-                    {formatCredits(creditSummary.included_credits_for_current_plan)}
-                  </span>
-                  <span className="text-sm text-amber-300 mb-1">incluidos</span>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-                  Históricos concedidos
-                </p>
-                <div className="flex items-end gap-2">
-                  <span className="text-4xl font-light text-white">
-                    {formatCredits(creditSummary.lifetime_granted)}
-                  </span>
-                  <span className="text-sm text-[#A3A3A3] mb-1">total</span>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/5 bg-[#0A0A0A] px-5 py-5">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-                  Históricos consumidos
-                </p>
-                <div className="flex items-end gap-2">
-                  <span className="text-4xl font-light text-white">
-                    {formatCredits(creditSummary.lifetime_used)}
-                  </span>
-                  <span className="text-sm text-[#A3A3A3] mb-1">total</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card mb-8"
-          data-testid="current-plan"
-        >
-          <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-6">
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-[#0F5257]/20 rounded-lg">
-                  <Sparkle size={24} className="text-[#0F5257]" />
-                </div>
-                <div>
-                  <p className="text-sm text-[#A3A3A3]">Plan actual</p>
-                  <h3 className="text-2xl text-white font-medium capitalize">
-                    {currentPlanName}
-                  </h3>
-                </div>
-              </div>
-
-              {currentPlanDefinition?.headline && (
-                <p className="text-[#D4D4D4] mb-4">{currentPlanDefinition.headline}</p>
-              )}
-
-              {billingData?.current_plan?.features && (
-                <div className="flex flex-wrap gap-2">
-                  {billingData.current_plan.features.map((feature) => (
-                    <span
-                      key={feature}
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        CURRENT_PLAN_BADGE_STYLES[feature] ||
-                        'bg-[#262626] text-[#A3A3A3]'
-                      }`}
-                    >
-                      {FEATURE_LABELS[feature] || feature}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-xl border border-white/5 bg-[#111111] px-5 py-5">
-              <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-4">
-                Marco operativo del plan
-              </p>
-
-              <OperationalGrid
-                items={buildOperationalItems(
-                  currentPlanDefinition,
-                  currentPlanIncludedCredits
-                )}
-              />
-
-              <p className="text-xs text-[#A3A3A3] mt-4 leading-relaxed">
-                {OPERATIONAL_NOTE}
-              </p>
-            </div>
-          </div>
-        </motion.div>
+        <CurrentPlanCard
+          currentPlanDefinition={currentPlanDefinition}
+          currentPlanIncludedCredits={currentPlanIncludedCredits}
+          currentPlanName={currentPlanName}
+          currentPlanFeatures={billingData?.current_plan?.features}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -652,7 +456,10 @@ const BillingPage = () => {
                         Marco operativo
                       </p>
 
-                      <OperationalGrid items={buildOperationalItems(plan)} />
+                      <OperationalGrid
+                        items={buildOperationalItems(plan)}
+                        getOperationalAccentClasses={getOperationalAccentClasses}
+                      />
                     </div>
 
                     <div className="flex flex-col gap-4">
@@ -919,4 +726,4 @@ const BillingPage = () => {
   );
 };
 
-export default Billing;
+export default BillingPage;
