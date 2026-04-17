@@ -17,7 +17,8 @@ import {
 import axios from 'axios';
 import { toast } from 'sonner';
 import DashboardLayout from '../components/DashboardLayout';
-import PremiumReportPdfTemplate from '../components/reports/PremiumReportPdfTemplate';
+import PremiumReportScreenTemplate from '../components/reports/premium/screen/PremiumReportScreenTemplate';
+import PremiumReportPrintTemplate from '../components/reports/premium/print/PremiumReportPrintTemplate';
 import { useAuth } from '../context/AuthContext';
 
 const API_BASE = '/api';
@@ -132,7 +133,7 @@ const ReportPreview = () => {
     setTimeout(() => {
       window.print();
       setTimeout(restoreState, 1200);
-    }, 80);
+    }, 120);
   };
 
   if (loading) {
@@ -178,7 +179,7 @@ const ReportPreview = () => {
 
           html,
           body {
-            background: #0A0A0A !important;
+            background: #ffffff !important;
             print-color-adjust: exact;
             -webkit-print-color-adjust: exact;
           }
@@ -187,20 +188,6 @@ const ReportPreview = () => {
             display: none !important;
           }
 
-          ${!canExportPdf ? `
-          body * {
-            visibility: hidden !important;
-          }
-
-          body::before {
-            content: "La exportación PDF está bloqueada para este usuario.";
-            display: block;
-            visibility: visible !important;
-            color: white;
-            font-size: 18px;
-            padding: 48px;
-          }
-          ` : `
           body * {
             visibility: hidden !important;
           }
@@ -218,13 +205,14 @@ const ReportPreview = () => {
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
+            background: #ffffff !important;
           }
 
           #print-report-root .report-print-frame {
             margin: 0 !important;
             padding: 0 !important;
+            background: #ffffff !important;
           }
-          `}
         }
       `}</style>
 
@@ -453,14 +441,25 @@ const ReportPreview = () => {
               </>
             )}
 
-            <div id="print-report-root">
-              <div className="report-print-frame">
-                <PremiumReportPdfTemplate
-                  project={project}
-                  brandName="Sistema Maestro"
-                  documentTitle="Informe Puntual"
-                  showSystemFooter={true}
-                />
+            <div className="relative z-[1]">
+              <PremiumReportScreenTemplate
+                project={project}
+                brandName="Sistema Maestro"
+                documentTitle="Informe Puntual"
+                showSystemFooter={true}
+              />
+            </div>
+
+            <div className="h-0 overflow-hidden" aria-hidden="true">
+              <div id="print-report-root">
+                <div className="report-print-frame">
+                  <PremiumReportPrintTemplate
+                    project={project}
+                    brandName="Sistema Maestro"
+                    documentTitle="Informe Puntual"
+                    showSystemFooter={true}
+                  />
+                </div>
               </div>
             </div>
           </div>
