@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import ReportPreview from './pages/ReportPreview';
+import ReportPrintPage from './pages/ReportPrintPage';
 import Opportunities from './pages/Opportunities';
 import Billing from './pages/Billing';
 import Settings from './pages/Settings';
@@ -66,6 +67,7 @@ const AppRouter = () => {
       <Route path="/dashboard/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id/report-preview" element={<ProtectedRoute><ReportPreview /></ProtectedRoute>} />
+      <Route path="/dashboard/project/:id/report-print" element={<ProtectedRoute><ReportPrintPage /></ProtectedRoute>} />
       <Route path="/dashboard/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
       <Route path="/dashboard/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
