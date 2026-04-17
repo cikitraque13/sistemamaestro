@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   CheckCircle,
@@ -267,6 +268,7 @@ const FlowResultStep = ({
             <button
               onClick={onPlayDiagnosis}
               disabled={typeof onPlayDiagnosis !== 'function'}
+             ={typeof onPlayDiagnosis !== 'function'}
               className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all disabled:opacity-50 ${
                 isSpeaking
                   ? 'bg-[#0F5257] text-white'
