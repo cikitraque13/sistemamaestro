@@ -21,52 +21,52 @@ const ROUTE_NAMES = {
 const DIMENSION_STATUS_META = {
   strong: {
     label: 'Fuerte',
-    badgeClass: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20',
-    cardClass: 'border-emerald-500/20 bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(10,10,10,1))]'
+    badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    cardClass: 'border-emerald-200 bg-emerald-50'
   },
   improvable: {
     label: 'Mejorable',
-    badgeClass: 'bg-sky-500/10 text-sky-300 border border-sky-500/20',
-    cardClass: 'border-sky-500/20 bg-[linear-gradient(180deg,rgba(14,165,233,0.06),rgba(10,10,10,1))]'
+    badgeClass: 'bg-sky-50 text-sky-700 border border-sky-200',
+    cardClass: 'border-sky-200 bg-sky-50'
   },
   priority: {
     label: 'Prioritario',
-    badgeClass: 'bg-amber-500/15 text-amber-300 border border-amber-500/20',
-    cardClass: 'border-amber-500/20 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(10,10,10,1))]'
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200',
+    cardClass: 'border-amber-200 bg-amber-50'
   }
 };
 
 const PRIORITY_META = {
   high: {
     label: 'Alta',
-    badgeClass: 'bg-amber-500/15 text-amber-300'
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200'
   },
   medium: {
     label: 'Media',
-    badgeClass: 'bg-[#262626] text-[#D4D4D4]'
+    badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200'
   },
   low: {
     label: 'Baja',
-    badgeClass: 'bg-[#1B2A20] text-[#8BE3A1]'
+    badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200'
   }
 };
 
 const CONTINUITY_META = {
   stay: {
     label: 'Seguir analizando',
-    badgeClass: 'bg-[#262626] text-[#D4D4D4]'
+    badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200'
   },
   blueprint: {
     label: 'Entrar en Pro',
-    badgeClass: 'bg-[#0F5257]/20 text-[#8DE1D0]'
+    badgeClass: 'bg-teal-50 text-teal-700 border border-teal-200'
   },
   sistema: {
     label: 'Entrar en Growth',
-    badgeClass: 'bg-amber-500/20 text-amber-300'
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200'
   },
   premium: {
     label: 'Acceder a AI Master 199',
-    badgeClass: 'bg-fuchsia-500/20 text-fuchsia-300'
+    badgeClass: 'bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200'
   }
 };
 
@@ -199,23 +199,23 @@ const getGridClass = (count) => {
   return 'md:grid-cols-3';
 };
 
-const PdfSection = ({ page, title, icon, children, noBorder = false }) => (
+const PdfSection = ({ label, title, icon, children, noBorder = false }) => (
   <section
-    className={`px-8 py-8 sm:px-10 sm:py-9 ${noBorder ? '' : 'border-b border-white/5'}`}
+    className={`pdf-section px-8 py-8 sm:px-10 sm:py-9 ${noBorder ? '' : 'border-t border-slate-200'}`}
     style={{ pageBreakInside: 'avoid' }}
   >
-    {(page || title) && (
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    {(label || title) && (
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div className="flex items-center gap-2">
           {icon}
-          <h2 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
             {title}
           </h2>
         </div>
 
-        {page && (
-          <div className="inline-flex items-center self-start px-3 py-1 rounded-full bg-[#141414] border border-white/5 text-[11px] uppercase tracking-wide text-[#A3A3A3]">
-            {page}
+        {label && (
+          <div className="inline-flex items-center self-start px-3 py-1 rounded-full border border-slate-200 bg-slate-50 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">
+            {label}
           </div>
         )}
       </div>
@@ -227,35 +227,40 @@ const PdfSection = ({ page, title, icon, children, noBorder = false }) => (
 
 const SnapshotCard = ({ eyebrow, value, accent = 'default' }) => {
   const accentMap = {
-    teal: 'border-[#0F5257]/20 bg-[#0F5257]/8 text-[#8DE1D0]',
-    amber: 'border-amber-500/20 bg-amber-500/8 text-amber-300',
-    violet: 'border-fuchsia-500/20 bg-fuchsia-500/8 text-fuchsia-300',
-    default: 'border-white/5 bg-[#0A0A0A] text-white'
+    teal: 'border-teal-200 bg-teal-50',
+    amber: 'border-amber-200 bg-amber-50',
+    violet: 'border-fuchsia-200 bg-fuchsia-50',
+    default: 'border-slate-200 bg-slate-50'
   };
 
-  const accentClass = accentMap[accent] || accentMap.default;
-
   return (
-    <div className={`rounded-xl border p-5 ${accentClass}`} style={{ pageBreakInside: 'avoid' }}>
-      <p className="text-[11px] uppercase tracking-wide mb-2 opacity-80">{eyebrow}</p>
-      <p className="text-white font-medium leading-relaxed">{value}</p>
+    <div
+      className={`pdf-card rounded-2xl border p-5 ${accentMap[accent] || accentMap.default}`}
+      style={{ pageBreakInside: 'avoid' }}
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+        {eyebrow}
+      </p>
+      <p className="text-slate-900 font-medium leading-relaxed">
+        {value}
+      </p>
     </div>
   );
 };
 
 const SignalList = ({ title, items }) => (
   <div
-    className="bg-[#0A0A0A] rounded-xl p-4 border border-white/5"
+    className="pdf-signal-list rounded-2xl border border-slate-200 bg-white p-4"
     style={{ pageBreakInside: 'avoid' }}
   >
-    <p className="text-sm text-[#A3A3A3] mb-3">{title}</p>
+    <p className="text-sm font-medium text-slate-700 mb-3">{title}</p>
     <ul className="space-y-2">
       {items.map((item, index) => (
         <li
           key={`${title}-${index}-${String(item).substring(0, 24)}`}
-          className="text-white text-sm flex items-start gap-2"
+          className="text-slate-700 text-sm flex items-start gap-2"
         >
-          <CheckCircle size={14} className="text-[#0F5257] mt-1 flex-shrink-0" />
+          <CheckCircle size={14} className="text-teal-600 mt-1 flex-shrink-0" weight="fill" />
           <span>{item}</span>
         </li>
       ))}
@@ -466,8 +471,13 @@ const PremiumReportPdfTemplate = ({
   }, [reportView]);
 
   const continuityPath = reportView?.continuityRecommendation?.recommended_path || null;
-  const continuityMeta = continuityPath
-    ? (CONTINUITY_META[continuityPath] || CONTINUITY_META.stay)
+  const continuityMeta = reportView?.continuityRecommendation
+    ? (
+        CONTINUITY_META[continuityPath] || {
+          label: 'Continuidad recomendada',
+          badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200'
+        }
+      )
     : null;
 
   const heroCards = useMemo(() => {
@@ -541,17 +551,17 @@ const PremiumReportPdfTemplate = ({
     return sections;
   }, [reportView, signalGroups]);
 
-  const pageMap = useMemo(() => {
+  const sectionMap = useMemo(() => {
     const map = {};
     visibleSections.forEach((section, index) => {
-      map[section] = `Página ${index + 1}`;
+      map[section] = `Bloque ${index + 1}`;
     });
     return map;
   }, [visibleSections]);
 
   if (!project || !reportView) {
     return (
-      <div className="max-w-[920px] mx-auto rounded-2xl border border-white/5 bg-[#111111] p-8 text-white">
+      <div className="max-w-[920px] mx-auto rounded-2xl border border-slate-200 bg-white p-8 text-slate-800">
         No hay datos suficientes para renderizar el informe.
       </div>
     );
@@ -559,55 +569,99 @@ const PremiumReportPdfTemplate = ({
 
   return (
     <div className="max-w-[920px] mx-auto">
-      <div className="bg-[#0A0A0A] text-white rounded-[28px] overflow-hidden border border-white/5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
-        <PdfSection page={pageMap.hero} noBorder>
-          <div className="pb-8 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.16),transparent_35%)] -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9">
+      <style>{`
+        @media print {
+          #print-report-root,
+          #print-report-root * {
+            color: inherit !important;
+          }
+
+          .pdf-document-shell {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            max-width: none !important;
+            margin: 0 !important;
+            overflow: visible !important;
+          }
+
+          .pdf-hero-band,
+          .pdf-card,
+          .pdf-signal-list,
+          .pdf-soft-card,
+          .pdf-meta-card,
+          .pdf-context-card,
+          .pdf-footer-card {
+            background: #ffffff !important;
+            box-shadow: none !important;
+          }
+
+          .pdf-section,
+          .pdf-card,
+          .pdf-signal-list,
+          .pdf-soft-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+        }
+      `}</style>
+
+      <div className="pdf-document-shell bg-white text-slate-900 rounded-[28px] overflow-hidden border border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
+        <PdfSection label={sectionMap.hero} noBorder>
+          <div className="pdf-hero-band pb-8 border-b border-slate-200 -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9 bg-[linear-gradient(180deg,#F8FAFC_0%,#FFFFFF_100%)]">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-sm font-medium mb-4">
-                  <Sparkle weight="fill" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 text-sm font-medium mb-4">
+                  <Sparkle size={14} weight="fill" />
                   {documentTitle}
                 </div>
 
-                <h1 className="text-3xl sm:text-[2.3rem] font-light text-white mb-3 leading-tight">
+                <h1 className="text-3xl sm:text-[2.3rem] font-semibold text-slate-900 mb-3 leading-tight">
                   Lectura premium estructurada
                 </h1>
 
-                <p className="text-[#CFCFCF] max-w-3xl leading-relaxed">
-                  Validación breve y accionable para entender el caso, detectar la fricción principal
-                  y ordenar el siguiente paso correcto dentro del sistema.
+                <p className="text-slate-600 max-w-3xl leading-relaxed">
+                  Vista base del informe canónico: comprensión, diagnóstico central,
+                  dimensiones, prioridades y recomendación de continuidad.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5 min-w-[260px]">
-                <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+              <div className="pdf-meta-card rounded-2xl border border-slate-200 bg-white px-5 py-5 min-w-[260px]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-1">
                   Documento
                 </p>
-                <p className="text-white font-medium mb-3">{brandName}</p>
+                <p className="text-slate-900 font-medium mb-3">{brandName}</p>
 
                 <div className="space-y-2 text-sm">
-                  <p className="text-[#D4D4D4]">
-                    <span className="text-[#A3A3A3]">Fecha:</span> {issueDate || 'Sin fecha'}
+                  <p className="text-slate-700">
+                    <span className="text-slate-500">Fecha:</span> {issueDate || 'Sin fecha'}
                   </p>
-                  <p className="text-[#D4D4D4]">
-                    <span className="text-[#A3A3A3]">Ruta:</span> {routeLabel}
+                  <p className="text-slate-700">
+                    <span className="text-slate-500">Ruta:</span> {routeLabel}
                   </p>
-                  <p className="text-[#D4D4D4]">
-                    <span className="text-[#A3A3A3]">Entrada:</span>{' '}
-                    {project.input_type === 'url' ? 'URL' : 'Descripción'}
+                  <p className="text-slate-700">
+                    <span className="text-slate-500">Entrada:</span>{' '}
+                    {project.input_type === 'url' ? 'URL' : 'Idea / descripción'}
                   </p>
+                  {project.project_id && (
+                    <p className="text-slate-700 break-all">
+                      <span className="text-slate-500">Proyecto:</span> {project.project_id}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
             <div
-              className="rounded-2xl border border-white/5 bg-[#0A0A0A] p-5 mb-6"
+              className="pdf-context-card rounded-2xl border border-slate-200 bg-white p-5 mb-6"
               style={{ pageBreakInside: 'avoid' }}
             >
-              <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
                 Contexto analizado
               </p>
-              <p className="text-white leading-relaxed break-words">{project.input_content}</p>
+              <p className="text-slate-800 leading-relaxed break-words">{project.input_content}</p>
             </div>
 
             {heroCards.length > 0 && (
@@ -627,18 +681,22 @@ const PremiumReportPdfTemplate = ({
 
         {visibleSections.includes('summary') && (
           <PdfSection
-            page={pageMap.summary}
+            label={sectionMap.summary}
             title="Resumen ejecutivo"
-            icon={<DiamondsFour size={18} className="text-amber-300" weight="fill" />}
+            icon={<DiamondsFour size={18} className="text-amber-600" weight="fill" />}
           >
             {reportView.executiveCards.length > 0 && (
               <div className="grid md:grid-cols-2 gap-4">
                 {reportView.executiveCards.map((item) => (
-                  <div key={item.key} className="bg-[#0A0A0A] rounded-xl p-5 border border-white/5">
-                    <p className="text-xs text-[#A3A3A3] mb-2 uppercase tracking-wide">
+                  <div
+                    key={item.key}
+                    className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5"
+                    style={{ pageBreakInside: 'avoid' }}
+                  >
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
                       {item.label}
                     </p>
-                    <p className="text-white">{item.value}</p>
+                    <p className="text-slate-800 leading-relaxed">{item.value}</p>
                   </div>
                 ))}
               </div>
@@ -647,8 +705,8 @@ const PremiumReportPdfTemplate = ({
             {reportView.coreDiagnosisCards.length > 0 && (
               <div className={`${reportView.executiveCards.length > 0 ? 'mt-6' : ''}`}>
                 <div className="flex items-center gap-2 mb-4">
-                  <Lightning size={18} className="text-[#8DE1D0]" weight="fill" />
-                  <h3 className="text-sm uppercase tracking-wide text-[#A3A3A3]">
+                  <Lightning size={18} className="text-teal-600" weight="fill" />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                     Diagnóstico central
                   </h3>
                 </div>
@@ -657,24 +715,28 @@ const PremiumReportPdfTemplate = ({
                   {reportView.coreDiagnosisCards.map((item) => {
                     const accentClass =
                       item.accent === 'teal'
-                        ? 'border-[#0F5257]/20 bg-[#0F5257]/8'
+                        ? 'border-teal-200 bg-teal-50'
                         : item.accent === 'amber'
-                          ? 'border-amber-500/20 bg-amber-500/8'
-                          : 'border-white/5 bg-[#0A0A0A]';
+                          ? 'border-amber-200 bg-amber-50'
+                          : 'border-slate-200 bg-slate-50';
 
                     const eyebrowClass =
                       item.accent === 'teal'
-                        ? 'text-[#8DE1D0]'
+                        ? 'text-teal-700'
                         : item.accent === 'amber'
-                          ? 'text-amber-300'
-                          : 'text-[#A3A3A3]';
+                          ? 'text-amber-700'
+                          : 'text-slate-500';
 
                     return (
-                      <div key={item.key} className={`rounded-xl p-5 border ${accentClass}`}>
-                        <p className={`text-xs mb-2 uppercase tracking-wide ${eyebrowClass}`}>
+                      <div
+                        key={item.key}
+                        className={`pdf-card rounded-2xl border p-5 ${accentClass}`}
+                        style={{ pageBreakInside: 'avoid' }}
+                      >
+                        <p className={`text-[11px] font-semibold uppercase tracking-[0.16em] mb-2 ${eyebrowClass}`}>
                           {item.label}
                         </p>
-                        <p className="text-white font-medium">{item.value}</p>
+                        <p className="text-slate-900 font-medium leading-relaxed">{item.value}</p>
                       </div>
                     );
                   })}
@@ -686,18 +748,18 @@ const PremiumReportPdfTemplate = ({
 
         {visibleSections.includes('dimensions') && (
           <PdfSection
-            page={pageMap.dimensions}
+            label={sectionMap.dimensions}
             title="Lectura por dimensiones"
-            icon={<Flag size={18} className="text-[#8DE1D0]" weight="fill" />}
+            icon={<Flag size={18} className="text-teal-600" weight="fill" />}
           >
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.strong.badgeClass}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${DIMENSION_STATUS_META.strong.badgeClass}`}>
                 {dimensionCounters.strong} fuertes
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.improvable.badgeClass}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${DIMENSION_STATUS_META.improvable.badgeClass}`}>
                 {dimensionCounters.improvable} mejorables
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs ${DIMENSION_STATUS_META.priority.badgeClass}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${DIMENSION_STATUS_META.priority.badgeClass}`}>
                 {dimensionCounters.priority} prioritarias
               </span>
             </div>
@@ -712,21 +774,21 @@ const PremiumReportPdfTemplate = ({
                 return (
                   <div
                     key={dimension.id}
-                    className={`rounded-xl border p-4 ${statusMeta.cardClass}`}
+                    className={`pdf-card rounded-2xl border p-4 ${statusMeta.cardClass}`}
                     style={{ pageBreakInside: 'avoid' }}
                   >
                     <div className="flex items-start justify-between gap-2 mb-3">
-                      <p className="text-white font-medium">{dimension.label}</p>
-                      <span className={`px-2 py-1 rounded-full text-[11px] ${statusMeta.badgeClass}`}>
+                      <p className="text-slate-900 font-medium">{dimension.label}</p>
+                      <span className={`px-2 py-1 rounded-full text-[11px] font-medium ${statusMeta.badgeClass}`}>
                         {statusMeta.label}
                       </span>
                     </div>
 
-                    <p className="text-sm text-[#D4D4D4] leading-relaxed mb-4">
+                    <p className="text-sm text-slate-700 leading-relaxed mb-4">
                       {dimension.reading}
                     </p>
 
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] ${priorityMeta.badgeClass}`}>
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] font-medium ${priorityMeta.badgeClass}`}>
                       Prioridad {priorityMeta.label.toLowerCase()}
                     </span>
                   </div>
@@ -738,9 +800,9 @@ const PremiumReportPdfTemplate = ({
 
         {visibleSections.includes('actions') && (
           <PdfSection
-            page={pageMap.actions}
+            label={sectionMap.actions}
             title="Acciones prioritarias"
-            icon={<CheckCircle size={18} className="text-[#8DE1D0]" weight="fill" />}
+            icon={<CheckCircle size={18} className="text-teal-600" weight="fill" />}
           >
             {reportView.priorityActions.length > 0 && (
               <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -751,21 +813,21 @@ const PremiumReportPdfTemplate = ({
                   return (
                     <div
                       key={action.id || `${action.title}-${index}`}
-                      className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                      className="pdf-card rounded-2xl border border-slate-200 bg-white p-5"
                       style={{ pageBreakInside: 'avoid' }}
                     >
                       <div className="flex items-center justify-between gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] flex items-center justify-center text-sm font-medium">
+                        <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center text-sm font-semibold">
                           {index + 1}
                         </div>
-                        <span className={`px-2.5 py-1 rounded-full text-[11px] ${intensityMeta.badgeClass}`}>
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-medium ${intensityMeta.badgeClass}`}>
                           {intensityMeta.label}
                         </span>
                       </div>
 
-                      <p className="text-white font-medium mb-2">{action.title}</p>
+                      <p className="text-slate-900 font-medium mb-2 leading-relaxed">{action.title}</p>
                       {isMeaningfulText(action.why_it_matters) && (
-                        <p className="text-sm text-[#D4D4D4] leading-relaxed">
+                        <p className="text-sm text-slate-700 leading-relaxed">
                           {action.why_it_matters}
                         </p>
                       )}
@@ -777,19 +839,19 @@ const PremiumReportPdfTemplate = ({
 
             {reportView.immediateAction && (
               <div
-                className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                className="pdf-soft-card rounded-2xl border border-slate-200 bg-slate-50 p-5"
                 style={{ pageBreakInside: 'avoid' }}
               >
-                <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
                   Acción inmediata
                 </p>
 
-                <p className="text-white font-medium mb-2">
+                <p className="text-slate-900 font-medium mb-2">
                   {reportView.immediateAction.title}
                 </p>
 
                 {isMeaningfulText(reportView.immediateAction.description) && (
-                  <p className="text-[#D4D4D4] leading-relaxed">
+                  <p className="text-slate-700 leading-relaxed">
                     {reportView.immediateAction.description}
                   </p>
                 )}
@@ -800,7 +862,7 @@ const PremiumReportPdfTemplate = ({
 
         {visibleSections.includes('closing') && (
           <PdfSection
-            page={pageMap.closing}
+            label={sectionMap.closing}
             title={
               reportView.continuityRecommendation && signalGroups.length > 0
                 ? 'Continuidad y señales complementarias'
@@ -808,32 +870,32 @@ const PremiumReportPdfTemplate = ({
                   ? 'Continuidad recomendada'
                   : 'Señales complementarias'
             }
-            icon={<Sparkle size={18} className="text-[#8DE1D0]" weight="fill" />}
+            icon={<Sparkle size={18} className="text-teal-600" weight="fill" />}
           >
             <div className={`grid gap-4 ${reportView.continuityRecommendation && signalGroups.length > 0 ? 'lg:grid-cols-[1.05fr_0.95fr]' : 'grid-cols-1'}`}>
-              {reportView.continuityRecommendation && (
+              {reportView.continuityRecommendation && continuityMeta && (
                 <div
-                  className="rounded-xl border border-[#0F5257]/20 bg-[#0F5257]/8 p-5"
+                  className="pdf-soft-card rounded-2xl border border-teal-200 bg-teal-50 p-5"
                   style={{ pageBreakInside: 'avoid' }}
                 >
                   <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <span className={`px-3 py-1 rounded-full text-sm ${continuityMeta.badgeClass}`}>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${continuityMeta.badgeClass}`}>
                       {continuityMeta.label}
                     </span>
                   </div>
 
                   {isMeaningfulText(reportView.continuityRecommendation.reason) && (
-                    <p className="text-white leading-relaxed mb-4">
+                    <p className="text-slate-800 leading-relaxed mb-4">
                       {reportView.continuityRecommendation.reason}
                     </p>
                   )}
 
                   {isMeaningfulText(reportView.continuityRecommendation.cta_label) && (
-                    <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
-                      <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-1">
                         CTA de continuidad
                       </p>
-                      <p className="text-white">
+                      <p className="text-slate-900">
                         {reportView.continuityRecommendation.cta_label}
                       </p>
                     </div>
@@ -843,10 +905,10 @@ const PremiumReportPdfTemplate = ({
 
               {signalGroups.length > 0 && (
                 <div
-                  className="rounded-xl border border-white/5 bg-[#0A0A0A] p-5"
+                  className="pdf-soft-card rounded-2xl border border-slate-200 bg-slate-50 p-5"
                   style={{ pageBreakInside: 'avoid' }}
                 >
-                  <p className="text-sm uppercase tracking-wide text-[#A3A3A3] mb-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
                     Señales complementarias
                   </p>
 
@@ -861,15 +923,15 @@ const PremiumReportPdfTemplate = ({
 
             {continuityMeta?.label && (
               <div
-                className="rounded-2xl border border-white/5 bg-[#111111] px-5 py-5 mt-6"
+                className="pdf-footer-card rounded-2xl border border-slate-200 bg-white px-5 py-5 mt-6"
                 style={{ pageBreakInside: 'avoid' }}
               >
-                <p className="text-white leading-relaxed">
+                <p className="text-slate-800 leading-relaxed">
                   Con esta lectura ya puedes ver el caso con más claridad.
                   {reportView.continuityRecommendation ? (
                     <>
                       {' '}Si quieres activarlo dentro del sistema, el siguiente paso correcto es{' '}
-                      <span className="text-[#8DE1D0] font-medium">{continuityMeta.label}</span>.
+                      <span className="text-teal-700 font-semibold">{continuityMeta.label}</span>.
                     </>
                   ) : (
                     <>
@@ -883,12 +945,12 @@ const PremiumReportPdfTemplate = ({
         )}
 
         {showSystemFooter && (
-          <div className="px-8 py-5 sm:px-10 border-t border-white/5 bg-[#0B0B0B]">
+          <div className="px-8 py-5 sm:px-10 border-t border-slate-200 bg-slate-50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
-              <p className="text-[#D4D4D4]">
+              <p className="text-slate-700">
                 {brandName} · Validación breve y accionable
               </p>
-              <p className="text-[#A3A3A3]">
+              <p className="text-slate-500">
                 Documento preparado para vista premium y futura exportación PDF
               </p>
             </div>
