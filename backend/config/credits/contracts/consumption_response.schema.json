@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "consumption_response.schema.json",
+  "title": "ConsumptionResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "action_key",
+    "mode",
+    "decision",
+    "gates",
+    "ux",
+    "trace"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "allowed",
+        "blocked_plan",
+        "blocked_balance",
+        "blocked_special_credit",
+        "blocked_invalid_action"
+      ]
+    },
+    "action_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["simulate", "execute"]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumption_type",
+        "consumption_amount"
+      ],
+      "properties": {
+        "base_tier": {
+          "type": ["string", "null"],
+          "enum": ["T1", "T2", "T3", null]
+        },
+        "final_tier": {
+          "type": ["string", "null"],
+          "enum": ["T1", "T2", "T3", null]
+        },
+        "decision_mode": {
+          "type": ["string", "null"],
+          "enum": [
+            "base",
+            "reinforced",
+            "escalated",
+            "special_gated",
+            null
+          ]
+        },
+        "consumption_type": {
+          "type": "string",
+          "enum": ["none", "standard", "special"]
+        },
+        "consumption_amount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scale_reason": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_gate_triggered",
+        "balance_gate_triggered",
+        "special_credit_gate_triggered"
+      ],
+      "properties": {
+        "plan_gate_triggered": {
+          "type": "boolean"
+        },
+        "balance_gate_triggered": {
+          "type": "boolean"
+        },
+        "special_credit_gate_triggered": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ux": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ux_label",
+        "message"
+      ],
+      "properties": {
+        "ux_label": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "next_step_hint": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine_version",
+        "catalog_version",
+        "scores_snapshot",
+        "repetition_snapshot"
+      ],
+      "properties": {
+        "trace_id": {
+          "type": ["string", "null"]
+        },
+        "engine_version": {
+          "type": "string"
+        },
+        "catalog_version": {
+          "type": "string"
+        },
+        "scores_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "project_complexity_score",
+            "journey_depth_score",
+            "output_value_score",
+            "operational_cost_score"
+          ],
+          "properties": {
+            "project_complexity_score": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "journey_depth_score": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "output_value_score": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "operational_cost_score": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            }
+          }
+        },
+        "repetition_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "action_count_in_session",
+            "action_count_on_project"
+          ],
+          "properties": {
+            "action_count_in_session": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "action_count_on_project": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
