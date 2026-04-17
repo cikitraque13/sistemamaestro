@@ -380,7 +380,8 @@ const FlowPage = () => {
       navigate('/dashboard/billing', {
         state: {
           suggestedPlan: normalizedPlanRecommendation?.planId || 'blueprint',
-          fromProjectId: project.project_id
+          fromProjectId: project.project_id,
+          focusSection: 'plans'
         }
       });
       return;
@@ -448,7 +449,7 @@ const FlowPage = () => {
 
   const goToPremiumPreview = () => {
     if (!project?.project_id) return;
-    navigate(`/dashboard/report-preview/${project.project_id}`);
+    navigate(`/dashboard/project/${project.project_id}/report-preview`);
   };
 
   const openStrategicBilling = () => {
@@ -457,7 +458,8 @@ const FlowPage = () => {
     navigate('/dashboard/billing', {
       state: {
         suggestedPlan: normalizedPlanRecommendation?.planId || 'blueprint',
-        fromProjectId: project.project_id
+        fromProjectId: project.project_id,
+        focusSection: 'plans'
       }
     });
   };
