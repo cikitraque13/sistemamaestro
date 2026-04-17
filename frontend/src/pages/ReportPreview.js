@@ -114,16 +114,28 @@ const ReportPreview = () => {
 
     setExportingPdf(true);
 
-    const printUrl = `/dashboard/project/${id}/report-print`;
-    const printWindow = window.open(printUrl, '_blank', 'noopener,noreferrer');
+    const returnTo = `/dashboard/project/${id}/report-preview`;
+    const printUrl = `/dashboard/project/${id}/report-print?returnTo=${encodeURIComponent(returnTo)}`;
+
+    const printWindow = window.open(
+      printUrl,
+      '_blank',
+      'width=1120,height=920,resizable=yes,scrollbars=yes'
+    );
 
     if (!printWindow) {
       navigate(printUrl);
+    } else {
+      try {
+        printWindow.focus();
+      } catch (error) {
+        console.warn('No se pudo enfocar la ventana de impresión', error);
+      }
     }
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       setExportingPdf(false);
-    }, 800);
+    }, 420);
   };
 
   if (loading) {
@@ -214,7 +226,7 @@ const ReportPreview = () => {
                 </p>
                 <p className="text-white">
                   {isAdmin
-                    ? 'Este botón abre una página de impresión dedicada para guardar el informe como PDF.'
+                    ? 'Este botón abre una ventana de impresión dedicada. Al guardar o cancelar, el flujo debe cerrarse sin dejar una vista residual.'
                     : 'Tu compra puntual está activa. Ya puedes exportar el informe completo en PDF.'}
                 </p>
               </div>
