@@ -1,0 +1,26 @@
+{
+  "score_range": {
+    "min": 1,
+    "max": 4
+  },
+  "repetition": {
+    "medium_in_session": 3,
+    "medium_on_project": 5,
+    "intense_in_session": 5,
+    "intense_on_project": 8
+  },
+  "reinforced": {
+    "critical_signals_min": 1,
+    "high_signals_min": 2
+  },
+  "escalated": {
+    "critical_and_high": true,
+    "high_signals_min": 3
+  },
+  "special_credit": {
+    "protected_action_keys": [
+      "project_export",
+      "project_deploy"
+    ]
+  }
+}
