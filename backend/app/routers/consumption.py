@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from backend.app.core.credits_config_loader import get_credits_config_bundle
+from backend.app.core.security import get_current_user
 from backend.app.schemas.consumption import (
     ConsumptionErrorEnvelope,
     ConsumptionExecutionEnvelope,
@@ -12,6 +13,7 @@ from backend.app.schemas.consumption import (
     ConsumptionSimulationEnvelope,
 )
 from backend.app.services.consumption_engine import evaluate_consumption
+from backend.app.services.consumption_executor import execute_consumption_for_user
 
 router = APIRouter(
     prefix="/consumption",
@@ -114,9 +116,12 @@ def simulate_consumption(payload: ConsumptionRequest) -> ConsumptionSimulationEn
 @router.post(
     "/execute",
     response_model=ConsumptionExecutionEnvelope,
-    summary="Evalúa una acción en modo ejecución",
+    summary="Ejecuta una acción del motor de consumo sobre el usuario autenticado",
 )
-def execute_consumption(payload: ConsumptionRequest) -> ConsumptionExecutionEnvelope:
+async def execute_consumption(
+    payload: ConsumptionRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+) -> ConsumptionExecutionEnvelope:
     if payload.mode != "execute":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -133,7 +138,7 @@ def execute_consumption(payload: ConsumptionRequest) -> ConsumptionExecutionEnve
         )
 
     try:
-        result = evaluate_consumption(payload)
+        result = await execute_consumption_for_user(current_user, payload)
         return ConsumptionExecutionEnvelope(ok=True, data=result)
     except Exception as exc:
         raise HTTPException(
