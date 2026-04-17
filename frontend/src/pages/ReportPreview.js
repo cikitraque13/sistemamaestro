@@ -181,16 +181,12 @@ const ReportPreview = () => {
     <DashboardLayout title="Vista previa del informe">
       <style>{`
         @media screen {
+          .report-screen-host {
+            display: block;
+          }
+
           .report-print-host {
-            position: fixed;
-            left: -100000px;
-            top: 0;
-            width: 794px;
-            max-width: 794px;
-            opacity: 0;
-            pointer-events: none;
-            overflow: visible;
-            z-index: -1;
+            display: none !important;
           }
         }
 
@@ -207,33 +203,22 @@ const ReportPreview = () => {
             -webkit-print-color-adjust: exact;
           }
 
+          .report-screen-host,
           .report-preview-screen-only {
             display: none !important;
           }
 
           .report-print-host {
-            position: static !important;
-            left: auto !important;
-            top: auto !important;
-            width: auto !important;
+            display: block !important;
+            width: 100% !important;
             max-width: none !important;
-            opacity: 1 !important;
-            pointer-events: auto !important;
-            overflow: visible !important;
-            z-index: auto !important;
-          }
-
-          body * {
-            visibility: hidden !important;
-          }
-
-          #print-report-root,
-          #print-report-root * {
-            visibility: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
           }
 
           #print-report-root {
-            position: static !important;
+            display: block !important;
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
@@ -449,44 +434,46 @@ const ReportPreview = () => {
           </div>
         )}
 
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="pb-10"
-          data-testid="report-preview-template"
-        >
-          <div className="relative overflow-hidden rounded-[28px]">
-            {!canExportPdf && (
-              <>
-                <div className="absolute inset-x-0 top-[220px] sm:top-[235px] lg:top-[250px] bottom-0 z-10 pointer-events-none rounded-b-[28px] backdrop-blur-[8px] bg-[linear-gradient(180deg,rgba(10,10,10,0.04)_0%,rgba(10,10,10,0.24)_10%,rgba(10,10,10,0.58)_24%,rgba(10,10,10,0.86)_46%,rgba(10,10,10,0.97)_72%,rgba(10,10,10,1)_100%)]" />
+        <div className="report-screen-host">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pb-10"
+            data-testid="report-preview-template"
+          >
+            <div className="relative overflow-hidden rounded-[28px]">
+              {!canExportPdf && (
+                <>
+                  <div className="absolute inset-x-0 top-[220px] sm:top-[235px] lg:top-[250px] bottom-0 z-10 pointer-events-none rounded-b-[28px] backdrop-blur-[8px] bg-[linear-gradient(180deg,rgba(10,10,10,0.04)_0%,rgba(10,10,10,0.24)_10%,rgba(10,10,10,0.58)_24%,rgba(10,10,10,0.86)_46%,rgba(10,10,10,0.97)_72%,rgba(10,10,10,1)_100%)]" />
 
-                <div className="absolute inset-x-0 top-[205px] sm:top-[220px] lg:top-[235px] bottom-0 z-[11] pointer-events-none rounded-b-[28px] bg-[radial-gradient(circle_at_center_top,rgba(255,255,255,0.07),transparent_22%),linear-gradient(180deg,rgba(10,10,10,0)_0%,rgba(10,10,10,0.10)_7%,rgba(10,10,10,0.42)_18%,rgba(10,10,10,0.80)_38%,rgba(10,10,10,0.98)_68%,rgba(10,10,10,1)_100%)]" />
+                  <div className="absolute inset-x-0 top-[205px] sm:top-[220px] lg:top-[235px] bottom-0 z-[11] pointer-events-none rounded-b-[28px] bg-[radial-gradient(circle_at_center_top,rgba(255,255,255,0.07),transparent_22%),linear-gradient(180deg,rgba(10,10,10,0)_0%,rgba(10,10,10,0.10)_7%,rgba(10,10,10,0.42)_18%,rgba(10,10,10,0.80)_38%,rgba(10,10,10,0.98)_68%,rgba(10,10,10,1)_100%)]" />
 
-                <div className="absolute inset-x-6 sm:inset-x-8 top-[300px] sm:top-[325px] lg:top-[345px] z-[12] pointer-events-none">
-                  <div className="max-w-xl mx-auto rounded-2xl border border-amber-500/14 bg-[rgba(12,12,12,0.72)] backdrop-blur-md px-5 py-4 shadow-[0_0_0_1px_rgba(245,158,11,0.04)]">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-[11px] font-medium border border-amber-500/18 mb-3">
-                      <Lock size={13} />
-                      Contenido premium bloqueado
+                  <div className="absolute inset-x-6 sm:inset-x-8 top-[300px] sm:top-[325px] lg:top-[345px] z-[12] pointer-events-none">
+                    <div className="max-w-xl mx-auto rounded-2xl border border-amber-500/14 bg-[rgba(12,12,12,0.72)] backdrop-blur-md px-5 py-4 shadow-[0_0_0_1px_rgba(245,158,11,0.04)]">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-[11px] font-medium border border-amber-500/18 mb-3">
+                        <Lock size={13} />
+                        Contenido premium bloqueado
+                      </div>
+
+                      <p className="text-white text-sm sm:text-base leading-relaxed">
+                        Ya estás viendo la portada y la estructura premium. La lectura completa queda bloqueada hasta activar la compra puntual.
+                      </p>
                     </div>
-
-                    <p className="text-white text-sm sm:text-base leading-relaxed">
-                      Ya estás viendo la portada y la estructura premium. La lectura completa queda bloqueada hasta activar la compra puntual.
-                    </p>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
 
-            <div className="relative z-[1]">
-              <PremiumReportScreenTemplate
-                project={project}
-                brandName="Sistema Maestro"
-                documentTitle="Informe Puntual"
-                showSystemFooter={true}
-              />
+              <div className="relative z-[1]">
+                <PremiumReportScreenTemplate
+                  project={project}
+                  brandName="Sistema Maestro"
+                  documentTitle="Informe Puntual"
+                  showSystemFooter={true}
+                />
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
         <div className="report-print-host" aria-hidden="true">
           <div id="print-report-root">
