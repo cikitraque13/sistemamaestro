@@ -9,7 +9,10 @@ import {
   Printer,
   Lock,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  DiamondsFour,
+  Flag,
+  Lightning
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -206,7 +209,7 @@ const ReportPreview = () => {
                   Vista previa del informe premium
                 </h1>
                 <p className="text-[#A3A3A3] max-w-3xl">
-                  Esta página valida la plantilla visual PDF-ready antes de abrir o desbloquear la exportación final.
+                  Esta página presenta la salida visual premium del informe antes de desbloquear o exportar la versión completa.
                 </p>
               </div>
             </div>
@@ -276,35 +279,107 @@ const ReportPreview = () => {
           </div>
         ) : (
           <div className="report-preview-screen-only rounded-2xl border border-amber-500/20 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.10),transparent_28%),linear-gradient(180deg,#151311_0%,#101010_100%)] px-5 py-5 mb-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-              <div className="max-w-3xl">
+            <div className="grid xl:grid-cols-[1.15fr_0.85fr] gap-5">
+              <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-xs font-medium border border-amber-500/20 mb-3">
                   <Lock size={14} />
-                  Exportación bloqueada
+                  Vista premium bloqueada
                 </div>
 
-                <h2 className="text-xl text-white font-medium mb-2">
+                <h2 className="text-xl sm:text-2xl text-white font-medium mb-2">
                   Desbloquea el informe PDF premium
                 </h2>
 
-                <p className="text-[#DDD3C2] leading-relaxed">
-                  Ya estás viendo una vista previa controlada. Para exportar el informe completo en PDF,
-                  activa la compra puntual de 6,99 €.
+                <p className="text-[#DDD3C2] leading-relaxed mb-4 max-w-3xl">
+                  Ya estás viendo la salida visual premium del documento. La versión completa desbloquea la lectura íntegra, la exportación PDF y una estructura pensada para ayudarte a decidir el siguiente paso con más claridad.
                 </p>
+
+                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                  <div className="rounded-xl border border-white/6 bg-[#111111] px-4 py-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DiamondsFour size={16} className="text-amber-300" weight="fill" />
+                      <p className="text-sm text-white font-medium">Resumen ejecutivo</p>
+                    </div>
+                    <p className="text-xs leading-relaxed text-[#BEB6A8]">
+                      Lectura breve y estructurada para entender el caso con más precisión.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/6 bg-[#111111] px-4 py-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightning size={16} className="text-amber-300" weight="fill" />
+                      <p className="text-sm text-white font-medium">Diagnóstico central</p>
+                    </div>
+                    <p className="text-xs leading-relaxed text-[#BEB6A8]">
+                      Hallazgo principal, debilidad clave y palanca prioritaria de mejora.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/6 bg-[#111111] px-4 py-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Flag size={16} className="text-amber-300" weight="fill" />
+                      <p className="text-sm text-white font-medium">Lectura por dimensiones</p>
+                    </div>
+                    <p className="text-xs leading-relaxed text-[#BEB6A8]">
+                      Claridad, propuesta, conversión, estructura y continuidad.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/6 bg-[#111111] px-4 py-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle size={16} className="text-amber-300" weight="fill" />
+                      <p className="text-sm text-white font-medium">Acciones prioritarias</p>
+                    </div>
+                    <p className="text-xs leading-relaxed text-[#BEB6A8]">
+                      Qué deberías mover primero y por qué importa comercialmente.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/6 bg-[#111111] px-4 py-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText size={16} className="text-amber-300" weight="fill" />
+                      <p className="text-sm text-white font-medium">Exportación PDF</p>
+                    </div>
+                    <p className="text-xs leading-relaxed text-[#BEB6A8]">
+                      Documento listo para guardar, revisar o compartir cuando lo necesites.
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <Link
-                to="/dashboard/billing"
-                state={{
-                  entryOfferId: 'single_report',
-                  fromProjectId: project.project_id,
-                  focusSection: 'entry-offer'
-                }}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[linear-gradient(180deg,#3F3728_0%,#30291F_100%)] text-white hover:brightness-110 transition-all border border-amber-500/20"
-              >
-                Desbloquear PDF premium · 6,99 €
-                <ArrowRight size={16} />
-              </Link>
+              <div className="rounded-2xl border border-amber-500/18 bg-[linear-gradient(180deg,#17120E_0%,#100F0E_100%)] px-5 py-5 flex flex-col justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-amber-200/70 mb-2">
+                    Activación puntual
+                  </p>
+                  <p className="text-4xl font-light text-white mb-2">6,99 €</p>
+                  <p className="text-sm leading-relaxed text-[#D7CCBC] mb-4">
+                    Activa el informe premium para ver la lectura completa y exportarla en PDF.
+                  </p>
+
+                  <div className="rounded-xl border border-amber-500/14 bg-[#111111] px-4 py-4 mb-4">
+                    <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
+                      Qué estás activando
+                    </p>
+                    <p className="text-sm text-white">
+                      Una lectura premium más útil, más seria y lista para exportación.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  to="/dashboard/billing"
+                  state={{
+                    entryOfferId: 'single_report',
+                    fromProjectId: project.project_id,
+                    focusSection: 'entry-offer'
+                  }}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[linear-gradient(180deg,#3F3728_0%,#30291F_100%)] text-white hover:brightness-110 transition-all border border-amber-500/20"
+                >
+                  Desbloquear PDF premium · 6,99 €
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
           </div>
         )}
@@ -315,9 +390,26 @@ const ReportPreview = () => {
           className="pb-10"
           data-testid="report-preview-template"
         >
-          <div className="relative">
+          <div className="relative overflow-hidden rounded-[28px]">
             {!canExportPdf && (
-              <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/92 to-transparent backdrop-blur-[2px] z-10 pointer-events-none rounded-b-[28px]" />
+              <>
+                <div className="absolute inset-x-0 top-[220px] sm:top-[235px] lg:top-[250px] bottom-0 z-10 pointer-events-none rounded-b-[28px] backdrop-blur-[8px] bg-[linear-gradient(180deg,rgba(10,10,10,0.04)_0%,rgba(10,10,10,0.24)_10%,rgba(10,10,10,0.58)_24%,rgba(10,10,10,0.86)_46%,rgba(10,10,10,0.97)_72%,rgba(10,10,10,1)_100%)]" />
+
+                <div className="absolute inset-x-0 top-[205px] sm:top-[220px] lg:top-[235px] bottom-0 z-[11] pointer-events-none rounded-b-[28px] bg-[radial-gradient(circle_at_center_top,rgba(255,255,255,0.07),transparent_22%),linear-gradient(180deg,rgba(10,10,10,0)_0%,rgba(10,10,10,0.10)_7%,rgba(10,10,10,0.42)_18%,rgba(10,10,10,0.80)_38%,rgba(10,10,10,0.98)_68%,rgba(10,10,10,1)_100%)]" />
+
+                <div className="absolute inset-x-6 sm:inset-x-8 top-[300px] sm:top-[325px] lg:top-[345px] z-[12] pointer-events-none">
+                  <div className="max-w-xl mx-auto rounded-2xl border border-amber-500/14 bg-[rgba(12,12,12,0.72)] backdrop-blur-md px-5 py-4 shadow-[0_0_0_1px_rgba(245,158,11,0.04)]">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-[11px] font-medium border border-amber-500/18 mb-3">
+                      <Lock size={13} />
+                      Contenido premium bloqueado
+                    </div>
+
+                    <p className="text-white text-sm sm:text-base leading-relaxed">
+                      Ya estás viendo la portada y la estructura premium. La lectura completa queda bloqueada hasta activar la compra puntual.
+                    </p>
+                  </div>
+                </div>
+              </>
             )}
 
             <div id="print-report-root">
