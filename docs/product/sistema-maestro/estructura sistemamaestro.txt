@@ -1,0 +1,214 @@
+Listado de rutas de carpetas para el volumen Windows-SSD
+El número de serie del volumen es 10CD-582E
+C:.
+│   .gitconfig
+│   .gitignore
+│   backend_test.py
+│   DEPLOY_RAILWAY.md
+│   design_guidelines.json
+│   Dockerfile
+│   estructura sistemamaestro.txt
+│   railway.json
+│   README.md
+│   test_result.md
+│   yarn.lock
+│
+├───.emergent
+│   │   emergent.yml
+│   │
+│   └───markers
+│           .bootstrap-complete
+│           .restic-restore-verified
+│           .restore-complete
+│
+├───backend
+│   │   requirements.txt
+│   │   server.py
+│   │   __init__.py
+│   │
+│   └───app
+│       │   main.py
+│       │   __init__.py
+│       │
+│       ├───core
+│       │       config.py
+│       │       security.py
+│       │       __init__.py
+│       │
+│       ├───db
+│       │       mongodb.py
+│       │       __init__.py
+│       │
+│       ├───domain
+│       │       opportunities.py
+│       │       plans.py
+│       │       __init__.py
+│       │
+│       ├───routers
+│       │       auth.py
+│       │       billing.py
+│       │       opportunities.py
+│       │       payments.py
+│       │       projects.py
+│       │       public.py
+│       │       __init__.py
+│       │
+│       ├───schemas
+│       │       payments.py
+│       │       projects.py
+│       │       __init__.py
+│       │
+│       └───services
+│               ai_analysis.py
+│               blueprint.py
+│               credits.py
+│               plan_recommendation.py
+│               url_analysis.py
+│               __init__.py
+│
+├───docs
+│   └───product
+│       │   01-INFORME-PUNTUAL-CANONICO.md
+│       │   02-PDF-INFORME-PUNTUAL-SALIDA-VISUAL.md
+│       │
+│       └───sistema-maestro
+│               00-INDICE.md
+│               01-PRODUCTO-MAESTRO-V2.md
+│               02-ACTIVACION-DOCTRINA.md
+│               03-CREDITOS-Y-ECONOMIA.md
+│               04-EXPERIENCIA-CONSTRUCTOR-VISIBLE.md
+│               05-CONTRATOS-TECNICOS-V1.md
+│               06-ROADMAP-DE-IMPLEMENTACION-V1.md
+│
+├───frontend
+│   │   .gitignore
+│   │   components.json
+│   │   craco.config.js
+│   │   jsconfig.json
+│   │   package.json
+│   │   postcss.config.js
+│   │   README.md
+│   │   tailwind.config.js
+│   │   yarn.lock
+│   │
+│   ├───plugins
+│   │   └───health-check
+│   │           health-endpoints.js
+│   │           webpack-health-plugin.js
+│   │
+│   ├───public
+│   │       index.html
+│   │       logo-sm.png
+│   │       logo.png
+│   │
+│   └───src
+│       │   App.css
+│       │   App.js
+│       │   index.css
+│       │   index.js
+│       │
+│       ├───components
+│       │   │   DashboardLayout.js
+│       │   │   GoogleSignInButton.js
+│       │   │   Logo.js
+│       │   │   VoiceButton.js
+│       │   │
+│       │   ├───reports
+│       │   │       PremiumReportPdfTemplate.js
+│       │   │
+│       │   └───ui
+│       │           accordion.jsx
+│       │           alert-dialog.jsx
+│       │           alert.jsx
+│       │           aspect-ratio.jsx
+│       │           avatar.jsx
+│       │           badge.jsx
+│       │           breadcrumb.jsx
+│       │           button.jsx
+│       │           calendar.jsx
+│       │           card.jsx
+│       │           carousel.jsx
+│       │           checkbox.jsx
+│       │           collapsible.jsx
+│       │           command.jsx
+│       │           context-menu.jsx
+│       │           dialog.jsx
+│       │           drawer.jsx
+│       │           dropdown-menu.jsx
+│       │           form.jsx
+│       │           hover-card.jsx
+│       │           input-otp.jsx
+│       │           input.jsx
+│       │           label.jsx
+│       │           menubar.jsx
+│       │           navigation-menu.jsx
+│       │           pagination.jsx
+│       │           popover.jsx
+│       │           progress.jsx
+│       │           radio-group.jsx
+│       │           resizable.jsx
+│       │           scroll-area.jsx
+│       │           select.jsx
+│       │           separator.jsx
+│       │           sheet.jsx
+│       │           skeleton.jsx
+│       │           slider.jsx
+│       │           sonner.jsx
+│       │           switch.jsx
+│       │           table.jsx
+│       │           tabs.jsx
+│       │           textarea.jsx
+│       │           toast.jsx
+│       │           toaster.jsx
+│       │           toggle-group.jsx
+│       │           toggle.jsx
+│       │           tooltip.jsx
+│       │
+│       ├───content
+│       │       pricingContent.js
+│       │
+│       ├───context
+│       │       AuthContext.js
+│       │
+│       ├───hooks
+│       │       use-toast.js
+│       │       useVoice.js
+│       │
+│       ├───lib
+│       │       utils.js
+│       │
+│       └───pages
+│               AuthCallback.js
+│               Billing.js
+│               Cookies.js
+│               Dashboard.js
+│               Flow.js
+│               Home.js
+│               Login.js
+│               Opportunities.js
+│               Privacy.js
+│               ProjectDetail.js
+│               Projects.js
+│               Register.js
+│               ReportPreview.js
+│               Settings.js
+│               Terms.js
+│
+├───memory
+│       .gitkeep
+│       PRD.md
+│
+├───railway
+│       requirements.txt
+│       server_railway.py
+│
+├───tests
+│       __init__.py
+│
+└───test_reports
+    │   .gitkeep
+    │   iteration_1.json
+    │   iteration_2.json
+    │
+    └───pytest
+            .gitkeep
