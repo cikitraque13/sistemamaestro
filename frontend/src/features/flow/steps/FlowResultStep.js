@@ -9,7 +9,18 @@ import {
   Stop,
   Sparkle
 } from '@phosphor-icons/react';
-import { ROUTE_DESCRIPTIONS, ROUTE_NAMES } from '../flow.constants';
+import { ROUTE_NAMES } from '../flow.constants';
+
+const ROUTE_DESCRIPTION_FALLBACKS = {
+  improve: 'Analizamos un activo existente y detectamos fricciones que afectan claridad, captación o conversión.',
+  sell: 'Estructuramos la propuesta comercial y detectamos oportunidades de monetización.',
+  automate: 'Identificamos cuellos de botella operativos y oportunidades de automatización.',
+  idea: 'Convertimos una idea en una dirección de proyecto con potencial de validación y crecimiento.',
+  improve_existing: 'Analizamos tu activo existente y te mostramos cómo mejorarlo.',
+  sell_and_charge: 'Estructuramos tu propuesta comercial con el flujo correcto.',
+  automate_operation: 'Identificamos cuellos de botella y proponemos automatización.',
+  idea_to_project: 'Convertimos tu idea en un proyecto digital monetizable.'
+};
 
 const PreviewSignal = ({ children }) => (
   <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs bg-[#0A0A0A] border border-amber-500/12 text-[#E7D8BB]">
@@ -38,7 +49,7 @@ const StrategicContinuationCard = ({
         <div
           className={`px-4 py-2 rounded-full text-sm font-medium ${normalizedPlanRecommendation.badgeClass}`}
         >
-          {normalizedPlanRecommendation.scoreTotal}/20
+          {normalizedPlanRecommendation.scoreTotal ?? 0}/20
         </div>
       </div>
 
@@ -58,38 +69,39 @@ const StrategicContinuationCard = ({
         <div className="bg-[#0A0A0A] rounded-lg p-3">
           <p className="text-xs text-[#A3A3A3] mb-1">Complejidad</p>
           <p className="text-white font-medium">
-            {normalizedPlanRecommendation.scores.complexity ?? 0}/4
+            {normalizedPlanRecommendation.scores?.complexity ?? 0}/4
           </p>
         </div>
         <div className="bg-[#0A0A0A] rounded-lg p-3">
           <p className="text-xs text-[#A3A3A3] mb-1">Impacto</p>
           <p className="text-white font-medium">
-            {normalizedPlanRecommendation.scores.economic_impact ?? 0}/4
+            {normalizedPlanRecommendation.scores?.economic_impact ?? 0}/4
           </p>
         </div>
         <div className="bg-[#0A0A0A] rounded-lg p-3">
           <p className="text-xs text-[#A3A3A3] mb-1">Urgencia</p>
           <p className="text-white font-medium">
-            {normalizedPlanRecommendation.scores.urgency ?? 0}/4
+            {normalizedPlanRecommendation.scores?.urgency ?? 0}/4
           </p>
         </div>
         <div className="bg-[#0A0A0A] rounded-lg p-3">
           <p className="text-xs text-[#A3A3A3] mb-1">Estructura</p>
           <p className="text-white font-medium">
-            {normalizedPlanRecommendation.scores.structure_need ?? 0}/4
+            {normalizedPlanRecommendation.scores?.structure_need ?? 0}/4
           </p>
         </div>
         <div className="bg-[#0A0A0A] rounded-lg p-3">
           <p className="text-xs text-[#A3A3A3] mb-1">Continuidad</p>
           <p className="text-white font-medium">
-            {normalizedPlanRecommendation.scores.continuity_need ?? 0}/4
+            {normalizedPlanRecommendation.scores?.continuity_need ?? 0}/4
           </p>
         </div>
       </div>
 
       <button
         onClick={onOpenStrategicBilling}
-        className="w-full btn-secondary flex items-center justify-center gap-2"
+        disabled={typeof onOpenStrategicBilling !== 'function'}
+        className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50"
         data-testid="open-strategic-billing-btn"
       >
         Ver continuidad estratégica
@@ -153,7 +165,8 @@ const PremiumBridgeCard = ({ onOpenPremiumPreview }) => {
 
           <button
             onClick={onOpenPremiumPreview}
-            className="w-full mt-5 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[linear-gradient(180deg,#3F3728_0%,#30291F_100%)] text-white hover:brightness-110 transition-all border border-amber-500/20"
+            disabled={typeof onOpenPremiumPreview !== 'function'}
+            className="w-full mt-5 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[linear-gradient(180deg,#3F3728_0%,#30291F_100%)] text-white hover:brightness-110 transition-all border border-amber-500/20 disabled:opacity-50"
             data-testid="open-premium-preview-btn"
           >
             Ver vista previa PDF premium
@@ -185,7 +198,7 @@ const PaidPlanActionCard = ({ onGenerateBlueprint, loading }) => {
 
           <button
             onClick={onGenerateBlueprint}
-            disabled={loading}
+            disabled={loading || typeof onGenerateBlueprint !== 'function'}
             className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-50"
             data-testid="generate-blueprint-btn"
           >
@@ -219,6 +232,22 @@ const FlowResultStep = ({
   onGenerateBlueprint
 }) => {
   const isFree = !userPlan || userPlan === 'free';
+  const safeRoute = project?.route || 'idea';
+
+  const routeName =
+    ROUTE_NAMES[safeRoute] ||
+    safeRoute ||
+    'Ruta detectada';
+
+  const routeDescription =
+    ROUTE_DESCRIPTION_FALLBACKS[safeRoute] ||
+    'Ruta generada según el análisis actual del proyecto.';
+
+  const safeDiagnosis = normalizedDiagnosis || {
+    understanding: 'El sistema ha generado una lectura inicial del caso.',
+    mainFinding: 'Sin hallazgo principal disponible todavía.',
+    opportunity: 'Sin oportunidad principal disponible todavía.'
+  };
 
   return (
     <motion.div
@@ -237,7 +266,8 @@ const FlowResultStep = ({
           <div className="flex items-center justify-center gap-2 mt-3">
             <button
               onClick={onPlayDiagnosis}
-              className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all ${
+              disabled={typeof onPlayDiagnosis !== 'function'}
+              className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-all disabled:opacity-50 ${
                 isSpeaking
                   ? 'bg-[#0F5257] text-white'
                   : 'bg-[#262626] text-[#A3A3A3] hover:text-white'
@@ -267,35 +297,28 @@ const FlowResultStep = ({
           </div>
           <div>
             <p className="text-sm text-[#A3A3A3] mb-1">Ruta recomendada</p>
-            <h3 className="text-xl text-white font-medium">
-              {ROUTE_NAMES[project.route] || project.route || 'Ruta detectada'}
-            </h3>
-            <p className="text-[#A3A3A3] text-sm mt-1">
-              {ROUTE_DESCRIPTIONS[project.route] ||
-                'Ruta generada según el análisis actual del proyecto.'}
-            </p>
+            <h3 className="text-xl text-white font-medium">{routeName}</h3>
+            <p className="text-[#A3A3A3] text-sm mt-1">{routeDescription}</p>
           </div>
         </div>
       </div>
 
-      {normalizedDiagnosis && (
-        <div className="bg-[#171717] border border-white/10 rounded-2xl p-6 mb-6 space-y-4">
-          <div>
-            <p className="text-sm text-[#A3A3A3] mb-1">Comprensión</p>
-            <p className="text-white">{normalizedDiagnosis.understanding}</p>
-          </div>
-
-          <div>
-            <p className="text-sm text-[#A3A3A3] mb-1">Hallazgo principal</p>
-            <p className="text-white font-medium text-lg">{normalizedDiagnosis.mainFinding}</p>
-          </div>
-
-          <div>
-            <p className="text-sm text-[#A3A3A3] mb-1">Oportunidad</p>
-            <p className="text-white">{normalizedDiagnosis.opportunity}</p>
-          </div>
+      <div className="bg-[#171717] border border-white/10 rounded-2xl p-6 mb-6 space-y-4">
+        <div>
+          <p className="text-sm text-[#A3A3A3] mb-1">Comprensión</p>
+          <p className="text-white">{safeDiagnosis.understanding}</p>
         </div>
-      )}
+
+        <div>
+          <p className="text-sm text-[#A3A3A3] mb-1">Hallazgo principal</p>
+          <p className="text-white font-medium text-lg">{safeDiagnosis.mainFinding}</p>
+        </div>
+
+        <div>
+          <p className="text-sm text-[#A3A3A3] mb-1">Oportunidad</p>
+          <p className="text-white">{safeDiagnosis.opportunity}</p>
+        </div>
+      </div>
 
       {isFree ? (
         <>
@@ -306,7 +329,8 @@ const FlowResultStep = ({
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <button
               onClick={onGoToProject}
-              className="btn-secondary flex-1"
+              disabled={typeof onGoToProject !== 'function'}
+              className="btn-secondary flex-1 disabled:opacity-50"
               data-testid="view-project-btn"
             >
               Ver proyecto
@@ -314,7 +338,8 @@ const FlowResultStep = ({
 
             <button
               onClick={onOpenPremiumPreview}
-              className="btn-primary flex-1 flex items-center justify-center gap-2"
+              disabled={typeof onOpenPremiumPreview !== 'function'}
+              className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
               data-testid="open-premium-preview-btn-secondary"
             >
               <Lock size={16} />
@@ -339,7 +364,8 @@ const FlowResultStep = ({
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={onGoToProject}
-              className="btn-secondary flex-1"
+              disabled={typeof onGoToProject !== 'function'}
+              className="btn-secondary flex-1 disabled:opacity-50"
               data-testid="view-project-btn"
             >
               Ver proyecto
@@ -347,7 +373,7 @@ const FlowResultStep = ({
 
             <button
               onClick={onGenerateBlueprint}
-              disabled={loading}
+              disabled={loading || typeof onGenerateBlueprint !== 'function'}
               className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
               data-testid="generate-blueprint-btn-secondary"
             >
