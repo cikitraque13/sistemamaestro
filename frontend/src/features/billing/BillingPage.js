@@ -35,6 +35,7 @@ const BillingPage = () => {
   const fromProjectId = location.state?.fromProjectId || null;
   const entryOfferId = location.state?.entryOfferId || null;
   const focusSection = location.state?.focusSection || null;
+
   const entryOfferFocused =
     entryOfferId === 'single_report' || focusSection === 'entry-offer';
 
@@ -281,6 +282,15 @@ const BillingPage = () => {
 
         <CreditSummaryCard creditSummary={creditSummary} />
 
+        <div ref={entryOfferRef}>
+          <EntryOfferCard
+            selectedEntryOffer={selectedEntryOffer}
+            processingKey={processingKey}
+            onEntryOfferCheckout={handleEntryOfferCheckout}
+            isFocused={entryOfferFocused}
+          />
+        </div>
+
         <CurrentPlanCard
           currentPlanDefinition={currentPlanDefinition}
           currentPlanIncludedCredits={currentPlanIncludedCredits}
@@ -294,15 +304,6 @@ const BillingPage = () => {
           processingKey={processingKey}
           onPlanCheckout={handlePlanCheckout}
         />
-
-        <div ref={entryOfferRef}>
-          <EntryOfferCard
-            selectedEntryOffer={selectedEntryOffer}
-            processingKey={processingKey}
-            onEntryOfferCheckout={handleEntryOfferCheckout}
-            isFocused={entryOfferFocused}
-          />
-        </div>
 
         <PaymentHistoryTable transactions={transactions} />
       </div>
