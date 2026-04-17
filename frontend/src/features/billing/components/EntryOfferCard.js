@@ -5,7 +5,8 @@ import { ArrowRight, FileText } from '@phosphor-icons/react';
 const EntryOfferCard = ({
   selectedEntryOffer,
   processingKey,
-  onEntryOfferCheckout
+  onEntryOfferCheckout,
+  isFocused = false
 }) => {
   if (!selectedEntryOffer) return null;
 
@@ -14,7 +15,7 @@ const EntryOfferCard = ({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.08 }}
-      className="mb-10"
+      className={`mb-10 ${isFocused ? 'ring-2 ring-amber-400/30 rounded-2xl' : ''}`}
       data-testid="entry-offer-card"
     >
       <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_28%),linear-gradient(180deg,#141311_0%,#0F0F0F_100%)] p-6">
