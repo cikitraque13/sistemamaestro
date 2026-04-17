@@ -49,6 +49,7 @@ const FlowPage = () => {
   const [inputType, setInputType] = useState(location.state?.inputType || 'text');
   const [inputContent, setInputContent] = useState(location.state?.inputContent || '');
   const [loading, setLoading] = useState(false);
+  const [recoveringResult, setRecoveringResult] = useState(false);
   const [project, setProject] = useState(null);
   const [refineAnswers, setRefineAnswers] = useState({});
   const [transitionOverlay, setTransitionOverlay] = useState({
@@ -153,13 +154,15 @@ const FlowPage = () => {
         setProject(nextProject);
         setRefineAnswers(nextProject.refine_answers || {});
 
-        await wait(950);
+        const nextStep = nextProject.refine_questions?.length > 0 ? 'refine' : 'result';
+        window.history.replaceState(
+          null,
+          '',
+          buildFlowUrl(nextStep, nextProject.project_id)
+        );
 
-        if (nextProject.refine_questions?.length > 0) {
-          setStep('refine');
-        } else {
-          setStep('result');
-        }
+        await wait(950);
+        setStep(nextStep);
       } catch (error) {
         toast.error(
           formatApiErrorDetail(error.response?.data?.detail) ||
@@ -183,12 +186,11 @@ const FlowPage = () => {
   }, []);
 
   useEffect(() => {
-    if (location.state?.inputContent) return;
-    if (!projectIdFromQuery) return;
-    if (project) return;
+    if (!projectIdFromQuery || project) return;
 
     const loadProjectFromQuery = async () => {
       setLoading(true);
+      setRecoveringResult(true);
 
       try {
         const response = await axios.get(`${API_BASE}/projects/${projectIdFromQuery}`, {
@@ -210,12 +212,13 @@ const FlowPage = () => {
         toast.error('No se pudo recuperar el proyecto.');
         navigate('/dashboard/projects');
       } finally {
+        setRecoveringResult(false);
         setLoading(false);
       }
     };
 
     loadProjectFromQuery();
-  }, [location.state?.inputContent, navigate, project, projectIdFromQuery, urlStep]);
+  }, [navigate, project, projectIdFromQuery, urlStep]);
 
   useEffect(() => {
     if (voice.transcript && inputType === 'text') {
@@ -283,13 +286,15 @@ const FlowPage = () => {
       setProject(nextProject);
       setRefineAnswers(nextProject.refine_answers || {});
 
-      await wait(950);
+      const nextStep = nextProject.refine_questions?.length > 0 ? 'refine' : 'result';
+      window.history.replaceState(
+        null,
+        '',
+        buildFlowUrl(nextStep, nextProject.project_id)
+      );
 
-      if (nextProject.refine_questions?.length > 0) {
-        setStep('refine');
-      } else {
-        setStep('result');
-      }
+      await wait(950);
+      setStep(nextStep);
     } catch (error) {
       toast.error(
         formatApiErrorDetail(error.response?.data?.detail) ||
@@ -341,6 +346,12 @@ const FlowPage = () => {
 
       setProject(nextProject);
       setRefineAnswers(nextProject.refine_answers || {});
+      window.history.replaceState(
+        null,
+        '',
+        buildFlowUrl('result', nextProject.project_id)
+      );
+
       await wait(800);
       toast.success('Afinado guardado correctamente');
       setStep('result');
@@ -402,6 +413,12 @@ const FlowPage = () => {
       }
 
       setProject(nextProject);
+      window.history.replaceState(
+        null,
+        '',
+        buildFlowUrl('blueprint', nextProject.project_id)
+      );
+
       await wait(1000);
       setStep('blueprint');
     } catch (error) {
@@ -767,16 +784,28 @@ const FlowPage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="bg-[#171717] border border-white/10 rounded-2xl p-6 text-center"
                 >
-                  <h2 className="text-xl text-white mb-2">Estamos recuperando tu resultado</h2>
-                  <p className="text-[#A3A3A3] mb-5">
-                    El análisis se ha procesado, pero la vista necesita recargar el proyecto antes de pintar el resultado.
-                  </p>
-                  <button
-                    onClick={() => navigate('/dashboard/projects')}
-                    className="btn-secondary"
-                  >
-                    Volver a proyectos
-                  </button>
+                  {recoveringResult ? (
+                    <>
+                      <div className="spinner mx-auto mb-4"></div>
+                      <h2 className="text-xl text-white mb-2">Recuperando tu resultado</h2>
+                      <p className="text-[#A3A3A3]">
+                        El proyecto ya existe. Estamos rehaciendo la vista para mostrar el diagnóstico correctamente.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-xl text-white mb-2">No se pudo reconstruir el resultado</h2>
+                      <p className="text-[#A3A3A3] mb-5">
+                        El análisis se ha procesado, pero la vista no ha podido hidratar el proyecto en este paso.
+                      </p>
+                      <button
+                        onClick={() => navigate('/dashboard/projects')}
+                        className="btn-secondary"
+                      >
+                        Volver a proyectos
+                      </button>
+                    </>
+                  )}
                 </motion.div>
               )
             )}
