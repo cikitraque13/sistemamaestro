@@ -142,53 +142,72 @@ def build_plan_recommendation(
 
     score_total = complexity + economic_impact + urgency + structure_need + continuity_need
 
-    if score_total <= 7:
-        recommended_plan = "blueprint"
-    elif score_total <= 13:
+    # Regla de decisión más conservadora:
+    # - Blueprint/Pro = continuidad normal por defecto
+    # - Sistema/Growth = casos ya operativos
+    # - Premium/199 = solo casos de intensidad realmente alta
+    premium_gate = (
+        score_total >= 17
+        and complexity >= 4
+        and economic_impact >= 4
+        and structure_need >= 4
+        and continuity_need >= 3
+    )
+
+    sistema_gate = (
+        score_total >= 12
+        or (
+            complexity >= 3
+            and economic_impact >= 3
+        )
+        or (
+            structure_need >= 3
+            and continuity_need >= 3
+        )
+    )
+
+    if premium_gate:
+        recommended_plan = "premium"
+    elif sistema_gate:
         recommended_plan = "sistema"
     else:
-        if complexity >= 3 and (structure_need >= 3 or continuity_need >= 3):
-            recommended_plan = "premium"
-        else:
-            recommended_plan = "sistema"
+        recommended_plan = "blueprint"
 
     if recommended_plan == "blueprint":
         reason = (
-            "Tu caso todavía encaja en una fase de diagnóstico afinado. "
-            "El siguiente cuello de botella no es la complejidad del sistema, "
-            "sino precisar mejor el problema real y priorizar quick wins."
+            "Tu caso necesita una capa seria de orden, criterio y dirección, "
+            "pero todavía no exige una intervención de máxima intensidad. "
+            "Lo correcto ahora es aterrizar el caso con un blueprint bien enfocado."
         )
         why_not_lower = (
-            "La capa gratuita ayuda a detectar señales iniciales, "
-            "pero aquí ya conviene afinar el diagnóstico y ordenar mejor el foco."
+            "La capa gratuita detecta señales iniciales, pero aquí ya conviene "
+            "pasar a una base real de trabajo con más precisión y estructura."
         )
-        unlocks = "Más precisión, prioridad inicial y una primera dirección accionable."
-        cta_label = "Afinar diagnóstico"
+        unlocks = "Ruta clara, prioridad inicial, estructura útil y una primera base accionable."
+        cta_label = "Entrar en Pro"
     elif recommended_plan == "sistema":
         reason = (
             "Tu caso ya supera una mejora puntual. "
-            "Aquí el verdadero cuello de botella ya no es detectar el problema, "
-            "sino ordenar qué tocar primero, con qué prioridad y con qué lógica de ejecución."
+            "Aquí no basta con ordenar el problema: hace falta continuidad operativa, "
+            "priorización más firme y una capa de ejecución con más recorrido."
         )
         why_not_lower = (
-            "Un diagnóstico afinado se quedaría corto porque aquí ya no basta con detectar fallos; "
-            "hace falta priorizar y estructurar."
+            "El nivel Pro ayuda a estructurar, pero aquí ya hay suficiente carga "
+            "como para necesitar una continuidad más operativa."
         )
-        unlocks = "Prioridades, arquitectura y plan accionable para ejecutar con criterio."
-        cta_label = "Convertir esto en un plan accionable"
+        unlocks = "Continuidad, optimización, builder con más recorrido y ejecución mejor encadenada."
+        cta_label = "Entrar en Growth"
     else:
         reason = (
-            "Aquí ya no hablamos solo de corregir un bloque aislado. "
-            "El caso presenta varios frentes con impacto comercial, de conversión o de sistema, "
-            "y necesita una capa superior de profundidad estratégica."
+            "El caso combina complejidad alta, impacto alto y necesidad estructural profunda. "
+            "Aquí ya no se trata solo de ordenar o continuar, sino de intervenir con un criterio superior."
         )
         why_not_lower = (
-            "Un blueprint básico ayudaría, pero aquí hay suficiente complejidad e impacto "
-            "como para necesitar una intervención más profunda."
+            "Growth ayudaría, pero se quedaría corto frente al nivel de complejidad, "
+            "impacto y profundidad estratégica que presenta este caso."
         )
-        unlocks = "Profundidad estratégica, continuidad y una intervención más completa."
-        cta_label = "Activar intervención estratégica completa"
-
+        unlocks = "Profundidad estratégica, criterio maestro, builder avanzado y salida más preparada."
+        cta_label = "Entrar en AI Master"
     plan_data = PLANS[recommended_plan]
 
     return {
@@ -207,5 +226,5 @@ def build_plan_recommendation(
         "why_not_lower": why_not_lower,
         "unlocks": unlocks,
         "cta_label": cta_label,
-        "version": "v1"
+        "version": "v2"
     }
