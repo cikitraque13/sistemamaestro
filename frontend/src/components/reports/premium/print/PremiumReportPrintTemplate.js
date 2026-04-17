@@ -1,12 +1,8 @@
 import React, { useMemo } from 'react';
 import {
   CheckCircle,
-  DiamondsFour,
-  Flag,
-  FileText,
   Lightning,
-  Sparkle,
-  ArrowRight
+  Sparkle
 } from '@phosphor-icons/react';
 
 const ROUTE_NAMES = {
@@ -46,176 +42,34 @@ const formatDate = (value) => {
   }
 };
 
-const normalizeText = (value) => {
-  if (typeof value !== 'string') return '';
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9ñ\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-};
-
 const isMeaningfulText = (value) => {
   if (typeof value !== 'string') return false;
   const trimmed = value.trim();
   if (!trimmed) return false;
-  if (trimmed.length < 12) return false;
-
+  if (trimmed.length < 10) return false;
   return !PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(trimmed));
 };
 
-const tokenSet = (value) => {
-  const stopwords = new Set([
-    'de', 'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'o', 'u',
-    'a', 'ante', 'bajo', 'con', 'contra', 'desde', 'durante', 'en', 'entre',
-    'hacia', 'hasta', 'para', 'por', 'segun', 'sin', 'sobre', 'tras',
-    'que', 'como', 'del', 'al', 'se', 'su', 'sus', 'es', 'son', 'ha', 'han',
-    'muy', 'mas', 'menos', 'ya', 'hoy', 'real', 'principal', 'importante',
-    'caso', 'lectura', 'sistema', 'proyecto', 'negocio', 'usuario', 'usuarios',
-    'web', 'pagina', 'sitio', 'mensaje', 'landing', 'propuesta', 'valor',
-    'conversion', 'captacion', 'claridad', 'estructura', 'continuidad',
-    'mejora', 'oportunidad', 'accion', 'comercial'
-  ]);
-
-  return new Set(
-    normalizeText(value)
-      .split(' ')
-      .filter((token) => token.length > 2 && !stopwords.has(token))
-  );
-};
-
-const areTooSimilar = (a, b) => {
-  if (!isMeaningfulText(a) || !isMeaningfulText(b)) return false;
-
-  const normA = normalizeText(a);
-  const normB = normalizeText(b);
-
-  if (normA === normB) return true;
-  if (normA.length > 32 && normB.length > 32 && (normA.includes(normB) || normB.includes(normA))) {
-    return true;
-  }
-
-  const tokensA = tokenSet(a);
-  const tokensB = tokenSet(b);
-  if (!tokensA.size || !tokensB.size) return false;
-
-  const intersection = [...tokensA].filter((token) => tokensB.has(token)).length;
-  const union = new Set([...tokensA, ...tokensB]).size;
-  if (!union) return false;
-
-  return intersection / union >= 0.72;
-};
-
-const dedupeTexts = (items, avoid = [], maxItems = null) => {
+const dedupeTexts = (items, maxItems = null) => {
   const result = [];
 
   for (const item of items) {
     if (!isMeaningfulText(item)) continue;
-    if (avoid.some((blocked) => areTooSimilar(item, blocked))) continue;
-    if (result.some((existing) => areTooSimilar(item, existing))) continue;
-
+    if (result.includes(item)) continue;
     result.push(item);
-
-    if (maxItems && result.length >= maxItems) {
-      break;
-    }
+    if (maxItems && result.length >= maxItems) break;
   }
 
   return result;
 };
 
-const dedupeKeyValueBlocks = (items, maxItems = null) => {
-  const result = [];
-
-  for (const item of items) {
-    if (!item || !isMeaningfulText(item.value)) continue;
-    if (result.some((existing) => areTooSimilar(item.value, existing.value))) continue;
-
-    result.push(item);
-
-    if (maxItems && result.length >= maxItems) {
-      break;
-    }
-  }
-
-  return result;
-};
-
-const PrintSection = ({ label, title, icon, children, noBorder = false }) => (
-  <section
-    className={`print-section px-8 py-8 sm:px-10 sm:py-9 ${noBorder ? '' : 'border-t border-slate-200'}`}
-    style={{ pageBreakInside: 'avoid' }}
-  >
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          {title}
-        </h2>
-      </div>
-
-      {label && (
-        <div className="inline-flex items-center self-start px-3 py-1 rounded-full border border-slate-200 bg-slate-50 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">
-          {label}
-        </div>
-      )}
-    </div>
-
-    {children}
-  </section>
-);
-
-const SummaryCard = ({ eyebrow, value, tone = 'default' }) => {
-  const toneMap = {
-    teal: 'border-teal-200 bg-teal-50',
-    amber: 'border-amber-200 bg-amber-50',
-    slate: 'border-slate-200 bg-slate-50',
-    default: 'border-slate-200 bg-white'
-  };
-
-  return (
-    <div
-      className={`rounded-2xl border p-5 ${toneMap[tone] || toneMap.default}`}
-      style={{ pageBreakInside: 'avoid' }}
-    >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-        {eyebrow}
-      </p>
-      <p className="text-slate-900 leading-relaxed">{value}</p>
-    </div>
-  );
-};
-
-const BulletList = ({ title, items }) => (
-  <div
-    className="rounded-2xl border border-slate-200 bg-white p-5"
-    style={{ pageBreakInside: 'avoid' }}
-  >
-    <p className="text-sm font-medium text-slate-700 mb-3">{title}</p>
-    <ul className="space-y-2">
-      {items.map((item, index) => (
-        <li
-          key={`${title}-${index}-${String(item).substring(0, 20)}`}
-          className="text-slate-700 text-sm flex items-start gap-2"
-        >
-          <CheckCircle size={14} className="text-teal-600 mt-1 flex-shrink-0" weight="fill" />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
-
-const normalizePrintView = (project) => {
+const normalizeReportView = (project) => {
   const diagnosis = project?.diagnosis;
   if (!diagnosis) return null;
 
-  const strengths = ensureArray(diagnosis.strengths);
-  const weaknesses = ensureArray(diagnosis.weaknesses);
-  const quickWins = ensureArray(diagnosis.quick_wins);
-  const rawPriorityActions = ensureArray(diagnosis.priority_actions);
+  const strengths = dedupeTexts(ensureArray(diagnosis.strengths), 3);
+  const weaknesses = dedupeTexts(ensureArray(diagnosis.weaknesses), 4);
+  const quickWins = dedupeTexts(ensureArray(diagnosis.quick_wins), 4);
 
   const executiveSummaryRaw =
     diagnosis.executive_summary && typeof diagnosis.executive_summary === 'object'
@@ -227,29 +81,22 @@ const normalizePrintView = (project) => {
       ? diagnosis.core_diagnosis
       : {};
 
+  const rawPriorityActions = ensureArray(diagnosis.priority_actions);
+
   const immediateActionRaw =
     diagnosis.immediate_action && typeof diagnosis.immediate_action === 'object'
       ? diagnosis.immediate_action
+      : null;
+
+  const continuityRecommendationRaw =
+    diagnosis.continuity_recommendation && typeof diagnosis.continuity_recommendation === 'object'
+      ? diagnosis.continuity_recommendation
       : null;
 
   const understanding =
     diagnosis.understanding ||
     diagnosis.summary ||
     executiveSummaryRaw.understanding ||
-    '';
-
-  const tension =
-    executiveSummaryRaw.main_tension ||
-    weaknesses[0] ||
-    '';
-
-  const commercialImportance =
-    executiveSummaryRaw.commercial_importance ||
-    '';
-
-  const executiveConclusion =
-    executiveSummaryRaw.bottom_line ||
-    quickWins[0] ||
     '';
 
   const mainFinding =
@@ -271,29 +118,26 @@ const normalizePrintView = (project) => {
     quickWins[0] ||
     '';
 
-  const executiveBlocks = dedupeKeyValueBlocks([
-    { key: 'understanding', label: 'Comprensión del caso', value: understanding },
-    { key: 'tension', label: 'Tensión principal', value: tension },
-    { key: 'importance', label: 'Por qué importa', value: commercialImportance },
-    { key: 'conclusion', label: 'Lectura más útil', value: executiveConclusion }
-  ], 4);
+  const executiveSummary = {
+    understanding:
+      executiveSummaryRaw.understanding || understanding,
+    mainTension:
+      executiveSummaryRaw.main_tension || weaknesses[0] || '',
+    commercialImportance:
+      executiveSummaryRaw.commercial_importance || '',
+    bottomLine:
+      executiveSummaryRaw.bottom_line || quickWins[0] || ''
+  };
 
-  const focusBlocks = dedupeKeyValueBlocks([
-    { key: 'finding', label: 'Hallazgo principal', value: mainFinding, tone: 'teal' },
-    { key: 'weakness', label: 'Debilidad detectada', value: mainWeakness, tone: 'slate' },
-    { key: 'leverage', label: 'Primer foco de mejora', value: mainLeverage, tone: 'amber' }
-  ], 3);
+  const coreDiagnosis = {
+    mainFinding,
+    mainWeakness,
+    mainLeverage
+  };
 
   const priorityActions = rawPriorityActions
     .filter((action) => action && typeof action === 'object')
     .filter((action) => isMeaningfulText(action.title) || isMeaningfulText(action.why_it_matters))
-    .filter((action, index, list) =>
-      list.findIndex((candidate) => {
-        const sameTitle = areTooSimilar(candidate.title, action.title);
-        const sameWhy = areTooSimilar(candidate.why_it_matters, action.why_it_matters);
-        return sameTitle || sameWhy;
-      }) === index
-    )
     .slice(0, 3);
 
   let immediateAction = null;
@@ -315,123 +159,190 @@ const normalizePrintView = (project) => {
       title: priorityActions[0].title || 'Aplicar acción prioritaria',
       description: priorityActions[0].why_it_matters || ''
     };
-  } else if (quickWins.length > 0 && isMeaningfulText(quickWins[0])) {
+  } else if (quickWins.length > 0) {
     immediateAction = {
       title: 'Aplicar quick win prioritario',
       description: quickWins[0]
     };
   }
 
-  const avoidSignals = [
-    ...executiveBlocks.map((item) => item.value),
-    ...focusBlocks.map((item) => item.value),
-    immediateAction?.title || '',
-    immediateAction?.description || ''
-  ];
-
-  const filteredStrengths = dedupeTexts(strengths, avoidSignals, 2);
-  const filteredWeaknesses = dedupeTexts(weaknesses, avoidSignals, 2);
-  const filteredQuickWins = dedupeTexts(quickWins, avoidSignals, 3);
-
-  const promptContext = dedupeTexts([
-    understanding,
-    mainFinding,
-    mainWeakness,
-    mainLeverage,
-    immediateAction?.description || '',
-    executiveConclusion
-  ], [], 4);
+  const continuityRecommendation =
+    continuityRecommendationRaw &&
+    (isMeaningfulText(continuityRecommendationRaw.reason) ||
+      isMeaningfulText(continuityRecommendationRaw.cta_label))
+      ? continuityRecommendationRaw
+      : null;
 
   return {
-    executiveBlocks,
-    focusBlocks,
+    strengths,
+    weaknesses,
+    quickWins,
+    executiveSummary,
+    coreDiagnosis,
     priorityActions,
     immediateAction,
-    strengths: filteredStrengths,
-    weaknesses: filteredWeaknesses,
-    quickWins: filteredQuickWins,
-    promptContext
+    continuityRecommendation
   };
 };
 
-const buildAdvancePrompt = ({ project, routeLabel, view }) => {
-  const contextLines = view.promptContext
-    .filter(isMeaningfulText)
-    .slice(0, 4)
-    .map((line) => `- ${line}`);
+const buildAdvancePrompt = ({ project, routeLabel, reportView }) => {
+  const context = project?.input_content || 'Sin contexto';
+  const entryType = project?.input_type === 'url' ? 'URL' : 'idea o descripción';
+  const immediateTitle =
+    reportView?.immediateAction?.title ||
+    reportView?.coreDiagnosis?.mainLeverage ||
+    'Definir el siguiente paso prioritario';
 
-  const immediateTitle = isMeaningfulText(view.immediateAction?.title)
-    ? view.immediateAction.title
-    : 'No definido todavía';
-
-  const prompt = [
-    `Actúa como consultor estratégico senior y ayúdame a avanzar este caso sin dispersión.`,
-    ``,
-    `CONTEXTO`,
-    `- Tipo de entrada: ${project?.input_type === 'url' ? 'URL' : 'Idea / descripción'}`,
-    `- Ruta del sistema: ${routeLabel}`,
-    `- Caso analizado: ${project?.input_content || 'Sin contexto visible'}`,
-    ``,
-    `VALIDACIÓN PUNTUAL YA REALIZADA`,
-    ...contextLines,
-    ``,
-    `PRIMER FOCO DE MEJORA`,
-    `- ${immediateTitle}`,
-    ``,
-    `LO QUE NECESITO AHORA`,
-    `1. Reformula el problema central en una frase clara.`,
-    `2. Indica qué debería tocar primero y por qué.`,
-    `3. Dame una secuencia de 3 pasos concretos y ordenados para avanzar.`,
-    `4. Señala qué error debería evitar para no perder tiempo ni valor.`,
-    ``,
-    `RESPUESTA PEDIDA`,
-    `- clara`,
-    `- priorizada`,
-    `- sin relleno`,
-    `- orientada a acción`
+  return [
+    'Actúa como estratega digital senior y transforma este caso en un siguiente paso ejecutable.',
+    '',
+    `Contexto analizado: ${context}`,
+    `Tipo de entrada: ${entryType}`,
+    `Ruta detectada: ${routeLabel}`,
+    `Hallazgo principal: ${reportView?.coreDiagnosis?.mainFinding || 'No disponible'}`,
+    `Palanca principal: ${reportView?.coreDiagnosis?.mainLeverage || 'No disponible'}`,
+    `Primer foco de mejora: ${immediateTitle}`,
+    '',
+    'Devuélveme:',
+    '1. El objetivo inmediato correcto para este caso.',
+    '2. La estructura o enfoque recomendado para moverlo sin dispersión.',
+    '3. Las 3 acciones prioritarias más concretas.',
+    '4. Qué copy, elementos o bloques debería implementar primero.',
+    '5. Qué errores o desvíos debería evitar en este caso.',
+    '',
+    'Condiciones:',
+    '- No generalices.',
+    '- No improvises soluciones vagas.',
+    '- Prioriza claridad, conversión y continuidad.',
+    '- Responde con enfoque profesional y accionable.'
   ].join('\n');
+};
 
-  return prompt;
+const PdfSection = ({ title, icon, children, noBorder = false }) => (
+  <section
+    className={`pdf-section px-8 py-8 sm:px-10 sm:py-9 ${noBorder ? '' : 'border-t border-slate-200'}`}
+    style={{ pageBreakInside: 'avoid' }}
+  >
+    {title && (
+      <div className="flex items-center gap-2 mb-5">
+        {icon}
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+          {title}
+        </h2>
+      </div>
+    )}
+
+    {children}
+  </section>
+);
+
+const MetricCard = ({ eyebrow, value, accent = 'default' }) => {
+  const accentMap = {
+    teal: 'border-teal-200 bg-teal-50',
+    amber: 'border-amber-200 bg-amber-50',
+    violet: 'border-fuchsia-200 bg-fuchsia-50',
+    default: 'border-slate-200 bg-slate-50'
+  };
+
+  return (
+    <div
+      className={`pdf-card rounded-2xl border p-5 ${accentMap[accent] || accentMap.default}`}
+      style={{ pageBreakInside: 'avoid' }}
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+        {eyebrow}
+      </p>
+      <p className="text-slate-900 font-medium leading-relaxed">
+        {value}
+      </p>
+    </div>
+  );
+};
+
+const SoftCard = ({ eyebrow, value }) => (
+  <div
+    className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5"
+    style={{ pageBreakInside: 'avoid' }}
+  >
+    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+      {eyebrow}
+    </p>
+    <p className="text-slate-800 leading-relaxed">{value}</p>
+  </div>
+);
+
+const BulletList = ({ title, items }) => {
+  if (!items || items.length === 0) return null;
+
+  return (
+    <div
+      className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5"
+      style={{ pageBreakInside: 'avoid' }}
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
+        {title}
+      </p>
+
+      <ul className="space-y-2">
+        {items.map((item, index) => (
+          <li
+            key={`${title}-${index}-${String(item).substring(0, 24)}`}
+            className="text-slate-800 text-sm flex items-start gap-2"
+          >
+            <CheckCircle size={14} className="text-teal-600 mt-1 flex-shrink-0" weight="fill" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 const PremiumReportPrintTemplate = ({
   project,
   brandName = 'Sistema Maestro',
-  documentTitle = 'Validación puntual exportable',
+  documentTitle = 'Informe Puntual',
   showSystemFooter = true
 }) => {
-  const view = useMemo(() => normalizePrintView(project), [project]);
+  const reportView = useMemo(() => normalizeReportView(project), [project]);
 
   const routeLabel = ROUTE_NAMES[project?.route] || project?.route || 'Sin clasificar';
   const issueDate = formatDate(project?.created_at);
 
-  const pageLabels = {
-    hero: 'Página 1',
-    reading: 'Página 2',
-    focus: 'Página 3',
-    actions: 'Página 4',
-    prompt: 'Página 5',
-    closing: 'Página 6'
-  };
+  const advancePrompt = useMemo(() => {
+    if (!project || !reportView) return '';
+    return buildAdvancePrompt({ project, routeLabel, reportView });
+  }, [project, reportView, routeLabel]);
 
-  const promptText = useMemo(() => {
-    if (!project || !view) return '';
-    return buildAdvancePrompt({ project, routeLabel, view });
-  }, [project, routeLabel, view]);
-
-  if (!project || !view) {
+  if (!project || !reportView) {
     return (
       <div className="max-w-[920px] mx-auto rounded-2xl border border-slate-200 bg-white p-8 text-slate-800">
-        No hay datos suficientes para renderizar el documento.
+        No hay datos suficientes para renderizar el informe.
       </div>
     );
   }
+
+  const validationLead =
+    reportView.executiveSummary.bottomLine ||
+    reportView.executiveSummary.commercialImportance ||
+    reportView.executiveSummary.understanding ||
+    reportView.coreDiagnosis.mainFinding;
+
+  const firstFocus =
+    reportView.immediateAction?.title ||
+    reportView.coreDiagnosis.mainLeverage ||
+    'Definir el siguiente foco de mejora';
 
   return (
     <div className="max-w-[920px] mx-auto">
       <style>{`
         @media print {
-          .print-document-shell {
+          html, body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+
+          .pdf-document-shell {
             background: #ffffff !important;
             color: #0f172a !important;
             border: none !important;
@@ -442,43 +353,45 @@ const PremiumReportPrintTemplate = ({
             overflow: visible !important;
           }
 
-          .print-section,
-          .print-card,
-          .print-soft-card,
-          .print-prompt-box,
-          .print-footer-card {
+          .pdf-hero-band,
+          .pdf-card,
+          .pdf-soft-card,
+          .pdf-context-card,
+          .pdf-meta-card,
+          .pdf-prompt-box {
+            box-shadow: none !important;
+          }
+
+          .pdf-section,
+          .pdf-card,
+          .pdf-soft-card,
+          .pdf-prompt-box {
             break-inside: avoid;
             page-break-inside: avoid;
           }
         }
       `}</style>
 
-      <div className="print-document-shell bg-white text-slate-900 rounded-[28px] overflow-hidden border border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
-        <PrintSection
-          label={pageLabels.hero}
-          title="Validación puntual"
-          icon={<Sparkle size={18} className="text-teal-600" weight="fill" />}
-          noBorder
-        >
-          <div className="pb-8 border-b border-slate-200 -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9 bg-[linear-gradient(180deg,#F8FAFC_0%,#FFFFFF_100%)]">
+      <div className="pdf-document-shell bg-white text-slate-900 rounded-[28px] overflow-hidden border border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
+        <PdfSection noBorder>
+          <div className="pdf-hero-band pb-8 border-b border-slate-200 -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9 bg-[linear-gradient(180deg,#F8FAFC_0%,#FFFFFF_100%)]">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 text-sm font-medium mb-4">
-                  <FileText size={14} weight="fill" />
+                  <Sparkle size={14} weight="fill" />
                   {documentTitle}
                 </div>
 
-                <h1 className="text-3xl sm:text-[2.2rem] font-semibold text-slate-900 mb-3 leading-tight">
-                  Validación puntual exportable
+                <h1 className="text-3xl sm:text-[2.3rem] font-semibold text-slate-900 mb-3 leading-tight">
+                  Informe puntual de validación
                 </h1>
 
                 <p className="text-slate-600 max-w-3xl leading-relaxed">
-                  Documento breve y accionable con lectura más útil del caso, primer foco de mejora
-                  y prompt de avance para continuar sin fricción.
+                  Validación puntual, lectura útil, primer foco de mejora y prompt de avance para mover el caso con más criterio.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white px-5 py-5 min-w-[260px]">
+              <div className="pdf-meta-card rounded-2xl border border-slate-200 bg-white px-5 py-5 min-w-[260px]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-1">
                   Documento
                 </p>
@@ -505,7 +418,7 @@ const PremiumReportPrintTemplate = ({
             </div>
 
             <div
-              className="rounded-2xl border border-slate-200 bg-white p-5 mb-6"
+              className="pdf-context-card rounded-2xl border border-slate-200 bg-white p-5 mb-6"
               style={{ pageBreakInside: 'avoid' }}
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
@@ -515,184 +428,174 @@ const PremiumReportPrintTemplate = ({
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              {view.focusBlocks.map((item) => (
-                <SummaryCard
-                  key={item.key}
-                  eyebrow={item.label}
-                  value={item.value}
-                  tone={item.tone}
-                />
-              ))}
+              <MetricCard
+                eyebrow="Hallazgo principal"
+                value={reportView.coreDiagnosis.mainFinding}
+                accent="teal"
+              />
+              <MetricCard
+                eyebrow="Palanca principal"
+                value={reportView.coreDiagnosis.mainLeverage}
+                accent="amber"
+              />
+              <MetricCard
+                eyebrow="Primer foco de mejora"
+                value={firstFocus}
+                accent="violet"
+              />
             </div>
           </div>
-        </PrintSection>
+        </PdfSection>
 
-        <PrintSection
-          label={pageLabels.reading}
-          title="Lectura más útil"
-          icon={<DiamondsFour size={18} className="text-amber-600" weight="fill" />}
+        <PdfSection
+          title="Validación puntual"
+          icon={<CheckCircle size={18} className="text-teal-600" weight="fill" />}
         >
-          <div className="grid md:grid-cols-2 gap-4">
-            {view.executiveBlocks.map((item) => (
-              <div
-                key={item.key}
-                className="print-soft-card rounded-2xl border border-slate-200 bg-white p-5"
-                style={{ pageBreakInside: 'avoid' }}
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-                  {item.label}
-                </p>
-                <p className="text-slate-800 leading-relaxed">{item.value}</p>
-              </div>
-            ))}
-          </div>
-        </PrintSection>
-
-        <PrintSection
-          label={pageLabels.focus}
-          title="Primer foco de mejora"
-          icon={<Flag size={18} className="text-teal-600" weight="fill" />}
-        >
-          <div className="grid gap-4 md:grid-cols-3">
-            {view.focusBlocks.map((item) => (
-              <div
-                key={`focus-${item.key}`}
-                className={`print-card rounded-2xl border p-5 ${
-                  item.tone === 'teal'
-                    ? 'border-teal-200 bg-teal-50'
-                    : item.tone === 'amber'
-                      ? 'border-amber-200 bg-amber-50'
-                      : 'border-slate-200 bg-slate-50'
-                }`}
-                style={{ pageBreakInside: 'avoid' }}
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-                  {item.label}
-                </p>
-                <p className="text-slate-900 font-medium leading-relaxed">{item.value}</p>
-              </div>
-            ))}
-          </div>
-
-          {view.immediateAction && (
+          <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-4 mb-4">
             <div
-              className="print-soft-card rounded-2xl border border-slate-200 bg-slate-50 p-5 mt-6"
+              className="pdf-soft-card rounded-2xl border border-slate-200 bg-slate-50 p-5"
               style={{ pageBreakInside: 'avoid' }}
             >
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
-                Acción inmediata recomendada
+                Lectura de validación
               </p>
-              <p className="text-slate-900 font-medium mb-2">{view.immediateAction.title}</p>
-              {isMeaningfulText(view.immediateAction.description) && (
-                <p className="text-slate-700 leading-relaxed">
-                  {view.immediateAction.description}
-                </p>
-              )}
+              <p className="text-slate-800 leading-relaxed">
+                {validationLead}
+              </p>
             </div>
-          )}
-        </PrintSection>
 
-        <PrintSection
-          label={pageLabels.actions}
-          title="Acciones iniciales"
-          icon={<CheckCircle size={18} className="text-teal-600" weight="fill" />}
+            <div className="grid gap-4">
+              <MetricCard
+                eyebrow="Fricción central"
+                value={reportView.coreDiagnosis.mainWeakness || reportView.executiveSummary.mainTension || 'Sin fricción central disponible.'}
+                accent="default"
+              />
+            </div>
+          </div>
+        </PdfSection>
+
+        <PdfSection
+          title="Lectura útil del caso"
+          icon={<Lightning size={18} className="text-amber-600" weight="fill" />}
         >
-          {view.priorityActions.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-3">
-              {view.priorityActions.map((action, index) => (
+          <div className="grid md:grid-cols-2 gap-4">
+            {isMeaningfulText(reportView.executiveSummary.understanding) && (
+              <SoftCard
+                eyebrow="Comprensión"
+                value={reportView.executiveSummary.understanding}
+              />
+            )}
+
+            {isMeaningfulText(reportView.executiveSummary.mainTension) && (
+              <SoftCard
+                eyebrow="Tensión principal"
+                value={reportView.executiveSummary.mainTension}
+              />
+            )}
+
+            {isMeaningfulText(reportView.executiveSummary.commercialImportance) && (
+              <SoftCard
+                eyebrow="Importancia comercial"
+                value={reportView.executiveSummary.commercialImportance}
+              />
+            )}
+
+            {isMeaningfulText(reportView.executiveSummary.bottomLine) && (
+              <SoftCard
+                eyebrow="Conclusión ejecutiva"
+                value={reportView.executiveSummary.bottomLine}
+              />
+            )}
+          </div>
+        </PdfSection>
+
+        <PdfSection
+          title="Primer foco de mejora"
+          icon={<Sparkle size={18} className="text-teal-600" weight="fill" />}
+        >
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-4 mb-4">
+            <div className="grid gap-4">
+              {reportView.immediateAction && (
                 <div
-                  key={action.id || `${action.title}-${index}`}
-                  className="print-card rounded-2xl border border-slate-200 bg-white p-5"
+                  className="pdf-soft-card rounded-2xl border border-teal-200 bg-teal-50 p-5"
                   style={{ pageBreakInside: 'avoid' }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center text-sm font-semibold">
-                      {index + 1}
-                    </div>
-                    <p className="text-slate-900 font-medium">{action.title}</p>
-                  </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-700 mb-3">
+                    Acción inmediata
+                  </p>
 
-                  {isMeaningfulText(action.why_it_matters) && (
-                    <p className="text-sm text-slate-700 leading-relaxed">
-                      {action.why_it_matters}
+                  <p className="text-slate-900 font-medium mb-2">
+                    {reportView.immediateAction.title}
+                  </p>
+
+                  {isMeaningfulText(reportView.immediateAction.description) && (
+                    <p className="text-slate-700 leading-relaxed">
+                      {reportView.immediateAction.description}
                     </p>
                   )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              className="print-soft-card rounded-2xl border border-slate-200 bg-slate-50 p-5"
-              style={{ pageBreakInside: 'avoid' }}
-            >
-              <p className="text-slate-700 leading-relaxed">
-                No hay una secuencia amplia cargada todavía, pero ya puedes avanzar con el foco principal
-                y el prompt de avance de este documento.
-              </p>
-            </div>
-          )}
-        </PrintSection>
+              )}
 
-        <PrintSection
-          label={pageLabels.prompt}
+              <BulletList
+                title="Acciones prioritarias"
+                items={reportView.priorityActions.map((action) => action.title).filter(Boolean)}
+              />
+            </div>
+
+            <div className="grid gap-4">
+              <BulletList
+                title="Fortalezas detectadas"
+                items={reportView.strengths}
+              />
+
+              <BulletList
+                title="Quick wins"
+                items={reportView.quickWins}
+              />
+            </div>
+          </div>
+        </PdfSection>
+
+        <PdfSection
           title="Prompt de avance"
           icon={<Lightning size={18} className="text-amber-600" weight="fill" />}
         >
           <div
-            className="print-prompt-box rounded-2xl border border-slate-200 bg-slate-50 p-5"
+            className="pdf-prompt-box rounded-2xl border border-slate-200 bg-slate-50 p-5"
             style={{ pageBreakInside: 'avoid' }}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
-              Úsalo para seguir avanzando
+              Prompt listo para copiar
             </p>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 overflow-x-auto">
-              <pre className="text-[13px] leading-relaxed text-slate-800 whitespace-pre-wrap font-mono">
-                {promptText}
-              </pre>
+            <pre className="whitespace-pre-wrap break-words text-[13px] leading-6 text-slate-800 font-mono">
+              {advancePrompt}
+            </pre>
+          </div>
+
+          {reportView.continuityRecommendation && isMeaningfulText(reportView.continuityRecommendation.reason) && (
+            <div
+              className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5 mt-4"
+              style={{ pageBreakInside: 'avoid' }}
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+                Nota de continuidad
+              </p>
+              <p className="text-slate-800 leading-relaxed">
+                {reportView.continuityRecommendation.reason}
+              </p>
             </div>
-          </div>
-        </PrintSection>
-
-        <PrintSection
-          label={pageLabels.closing}
-          title="Cierre"
-          icon={<ArrowRight size={18} className="text-teal-600" weight="fill" />}
-        >
-          <div className="grid gap-4 md:grid-cols-3">
-            {view.strengths.length > 0 && (
-              <BulletList title="Fortalezas detectadas" items={view.strengths} />
-            )}
-
-            {view.weaknesses.length > 0 && (
-              <BulletList title="Debilidades detectadas" items={view.weaknesses} />
-            )}
-
-            {view.quickWins.length > 0 && (
-              <BulletList title="Quick wins iniciales" items={view.quickWins} />
-            )}
-          </div>
-
-          <div
-            className="print-footer-card rounded-2xl border border-slate-200 bg-white px-5 py-5 mt-6"
-            style={{ pageBreakInside: 'avoid' }}
-          >
-            <p className="text-slate-800 leading-relaxed">
-              Esta validación puntual te da una lectura más útil del caso, un primer foco de mejora
-              y un prompt de avance para seguir sin dispersión. El objetivo de este documento no es
-              sustituir una capa superior, sino ayudarte a tomar el siguiente paso correcto con más claridad.
-            </p>
-          </div>
-        </PrintSection>
+          )}
+        </PdfSection>
 
         {showSystemFooter && (
           <div className="px-8 py-5 sm:px-10 border-t border-slate-200 bg-slate-50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
               <p className="text-slate-700">
-                {brandName} · Validación puntual exportable
+                {brandName} · Informe puntual de validación
               </p>
               <p className="text-slate-500">
-                Documento breve, útil y preparado para guardado en PDF
+                Documento final orientado a lectura útil y acción inmediata
               </p>
             </div>
           </div>
