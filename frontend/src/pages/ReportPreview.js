@@ -35,30 +35,51 @@ const ReportPreview = () => {
   const isAdmin = user?.role === 'admin' || user?.is_admin === true;
 
   useEffect(() => {
+    let cancelled = false;
+
+    const fetchData = async () => {
+      setLoading(true);
+      setProject(null);
+      setBillingData(null);
+
+      try {
+        const projectResponse = await axios.get(`${API_BASE}/projects/${id}`, {
+          withCredentials: true
+        });
+
+        if (cancelled) return;
+        setProject(projectResponse.data);
+
+        try {
+          const billingResponse = await axios.get(`${API_BASE}/user/billing`, {
+            withCredentials: true
+          });
+
+          if (cancelled) return;
+          setBillingData(billingResponse.data);
+        } catch (billingError) {
+          if (cancelled) return;
+          console.warn('Billing no disponible para ReportPreview', billingError);
+          setBillingData(null);
+        }
+      } catch (error) {
+        if (cancelled) return;
+        console.error('Error cargando proyecto para ReportPreview', error);
+        toast.error('No se pudo cargar la vista previa del informe');
+        navigate('/dashboard/projects');
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
 
-  const fetchData = async () => {
-    try {
-      const [projectResponse, billingResponse] = await Promise.all([
-        axios.get(`${API_BASE}/projects/${id}`, {
-          withCredentials: true
-        }),
-        axios.get(`${API_BASE}/user/billing`, {
-          withCredentials: true
-        })
-      ]);
-
-      setProject(projectResponse.data);
-      setBillingData(billingResponse.data);
-    } catch {
-      toast.error('No se pudo cargar la vista previa del informe');
-      navigate('/dashboard/projects');
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => {
+      cancelled = true;
+    };
+  }, [id, navigate]);
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -124,7 +145,27 @@ const ReportPreview = () => {
     );
   }
 
-  if (!project) return null;
+  if (!project) {
+    return (
+      <DashboardLayout title="Vista previa del informe">
+        <div className="flex items-center justify-center py-24">
+          <div className="max-w-xl rounded-2xl border border-white/10 bg-[#111111] p-6 text-center text-white">
+            <p className="text-lg font-semibold mb-2">No se pudo cargar el informe</p>
+            <p className="text-sm text-[#A3A3A3] mb-4">
+              La vista previa no recibió un proyecto válido o la sesión no estaba disponible.
+            </p>
+            <Link
+              to="/dashboard/projects"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-[#171717] text-white hover:bg-[#1E1E1E] transition-all"
+            >
+              <ArrowLeft size={16} />
+              Volver a proyectos
+            </Link>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Vista previa del informe">
