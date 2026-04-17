@@ -125,15 +125,24 @@ const ReportPreview = () => {
       window.removeEventListener('afterprint', restoreState);
     };
 
+    const triggerPrint = () => {
+      window.print();
+      setTimeout(restoreState, 1500);
+    };
+
     setExportingPdf(true);
     document.title = `informe-puntual-${safeProjectId}`;
-
     window.addEventListener('afterprint', restoreState);
 
-    setTimeout(() => {
-      window.print();
-      setTimeout(restoreState, 1200);
-    }, 120);
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          setTimeout(triggerPrint, 80);
+        });
+      });
+    } else {
+      setTimeout(triggerPrint, 180);
+    }
   };
 
   if (loading) {
@@ -171,6 +180,20 @@ const ReportPreview = () => {
   return (
     <DashboardLayout title="Vista previa del informe">
       <style>{`
+        @media screen {
+          .report-print-host {
+            position: fixed;
+            left: -100000px;
+            top: 0;
+            width: 794px;
+            max-width: 794px;
+            opacity: 0;
+            pointer-events: none;
+            overflow: visible;
+            z-index: -1;
+          }
+        }
+
         @media print {
           @page {
             size: A4;
@@ -188,6 +211,18 @@ const ReportPreview = () => {
             display: none !important;
           }
 
+          .report-print-host {
+            position: static !important;
+            left: auto !important;
+            top: auto !important;
+            width: auto !important;
+            max-width: none !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            overflow: visible !important;
+            z-index: auto !important;
+          }
+
           body * {
             visibility: hidden !important;
           }
@@ -198,20 +233,21 @@ const ReportPreview = () => {
           }
 
           #print-report-root {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
+            position: static !important;
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
+            overflow: visible !important;
           }
 
           #print-report-root .report-print-frame {
+            display: block !important;
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
+            overflow: visible !important;
           }
         }
       `}</style>
@@ -449,21 +485,21 @@ const ReportPreview = () => {
                 showSystemFooter={true}
               />
             </div>
-
-            <div className="h-0 overflow-hidden" aria-hidden="true">
-              <div id="print-report-root">
-                <div className="report-print-frame">
-                  <PremiumReportPrintTemplate
-                    project={project}
-                    brandName="Sistema Maestro"
-                    documentTitle="Informe Puntual"
-                    showSystemFooter={true}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
         </motion.div>
+
+        <div className="report-print-host" aria-hidden="true">
+          <div id="print-report-root">
+            <div className="report-print-frame">
+              <PremiumReportPrintTemplate
+                project={project}
+                brandName="Sistema Maestro"
+                documentTitle="Informe Puntual"
+                showSystemFooter={true}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );
