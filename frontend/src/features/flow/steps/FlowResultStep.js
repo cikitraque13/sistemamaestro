@@ -4,7 +4,6 @@ import {
   CheckCircle,
   FileText,
   Lightning,
-  Lock,
   SpeakerHigh,
   Stop,
   Sparkle
@@ -193,24 +192,14 @@ const FlowResultStep = (props) => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="mb-6">
             <button
               onClick={onGoToProject}
               disabled={typeof onGoToProject !== 'function'}
-              className="btn-secondary flex-1 disabled:opacity-50"
+              className="btn-secondary w-full disabled:opacity-50"
               data-testid="view-project-btn"
             >
               Ver proyecto
-            </button>
-
-            <button
-              onClick={onOpenPremiumPreview}
-              disabled={typeof onOpenPremiumPreview !== 'function'}
-              className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
-              data-testid="open-premium-preview-btn-secondary"
-            >
-              <Lock size={16} />
-              Ver vista previa PDF premium
             </button>
           </div>
 
