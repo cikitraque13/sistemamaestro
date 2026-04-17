@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "consumption_request.schema.json",
+  "title": "ConsumptionRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mode",
+    "action_key",
+    "user_context",
+    "project_context"
+  ],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["simulate", "execute"]
+    },
+    "action_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "user_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "user_id",
+        "user_plan",
+        "credit_balance",
+        "special_credit_balance"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "user_plan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "credit_balance": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "special_credit_balance": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "project_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "project_complexity_score",
+        "journey_depth_score",
+        "output_value_score",
+        "operational_cost_score"
+      ],
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_complexity_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "journey_depth_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "output_value_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "operational_cost_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        }
+      }
+    },
+    "usage_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_count_in_session",
+        "action_count_on_project"
+      ],
+      "properties": {
+        "action_count_in_session": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "action_count_on_project": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "surface": {
+          "type": ["string", "null"]
+        },
+        "entry_point": {
+          "type": ["string", "null"]
+        },
+        "trace_id": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  }
+}
