@@ -102,7 +102,8 @@ const PlanRecommendationSection = ({
           to="/dashboard/billing"
           state={{
             suggestedPlan: normalizedPlanRecommendation.planId,
-            fromProjectId: projectId
+            fromProjectId: projectId,
+            focusSection: 'plans'
           }}
           className="btn-primary inline-flex items-center gap-2"
         >
