@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { ArrowLeft, CheckCircle, Printer } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import PremiumReportPrintTemplate from '../components/reports/premium/print/PremiumReportPrintTemplate';
 import { useAuth } from '../context/AuthContext';
@@ -10,16 +11,25 @@ const API_BASE = '/api';
 const ReportPrintPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
 
   const [project, setProject] = useState(null);
   const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [billingChecked, setBillingChecked] = useState(false);
+  const [printFinished, setPrintFinished] = useState(false);
 
   const hasTriggeredPrintRef = useRef(false);
+  const finishTriggeredRef = useRef(false);
 
   const isAdmin = user?.role === 'admin' || user?.is_admin === true;
+
+  const safeReturnTo = useMemo(() => {
+    const raw = searchParams.get('returnTo');
+    if (raw && raw.startsWith('/')) return raw;
+    return `/dashboard/project/${id}/report-preview`;
+  }, [id, searchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +102,32 @@ const ReportPrintPage = () => {
 
   const canExportPdf = isAdmin || hasPaidSingleReport;
 
+  const finishPrintFlow = useCallback(() => {
+    if (finishTriggeredRef.current) return;
+    finishTriggeredRef.current = true;
+    setPrintFinished(true);
+
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.focus();
+      }
+    } catch (error) {
+      console.warn('No se pudo recuperar el foco de la ventana origen', error);
+    }
+
+    window.setTimeout(() => {
+      try {
+        window.close();
+      } catch (error) {
+        console.warn('No se pudo cerrar automáticamente la ventana de impresión', error);
+      }
+
+      window.setTimeout(() => {
+        navigate(safeReturnTo, { replace: true });
+      }, 120);
+    }, 120);
+  }, [navigate, safeReturnTo]);
+
   useEffect(() => {
     if (loading) return;
     if (!project) return;
@@ -102,42 +138,33 @@ const ReportPrintPage = () => {
 
     const originalTitle = document.title;
     const safeProjectId = project?.project_id || 'informe';
-    let restored = false;
-
-    const restoreState = () => {
-      if (restored) return;
-      restored = true;
-      document.title = originalTitle;
-      window.removeEventListener('afterprint', restoreState);
-    };
 
     const triggerPrint = () => {
       window.print();
-      setTimeout(restoreState, 1500);
     };
 
     document.title = `informe-puntual-${safeProjectId}`;
-    window.addEventListener('afterprint', restoreState);
+    window.addEventListener('afterprint', finishPrintFlow);
 
     if (typeof window.requestAnimationFrame === 'function') {
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
-          setTimeout(triggerPrint, 100);
+          window.setTimeout(triggerPrint, 120);
         });
       });
     } else {
-      setTimeout(triggerPrint, 220);
+      window.setTimeout(triggerPrint, 260);
     }
 
     return () => {
-      window.removeEventListener('afterprint', restoreState);
-      restoreState();
+      document.title = originalTitle;
+      window.removeEventListener('afterprint', finishPrintFlow);
     };
-  }, [loading, project, billingChecked, canExportPdf, isAdmin]);
+  }, [billingChecked, canExportPdf, finishPrintFlow, isAdmin, loading, project]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#EEF2F7] text-slate-900 flex items-center justify-center">
         <div className="text-center px-6">
           <p className="text-lg font-medium mb-2">Preparando documento</p>
           <p className="text-sm text-slate-500">Generando vista de impresión…</p>
@@ -148,7 +175,7 @@ const ReportPrintPage = () => {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#EEF2F7] text-slate-900 flex items-center justify-center">
         <div className="max-w-xl px-6 text-center">
           <p className="text-lg font-semibold mb-2">No se pudo cargar el documento</p>
           <p className="text-sm text-slate-500 mb-4">
@@ -167,7 +194,7 @@ const ReportPrintPage = () => {
 
   if (!isAdmin && billingChecked && !canExportPdf) {
     return (
-      <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#EEF2F7] text-slate-900 flex items-center justify-center">
         <div className="max-w-xl px-6 text-center">
           <p className="text-lg font-semibold mb-2">La exportación PDF no está disponible</p>
           <p className="text-sm text-slate-500 mb-4">
@@ -193,13 +220,26 @@ const ReportPrintPage = () => {
 
         @media screen {
           body {
-            background: #eef2f7 !important;
+            background: #0B0F14 !important;
           }
 
           .report-print-page-shell {
             min-height: 100vh;
-            padding: 24px 0 40px;
-            background: #eef2f7;
+            padding: 88px 24px 40px;
+            background:
+              radial-gradient(circle at top right, rgba(15, 82, 87, 0.10), transparent 24%),
+              linear-gradient(180deg, #0B0F14 0%, #111827 100%);
+          }
+
+          .report-print-screen-toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            backdrop-filter: blur(16px);
+            background: rgba(10, 10, 10, 0.82);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
           }
         }
 
@@ -217,10 +257,60 @@ const ReportPrintPage = () => {
             padding: 0 !important;
             background: #ffffff !important;
           }
+
+          .report-print-screen-toolbar {
+            display: none !important;
+          }
         }
       `}</style>
 
+      <div className="report-print-screen-toolbar">
+        <div className="max-w-6xl mx-auto px-5 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center flex-shrink-0">
+              <Printer size={18} className="text-[#8DE1D0]" />
+            </div>
+
+            <div>
+              <p className="text-white text-sm font-medium">
+                Ventana de impresión dedicada
+              </p>
+              <p className="text-[#A3A3A3] text-xs sm:text-sm">
+                Al guardar o cancelar, esta ventana intentará cerrarse sola y volver al flujo anterior.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#0F5257] text-white hover:bg-[#136970] transition-all"
+            >
+              <Printer size={16} />
+              Imprimir de nuevo
+            </button>
+
+            <button
+              onClick={finishPrintFlow}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-[#171717] text-white hover:bg-[#1E1E1E] transition-all"
+            >
+              <ArrowLeft size={16} />
+              Cerrar y volver
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="report-print-page-shell">
+        {printFinished && (
+          <div className="max-w-6xl mx-auto mb-4 px-2">
+            <div className="rounded-2xl border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm text-emerald-100 flex items-center gap-2">
+              <CheckCircle size={16} weight="fill" className="text-emerald-300" />
+              Cerrando flujo de impresión y devolviendo el control a la vista previa…
+            </div>
+          </div>
+        )}
+
         <PremiumReportPrintTemplate
           project={project}
           brandName="Sistema Maestro"
