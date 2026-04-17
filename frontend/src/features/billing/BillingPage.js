@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WarningCircle } from '@phosphor-icons/react';
 import axios from 'axios';
@@ -20,7 +21,9 @@ import PaymentHistoryTable from './components/PaymentHistoryTable';
 
 const BillingPage = () => {
   const { user, checkAuth } = useAuth();
-  const [searchParams] = useState(() => new URLSearchParams(window.location.search));
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const entryOfferRef = useRef(null);
 
   const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,9 +31,12 @@ const BillingPage = () => {
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
-  const suggestedPlanId = history.state?.usr?.suggestedPlan || null;
-  const fromProjectId = history.state?.usr?.fromProjectId || null;
-  const entryOfferId = history.state?.usr?.entryOfferId || null;
+  const suggestedPlanId = location.state?.suggestedPlan || null;
+  const fromProjectId = location.state?.fromProjectId || null;
+  const entryOfferId = location.state?.entryOfferId || null;
+  const focusSection = location.state?.focusSection || null;
+  const entryOfferFocused =
+    entryOfferId === 'single_report' || focusSection === 'entry-offer';
 
   const suggestedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.id === suggestedPlanId) || null,
@@ -212,7 +218,20 @@ const BillingPage = () => {
       pollPaymentStatus(sessionId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!entryOfferFocused || !entryOfferRef.current) return;
+
+    const timer = setTimeout(() => {
+      entryOfferRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 180);
+
+    return () => clearTimeout(timer);
+  }, [entryOfferFocused]);
 
   if (loading) {
     return (
@@ -276,11 +295,14 @@ const BillingPage = () => {
           onPlanCheckout={handlePlanCheckout}
         />
 
-        <EntryOfferCard
-          selectedEntryOffer={selectedEntryOffer}
-          processingKey={processingKey}
-          onEntryOfferCheckout={handleEntryOfferCheckout}
-        />
+        <div ref={entryOfferRef}>
+          <EntryOfferCard
+            selectedEntryOffer={selectedEntryOffer}
+            processingKey={processingKey}
+            onEntryOfferCheckout={handleEntryOfferCheckout}
+            isFocused={entryOfferFocused}
+          />
+        </div>
 
         <PaymentHistoryTable transactions={transactions} />
       </div>
