@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { WarningCircle } from '@phosphor-icons/react';
 import axios from 'axios';
@@ -19,11 +19,47 @@ import PlansGrid from './components/PlansGrid';
 import EntryOfferCard from './components/EntryOfferCard';
 import PaymentHistoryTable from './components/PaymentHistoryTable';
 
+const CHECKOUT_CONTEXT_KEY = 'sm_billing_checkout_context';
+
+const readCheckoutContext = () => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = window.sessionStorage.getItem(CHECKOUT_CONTEXT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeCheckoutContext = (value) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.sessionStorage.setItem(CHECKOUT_CONTEXT_KEY, JSON.stringify(value));
+  } catch {
+    // no-op
+  }
+};
+
+const clearCheckoutContext = () => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.sessionStorage.removeItem(CHECKOUT_CONTEXT_KEY);
+  } catch {
+    // no-op
+  }
+};
+
 const BillingPage = () => {
   const { user, checkAuth } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const entryOfferRef = useRef(null);
+
+  const restoredContext = useMemo(() => readCheckoutContext(), []);
 
   const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,10 +67,25 @@ const BillingPage = () => {
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
-  const suggestedPlanId = location.state?.suggestedPlan || null;
-  const fromProjectId = location.state?.fromProjectId || null;
-  const entryOfferId = location.state?.entryOfferId || null;
-  const focusSection = location.state?.focusSection || null;
+  const suggestedPlanId =
+    location.state?.suggestedPlan ||
+    restoredContext?.suggestedPlan ||
+    null;
+
+  const fromProjectId =
+    location.state?.fromProjectId ||
+    restoredContext?.fromProjectId ||
+    null;
+
+  const entryOfferId =
+    location.state?.entryOfferId ||
+    restoredContext?.entryOfferId ||
+    null;
+
+  const focusSection =
+    location.state?.focusSection ||
+    restoredContext?.focusSection ||
+    null;
 
   const entryOfferFocused =
     entryOfferId === 'single_report' || focusSection === 'entry-offer';
@@ -101,6 +152,8 @@ const BillingPage = () => {
       const { payment_status, item_type, item_id, status } = response.data || {};
 
       if (payment_status === 'paid') {
+        const checkoutContext = readCheckoutContext();
+
         if (item_type === 'one_time_offer' && item_id === 'single_report') {
           toast.success('Pago completado. Tu informe puntual ha quedado registrado.');
         } else {
@@ -111,6 +164,21 @@ const BillingPage = () => {
         await fetchBillingData();
         window.history.replaceState({}, '', window.location.pathname);
         setCheckingPayment(false);
+
+        if (
+          item_type === 'one_time_offer' &&
+          item_id === 'single_report' &&
+          checkoutContext?.fromProjectId
+        ) {
+          clearCheckoutContext();
+          navigate(
+            `/dashboard/project/${checkoutContext.fromProjectId}/report-preview`,
+            { replace: true }
+          );
+          return;
+        }
+
+        clearCheckoutContext();
         return;
       }
 
@@ -143,6 +211,13 @@ const BillingPage = () => {
     setProcessingKey(processingId);
     setCheckoutError('');
 
+    writeCheckoutContext({
+      kind: 'plan',
+      suggestedPlan: planId,
+      fromProjectId: fromProjectId || null,
+      focusSection: 'plans'
+    });
+
     try {
       const response = await axios.post(
         `${API_BASE}/payments/checkout`,
@@ -161,6 +236,7 @@ const BillingPage = () => {
 
       redirectToCheckout(checkoutUrl);
     } catch (error) {
+      clearCheckoutContext();
       const message = getErrorMessage(error, 'No se pudo iniciar el checkout del plan.');
       setCheckoutError(message);
       toast.error(message);
@@ -182,6 +258,13 @@ const BillingPage = () => {
     setProcessingKey(processingId);
     setCheckoutError('');
 
+    writeCheckoutContext({
+      kind: 'entry-offer',
+      entryOfferId: offerId,
+      fromProjectId: fromProjectId || null,
+      focusSection: 'entry-offer'
+    });
+
     try {
       const response = await axios.post(
         `${API_BASE}/payments/checkout`,
@@ -201,6 +284,7 @@ const BillingPage = () => {
 
       redirectToCheckout(checkoutUrl);
     } catch (error) {
+      clearCheckoutContext();
       const message = getErrorMessage(
         error,
         'No se pudo iniciar el checkout del informe puntual.'
