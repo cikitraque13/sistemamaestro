@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 
-import DashboardLayout from '../../components/DashboardLayout';
-import { useAuth } from '../../context/AuthContext';
+import DashboardLayout from '../../../components/DashboardLayout';
+import { useAuth } from '../../../context/AuthContext';
 
 import {
   buildContinuityView,
