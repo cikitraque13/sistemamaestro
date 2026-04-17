@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple
 
-from app.core.credits_config_loader import (
+from backend.app.core.credits_config_loader import (
     get_action_config,
     has_required_plan,
     load_threshold_rules,
     load_tier_amounts,
 )
-from app.schemas.consumption import (
+from backend.app.schemas.consumption import (
     ConsumptionDecision,
     ConsumptionGates,
     ConsumptionRequest,
@@ -33,10 +33,6 @@ def _safe_int(value: Any, default: int = 0) -> int:
 
 
 def _count_signal_levels(request: ConsumptionRequest, action_config: Dict[str, Any]) -> Tuple[int, int]:
-    """
-    Cuenta señales altas (>=3) y críticas (=4).
-    Respeta los flags del catálogo cuando existen.
-    """
     scores: Dict[str, int] = {
         "project_complexity_score": request.project_context.project_complexity_score,
         "journey_depth_score": request.project_context.journey_depth_score,
@@ -100,9 +96,6 @@ def _apply_family_guards(
     final_tier: Optional[str],
     consumption_type: str,
 ) -> Tuple[Optional[str], str]:
-    """
-    Blindajes canónicos por familia.
-    """
     safe_tier = final_tier
 
     if family == "analysis" and safe_tier == "T3":
@@ -362,14 +355,6 @@ def _build_response(
 
 
 def evaluate_consumption(request: ConsumptionRequest) -> ConsumptionResponse:
-    """
-    Motor canónico de decisión.
-
-    Importante:
-    - decide tramos, consumo y bloqueos;
-    - NO descuenta todavía del ledger en esta fase;
-    - sirve tanto para simulate como para execute como capa de decisión.
-    """
     action_config = get_action_config(request.action_key)
 
     if not action_config:
