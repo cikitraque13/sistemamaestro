@@ -4,6 +4,7 @@ import {
   CheckCircle,
   FileText,
   Lightning,
+  Lock,
   SpeakerHigh,
   Stop,
   Sparkle
@@ -125,7 +126,7 @@ const FlowResultStep = (props) => {
         </div>
 
         <div>
-          <p className="text-sm text-[#A3A3A3] mb-1">Oportunidad</p>
+          <p className="text-sm text-[#A3A3A3] mb-1">Primer foco de mejora</p>
           <p className="text-white">{safeDiagnosis.opportunity}</p>
         </div>
       </div>
@@ -135,7 +136,7 @@ const FlowResultStep = (props) => {
           <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.10),transparent_28%),linear-gradient(180deg,#151311_0%,#101010_100%)] p-6 mb-6">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/0 via-amber-500/40 to-amber-500/0" />
 
-            <div className="grid lg:grid-cols-[1.12fr_0.88fr] gap-6 items-stretch">
+            <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6 items-stretch">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-xs font-medium border border-amber-500/20 mb-4">
                   <FileText size={14} weight="fill" />
@@ -143,18 +144,20 @@ const FlowResultStep = (props) => {
                 </div>
 
                 <h3 className="text-2xl text-white font-medium mb-3">
-                  Vista previa del informe PDF premium
+                  Vista previa del informe puntual
                 </h3>
 
                 <p className="text-[#E3D7C3] leading-relaxed mb-5 max-w-2xl">
-                  Entras en una salida premium real, ves la estructura del informe y percibes su nivel profesional antes de decidir si lo desbloqueas completo.
+                  Aquí no entregamos todavía el documento final. Primero te mostramos una
+                  vista premium controlada para que percibas nivel, estructura y valor real
+                  antes de desbloquearlo.
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                  <PreviewSignal>Resumen ejecutivo</PreviewSignal>
-                  <PreviewSignal>Diagnóstico central</PreviewSignal>
-                  <PreviewSignal>Lectura por dimensiones</PreviewSignal>
-                  <PreviewSignal>Acciones prioritarias</PreviewSignal>
+                  <PreviewSignal>Validación puntual</PreviewSignal>
+                  <PreviewSignal>Lectura más útil</PreviewSignal>
+                  <PreviewSignal>Primer foco de mejora</PreviewSignal>
+                  <PreviewSignal>Prompt de avance</PreviewSignal>
                   <PreviewSignal>Exportación PDF</PreviewSignal>
                 </div>
               </div>
@@ -162,11 +165,12 @@ const FlowResultStep = (props) => {
               <div className="bg-[#090909] border border-amber-500/14 rounded-2xl p-5 flex flex-col justify-between">
                 <div>
                   <p className="text-[11px] uppercase tracking-wide text-amber-200/70 mb-2">
-                    Qué activa
+                    Qué desbloquea el 6,99
                   </p>
 
                   <p className="text-white text-lg leading-relaxed mb-4">
-                    Una vista premium controlada con efecto wow y acceso al desbloqueo del PDF completo.
+                    Un informe puntual descargable, más serio, más útil y ya orientado a
+                    acción, sin regalarlo antes de tiempo.
                   </p>
 
                   <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4">
@@ -174,7 +178,7 @@ const FlowResultStep = (props) => {
                       Siguiente paso correcto
                     </p>
                     <p className="text-sm text-white">
-                      Abrir la preview premium y empujar desde ahí al desbloqueo puntual.
+                      Abrir la vista previa premium y decidir desde ahí si activas el documento final.
                     </p>
                   </div>
                 </div>
@@ -192,19 +196,27 @@ const FlowResultStep = (props) => {
             </div>
           </div>
 
-          <div className="mb-6">
+          <div className="rounded-2xl border border-white/10 bg-[linear-gradient(180deg,#131313_0%,#0D0D0D_100%)] p-5 mb-6">
+            <p className="text-sm text-[#A3A3A3] mb-3">Salida secundaria</p>
+
             <button
               onClick={onGoToProject}
               disabled={typeof onGoToProject !== 'function'}
-              className="btn-secondary w-full disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl border border-white/12 bg-[#090909] text-white text-lg font-medium hover:bg-[#111111] hover:border-white/18 transition-all disabled:opacity-50"
               data-testid="view-project-btn"
             >
               Ver proyecto
             </button>
+
+            <p className="text-sm text-[#8F8F8F] mt-3">
+              Accede al caso base sin abrir todavía la capa completa del informe puntual.
+            </p>
           </div>
 
           {normalizedPlanRecommendation ? (
-            <div className={`border rounded-2xl p-6 ${normalizedPlanRecommendation.borderClass} ${normalizedPlanRecommendation.boxClass}`}>
+            <div
+              className={`border rounded-2xl p-6 ${normalizedPlanRecommendation.borderClass} ${normalizedPlanRecommendation.boxClass}`}
+            >
               <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
                 <div>
                   <p className="text-sm text-[#A3A3A3] mb-1">
@@ -235,7 +247,7 @@ const FlowResultStep = (props) => {
               <button
                 onClick={onOpenStrategicBilling}
                 disabled={typeof onOpenStrategicBilling !== 'function'}
-                className="w-full btn-secondary flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[linear-gradient(180deg,#4A3310_0%,#352108_100%)] text-white text-lg font-medium border border-amber-500/24 hover:brightness-110 transition-all disabled:opacity-50"
                 data-testid="open-strategic-billing-btn"
               >
                 Ver continuidad estratégica
@@ -280,30 +292,14 @@ const FlowResultStep = (props) => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="rounded-2xl border border-white/10 bg-[linear-gradient(180deg,#131313_0%,#0D0D0D_100%)] p-5">
             <button
               onClick={onGoToProject}
               disabled={typeof onGoToProject !== 'function'}
-              className="btn-secondary flex-1 disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl border border-white/12 bg-[#090909] text-white text-lg font-medium hover:bg-[#111111] hover:border-white/18 transition-all disabled:opacity-50"
               data-testid="view-project-btn"
             >
               Ver proyecto
-            </button>
-
-            <button
-              onClick={onGenerateBlueprint}
-              disabled={loading || typeof onGenerateBlueprint !== 'function'}
-              className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
-              data-testid="generate-blueprint-btn-secondary"
-            >
-              {loading ? (
-                <div className="spinner w-4 h-4"></div>
-              ) : (
-                <>
-                  <Sparkle size={16} weight="fill" />
-                  Generar Blueprint
-                </>
-              )}
             </button>
           </div>
         </div>
