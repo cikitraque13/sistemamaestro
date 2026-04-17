@@ -1,0 +1,17 @@
+{
+  "standard": {
+    "T1": 1,
+    "T2": 3,
+    "T3": 6
+  },
+  "special": {
+    "T1": 0,
+    "T2": 0,
+    "T3": 1
+  },
+  "multipliers": {
+    "base": 1.0,
+    "reinforced": 1.5,
+    "intensive_t3": 2.0
+  }
+}
