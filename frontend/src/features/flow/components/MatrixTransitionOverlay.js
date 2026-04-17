@@ -173,4 +173,9 @@ const MatrixTransitionOverlay = ({ title, detail, status }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> 
+    </div>
+  );
+};
+
+export default MatrixTransitionOverlay;
