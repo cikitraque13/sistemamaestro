@@ -1,6 +1,6 @@
 {
   "free": 0,
-  "pro": 1,
-  "growth": 2,
-  "master": 3
+  "blueprint": 1,
+  "sistema": 2,
+  "premium": 3
 }
