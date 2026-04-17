@@ -8,7 +8,8 @@ import {
   DownloadSimple,
   Printer,
   Lock,
-  ArrowRight
+  ArrowRight,
+  CheckCircle
 } from '@phosphor-icons/react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -24,22 +25,30 @@ const ReportPreview = () => {
   const { user } = useAuth();
 
   const [project, setProject] = useState(null);
+  const [billingData, setBillingData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [exportingPdf, setExportingPdf] = useState(false);
 
   const isAdmin = user?.role === 'admin' || user?.is_admin === true;
 
   useEffect(() => {
-    fetchProject();
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const fetchProject = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/projects/${id}`, {
-        withCredentials: true
-      });
-      setProject(response.data);
+      const [projectResponse, billingResponse] = await Promise.all([
+        axios.get(`${API_BASE}/projects/${id}`, {
+          withCredentials: true
+        }),
+        axios.get(`${API_BASE}/user/billing`, {
+          withCredentials: true
+        })
+      ]);
+
+      setProject(projectResponse.data);
+      setBillingData(billingResponse.data);
     } catch {
       toast.error('No se pudo cargar la vista previa del informe');
       navigate('/dashboard/projects');
@@ -63,8 +72,21 @@ const ReportPreview = () => {
     }
   };
 
+  const transactions = Array.isArray(billingData?.transactions)
+    ? billingData.transactions
+    : [];
+
+  const hasPaidSingleReport = transactions.some(
+    (tx) =>
+      tx?.payment_status === 'paid' &&
+      tx?.item_type === 'one_time_offer' &&
+      (tx?.item_id === 'single_report' || tx?.offer_id === 'single_report')
+  );
+
+  const canExportPdf = isAdmin || hasPaidSingleReport;
+
   const handleExportPdf = () => {
-    if (!project || exportingPdf || !isAdmin) return;
+    if (!project || exportingPdf || !canExportPdf) return;
 
     const originalTitle = document.title;
     const safeProjectId = project.project_id || 'informe';
@@ -121,7 +143,7 @@ const ReportPreview = () => {
             display: none !important;
           }
 
-          ${!isAdmin ? `
+          ${!canExportPdf ? `
           body * {
             visibility: hidden !important;
           }
@@ -184,7 +206,7 @@ const ReportPreview = () => {
                   Vista previa del informe premium
                 </h1>
                 <p className="text-[#A3A3A3] max-w-3xl">
-                  Esta página valida la plantilla visual PDF-ready antes de cerrar la exportación final.
+                  Esta página valida la plantilla visual PDF-ready antes de abrir o desbloquear la exportación final.
                 </p>
               </div>
             </div>
@@ -202,13 +224,22 @@ const ReportPreview = () => {
           </div>
         </div>
 
-        {isAdmin ? (
-          <div className="report-preview-screen-only rounded-2xl border border-white/5 bg-[#111111] px-5 py-5 mb-6">
+        {canExportPdf ? (
+          <div className="report-preview-screen-only rounded-2xl border border-[#0F5257]/20 bg-[linear-gradient(180deg,#111111_0%,#0F1414_100%)] px-5 py-5 mb-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
-                <p className="text-sm text-[#A3A3A3] mb-1">Exportación inicial</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium border border-[#0F5257]/20 mb-3">
+                  <CheckCircle size={14} weight="fill" />
+                  {isAdmin ? 'Modo administrador' : 'PDF desbloqueado'}
+                </div>
+
+                <p className="text-sm text-[#A3A3A3] mb-1">
+                  {isAdmin ? 'Exportación de prueba' : 'Exportación activa'}
+                </p>
                 <p className="text-white">
-                  Este botón abre la impresión del navegador para guardar el informe como PDF.
+                  {isAdmin
+                    ? 'Este botón abre la impresión del navegador para guardar el informe como PDF.'
+                    : 'Tu compra puntual está activa. Ya puedes exportar el informe completo en PDF.'}
                 </p>
               </div>
 
@@ -285,7 +316,7 @@ const ReportPreview = () => {
           data-testid="report-preview-template"
         >
           <div className="relative">
-            {!isAdmin && (
+            {!canExportPdf && (
               <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/92 to-transparent backdrop-blur-[2px] z-10 pointer-events-none rounded-b-[28px]" />
             )}
 
