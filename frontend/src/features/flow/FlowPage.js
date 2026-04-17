@@ -1,27 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams
-} from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import {
-  ArrowLeft,
   ArrowRight,
-  CheckCircle,
+  ArrowLeft,
   Globe,
+  TextAlignLeft,
   Lightning,
+  CheckCircle,
   Microphone,
-  Sparkle,
-  Stop,
-  TextAlignLeft
+  Stop
 } from '@phosphor-icons/react';
 import axios from 'axios';
-import { toast } from 'sonner';
-
-import Logo from '../../components/Logo';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'sonner';
+import Logo from '../../components/Logo';
 import { useVoice } from '../../hooks/useVoice';
 
 import {
@@ -38,6 +31,10 @@ import {
 
 import MatrixTransitionOverlay from './components/MatrixTransitionOverlay';
 import FlowResultStep from './steps/FlowResultStep';
+
+const isValidProjectPayload = (value) => {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+};
 
 const FlowPage = () => {
   const navigate = useNavigate();
@@ -147,12 +144,18 @@ const FlowPage = () => {
           { withCredentials: true }
         );
 
-        setProject(response.data);
-        setRefineAnswers(response.data.refine_answers || {});
+        const nextProject = response?.data;
+
+        if (!isValidProjectPayload(nextProject)) {
+          throw new Error('Respuesta de proyecto no válida');
+        }
+
+        setProject(nextProject);
+        setRefineAnswers(nextProject.refine_answers || {});
 
         await wait(950);
 
-        if (response.data.refine_questions?.length > 0) {
+        if (nextProject.refine_questions?.length > 0) {
           setStep('refine');
         } else {
           setStep('result');
@@ -160,6 +163,7 @@ const FlowPage = () => {
       } catch (error) {
         toast.error(
           formatApiErrorDetail(error.response?.data?.detail) ||
+            error.message ||
             'Error al analizar. Intenta de nuevo.'
         );
         setStep('input');
@@ -192,6 +196,11 @@ const FlowPage = () => {
         });
 
         const loadedProject = response.data;
+
+        if (!isValidProjectPayload(loadedProject)) {
+          throw new Error('Proyecto inválido');
+        }
+
         setProject(loadedProject);
         setRefineAnswers(loadedProject.refine_answers || {});
 
@@ -265,12 +274,18 @@ const FlowPage = () => {
         { withCredentials: true }
       );
 
-      setProject(response.data);
-      setRefineAnswers(response.data.refine_answers || {});
+      const nextProject = response?.data;
+
+      if (!isValidProjectPayload(nextProject)) {
+        throw new Error('Respuesta de proyecto no válida');
+      }
+
+      setProject(nextProject);
+      setRefineAnswers(nextProject.refine_answers || {});
 
       await wait(950);
 
-      if (response.data.refine_questions?.length > 0) {
+      if (nextProject.refine_questions?.length > 0) {
         setStep('refine');
       } else {
         setStep('result');
@@ -278,6 +293,7 @@ const FlowPage = () => {
     } catch (error) {
       toast.error(
         formatApiErrorDetail(error.response?.data?.detail) ||
+          error.message ||
           'Error al analizar. Intenta de nuevo.'
       );
       setStep('input');
@@ -293,7 +309,7 @@ const FlowPage = () => {
   };
 
   const handleRefineSubmit = async () => {
-    if (!project) return;
+    if (!project?.project_id) return;
 
     if (voice.isSpeaking) {
       voice.stopSpeaking();
@@ -317,14 +333,21 @@ const FlowPage = () => {
         { withCredentials: true }
       );
 
-      setProject(response.data);
-      setRefineAnswers(response.data.refine_answers || {});
+      const nextProject = response?.data;
+
+      if (!isValidProjectPayload(nextProject)) {
+        throw new Error('Respuesta de proyecto no válida');
+      }
+
+      setProject(nextProject);
+      setRefineAnswers(nextProject.refine_answers || {});
       await wait(800);
       toast.success('Afinado guardado correctamente');
       setStep('result');
     } catch (error) {
       toast.error(
         formatApiErrorDetail(error.response?.data?.detail) ||
+          error.message ||
           'Error al guardar respuestas'
       );
     } finally {
@@ -339,7 +362,7 @@ const FlowPage = () => {
   };
 
   const handleGenerateBlueprint = async () => {
-    if (!project) return;
+    if (!project?.project_id) return;
 
     if (user?.plan === 'free') {
       toast.error('Necesitas el plan Blueprint o superior');
@@ -372,12 +395,19 @@ const FlowPage = () => {
         { withCredentials: true }
       );
 
-      setProject(response.data);
+      const nextProject = response?.data;
+
+      if (!isValidProjectPayload(nextProject)) {
+        throw new Error('Respuesta de proyecto no válida');
+      }
+
+      setProject(nextProject);
       await wait(1000);
       setStep('blueprint');
     } catch (error) {
       toast.error(
         formatApiErrorDetail(error.response?.data?.detail) ||
+          error.message ||
           'Error al generar blueprint'
       );
     } finally {
@@ -392,7 +422,7 @@ const FlowPage = () => {
   };
 
   const goToProject = () => {
-    if (project) {
+    if (project?.project_id) {
       navigate(`/dashboard/project/${project.project_id}`);
     } else {
       navigate('/dashboard/projects');
@@ -713,21 +743,42 @@ const FlowPage = () => {
               </motion.div>
             )}
 
-            {step === 'result' && project && (
-              <FlowResultStep
-                project={project}
-                normalizedDiagnosis={normalizedDiagnosis}
-                normalizedPlanRecommendation={normalizedPlanRecommendation}
-                userPlan={user?.plan}
-                loading={loading}
-                voiceSupported={voice.isSupported}
-                isSpeaking={voice.isSpeaking}
-                onPlayDiagnosis={handlePlayDiagnosis}
-                onGoToProject={goToProject}
-                onOpenPremiumPreview={goToPremiumPreview}
-                onOpenStrategicBilling={openStrategicBilling}
-                onGenerateBlueprint={handleGenerateBlueprint}
-              />
+            {step === 'result' && (
+              project ? (
+                <FlowResultStep
+                  project={project}
+                  normalizedDiagnosis={normalizedDiagnosis}
+                  normalizedPlanRecommendation={normalizedPlanRecommendation}
+                  userPlan={user?.plan}
+                  loading={loading}
+                  voiceSupported={voice.isSupported}
+                  isSpeaking={voice.isSpeaking}
+                  onPlayDiagnosis={handlePlayDiagnosis}
+                  onGoToProject={goToProject}
+                  onOpenPremiumPreview={goToPremiumPreview}
+                  onOpenStrategicBilling={openStrategicBilling}
+                  onGenerateBlueprint={handleGenerateBlueprint}
+                />
+              ) : (
+                <motion.div
+                  key="result-fallback"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-[#171717] border border-white/10 rounded-2xl p-6 text-center"
+                >
+                  <h2 className="text-xl text-white mb-2">Estamos recuperando tu resultado</h2>
+                  <p className="text-[#A3A3A3] mb-5">
+                    El análisis se ha procesado, pero la vista necesita recargar el proyecto antes de pintar el resultado.
+                  </p>
+                  <button
+                    onClick={() => navigate('/dashboard/projects')}
+                    className="btn-secondary"
+                  >
+                    Volver a proyectos
+                  </button>
+                </motion.div>
+              )
             )}
 
             {step === 'blueprint' && project?.blueprint && (
@@ -738,7 +789,7 @@ const FlowPage = () => {
                 exit={{ opacity: 0, y: -20 }}
               >
                 <div className="text-center mb-8">
-                  <Sparkle size={48} weight="fill" className="text-[#0F5257] mx-auto mb-4" />
+                  <CheckCircle size={48} weight="fill" className="text-[#0F5257] mx-auto mb-4" />
                   <h2
                     className="text-2xl font-light text-white mb-2"
                     data-testid="blueprint-title"
