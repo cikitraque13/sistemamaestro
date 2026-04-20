@@ -27,16 +27,19 @@ const BuilderCodePreview = ({ activeIntent, activeType, projectLabel }) => {
     [activeIntent, activeType]
   );
 
-  const [visibleLines, setVisibleLines] = useState(5);
+  const [visibleLines, setVisibleLines] = useState(6);
+  const maxVisible = 14;
 
   useEffect(() => {
-    let current = 5;
-    setVisibleLines(5);
+    let current = 6;
+    setVisibleLines(6);
+
+    const limit = Math.min(frame.lines.length, maxVisible);
 
     const timer = setInterval(() => {
       current += 1;
-      if (current >= frame.lines.length) {
-        current = frame.lines.length;
+      if (current >= limit) {
+        current = limit;
         clearInterval(timer);
       }
       setVisibleLines(current);
@@ -46,7 +49,7 @@ const BuilderCodePreview = ({ activeIntent, activeType, projectLabel }) => {
   }, [frame]);
 
   return (
-    <div className="relative overflow-hidden rounded-[28px] border border-cyan-500/15 bg-[#07090c] p-5 shadow-[0_0_50px_rgba(6,182,212,0.08)] md:p-6">
+    <div className="relative overflow-hidden rounded-[28px] border border-cyan-500/15 bg-[#07090c] p-5 shadow-[0_0_40px_rgba(6,182,212,0.08)] md:p-6">
       <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-cyan-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-28 w-28 rounded-full bg-violet-500/10 blur-3xl" />
 
@@ -71,17 +74,19 @@ const BuilderCodePreview = ({ activeIntent, activeType, projectLabel }) => {
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
         </div>
 
-        <div className="space-y-2 font-mono text-[12px] leading-6 md:text-[13px]">
-          {frame.lines.slice(0, visibleLines).map((line, index) => (
-            <div key={`${frame.fileLabel}-${index}`} className="flex gap-4">
-              <span className="w-6 shrink-0 text-right text-zinc-600">
-                {index + 1}
-              </span>
-              <span className={`whitespace-pre-wrap ${getLineClass(line)}`}>
-                {line || ' '}
-              </span>
-            </div>
-          ))}
+        <div className="h-[270px] overflow-hidden">
+          <div className="space-y-2 font-mono text-[12px] leading-6 md:text-[13px]">
+            {frame.lines.slice(0, visibleLines).map((line, index) => (
+              <div key={`${frame.fileLabel}-${index}`} className="flex gap-4">
+                <span className="w-6 shrink-0 text-right text-zinc-600">
+                  {index + 1}
+                </span>
+                <span className={`whitespace-pre-wrap ${getLineClass(line)}`}>
+                  {line || ' '}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

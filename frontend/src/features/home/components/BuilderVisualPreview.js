@@ -24,11 +24,8 @@ const BuilderVisualPreview = ({ activeIntent, activeType, projectLabel }) => {
   }, [visualState]);
 
   return (
-    <div className="relative overflow-hidden rounded-[28px] border border-violet-500/15 bg-[#0a0a11] p-5 shadow-[0_0_50px_rgba(168,85,247,0.08)] md:p-6">
-      <div className="pointer-events-none absolute -left-14 -top-10 h-36 w-36 rounded-full bg-violet-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-14 right-0 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl" />
-
-      <div className="relative mb-4 flex items-start justify-between gap-4">
+    <div className="h-full rounded-[28px] border border-white/10 bg-[#0a0a11] p-5 shadow-[0_0_40px_rgba(168,85,247,0.08)] md:p-6">
+      <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Preview visual
@@ -44,11 +41,11 @@ const BuilderVisualPreview = ({ activeIntent, activeType, projectLabel }) => {
         </div>
       </div>
 
-      <p className="relative text-sm leading-6 text-zinc-300">
+      <p className="text-sm leading-6 text-zinc-300">
         {visualState.description}
       </p>
 
-      <div className="relative mt-6 rounded-2xl border border-zinc-800 bg-black/35 p-4">
+      <div className="mt-5 rounded-2xl border border-zinc-800 bg-black/35 p-4">
         <div className="mb-4 flex items-center justify-between">
           <div className="h-4 w-24 rounded-full bg-zinc-800" />
           <div className="h-8 w-24 rounded-xl bg-gradient-to-r from-amber-300 via-amber-200 to-white opacity-90" />
