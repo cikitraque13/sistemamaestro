@@ -2,8 +2,7 @@ import React from 'react';
 import HomeNav from './components/HomeNav';
 import CookieBanner from './components/CookieBanner';
 import HomeFooter from './components/HomeFooter';
-import HeroSection from './sections/HeroSection';
-import BuilderShowcaseSection from './sections/BuilderShowcaseSection';
+import HeroBuilderSection from './sections/HeroBuilderSection';
 import AudienceSection from './sections/AudienceSection';
 import ProblemSection from './sections/ProblemSection';
 import HowItWorksSection from './sections/HowItWorksSection';
@@ -22,8 +21,7 @@ const HomePage = () => {
       <HomeNav />
 
       <main className="bg-[#0A0A0A] text-white">
-        <HeroSection />
-        <BuilderShowcaseSection />
+        <HeroBuilderSection />
         <AudienceSection />
         <ProblemSection />
         <HowItWorksSection />
