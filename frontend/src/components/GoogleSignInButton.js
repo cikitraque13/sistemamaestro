@@ -1,11 +1,12 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 
 const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
+const FALLBACK_GOOGLE_CLIENT_ID = '265766842238-fmk21udhv7f1om2j6a2ljvs7hv8ebkeq.apps.googleusercontent.com';
 
-const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
+const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || (typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'https://sistemamaestro.com'))
   .trim()
   .replace(/\/$/, '');
 
@@ -73,10 +74,10 @@ const getGoogleClientId = async () => {
     }
 
     const data = await response.json();
-    return (data?.google_client_id || '').trim();
+    return (data?.google_client_id || FALLBACK_GOOGLE_CLIENT_ID).trim();
   } catch (error) {
     console.error(`Error cargando ${PUBLIC_CONFIG_URL}:`, error);
-    return '';
+    return FALLBACK_GOOGLE_CLIENT_ID;
   }
 };
 
@@ -207,7 +208,7 @@ const GoogleConnectingOverlay = ({ stepText }) => {
                 </h3>
 
                 <p className="text-[#9aa4a0] leading-relaxed mb-8 max-w-xl">
-                  Verificando identidad, activando sesiÃ³n segura y preparando el entorno de trabajo para entrar en tu dashboard.
+                  Verificando identidad, activando sesión segura y preparando el entorno de trabajo para entrar en tu dashboard.
                 </p>
 
                 <div className="rounded-2xl border border-[#39ff88]/14 bg-[#040a07] px-5 py-5">
@@ -340,7 +341,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
         if (!clientId) {
           if (mountedRef.current) {
             setStatus('missing_client');
-            setErrorMessage('Google Sign-In no estÃ¡ disponible temporalmente.');
+            setErrorMessage('Google Sign-In no está disponible temporalmente.');
           }
           return;
         }
@@ -351,11 +352,11 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 
         const googleId = window.google?.accounts?.id;
         if (!googleId) {
-          throw new Error('Google Identity Services no estÃ¡ disponible');
+          throw new Error('Google Identity Services no está disponible');
         }
 
         if (!containerRef.current) {
-          throw new Error('No existe el contenedor del botÃ³n de Google');
+          throw new Error('No existe el contenedor del botón de Google');
         }
 
         if (!initializedRef.current) {
@@ -366,7 +367,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
             callback: async (response) => {
               try {
                 if (!response?.credential) {
-                  throw new Error('Google no devolviÃ³ credencial');
+                  throw new Error('Google no devolvió credencial');
                 }
 
                 if (!mountedRef.current) return;
@@ -388,7 +389,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                 if (!mountedRef.current) return;
 
                 if (result.success) {
-                  setOverlayStep('Cargando sesiÃ³n');
+                  setOverlayStep('Cargando sesión');
                   await wait(420);
                   setOverlayStep('Preparando dashboard');
                   await wait(520);
@@ -401,7 +402,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                 }
 
                 setIsAuthenticating(false);
-                toast.error(result.error || 'Error al iniciar sesiÃ³n con Google');
+                toast.error(result.error || 'Error al iniciar sesión con Google');
               } catch (callbackError) {
                 console.error('Google callback error:', callbackError);
                 if (mountedRef.current) {
@@ -441,7 +442,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 
             if (!ok && mountedRef.current) {
               setStatus('error');
-              setErrorMessage('No se pudo dibujar el botÃ³n de Google.');
+              setErrorMessage('No se pudo dibujar el botón de Google.');
             }
           }, 220);
         }
@@ -503,3 +504,4 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 };
 
 export default GoogleSignInButton;
+

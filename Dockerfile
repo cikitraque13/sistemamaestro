@@ -1,4 +1,4 @@
-﻿# Frontend build
+# Frontend build
 FROM node:22-alpine AS frontend-build
 
 WORKDIR /app/frontend
@@ -7,7 +7,8 @@ RUN npm install
 COPY frontend/ ./
 
 # Override env for Railway: backend is same origin
-ENV REACT_APP_BACKEND_URL=""
+ARG REACT_APP_BACKEND_URL=https://sistemamaestro.com
+ENV REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
 
 RUN npm run build
 
