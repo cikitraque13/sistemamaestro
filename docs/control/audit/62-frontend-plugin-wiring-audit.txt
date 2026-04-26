@@ -1,0 +1,687 @@
+﻿=== 62-FRONTEND-PLUGIN-WIRING-AUDIT ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+FILE: frontend\craco.config.js
+EXISTS: True
+SIZE: 3018 bytes
+
+[PATTERN HITS]
+L1 :: // craco.config.js
+L2 :: const path = require("path");
+L3 :: require("dotenv").config();
+L6 :: // Craco sets NODE_ENV=development for start, NODE_ENV=production for build
+L7 :: const isDevServer = process.env.NODE_ENV !== "production";
+L11 :: enableHealthCheck: process.env.ENABLE_HEALTH_CHECK === "true",
+L14 :: // Conditionally load health check modules only if enabled
+L15 :: let WebpackHealthPlugin;
+L16 :: let setupHealthEndpoints;
+L17 :: let healthPluginInstance;
+L19 :: if (config.enableHealthCheck) {
+L20 :: WebpackHealthPlugin = require("./plugins/health-check/webpack-health-plugin");
+L21 :: setupHealthEndpoints = require("./plugins/health-check/health-endpoints");
+L22 :: healthPluginInstance = new WebpackHealthPlugin();
+L25 :: let webpackConfig = {
+L35 :: webpack: {
+L39 :: configure: (webpackConfig) => {
+L42 :: webpackConfig.watchOptions = {
+L43 :: ...webpackConfig.watchOptions,
+L54 :: // Add health check plugin to webpack if enabled
+L55 :: if (config.enableHealthCheck && healthPluginInstance) {
+L56 :: webpackConfig.plugins.push(healthPluginInstance);
+L58 :: return webpackConfig;
+L63 :: webpackConfig.devServer = (devServerConfig) => {
+L64 :: // Add health check endpoints if enabled
+L65 :: if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
+L66 :: const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+L68 :: devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+L71 :: middlewares = originalSetupMiddlewares(middlewares, devServer);
+L74 :: // Setup health endpoints
+L75 :: setupHealthEndpoints(devServer, healthPluginInstance);
+L81 :: return devServerConfig;
+L85 :: if (isDevServer) {
+L87 :: const { withVisualEdits } = require("@emergentbase/visual-edits/craco");
+L88 :: webpackConfig = withVisualEdits(webpackConfig);
+L90 :: if (err.code === 'MODULE_NOT_FOUND' && err.message.includes('@emergentbase/visual-edits/craco')) {
+L100 :: module.exports = webpackConfig;
+
+[HEAD]
+// craco.config.js
+const path = require("path");
+require("dotenv").config();
+
+// Check if we're in development/preview mode (not production build)
+// Craco sets NODE_ENV=development for start, NODE_ENV=production for build
+const isDevServer = process.env.NODE_ENV !== "production";
+
+// Environment variable overrides
+const config = {
+  enableHealthCheck: process.env.ENABLE_HEALTH_CHECK === "true",
+};
+
+// Conditionally load health check modules only if enabled
+let WebpackHealthPlugin;
+let setupHealthEndpoints;
+let healthPluginInstance;
+
+if (config.enableHealthCheck) {
+  WebpackHealthPlugin = require("./plugins/health-check/webpack-health-plugin");
+  setupHealthEndpoints = require("./plugins/health-check/health-endpoints");
+  healthPluginInstance = new WebpackHealthPlugin();
+}
+
+let webpackConfig = {
+  eslint: {
+    configure: {
+      extends: ["plugin:react-hooks/recommended"],
+      rules: {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn",
+      },
+    },
+  },
+  webpack: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+    configure: (webpackConfig) => {
+
+      // Add ignored patterns to reduce watched directories
+        webpackConfig.watchOptions = {
+          ...webpackConfig.watchOptions,
+          ignored: [
+            '**/node_modules/**',
+            '**/.git/**',
+            '**/build/**',
+            '**/dist/**',
+            '**/coverage/**',
+            '**/public/**',
+        ],
+      };
+
+      // Add health check plugin to webpack if enabled
+      if (config.enableHealthCheck && healthPluginInstance) {
+        webpackConfig.plugins.push(healthPluginInstance);
+      }
+      return webpackConfig;
+    },
+  },
+};
+
+webpackConfig.devServer = (devServerConfig) => {
+  // Add health check endpoints if enabled
+  if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
+    const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+
+    devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+      // Call original setup if exists
+      if (originalSetupMiddlewares) {
+        middlewares = originalSetupMiddlewares(middlewares, devServer);
+      }
+
+      // Setup health endpoints
+      setupHealthEndpoints(devServer, healthPluginInstance);
+
+      return middlewares;
+    };
+  }
+
+  return devServerConfig;
+};
+
+// Wrap with visual edits (automatically adds babel plugin, dev server, and overlay in dev mode)
+if (isDevServer) {
+  try {
+    const { withVisualEdits } = require("@emergentbase/visual-edits/craco");
+    webpackConfig = withVisualEdits(webpackConfig);
+  } catch (err) {
+    if (err.code === 'MODULE_NOT_FOUND' && err.message.includes('@emergentbase/visual-edits/craco')) {
+      console.warn(
+        "[visual-edits] @emergentbase/visual-edits not installed — visual editing disabled."
+      );
+    } else {
+      throw err;
+    }
+  }
+}
+
+module.exports = webpackConfig;
+
+==============================================================
+FILE: frontend\package.json
+EXISTS: True
+SIZE: 3049 bytes
+
+[PATTERN HITS]
+L61 :: "start": "craco start",
+L62 :: "build": "craco build",
+L63 :: "test": "craco test"
+L79 :: "@craco/craco": "^7.1.0",
+
+[HEAD]
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
+    "@phosphor-icons/react": "^2.1.10",
+    "@radix-ui/react-accordion": "^1.2.8",
+    "@radix-ui/react-alert-dialog": "^1.1.11",
+    "@radix-ui/react-aspect-ratio": "^1.1.4",
+    "@radix-ui/react-avatar": "^1.1.7",
+    "@radix-ui/react-checkbox": "^1.2.3",
+    "@radix-ui/react-collapsible": "^1.1.8",
+    "@radix-ui/react-context-menu": "^2.2.12",
+    "@radix-ui/react-dialog": "^1.1.11",
+    "@radix-ui/react-dropdown-menu": "^2.1.12",
+    "@radix-ui/react-hover-card": "^1.1.11",
+    "@radix-ui/react-label": "^2.1.4",
+    "@radix-ui/react-menubar": "^1.1.12",
+    "@radix-ui/react-navigation-menu": "^1.2.10",
+    "@radix-ui/react-popover": "^1.1.11",
+    "@radix-ui/react-progress": "^1.1.4",
+    "@radix-ui/react-radio-group": "^1.3.4",
+    "@radix-ui/react-scroll-area": "^1.2.6",
+    "@radix-ui/react-select": "^2.2.2",
+    "@radix-ui/react-separator": "^1.1.4",
+    "@radix-ui/react-slider": "^1.3.2",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-switch": "^1.2.2",
+    "@radix-ui/react-tabs": "^1.1.9",
+    "@radix-ui/react-toast": "^1.2.11",
+    "@radix-ui/react-toggle": "^1.1.6",
+    "@radix-ui/react-toggle-group": "^1.1.7",
+    "@radix-ui/react-tooltip": "^1.2.4",
+    "axios": "^1.8.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "cra-template": "1.2.0",
+    "date-fns": "3.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.38.0",
+    "input-otp": "^1.4.2",
+    "lucide-react": "^0.507.0",
+    "next-themes": "^0.4.6",
+    "react": "18.2.0",
+    "react-day-picker": "8.10.1",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.56.2",
+    "react-resizable-panels": "^3.0.1",
+    "react-router-dom": "7.5.1",
+    "react-scripts": "5.0.1",
+    "recharts": "^3.6.0",
+    "sonner": "^2.0.3",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^1.1.2",
+    "zod": "^3.24.4"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@craco/craco": "^7.1.0",
+    "@emergentbase/visual-edits": "https://assets.emergent.sh/npm/emergentbase-visual-edits-1.0.8.tgz",
+    "@eslint/js": "9.23.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "9.23.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.4",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "globals": "15.15.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
+  },
+  "engines": {
+    "node": ">=20 <23"
+  }
+}
+
+==============================================================
+FILE: frontend\plugins\health-check\webpack-health-plugin.js
+EXISTS: True
+SIZE: 3261 bytes
+
+[PATTERN HITS]
+L1 :: // webpack-health-plugin.js
+L2 :: // Webpack plugin that tracks compilation state and health metrics
+L4 :: class WebpackHealthPlugin {
+L19 :: const pluginName = 'WebpackHealthPlugin';
+L88 :: isHealthy: this.status.state === 'success',
+L99 :: isHealthy: this.status.state === 'success',
+L120 :: module.exports = WebpackHealthPlugin;
+
+[HEAD]
+// webpack-health-plugin.js
+// Webpack plugin that tracks compilation state and health metrics
+
+class WebpackHealthPlugin {
+  constructor() {
+    this.status = {
+      state: 'idle',           // idle, compiling, success, failed
+      errors: [],
+      warnings: [],
+      lastCompileTime: null,
+      lastSuccessTime: null,
+      compileDuration: 0,
+      totalCompiles: 0,
+      firstCompileTime: null,
+    };
+  }
+
+  apply(compiler) {
+    const pluginName = 'WebpackHealthPlugin';
+
+    // Hook: Compilation started
+    compiler.hooks.compile.tap(pluginName, () => {
+      const now = Date.now();
+      this.status.state = 'compiling';
+      this.status.lastCompileTime = now;
+
+      if (!this.status.firstCompileTime) {
+        this.status.firstCompileTime = now;
+      }
+    });
+
+    // Hook: Compilation completed
+    compiler.hooks.done.tap(pluginName, (stats) => {
+      const info = stats.toJson({
+        all: false,
+        errors: true,
+        warnings: true,
+      });
+
+      this.status.totalCompiles++;
+      this.status.compileDuration = Date.now() - this.status.lastCompileTime;
+
+      if (stats.hasErrors()) {
+        this.status.state = 'failed';
+        this.status.errors = info.errors.map(err => ({
+          message: err.message || String(err),
+          stack: err.stack,
+          moduleName: err.moduleName,
+          loc: err.loc,
+        }));
+      } else {
+        this.status.state = 'success';
+        this.status.lastSuccessTime = Date.now();
+        this.status.errors = [];
+      }
+
+      if (stats.hasWarnings()) {
+        this.status.warnings = info.warnings.map(warn => ({
+          message: warn.message || String(warn),
+          moduleName: warn.moduleName,
+          loc: warn.loc,
+        }));
+      } else {
+        this.status.warnings = [];
+      }
+    });
+
+    // Hook: Compilation failed
+    compiler.hooks.failed.tap(pluginName, (error) => {
+      this.status.state = 'failed';
+      this.status.errors = [{
+        message: error.message,
+        stack: error.stack,
+      }];
+      this.status.compileDuration = Date.now() - this.status.lastCompileTime;
+    });
+
+    // Hook: Invalid (file changed, recompiling)
+    compiler.hooks.invalid.tap(pluginName, () => {
+      this.status.state = 'compiling';
+    });
+  }
+
+  getStatus() {
+    return {
+      ...this.status,
+      // Add computed fields
+      isHealthy: this.status.state === 'success',
+      errorCount: this.status.errors.length,
+      warningCount: this.status.warnings.length,
+      hasCompiled: this.status.totalCompiles > 0,
+    };
+  }
+
+  // Get simplified status for quick checks
+  getSimpleStatus() {
+    return {
+      state: this.status.state,
+      isHealthy: this.status.state === 'success',
+      errorCount: this.status.errors.length,
+      warningCount: this.status.warnings.length,
+    };
+  }
+
+  // Reset statistics (useful for testing)
+  reset() {
+    this.status = {
+      state: 'idle',
+      errors: [],
+      warnings: [],
+      lastCompileTime: null,
+      lastSuccessTime: null,
+      compileDuration: 0,
+      totalCompiles: 0,
+      firstCompileTime: null,
+    };
+  }
+}
+
+module.exports = WebpackHealthPlugin;
+
+==============================================================
+FILE: frontend\plugins\health-check\health-endpoints.js
+EXISTS: True
+SIZE: 7625 bytes
+
+[PATTERN HITS]
+L1 :: // health-endpoints.js
+L2 :: // API endpoints for health checks and monitoring
+L4 :: const os = require('os');
+L9 :: * Setup health check endpoints on the dev server
+L10 :: * @param {Object} devServer - Webpack dev server instance
+L11 :: * @param {Object} healthPlugin - Instance of WebpackHealthPlugin
+L13 :: function setupHealthEndpoints(devServer, healthPlugin) {
+L14 :: if (!devServer || !devServer.app) {
+L15 :: console.warn('[Health Check] Dev server not available, skipping health endpoints');
+L19 :: if (!healthPlugin) {
+L20 :: console.warn('[Health Check] Health plugin not provided, skipping health endpoints');
+L24 :: console.log('[Health Check] Setting up health endpoints...');
+L27 :: // GET /health - Detailed health status (JSON)
+L29 :: devServer.app.get("/health", (req, res) => {
+L30 :: const webpackStatus = healthPlugin.getStatus();
+L35 :: status: webpackStatus.isHealthy ? 'healthy' : 'unhealthy',
+L41 :: webpack: {
+L42 :: state: webpackStatus.state,
+L43 :: isHealthy: webpackStatus.isHealthy,
+L44 :: hasCompiled: webpackStatus.hasCompiled,
+L45 :: errors: webpackStatus.errorCount,
+L46 :: warnings: webpackStatus.warningCount,
+L47 :: lastCompileTime: webpackStatus.lastCompileTime
+L48 :: ? new Date(webpackStatus.lastCompileTime).toISOString()
+L50 :: lastSuccessTime: webpackStatus.lastSuccessTime
+L51 :: ? new Date(webpackStatus.lastSuccessTime).toISOString()
+L53 :: compileDuration: webpackStatus.compileDuration
+L54 :: ? `${webpackStatus.compileDuration}ms`
+L56 :: totalCompiles: webpackStatus.totalCompiles,
+L57 :: firstCompileTime: webpackStatus.firstCompileTime
+L58 :: ? new Date(webpackStatus.firstCompileTime).toISOString()
+L83 :: // GET /health/simple - Simple text response (OK/COMPILING/ERROR)
+L85 :: devServer.app.get("/health/simple", (req, res) => {
+L86 :: const webpackStatus = healthPlugin.getSimpleStatus();
+L88 :: if (webpackStatus.state === 'success') {
+L90 :: } else if (webpackStatus.state === 'compiling') {
+L92 :: } else if (webpackStatus.state === 'idle') {
+L100 :: // GET /health/ready - Readiness check (Kubernetes/load balancer)
+L102 :: devServer.app.get("/health/ready", (req, res) => {
+L103 :: const webpackStatus = healthPlugin.getSimpleStatus();
+L105 :: if (webpackStatus.state === 'success') {
+L108 :: state: webpackStatus.state,
+L113 :: state: webpackStatus.state,
+L114 :: reason: webpackStatus.state === 'compiling'
+L122 :: // GET /health/live - Liveness check (Kubernetes)
+L124 :: devServer.app.get("/health/live", (req, res) => {
+L132 :: // GET /health/errors - Get current errors and warnings
+L134 :: devServer.app.get("/health/errors", (req, res) => {
+L135 :: const webpackStatus = healthPlugin.getStatus();
+L138 :: errorCount: webpackStatus.errorCount,
+L139 :: warningCount: webpackStatus.warningCount,
+L140 :: errors: webpackStatus.errors,
+L141 :: warnings: webpackStatus.warnings,
+L142 :: state: webpackStatus.state,
+L147 :: // GET /health/stats - Compilation statistics
+L149 :: devServer.app.get("/health/stats", (req, res) => {
+L150 :: const webpackStatus = healthPlugin.getStatus();
+L154 :: totalCompiles: webpackStatus.totalCompiles,
+L155 :: averageCompileTime: webpackStatus.totalCompiles > 0
+L156 :: ? `${Math.round(uptime / webpackStatus.totalCompiles)}ms`
+L158 :: lastCompileDuration: webpackStatus.compileDuration
+L159 :: ? `${webpackStatus.compileDuration}ms`
+L161 :: firstCompileTime: webpackStatus.firstCompileTime
+L162 :: ? new Date(webpackStatus.firstCompileTime).toISOString()
+L168 :: console.log('[Health Check] ✓ Health endpoints ready:');
+L169 :: console.log('  • GET /health         - Detailed status');
+L170 :: console.log('  • GET /health/simple  - Simple OK/ERROR');
+L171 :: console.log('  • GET /health/ready   - Readiness check');
+L172 :: console.log('  • GET /health/live    - Liveness check');
+L173 :: console.log('  • GET /health/errors  - Error details');
+L174 :: console.log('  • GET /health/stats   - Statistics');
+L213 :: module.exports = setupHealthEndpoints;
+
+[HEAD]
+// health-endpoints.js
+// API endpoints for health checks and monitoring
+
+const os = require('os');
+
+const SERVER_START_TIME = Date.now();
+
+/**
+ * Setup health check endpoints on the dev server
+ * @param {Object} devServer - Webpack dev server instance
+ * @param {Object} healthPlugin - Instance of WebpackHealthPlugin
+ */
+function setupHealthEndpoints(devServer, healthPlugin) {
+  if (!devServer || !devServer.app) {
+    console.warn('[Health Check] Dev server not available, skipping health endpoints');
+    return;
+  }
+
+  if (!healthPlugin) {
+    console.warn('[Health Check] Health plugin not provided, skipping health endpoints');
+    return;
+  }
+
+  console.log('[Health Check] Setting up health endpoints...');
+
+  // ====================================================================
+  // GET /health - Detailed health status (JSON)
+  // ====================================================================
+  devServer.app.get("/health", (req, res) => {
+    const webpackStatus = healthPlugin.getStatus();
+    const uptime = Date.now() - SERVER_START_TIME;
+    const memUsage = process.memoryUsage();
+
+    res.json({
+      status: webpackStatus.isHealthy ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      uptime: {
+        seconds: Math.floor(uptime / 1000),
+        formatted: formatDuration(uptime),
+      },
+      webpack: {
+        state: webpackStatus.state,
+        isHealthy: webpackStatus.isHealthy,
+        hasCompiled: webpackStatus.hasCompiled,
+        errors: webpackStatus.errorCount,
+        warnings: webpackStatus.warningCount,
+        lastCompileTime: webpackStatus.lastCompileTime
+          ? new Date(webpackStatus.lastCompileTime).toISOString()
+          : null,
+        lastSuccessTime: webpackStatus.lastSuccessTime
+          ? new Date(webpackStatus.lastSuccessTime).toISOString()
+          : null,
+        compileDuration: webpackStatus.compileDuration
+          ? `${webpackStatus.compileDuration}ms`
+          : null,
+        totalCompiles: webpackStatus.totalCompiles,
+        firstCompileTime: webpackStatus.firstCompileTime
+          ? new Date(webpackStatus.firstCompileTime).toISOString()
+          : null,
+      },
+      server: {
+        nodeVersion: process.version,
+        platform: os.platform(),
+        arch: os.arch(),
+        cpus: os.cpus().length,
+        memory: {
+          heapUsed: formatBytes(memUsage.heapUsed),
+          heapTotal: formatBytes(memUsage.heapTotal),
+          rss: formatBytes(memUsage.rss),
+          external: formatBytes(memUsage.external),
+        },
+        systemMemory: {
+          total: formatBytes(os.totalmem()),
+          free: formatBytes(os.freemem()),
+          used: formatBytes(os.totalmem() - os.freemem()),
+        },
+      },
+      environment: process.env.NODE_ENV || 'development',
+    });
+  });
+
+  // ====================================================================
+  // GET /health/simple - Simple text response (OK/COMPILING/ERROR)
+  // ====================================================================
+  devServer.app.get("/health/simple", (req, res) => {
+    const webpackStatus = healthPlugin.getSimpleStatus();
+
+    if (webpackStatus.state === 'success') {
+      res.status(200).send('OK');
+    } else if (webpackStatus.state === 'compiling') {
+      res.status(200).send('COMPILING');
+    } else if (webpackStatus.state === 'idle') {
+      res.status(200).send('IDLE');
+    } else {
+      res.status(503).send('ERROR');
+    }
+  });
+
+  // ====================================================================
+  // GET /health/ready - Readiness check (Kubernetes/load balancer)
+  // ====================================================================
+  devServer.app.get("/health/ready", (req, res) => {
+    const webpackStatus = healthPlugin.getSimpleStatus();
+
+    if (webpackStatus.state === 'success') {
+      res.status(200).json({
+        ready: true,
+        state: webpackStatus.state,
+      });
+    } else {
+      res.status(503).json({
+        ready: false,
+        state: webpackStatus.state,
+        reason: webpackStatus.state === 'compiling'
+          ? 'Compilation in progress'
+          : 'Compilation failed',
+      });
+    }
+  });
+
+  // ====================================================================
+  // GET /health/live - Liveness check (Kubernetes)
+  // ====================================================================
+  devServer.app.get("/health/live", (req, res) => {
+    res.status(200).json({
+      alive: true,
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // ====================================================================
+  // GET /health/errors - Get current errors and warnings
+  // ====================================================================
+  devServer.app.get("/health/errors", (req, res) => {
+    const webpackStatus = healthPlugin.getStatus();
+
+    res.json({
+      errorCount: webpackStatus.errorCount,
+      warningCount: webpackStatus.warningCount,
+      errors: webpackStatus.errors,
+      warnings: webpackStatus.warnings,
+      state: webpackStatus.state,
+    });
+  });
+
+  // ====================================================================
+  // GET /health/stats - Compilation statistics
+  // ====================================================================
+  devServer.app.get("/health/stats", (req, res) => {
+    const webpackStatus = healthPlugin.getStatus();
+    const uptime = Date.now() - SERVER_START_TIME;
+
+    res.json({
+      totalCompiles: webpackStatus.totalCompiles,
+      averageCompileTime: webpackStatus.totalCompiles > 0
+        ? `${Math.round(uptime / webpackStatus.totalCompiles)}ms`
+        : null,
+      lastCompileDuration: webpackStatus.compileDuration
+        ? `${webpackStatus.compileDuration}ms`
+        : null,
+      firstCompileTime: webpackStatus.firstCompileTime
+        ? new Date(webpackStatus.firstCompileTime).toISOString()
+        : null,
+      serverUptime: formatDuration(uptime),
+    });
+  });
+
+  console.log('[Health Check] ✓ Health endpoints ready:');
+  console.log('  • GET /health         - Detailed status');
+  console.log('  • GET /health/simple  - Simple OK/ERROR');
+  console.log('  • GET /health/ready   - Readiness check');
+  console.log('  • GET /health/live    - Liveness check');
+  console.log('  • GET /health/errors  - Error details');
+  console.log('  • GET /health/stats   - Statistics');
+}
+
+// ====================================================================
+// Helper Functions
+// ====================================================================
+
+/**
+ * Format bytes to human-readable string
+ * @param {number} bytes
+ * @returns {string}
+ */
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+/**
+ * Format duration to human-readable string
+ * @param {number} ms - Duration in milliseconds
+ * @returns {string}
+ */
+function formatDuration(ms) {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+  } else if (minutes > 0) {
+    return `${minutes}m ${seconds % 60}s`;
+  } else {
+    return `${seconds}s`;
+  }
+}
+
+module.exports = setupHealthEndpoints;
+

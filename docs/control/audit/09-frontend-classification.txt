@@ -1,0 +1,9 @@
+﻿
+Path                  Classification         
+----                  --------------         
+frontend\src          FUENTE FRONTEND        
+frontend\public       FUENTE FRONTEND        
+frontend\node_modules DEPENDENCIA REGENERABLE
+
+
+

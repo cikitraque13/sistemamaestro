@@ -1,0 +1,41 @@
+﻿ M .gitignore
+ M frontend/src/App.js
+ M frontend/src/components/GoogleSignInButton.js
+ M frontend/src/features/home/HomePage.js
+ M frontend/src/features/home/components/BuilderInputPanel.js
+ M frontend/src/features/home/sections/BuilderShowcaseSection.js
+ D frontend/src/pages/AuthCallback.js
+ D frontend/src/pages/Billing.js
+ D frontend/src/pages/Dashboard.js
+ D frontend/src/pages/Flow.js
+ D frontend/src/pages/Home.js
+ D frontend/src/pages/Login.js
+ D frontend/src/pages/Opportunities.js
+ D frontend/src/pages/ProjectDetail.js
+ D frontend/src/pages/Projects.js
+ D frontend/src/pages/Register.js
+ D frontend/src/pages/ReportPreview.js
+ D frontend/src/pages/ReportPrintPage.js
+ D frontend/src/pages/Settings.js
+ M frontend/yarn.lock
+?? docs/control/
+?? frontend/package-lock.json
+?? frontend/src/features/app-shell/
+?? frontend/src/features/auth/
+?? frontend/src/features/builder/
+?? frontend/src/features/dashboard/
+?? frontend/src/features/home/components/HomeCapabilityChips.js
+?? frontend/src/features/home/components/HomeEntryPanel.js
+?? frontend/src/features/home/components/HomeFlowPreview.js
+?? frontend/src/features/home/components/HomeIntentTabs.js
+?? frontend/src/features/home/components/HomeOutputsPreview.js
+?? frontend/src/features/home/components/HomeTypeTabs.js
+?? frontend/src/features/home/data/homeEntryIntents.js
+?? frontend/src/features/home/data/homeEntryOutputs.js
+?? frontend/src/features/home/data/homeEntryStages.js
+?? frontend/src/features/home/data/homeEntryTypes.js
+?? frontend/src/features/home/sections/HomeEntrySection.js
+?? frontend/src/features/opportunities/
+?? frontend/src/features/projects/ProjectsPage.js
+?? frontend/src/features/reports/
+?? frontend/src/features/settings/

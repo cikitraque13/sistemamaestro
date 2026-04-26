@@ -1,0 +1,959 @@
+﻿=== 59-FRONTEND-ROOT-HYGIENE-TARGETED-AUDIT ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+TARGET: frontend\components
+EXISTS: False
+[NO EXISTE]
+
+==============================================================
+TARGET: frontend\README.md
+EXISTS: True
+TYPE: file
+SIZE: 3429 bytes
+
+[HEAD]
+# Getting Started with Create React App
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+==============================================================
+TARGET: frontend\plugins
+EXISTS: True
+TYPE: directory
+DIR COUNT: 1
+FILE COUNT: 2
+TOTAL BYTES: 10886
+
+[TREE]
+frontend\plugins\health-check
+frontend\plugins\health-check\health-endpoints.js
+frontend\plugins\health-check\webpack-health-plugin.js
+
+[HEAD PREVIEW]
+
+FILE: frontend\plugins\health-check\health-endpoints.js
+// health-endpoints.js
+// API endpoints for health checks and monitoring
+
+const os = require('os');
+
+const SERVER_START_TIME = Date.now();
+
+/**
+ * Setup health check endpoints on the dev server
+ * @param {Object} devServer - Webpack dev server instance
+ * @param {Object} healthPlugin - Instance of WebpackHealthPlugin
+ */
+function setupHealthEndpoints(devServer, healthPlugin) {
+  if (!devServer || !devServer.app) {
+    console.warn('[Health Check] Dev server not available, skipping health endpoints');
+    return;
+  }
+
+  if (!healthPlugin) {
+    console.warn('[Health Check] Health plugin not provided, skipping health endpoints');
+    return;
+  }
+
+  console.log('[Health Check] Setting up health endpoints...');
+
+  // ====================================================================
+  // GET /health - Detailed health status (JSON)
+  // ====================================================================
+  devServer.app.get("/health", (req, res) => {
+    const webpackStatus = healthPlugin.getStatus();
+    const uptime = Date.now() - SERVER_START_TIME;
+    const memUsage = process.memoryUsage();
+
+    res.json({
+      status: webpackStatus.isHealthy ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      uptime: {
+        seconds: Math.floor(uptime / 1000),
+        formatted: formatDuration(uptime),
+      },
+      webpack: {
+        state: webpackStatus.state,
+        isHealthy: webpackStatus.isHealthy,
+        hasCompiled: webpackStatus.hasCompiled,
+        errors: webpackStatus.errorCount,
+        warnings: webpackStatus.warningCount,
+        lastCompileTime: webpackStatus.lastCompileTime
+          ? new Date(webpackStatus.lastCompileTime).toISOString()
+          : null,
+        lastSuccessTime: webpackStatus.lastSuccessTime
+          ? new Date(webpackStatus.lastSuccessTime).toISOString()
+          : null,
+        compileDuration: webpackStatus.compileDuration
+          ? `${webpackStatus.compileDuration}ms`
+          : null,
+        totalCompiles: webpackStatus.totalCompiles,
+        firstCompileTime: webpackStatus.firstCompileTime
+          ? new Date(webpackStatus.firstCompileTime).toISOString()
+          : null,
+      },
+      server: {
+        nodeVersion: process.version,
+        platform: os.platform(),
+        arch: os.arch(),
+        cpus: os.cpus().length,
+        memory: {
+          heapUsed: formatBytes(memUsage.heapUsed),
+          heapTotal: formatBytes(memUsage.heapTotal),
+          rss: formatBytes(memUsage.rss),
+          external: formatBytes(memUsage.external),
+        },
+        systemMemory: {
+          total: formatBytes(os.totalmem()),
+          free: formatBytes(os.freemem()),
+          used: formatBytes(os.totalmem() - os.freemem()),
+        },
+      },
+      environment: process.env.NODE_ENV || 'development',
+    });
+  });
+
+FILE: frontend\plugins\health-check\webpack-health-plugin.js
+// webpack-health-plugin.js
+// Webpack plugin that tracks compilation state and health metrics
+
+class WebpackHealthPlugin {
+  constructor() {
+    this.status = {
+      state: 'idle',           // idle, compiling, success, failed
+      errors: [],
+      warnings: [],
+      lastCompileTime: null,
+      lastSuccessTime: null,
+      compileDuration: 0,
+      totalCompiles: 0,
+      firstCompileTime: null,
+    };
+  }
+
+  apply(compiler) {
+    const pluginName = 'WebpackHealthPlugin';
+
+    // Hook: Compilation started
+    compiler.hooks.compile.tap(pluginName, () => {
+      const now = Date.now();
+      this.status.state = 'compiling';
+      this.status.lastCompileTime = now;
+
+      if (!this.status.firstCompileTime) {
+        this.status.firstCompileTime = now;
+      }
+    });
+
+    // Hook: Compilation completed
+    compiler.hooks.done.tap(pluginName, (stats) => {
+      const info = stats.toJson({
+        all: false,
+        errors: true,
+        warnings: true,
+      });
+
+      this.status.totalCompiles++;
+      this.status.compileDuration = Date.now() - this.status.lastCompileTime;
+
+      if (stats.hasErrors()) {
+        this.status.state = 'failed';
+        this.status.errors = info.errors.map(err => ({
+          message: err.message || String(err),
+          stack: err.stack,
+          moduleName: err.moduleName,
+          loc: err.loc,
+        }));
+      } else {
+        this.status.state = 'success';
+        this.status.lastSuccessTime = Date.now();
+        this.status.errors = [];
+      }
+
+      if (stats.hasWarnings()) {
+        this.status.warnings = info.warnings.map(warn => ({
+          message: warn.message || String(warn),
+          moduleName: warn.moduleName,
+          loc: warn.loc,
+        }));
+      } else {
+        this.status.warnings = [];
+      }
+    });
+
+    // Hook: Compilation failed
+    compiler.hooks.failed.tap(pluginName, (error) => {
+      this.status.state = 'failed';
+      this.status.errors = [{
+        message: error.message,
+        stack: error.stack,
+      }];
+      this.status.compileDuration = Date.now() - this.status.lastCompileTime;
+    });
+
+    // Hook: Invalid (file changed, recompiling)
+    compiler.hooks.invalid.tap(pluginName, () => {
+      this.status.state = 'compiling';
+
+==============================================================
+TARGET: frontend\src\components
+EXISTS: True
+TYPE: directory
+DIR COUNT: 6
+FILE COUNT: 53
+TOTAL BYTES: 214896
+
+[TREE]
+frontend\src\components\DashboardLayout.js
+frontend\src\components\GoogleSignInButton.js
+frontend\src\components\Logo.js
+frontend\src\components\reports
+frontend\src\components\reports\premium
+frontend\src\components\reports\premium\print
+frontend\src\components\reports\premium\print\PremiumReportPrintTemplate.js
+frontend\src\components\reports\premium\screen
+frontend\src\components\reports\premium\screen\PremiumReportScreenTemplate.js
+frontend\src\components\reports\premium\shared
+frontend\src\components\reports\PremiumReportPdfTemplate.js
+frontend\src\components\ui
+frontend\src\components\ui\accordion.jsx
+frontend\src\components\ui\alert.jsx
+frontend\src\components\ui\alert-dialog.jsx
+frontend\src\components\ui\aspect-ratio.jsx
+frontend\src\components\ui\avatar.jsx
+frontend\src\components\ui\badge.jsx
+frontend\src\components\ui\breadcrumb.jsx
+frontend\src\components\ui\button.jsx
+frontend\src\components\ui\calendar.jsx
+frontend\src\components\ui\card.jsx
+frontend\src\components\ui\carousel.jsx
+frontend\src\components\ui\checkbox.jsx
+frontend\src\components\ui\collapsible.jsx
+frontend\src\components\ui\command.jsx
+frontend\src\components\ui\context-menu.jsx
+frontend\src\components\ui\dialog.jsx
+frontend\src\components\ui\drawer.jsx
+frontend\src\components\ui\dropdown-menu.jsx
+frontend\src\components\ui\form.jsx
+frontend\src\components\ui\hover-card.jsx
+frontend\src\components\ui\input.jsx
+frontend\src\components\ui\input-otp.jsx
+frontend\src\components\ui\label.jsx
+frontend\src\components\ui\menubar.jsx
+frontend\src\components\ui\navigation-menu.jsx
+frontend\src\components\ui\pagination.jsx
+frontend\src\components\ui\popover.jsx
+frontend\src\components\ui\progress.jsx
+frontend\src\components\ui\radio-group.jsx
+frontend\src\components\ui\resizable.jsx
+frontend\src\components\ui\scroll-area.jsx
+frontend\src\components\ui\select.jsx
+frontend\src\components\ui\separator.jsx
+frontend\src\components\ui\sheet.jsx
+frontend\src\components\ui\skeleton.jsx
+frontend\src\components\ui\slider.jsx
+frontend\src\components\ui\sonner.jsx
+frontend\src\components\ui\switch.jsx
+frontend\src\components\ui\table.jsx
+frontend\src\components\ui\tabs.jsx
+frontend\src\components\ui\textarea.jsx
+frontend\src\components\ui\toast.jsx
+frontend\src\components\ui\toaster.jsx
+frontend\src\components\ui\toggle.jsx
+frontend\src\components\ui\toggle-group.jsx
+frontend\src\components\ui\tooltip.jsx
+frontend\src\components\VoiceButton.js
+
+[HEAD PREVIEW]
+
+FILE: frontend\src\components\DashboardLayout.js
+import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { 
+  House, 
+  FolderOpen, 
+  Lightbulb, 
+  CreditCard, 
+  GearSix,
+  SignOut,
+  Plus,
+  List
+} from '@phosphor-icons/react';
+import { useAuth } from '../context/AuthContext';
+import Logo from './Logo';
+
+const SIDEBAR_LINKS = [
+  { path: '/dashboard', icon: House, label: 'Resumen' },
+  { path: '/dashboard/projects', icon: FolderOpen, label: 'Proyectos' },
+  { path: '/dashboard/opportunities', icon: Lightbulb, label: 'Oportunidades' },
+  { path: '/dashboard/billing', icon: CreditCard, label: 'Facturación' },
+  { path: '/dashboard/settings', icon: GearSix, label: 'Ajustes' },
+];
+
+const DashboardLayout = ({ children, title }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  const getPlanBadge = (plan) => {
+    const badges = {
+      free: { label: 'Gratis', color: 'bg-[#262626] text-[#A3A3A3]' },
+      blueprint: { label: 'Blueprint', color: 'bg-blue-500/20 text-blue-400' },
+      sistema: { label: 'Sistema', color: 'bg-[#0F5257]/30 text-[#0F5257]' },
+      premium: { label: 'Premium', color: 'bg-yellow-500/20 text-yellow-400' }
+    };
+    return badges[plan] || badges.free;
+  };
+
+  const planBadge = getPlanBadge(user?.plan);
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] flex">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:flex flex-col w-64 bg-[#171717] border-r border-[#262626]">
+        {/* Logo */}
+        <div className="p-6 border-b border-[#262626]">
+          <Logo size="large" />
+        </div>
+
+        {/* New Project Button */}
+        <div className="p-4">
+          <Link
+            to="/flow"
+            className="w-full btn-primary flex items-center justify-center gap-2"
+            data-testid="new-project-btn"
+          >
+            <Plus size={18} weight="bold" />
+            Nuevo proyecto
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-2">
+          {SIDEBAR_LINKS.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`sidebar-link ${location.pathname === link.path ? 'active' : ''}`}
+              data-testid={`nav-${link.label.toLowerCase()}`}
+            >
+              <link.icon size={20} weight={location.pathname === link.path ? 'fill' : 'regular'} />
+              {link.label}
+            </Link>
+          ))}
+
+FILE: frontend\src\components\GoogleSignInButton.js
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
+
+const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
+
+let googleScriptPromise = null;
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const loadGoogleScriptOnce = () => {
+  if (window.google?.accounts?.id) {
+    return Promise.resolve();
+  }
+
+  if (googleScriptPromise) {
+    return googleScriptPromise;
+  }
+
+  googleScriptPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
+
+    if (existing) {
+      if (window.google?.accounts?.id) {
+        resolve();
+        return;
+      }
+
+      existing.addEventListener('load', () => resolve(), { once: true });
+      existing.addEventListener(
+        'error',
+        () => reject(new Error('No se pudo cargar Google Sign-In')),
+        { once: true }
+      );
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = GOOGLE_SCRIPT_SRC;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('No se pudo cargar Google Sign-In'));
+    document.head.appendChild(script);
+  });
+
+  return googleScriptPromise;
+};
+
+const getGoogleClientId = async () => {
+  const envClientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
+
+  if (envClientId) {
+    return envClientId;
+  }
+
+  try {
+    const response = await fetch('/api/public/config', {
+      method: 'GET',
+      credentials: 'include',
+      headers: { Accept: 'application/json' }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Public config error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return (data?.google_client_id || '').trim();
+  } catch (error) {
+    console.error('Error cargando /api/public/config:', error);
+    return '';
+  }
+};
+
+const MATRIX_CHARS = [
+  '0', '1', 'A', 'U', 'T', 'H', 'X', '9', 'K', 'Σ', 'Λ', '7', 'N', 'O', 'D', 'E',
+  'S', 'Y', 'S', 'Q', 'R', 'I', 'V', 'M', 'C', '8', '2', '5', 'F', 'P'
+];
+
+FILE: frontend\src\components\Logo.js
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const Logo = ({ size = 'default', linkTo = '/', className = '' }) => {
+  const sizes = {
+    small: { img: 40 },
+    default: { img: 52 },
+    large: { img: 64 },
+    xlarge: { img: 88 }
+  };
+
+  const { img } = sizes[size] || sizes.default;
+
+  return (
+    <Link 
+      to={linkTo} 
+      className={`flex items-center gap-2 ${className}`}
+      data-testid="logo"
+    >
+      <img 
+        src="/logo.png" 
+        alt="Sistema Maestro" 
+        style={{ height: img, width: 'auto' }}
+        className="object-contain"
+      />
+    </Link>
+  );
+};
+
+export default Logo;
+
+FILE: frontend\src\components\reports\premium\print\PremiumReportPrintTemplate.js
+import React, { useMemo } from 'react';
+import {
+  CheckCircle,
+  Lightning,
+  Sparkle
+} from '@phosphor-icons/react';
+
+const ROUTE_NAMES = {
+  improve: 'Mejorar algo existente',
+  sell: 'Vender y cobrar',
+  automate: 'Automatizar operación',
+  idea: 'Idea a proyecto',
+  improve_existing: 'Mejorar algo existente',
+  sell_and_charge: 'Vender y cobrar',
+  automate_operation: 'Automatizar operación',
+  idea_to_project: 'Idea a proyecto'
+};
+
+const PLACEHOLDER_PATTERNS = [
+  /^sin .*disponible/i,
+  /^sin .*datos/i,
+  /^sin recomendaci[oó]n/i,
+  /^sin acci[oó]n/i,
+  /^no se ha/i,
+  /^no hay/i,
+  /^lectura pendiente/i,
+  /^pendiente/i
+];
+
+const ensureArray = (value) => (Array.isArray(value) ? value : []);
+
+const formatDate = (value) => {
+  if (!value) return '';
+  try {
+    return new Date(value).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } catch {
+    return '';
+  }
+};
+
+const isMeaningfulText = (value) => {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (trimmed.length < 10) return false;
+  return !PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(trimmed));
+};
+
+const dedupeTexts = (items, maxItems = null) => {
+  const result = [];
+
+  for (const item of items) {
+    if (!isMeaningfulText(item)) continue;
+    if (result.includes(item)) continue;
+    result.push(item);
+    if (maxItems && result.length >= maxItems) break;
+  }
+
+  return result;
+};
+
+const normalizeReportView = (project) => {
+  const diagnosis = project?.diagnosis;
+  if (!diagnosis) return null;
+
+  const strengths = dedupeTexts(ensureArray(diagnosis.strengths), 3);
+  const weaknesses = dedupeTexts(ensureArray(diagnosis.weaknesses), 4);
+  const quickWins = dedupeTexts(ensureArray(diagnosis.quick_wins), 4);
+
+  const executiveSummaryRaw =
+    diagnosis.executive_summary && typeof diagnosis.executive_summary === 'object'
+      ? diagnosis.executive_summary
+      : {};
+
+  const coreDiagnosisRaw =
+    diagnosis.core_diagnosis && typeof diagnosis.core_diagnosis === 'object'
+
+FILE: frontend\src\components\reports\premium\screen\PremiumReportScreenTemplate.js
+import React, { useMemo } from 'react';
+import {
+  CheckCircle,
+  DiamondsFour,
+  Flag,
+  Lightning,
+  Sparkle
+} from '@phosphor-icons/react';
+
+const ROUTE_NAMES = {
+  improve: 'Mejorar algo existente',
+  sell: 'Vender y cobrar',
+  automate: 'Automatizar operaci├│n',
+  idea: 'Idea a proyecto',
+  improve_existing: 'Mejorar algo existente',
+  sell_and_charge: 'Vender y cobrar',
+  automate_operation: 'Automatizar operaci├│n',
+  idea_to_project: 'Idea a proyecto'
+};
+
+const DIMENSION_STATUS_META = {
+  strong: {
+    label: 'Fuerte',
+    badgeClass: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/20',
+    cardClass: 'border-emerald-500/20 bg-[linear-gradient(180deg,rgba(16,185,129,0.08),rgba(10,10,10,1))]'
+  },
+  improvable: {
+    label: 'Mejorable',
+    badgeClass: 'bg-sky-500/10 text-sky-300 border border-sky-500/20',
+    cardClass: 'border-sky-500/20 bg-[linear-gradient(180deg,rgba(14,165,233,0.06),rgba(10,10,10,1))]'
+  },
+  priority: {
+    label: 'Prioritario',
+    badgeClass: 'bg-amber-500/15 text-amber-300 border border-amber-500/20',
+    cardClass: 'border-amber-500/20 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(10,10,10,1))]'
+  }
+};
+
+const PRIORITY_META = {
+  high: {
+    label: 'Alta',
+    badgeClass: 'bg-amber-500/15 text-amber-300'
+  },
+  medium: {
+    label: 'Media',
+    badgeClass: 'bg-[#262626] text-[#D4D4D4]'
+  },
+  low: {
+    label: 'Baja',
+    badgeClass: 'bg-[#1B2A20] text-[#8BE3A1]'
+  }
+};
+
+const CONTINUITY_META = {
+  stay: {
+    label: 'Seguir analizando',
+    badgeClass: 'bg-[#262626] text-[#D4D4D4]'
+  },
+  blueprint: {
+    label: 'Entrar en Pro',
+    badgeClass: 'bg-[#0F5257]/20 text-[#8DE1D0]'
+  },
+  sistema: {
+    label: 'Entrar en Growth',
+    badgeClass: 'bg-amber-500/20 text-amber-300'
+  },
+  premium: {
+    label: 'Acceder a AI Master 199',
+    badgeClass: 'bg-fuchsia-500/20 text-fuchsia-300'
+  }
+};
+
+const PLACEHOLDER_PATTERNS = [
+  /^sin .*disponible/i,
+  /^sin .*datos/i,
+  /^sin recomendaci[o├│]n/i,
+  /^sin acci[o├│]n/i,
+  /^no se ha/i,
+  /^no hay/i,
+  /^lectura pendiente/i,
+
+FILE: frontend\src\components\reports\PremiumReportPdfTemplate.js
+import React, { useMemo } from 'react';
+import {
+  CheckCircle,
+  DiamondsFour,
+  Flag,
+  Lightning,
+  Sparkle
+} from '@phosphor-icons/react';
+
+const ROUTE_NAMES = {
+  improve: 'Mejorar algo existente',
+  sell: 'Vender y cobrar',
+  automate: 'Automatizar operación',
+  idea: 'Idea a proyecto',
+  improve_existing: 'Mejorar algo existente',
+  sell_and_charge: 'Vender y cobrar',
+  automate_operation: 'Automatizar operación',
+  idea_to_project: 'Idea a proyecto'
+};
+
+const DIMENSION_STATUS_META = {
+  strong: {
+    label: 'Fuerte',
+    badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    cardClass: 'border-emerald-200 bg-emerald-50'
+  },
+  improvable: {
+    label: 'Mejorable',
+    badgeClass: 'bg-sky-50 text-sky-700 border border-sky-200',
+    cardClass: 'border-sky-200 bg-sky-50'
+  },
+  priority: {
+    label: 'Prioritario',
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200',
+    cardClass: 'border-amber-200 bg-amber-50'
+  }
+};
+
+const PRIORITY_META = {
+  high: {
+    label: 'Alta',
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200'
+  },
+  medium: {
+    label: 'Media',
+    badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200'
+  },
+  low: {
+    label: 'Baja',
+    badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+  }
+};
+
+const CONTINUITY_META = {
+  stay: {
+    label: 'Seguir analizando',
+    badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200'
+  },
+  blueprint: {
+    label: 'Entrar en Pro',
+    badgeClass: 'bg-teal-50 text-teal-700 border border-teal-200'
+  },
+  sistema: {
+    label: 'Entrar en Growth',
+    badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200'
+  },
+  premium: {
+    label: 'Acceder a AI Master 199',
+    badgeClass: 'bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200'
+  }
+};
+
+const PLACEHOLDER_PATTERNS = [
+  /^sin .*disponible/i,
+  /^sin .*datos/i,
+  /^sin recomendaci[oó]n/i,
+  /^sin acci[oó]n/i,
+  /^no se ha/i,
+  /^no hay/i,
+  /^lectura pendiente/i,
+
+FILE: frontend\src\components\ui\accordion.jsx
+import * as React from "react"
+import * as AccordionPrimitive from "@radix-ui/react-accordion"
+import { ChevronDown } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+const Accordion = AccordionPrimitive.Root
+
+const AccordionItem = React.forwardRef(({ className, ...props }, ref) => (
+  <AccordionPrimitive.Item ref={ref} className={cn("border-b", className)} {...props} />
+))
+AccordionItem.displayName = "AccordionItem"
+
+const AccordionTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180",
+        className
+      )}
+      {...props}>
+      {children}
+      <ChevronDown
+        className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+))
+AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
+
+const AccordionContent = React.forwardRef(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Content
+    ref={ref}
+    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    {...props}>
+    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+  </AccordionPrimitive.Content>
+))
+AccordionContent.displayName = AccordionPrimitive.Content.displayName
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+
+FILE: frontend\src\components\ui\alert.jsx
+import * as React from "react"
+import { cva } from "class-variance-authority";
+
+import { cn } from "@/lib/utils"
+
+const alertVariants = cva(
+  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
+  {
+    variants: {
+      variant: {
+        default: "bg-background text-foreground",
+        destructive:
+          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+const Alert = React.forwardRef(({ className, variant, ...props }, ref) => (
+  <div
+    ref={ref}
+    role="alert"
+    className={cn(alertVariants({ variant }), className)}
+    {...props} />
+))
+Alert.displayName = "Alert"
+
+const AlertTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props} />
+))
+AlertTitle.displayName = "AlertTitle"
+
+const AlertDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props} />
+))
+AlertDescription.displayName = "AlertDescription"
+
+export { Alert, AlertTitle, AlertDescription }
+
+FILE: frontend\src\components\ui\alert-dialog.jsx
+import * as React from "react"
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
+
+const AlertDialog = AlertDialogPrimitive.Root
+
+const AlertDialogTrigger = AlertDialogPrimitive.Trigger
+
+const AlertDialogPortal = AlertDialogPrimitive.Portal
+
+const AlertDialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Overlay
+    className={cn(
+      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+    ref={ref} />
+))
+AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
+
+const AlertDialogContent = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPortal>
+    <AlertDialogOverlay />
+    <AlertDialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        className
+      )}
+      {...props} />
+  </AlertDialogPortal>
+))
+AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
+
+const AlertDialogHeader = ({
+  className,
+  ...props
+}) => (
+  <div
+    className={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
+    {...props} />
+)
+AlertDialogHeader.displayName = "AlertDialogHeader"
+
+const AlertDialogFooter = ({
+  className,
+  ...props
+}) => (
+  <div
+    className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+    {...props} />
+)
+AlertDialogFooter.displayName = "AlertDialogFooter"
+
+const AlertDialogTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Title ref={ref} className={cn("text-lg font-semibold", className)} {...props} />
+))
+AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName
+
+const AlertDialogDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props} />
+))
+AlertDialogDescription.displayName =
+  AlertDialogPrimitive.Description.displayName
+
+const AlertDialogAction = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Action ref={ref} className={cn(buttonVariants(), className)} {...props} />
+))
+AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
+
+const AlertDialogCancel = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Cancel
+    ref={ref}
+    className={cn(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className)}
+
+FILE: frontend\src\components\ui\aspect-ratio.jsx
+import * as AspectRatioPrimitive from "@radix-ui/react-aspect-ratio"
+
+const AspectRatio = AspectRatioPrimitive.Root
+
+export { AspectRatio }
+

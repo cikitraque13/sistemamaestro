@@ -1,0 +1,329 @@
+﻿=== 69-AI-FIRST-INTEGRATION-CANDIDATES ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+TARGET: backend\app\routers
+EXISTS: True
+FILE: backend\app\routers\auth.py
+L254 :: session_token = google_data.get("session_token", secrets.token_urlsafe(32))
+
+FILE: backend\app\routers\billing.py
+L6 :: from backend.app.services.credits import get_plan_included_credits, get_user_credit_summary
+L22 :: credit_summary = await get_user_credit_summary(user["user_id"])
+L32 :: "credit_summary": {
+L34 :: "balance": credit_summary["credit_balance"],
+L35 :: "lifetime_granted": credit_summary["credit_lifetime_granted"],
+L36 :: "lifetime_used": credit_summary["credit_lifetime_used"],
+L83 :: project_count = await db.projects.count_documents({"user_id": user["user_id"]})
+L84 :: blueprint_count = await db.projects.count_documents(
+L85 :: {"user_id": user["user_id"], "status": "blueprint_generated"}
+L87 :: credit_summary = await get_user_credit_summary(user["user_id"])
+L90 :: "total_projects": project_count,
+L91 :: "blueprints_generated": blueprint_count,
+L93 :: "credit_balance": credit_summary["credit_balance"]
+
+FILE: backend\app\routers\consumption.py
+L38 :: "/config-summary",
+L40 :: summary="Resumen de configuración del motor de consumo",
+L42 :: def get_consumption_config_summary() -> Dict[str, Any]:
+L57 :: "summary": {
+L80 :: summary="Simula una acción del motor de consumo",
+L117 :: summary="Evalúa una acción en modo ejecución",
+
+FILE: backend\app\routers\payments.py
+L98 :: host_url = checkout_data.origin_url.rstrip("/")
+L99 :: success_url = f"{host_url}/dashboard/billing?session_id={{CHECKOUT_SESSION_ID}}"
+L100 :: cancel_url = f"{host_url}/dashboard/billing"
+L117 :: success_url=success_url,
+L118 :: cancel_url=cancel_url,
+L149 :: return {"url": session.url, "session_id": session.id}
+
+FILE: backend\app\routers\projects.py
+L8 :: from backend.app.schemas.projects import ProjectCreate, RefineInput
+L9 :: from backend.app.services.ai_analysis import analyze_with_ai
+L10 :: from backend.app.services.blueprint import generate_blueprint
+L11 :: from backend.app.services.plan_recommendation import build_plan_recommendation
+L12 :: from backend.app.services.url_analysis import fetch_and_analyze_url
+L14 :: router = APIRouter(prefix="/api/projects", tags=["projects"])
+L18 :: async def create_project(project_data: ProjectCreate, request: Request):
+L21 :: url_analysis = None
+L22 :: if project_data.input_type == "url":
+L23 :: url_analysis = await fetch_and_analyze_url(project_data.input_content)
+L24 :: if not url_analysis.get("success"):
+L27 :: detail=url_analysis.get("error", "No se pudo analizar la URL")
+L30 :: analysis = await analyze_with_ai(
+L31 :: project_data.input_type,
+L32 :: project_data.input_content,
+L33 :: url_analysis
+L36 :: plan_recommendation = build_plan_recommendation(
+L37 :: input_type=project_data.input_type,
+L38 :: input_content=project_data.input_content,
+L39 :: analysis=analysis,
+L40 :: url_analysis=url_analysis
+L43 :: project_id = f"proj_{uuid.uuid4().hex[:12]}"
+L44 :: project_doc = {
+L45 :: "project_id": project_id,
+L47 :: "input_type": project_data.input_type,
+L48 :: "input_content": project_data.input_content,
+L49 :: "route": analysis.get("route", "idea"),
+L50 :: "diagnosis": analysis.get("diagnosis", {}),
+L51 :: "refine_questions": analysis.get("refine_questions", []),
+L52 :: "plan_recommendation": plan_recommendation,
+L53 :: "url_analysis": url_analysis.get("content") if url_analysis and url_analysis.get("success") else None,
+L54 :: "status": "analyzed",
+L59 :: await db.projects.insert_one(project_doc)
+L60 :: project_doc.pop("_id", None)
+L61 :: return project_doc
+L65 :: async def get_projects(request: Request):
+L68 :: projects = await db.projects.find(
+L73 :: return projects
+L76 :: @router.get("/{project_id}")
+L77 :: async def get_project(project_id: str, request: Request):
+L80 :: project = await db.projects.find_one(
+L81 :: {"project_id": project_id, "user_id": user["user_id"]},
+L84 :: if not project:
+L85 :: raise HTTPException(status_code=404, detail="Project not found")
+L87 :: return project
+L90 :: @router.post("/{project_id}/refine")
+L91 :: async def refine_project(project_id: str, refine_data: RefineInput, request: Request):
+L94 :: project = await db.projects.find_one(
+L95 :: {"project_id": project_id, "user_id": user["user_id"]}
+L97 :: if not project:
+L98 :: raise HTTPException(status_code=404, detail="Project not found")
+L100 :: analysis_for_recommendation = {
+L101 :: "route": project.get("route", "idea"),
+L102 :: "diagnosis": project.get("diagnosis", {}),
+L103 :: "refine_questions": project.get("refine_questions", [])
+L106 :: plan_recommendation = build_plan_recommendation(
+L107 :: input_type=project.get("input_type", "text"),
+L108 :: input_content=project.get("input_content", ""),
+L109 :: analysis=analysis_for_recommendation,
+L110 :: url_analysis=project.get("url_analysis"),
+L114 :: await db.projects.update_one(
+L115 :: {"project_id": project_id},
+L118 :: "plan_recommendation": plan_recommendation,
+L124 :: updated = await db.projects.find_one({"project_id": project_id}, {"_id": 0})
+L128 :: @router.post("/{project_id}/blueprint")
+L129 :: async def create_blueprint(project_id: str, request: Request):
+L135 :: detail="Upgrade to Blueprint plan to unlock this feature"
+L138 :: project = await db.projects.find_one(
+L139 :: {"project_id": project_id, "user_id": user["user_id"]}
+L141 :: if not project:
+L142 :: raise HTTPException(status_code=404, detail="Project not found")
+L144 :: blueprint = await generate_blueprint(project)
+L146 :: await db.projects.update_one(
+L147 :: {"project_id": project_id},
+L149 :: "blueprint": blueprint,
+L150 :: "status": "blueprint_generated",
+L155 :: updated = await db.projects.find_one({"project_id": project_id}, {"_id": 0})
+L159 :: @router.delete("/{project_id}")
+L160 :: async def delete_project(project_id: str, request: Request):
+L163 :: result = await db.projects.delete_one(
+L164 :: {"project_id": project_id, "user_id": user["user_id"]}
+L167 :: raise HTTPException(status_code=404, detail="Project not found")
+
+==============================================================
+TARGET: backend\app\services
+EXISTS: True
+FILE: backend\app\services\ai_analysis.py
+L23 :: ALLOWED_CONTINUITY_PATHS = {"stay", "blueprint", "sistema", "premium"}
+L285 :: def _normalize_continuity_recommendation(item: Any) -> Dict[str, str]:
+L288 :: "recommended_path": "stay",
+L293 :: recommended_path = str(item.get("recommended_path", "")).strip().lower()
+L294 :: if recommended_path not in ALLOWED_CONTINUITY_PATHS:
+L295 :: recommended_path = "stay"
+L299 :: "blueprint": "Entrar en Pro",
+L302 :: }[recommended_path]
+L305 :: "recommended_path": recommended_path,
+L336 :: def _build_fallback_analysis(configured: bool = True) -> Dict[str, Any]:
+L337 :: summary = (
+L343 :: diagnosis = {
+L344 :: "summary": summary,
+L345 :: "understanding": summary,
+L351 :: "executive_summary": {
+L352 :: "understanding": summary,
+L357 :: "core_diagnosis": {
+L368 :: "continuity_recommendation": {
+L369 :: "recommended_path": "stay",
+L376 :: "route": "idea",
+L377 :: "diagnosis": diagnosis,
+L382 :: def _normalize_analysis_payload(parsed: Dict[str, Any]) -> Dict[str, Any]:
+L383 :: diagnosis_raw = parsed.get("diagnosis", {})
+L384 :: if not isinstance(diagnosis_raw, dict):
+L385 :: diagnosis_raw = {}
+L387 :: summary = _ensure_string(
+L388 :: diagnosis_raw.get("summary"),
+L393 :: _ensure_string_list(diagnosis_raw.get("strengths"), []),
+L397 :: _ensure_string_list(diagnosis_raw.get("weaknesses"), []),
+L401 :: _ensure_string_list(diagnosis_raw.get("quick_wins"), []),
+L405 :: dimension_review = _normalize_dimension_review(diagnosis_raw.get("dimension_review"))
+L406 :: priority_actions = _normalize_priority_actions(diagnosis_raw.get("priority_actions"))
+L407 :: immediate_action = _normalize_immediate_action(diagnosis_raw.get("immediate_action"))
+L408 :: continuity_recommendation = _normalize_continuity_recommendation(
+L409 :: diagnosis_raw.get("continuity_recommendation")
+L412 :: executive_summary_raw = diagnosis_raw.get("executive_summary", {})
+L413 :: if not isinstance(executive_summary_raw, dict):
+L414 :: executive_summary_raw = {}
+L416 :: core_diagnosis_raw = diagnosis_raw.get("core_diagnosis", {})
+L417 :: if not isinstance(core_diagnosis_raw, dict):
+L418 :: core_diagnosis_raw = {}
+L422 :: diagnosis_raw.get("understanding"),
+L423 :: executive_summary_raw.get("understanding"),
+L424 :: summary,
+L433 :: executive_summary_raw.get("main_tension"),
+L436 :: summary,
+L444 :: executive_summary_raw.get("commercial_importance"),
+L454 :: core_diagnosis_raw.get("main_finding"),
+L455 :: diagnosis_raw.get("main_finding"),
+L458 :: summary,
+L466 :: core_diagnosis_raw.get("main_weakness"),
+L477 :: core_diagnosis_raw.get("main_leverage"),
+L478 :: diagnosis_raw.get("opportunity"),
+L489 :: executive_summary_raw.get("bottom_line"),
+L498 :: diagnosis = {
+L499 :: "summary": summary,
+L506 :: "executive_summary": {
+L512 :: "core_diagnosis": {
+L520 :: "continuity_recommendation": continuity_recommendation,
+L524 :: "route": _ensure_string(parsed.get("route"), "idea"),
+L525 :: "diagnosis": diagnosis,
+L530 :: async def analyze_with_ai(
+L533 :: url_analysis: Optional[Dict[str, Any]] = None
+L536 :: return _build_fallback_analysis(configured=False)
+L552 :: "route": "improve|sell|automate|idea",
+L553 :: "diagnosis": {
+L554 :: "summary": "Resumen corto",
+L561 :: "executive_summary": {
+L567 :: "core_diagnosis": {
+L621 :: "continuity_recommendation": {
+L622 :: "recommended_path": "stay|blueprint|sistema|premium",
+L635 :: - summary = síntesis breve del caso, sin repetir listas ni CTAs
+L636 :: - understanding = lectura global del caso en una frase distinta del summary
+L645 :: - continuity_recommendation = una sola vía principal de continuidad
+L659 :: - Si es una URL, analiza el contenido real proporcionado y no inventes elementos no visibles
+L660 :: - continuity_recommendation debe recomendar solo una vía principal
+L661 :: - PROHIBIDO repetir la misma idea con palabras parecidas entre understanding, main_tension, main_finding, main_weakness, main_leverage, bottom_line, quick_wins e immediate_action
+L663 :: - Si no puedes aportar una idea distinta en un bloque, elige el segundo ángulo más relevante del caso en vez de parafrasear"""
+L665 :: if input_type == "url" and url_analysis and url_analysis.get("content"):
+L666 :: content = url_analysis["content"]
+L678 :: URL: {content['url']}
+L699 :: No repitas la misma idea entre bloques distintos."""
+L701 :: user_prompt = f"""El usuario describe una idea, necesidad o problema digital.
+L716 :: No repitas la misma idea entre bloques distintos y evita generalidades."""
+L733 :: return _normalize_analysis_payload(parsed)
+L736 :: logger.exception("AI analysis error")
+L737 :: return _build_fallback_analysis(configured=True)
+
+FILE: backend\app\services\blueprint.py
+L12 :: async def generate_blueprint(project: Dict) -> Dict:
+L15 :: "title": "Blueprint no disponible",
+L16 :: "summary": "Configura OPENAI_API_KEY para generar blueprints",
+L27 :: "improve": "Mejorar algo existente",
+L30 :: "idea": "Idea a proyecto"
+L33 :: system_prompt = """Eres el arquitecto de Sistema Maestro. Genera un Blueprint (plan de acción) en JSON exacto:
+L35 :: "title": "Título del blueprint",
+L36 :: "summary": "Resumen ejecutivo del plan",
+L51 :: Ruta: {route_names.get(project.get('route', ''), 'General')}
+L52 :: Entrada original: {project.get('input_content', '')}
+L53 :: Diagnóstico: {project.get('diagnosis', {})}
+L54 :: Respuestas de afinado: {project.get('refine_answers', {})}
+L55 :: Análisis de URL: {project.get('url_analysis', 'N/A')}
+L81 :: logger.error(f"Blueprint generation error: {e}")
+L83 :: "title": f"Blueprint: {route_names.get(project.get('route', ''), 'Proyecto')}",
+L84 :: "summary": "Blueprint generado para tu proyecto",
+
+FILE: backend\app\services\consumption_engine.py
+L21 :: get_user_credit_summary,
+L47 :: runtime_credit_summary: Dict[str, Any],
+L54 :: "credit_balance": int(runtime_credit_summary.get("credit_balance", 0) or 0),
+L55 :: "special_credit_balance": int(runtime_credit_summary.get("special_credit_balance", 0) or 0),
+L63 :: "project_complexity_score": payload.project_context.project_complexity_score,
+L64 :: "journey_depth_score": payload.project_context.journey_depth_score,
+L65 :: "output_value_score": payload.project_context.output_value_score,
+L66 :: "operational_cost_score": payload.project_context.operational_cost_score,
+L73 :: "action_count_on_project": payload.usage_context.action_count_on_project,
+L108 :: payload.project_context.project_complexity_score
+L109 :: + payload.project_context.journey_depth_score
+L110 :: + payload.project_context.output_value_score
+L111 :: + payload.project_context.operational_cost_score
+L125 :: high_signals = sum(1 for value in scores.values() if value >= 3)
+L126 :: critical_signals = sum(1 for value in scores.values() if value >= 4)
+L136 :: intense_project = repetition["action_count_on_project"] >= _safe_int(
+L137 :: repetition_rules.get("intense_on_project"),
+L144 :: medium_project = repetition["action_count_on_project"] >= _safe_int(
+L145 :: repetition_rules.get("medium_on_project"),
+L149 :: if intense_session or intense_project:
+L155 :: and critical_signals >= 1
+L156 :: and high_signals >= 2
+L158 :: or high_signals >= _safe_int(escalated_rules.get("high_signals_min"), 3)
+L163 :: critical_signals >= _safe_int(reinforced_rules.get("critical_signals_min"), 1)
+L164 :: or high_signals >= _safe_int(reinforced_rules.get("high_signals_min"), 2)
+L166 :: or medium_project
+L322 :: next_step_hint="continue_project",
+L363 :: runtime_credit_summary = await get_user_credit_summary(runtime_user_id)
+L367 :: runtime_credit_summary=runtime_credit_summary,
+L377 :: project_id = runtime_request.project_context.project_id
+L394 :: "project_id": project_id,
+L421 :: data["ux"]["next_step_hint"] = "continue_project"
+
+FILE: backend\app\services\credits.py
+L59 :: async def get_user_credit_summary(user_id: str) -> Dict[str, int]:
+L74 :: project_id: Optional[str] = None
+L81 :: "project_id": project_id,
+
+FILE: backend\app\services\plan_recommendation.py
+L15 :: def build_plan_recommendation(
+L18 :: analysis: Dict[str, Any],
+L19 :: url_analysis: Optional[Dict[str, Any]] = None,
+L22 :: route = analysis.get("route", "idea")
+L23 :: diagnosis = analysis.get("diagnosis") or {}
+L24 :: refine_questions = analysis.get("refine_questions") or []
+L27 :: url_content = {}
+L28 :: if isinstance(url_analysis, dict):
+L29 :: url_content = url_analysis.get("content", url_analysis)
+L31 :: summary = diagnosis.get("summary", "")
+L32 :: strengths = diagnosis.get("strengths") or []
+L33 :: weaknesses = diagnosis.get("weaknesses") or []
+L34 :: quick_wins = diagnosis.get("quick_wins") or []
+L42 :: str(summary or ""),
+L66 :: cta_count = len(url_content.get("ctas", []) or [])
+L67 :: h2_count = len(url_content.get("h2", []) or [])
+L68 :: forms_count = int(url_content.get("forms_count", 0) or 0)
+L71 :: "idea": 1,
+L72 :: "improve": 2,
+L79 :: if input_type == "url" and (forms_count > 0 or cta_count >= 3 or h2_count >= 5):
+L86 :: "idea": 1,
+L87 :: "improve": 2,
+L96 :: if input_type == "url" and (forms_count > 0 or cta_count >= 2):
+L101 :: "idea": 0,
+L102 :: "improve": 1,
+L111 :: if input_type == "url" and cta_count == 0 and forms_count == 0:
+L116 :: "idea": 1,
+L117 :: "improve": 2,
+L129 :: "idea": 1,
+L130 :: "improve": 1,
+L135 :: if input_type == "url":
+L146 :: # - Blueprint/Pro = continuidad normal por defecto
+L170 :: recommended_plan = "premium"
+L172 :: recommended_plan = "sistema"
+L174 :: recommended_plan = "blueprint"
+L176 :: if recommended_plan == "blueprint":
+L180 :: "Lo correcto ahora es aterrizar el caso con un blueprint bien enfocado."
+L188 :: elif recommended_plan == "sistema":
+L211 :: plan_data = PLANS[recommended_plan]
+L214 :: "recommended_plan_id": recommended_plan,
+L215 :: "recommended_plan_name": plan_data["name"],
+L216 :: "recommended_plan_price": plan_data["price"],
+
+FILE: backend\app\services\url_analysis.py
+L2 :: from urllib.parse import urlparse
+L8 :: async def fetch_and_analyze_url(url: str) -> Dict[str, Any]:
+L9 :: if not url.startswith(("http://", "https://")):
+L10 :: url = "https://" + url
+L12 :: parsed = urlparse(url)
+L14 :: return {"success": False, "error": "URL no válida"}
+L19 :: url,
+L83 :: "url": url,
+L97 :: return {"success": False, "error": "Tiempo de espera agotado al acceder a la URL"}
+L101 :: return {"success": False, "error": f"Error al analizar la URL: {str(e)}"}
+

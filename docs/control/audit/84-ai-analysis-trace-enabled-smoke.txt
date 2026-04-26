@@ -1,0 +1,13 @@
+﻿=== 84-AI-ANALYSIS-TRACE-ENABLED-SMOKE ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+AI_ANALYSIS_TRACE_ENABLED: 1
+AI_ANALYSIS_TRACE_VERBOSE: 0
+
+[FLAG CHECK]
+TRACE_ENABLED_NOW=True
+
+[SMOKE TEST WITH TRACE ENABLED]
+ROUTE=improve
+CONTINUITY=blueprint
+REFINE_COUNT=3

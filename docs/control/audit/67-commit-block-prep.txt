@@ -1,0 +1,305 @@
+﻿=== 67-COMMIT-BLOCK-PREP ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+[GIT STATUS SHORT]
+M  .gitignore
+ M DEPLOY_RAILWAY.md
+ M README.md
+ M backend/app/main.py
+ M backend/app/routers/public.py
+ D backend/server.py
+ M docs/architecture/04-runtime-and-deploy-truth.md
+AM docs/control/00-INDICE-MAESTRO.md
+AM docs/control/01-DECISIONES-CERRADAS.md
+AM docs/control/02-PENDIENTES-PRIORIZADOS.md
+AM docs/control/03-INVENTARIO-TECNICO.md
+AM docs/control/04-RUTAS-CANONICAS.md
+AM docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md
+AM docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md
+AM docs/control/07-GIT-DEPLOY-HIGIENE.md
+A  docs/control/audit/.gitignore-before-hygiene-20260421-061951.txt
+A  docs/control/audit/01-root-items.txt
+A  docs/control/audit/02-clean-directories.txt
+AD docs/control/audit/03-clean-files.txt
+A  docs/control/audit/04-noise-summary.txt
+A  docs/control/audit/05-top-level-size.txt
+A  docs/control/audit/06-manifests.txt
+A  docs/control/audit/07-source-hints.txt
+A  docs/control/audit/08-top-level-classification.txt
+A  docs/control/audit/09-frontend-classification.txt
+A  docs/control/audit/10-feature-modules.txt
+A  docs/control/audit/11-regenerable-zones.txt
+A  docs/control/audit/12-frontend-migration-verdict.txt
+A  docs/control/audit/13-frontend-clean-commit-candidate.txt
+A  docs/control/audit/14-status-before-commit-bucketing-20260421-063911.txt
+A  docs/control/audit/frontend-migration-status-20260421-062949.txt
+AD docs/control/audit/frontend-package-lock-backup-20260421-062422.txt
+RD frontend/yarn.lock -> docs/control/audit/frontend-yarn.lock-backup-20260421-062422.txt
+A  docs/control/audit/git-status-before-hygiene-20260421-061951.txt
+A  docs/control/audit/git-status-before-package-manager-cleanup-20260421-062422.txt
+A  docs/control/audit/gitignore-backup-20260421-061608.txt
+ D frontend/README.md
+A  frontend/package-lock.json
+ M frontend/src/App.js
+ M frontend/src/components/GoogleSignInButton.js
+ M frontend/src/features/home/HomePage.js
+ M frontend/src/features/home/components/BuilderInputPanel.js
+ M frontend/src/features/home/sections/BuilderShowcaseSection.js
+ D frontend/src/pages/AuthCallback.js
+ D frontend/src/pages/Billing.js
+ D frontend/src/pages/Dashboard.js
+ D frontend/src/pages/Flow.js
+ D frontend/src/pages/Home.js
+ D frontend/src/pages/Login.js
+ D frontend/src/pages/Opportunities.js
+ D frontend/src/pages/ProjectDetail.js
+ D frontend/src/pages/Projects.js
+ D frontend/src/pages/Register.js
+ D frontend/src/pages/ReportPreview.js
+ D frontend/src/pages/ReportPrintPage.js
+ D frontend/src/pages/Settings.js
+ D memory/.gitkeep
+ D memory/PRD.md
+ D railway/requirements.txt
+ D railway/server_railway.py
+ D test_reports/.gitkeep
+ D test_reports/iteration_1.json
+ D test_reports/iteration_2.json
+ D test_reports/pytest/.gitkeep
+?? docs/control/audit/14-docs-integrity.txt
+?? docs/control/audit/15-docs-headings.txt
+?? docs/control/audit/16-docs-semantic-check.txt
+?? docs/control/audit/17-docs-integrity-full.txt
+?? docs/control/audit/18-docs-integrity-full-after-05-06.txt
+?? docs/control/audit/19-docs-headings-full-after-05-06-fixed.txt
+?? docs/control/audit/19-docs-headings-full-after-05-06.txt
+?? docs/control/audit/20-docs-semantic-check-full.txt
+?? docs/control/audit/21-docs-integrity-full-after-03-fix.txt
+?? docs/control/audit/22-docs-semantic-check-full-after-03-fix.txt
+?? docs/control/audit/23-docs-headings-full-after-03-fix.txt
+?? docs/control/audit/27-docs-integrity-final.txt
+?? docs/control/audit/28-docs-headings-final.txt
+?? docs/control/audit/29-docs-semantic-final.txt
+?? docs/control/audit/30-backend-tree-topology.txt
+?? docs/control/audit/32-backend-extension-summary.txt
+?? docs/control/audit/33-backend-key-files-preview.txt
+?? docs/control/audit/42-pendientes-priorizados-check-minimo.txt
+?? docs/control/audit/44-aux-routes-classification-scan.txt
+?? docs/control/audit/45-volume-hotspots-scan.txt
+?? docs/control/audit/46-predelete-readiness-check.txt
+?? docs/control/audit/47-npm-diagnostic.txt
+?? docs/control/audit/48-npm-execution-isolation.txt
+?? docs/control/audit/49-volume-hotspots-after-wave1.txt
+?? docs/control/audit/50-volume-hotspots-after-wave2.txt
+?? docs/control/audit/59-frontend-root-hygiene-targeted-audit.txt
+?? docs/control/audit/62-frontend-plugin-wiring-audit.txt
+?? docs/control/audit/63-safety-external-policy-audit.txt
+?? docs/control/audit/64-ai-credits-structural-audit.txt
+?? docs/control/audit/65-ai-live-bridge-prepared-audit.txt
+?? docs/control/audit/66-ai-credits-doc-update-dump.txt
+?? frontend/src/features/app-shell/
+?? frontend/src/features/auth/
+?? frontend/src/features/builder/
+?? frontend/src/features/dashboard/
+?? frontend/src/features/home/components/HomeCapabilityChips.js
+?? frontend/src/features/home/components/HomeEntryPanel.js
+?? frontend/src/features/home/components/HomeFlowPreview.js
+?? frontend/src/features/home/components/HomeIntentTabs.js
+?? frontend/src/features/home/components/HomeOutputsPreview.js
+?? frontend/src/features/home/components/HomeTypeTabs.js
+?? frontend/src/features/home/data/homeEntryIntents.js
+?? frontend/src/features/home/data/homeEntryOutputs.js
+?? frontend/src/features/home/data/homeEntryStages.js
+?? frontend/src/features/home/data/homeEntryTypes.js
+?? frontend/src/features/home/sections/HomeEntrySection.js
+?? frontend/src/features/opportunities/
+?? frontend/src/features/projects/ProjectsPage.js
+?? frontend/src/features/reports/
+?? frontend/src/features/settings/
+
+[GIT STATUS]
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   .gitignore
+	new file:   docs/control/00-INDICE-MAESTRO.md
+	new file:   docs/control/01-DECISIONES-CERRADAS.md
+	new file:   docs/control/02-PENDIENTES-PRIORIZADOS.md
+	new file:   docs/control/03-INVENTARIO-TECNICO.md
+	new file:   docs/control/04-RUTAS-CANONICAS.md
+	new file:   docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md
+	new file:   docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md
+	new file:   docs/control/07-GIT-DEPLOY-HIGIENE.md
+	new file:   docs/control/audit/.gitignore-before-hygiene-20260421-061951.txt
+	new file:   docs/control/audit/01-root-items.txt
+	new file:   docs/control/audit/02-clean-directories.txt
+	new file:   docs/control/audit/03-clean-files.txt
+	new file:   docs/control/audit/04-noise-summary.txt
+	new file:   docs/control/audit/05-top-level-size.txt
+	new file:   docs/control/audit/06-manifests.txt
+	new file:   docs/control/audit/07-source-hints.txt
+	new file:   docs/control/audit/08-top-level-classification.txt
+	new file:   docs/control/audit/09-frontend-classification.txt
+	new file:   docs/control/audit/10-feature-modules.txt
+	new file:   docs/control/audit/11-regenerable-zones.txt
+	new file:   docs/control/audit/12-frontend-migration-verdict.txt
+	new file:   docs/control/audit/13-frontend-clean-commit-candidate.txt
+	new file:   docs/control/audit/14-status-before-commit-bucketing-20260421-063911.txt
+	new file:   docs/control/audit/frontend-migration-status-20260421-062949.txt
+	new file:   docs/control/audit/frontend-package-lock-backup-20260421-062422.txt
+	renamed:    frontend/yarn.lock -> docs/control/audit/frontend-yarn.lock-backup-20260421-062422.txt
+	new file:   docs/control/audit/git-status-before-hygiene-20260421-061951.txt
+	new file:   docs/control/audit/git-status-before-package-manager-cleanup-20260421-062422.txt
+	new file:   docs/control/audit/gitignore-backup-20260421-061608.txt
+	new file:   frontend/package-lock.json
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   DEPLOY_RAILWAY.md
+	modified:   README.md
+	modified:   backend/app/main.py
+	modified:   backend/app/routers/public.py
+	deleted:    backend/server.py
+	modified:   docs/architecture/04-runtime-and-deploy-truth.md
+	modified:   docs/control/00-INDICE-MAESTRO.md
+	modified:   docs/control/01-DECISIONES-CERRADAS.md
+	modified:   docs/control/02-PENDIENTES-PRIORIZADOS.md
+	modified:   docs/control/03-INVENTARIO-TECNICO.md
+	modified:   docs/control/04-RUTAS-CANONICAS.md
+	modified:   docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md
+	modified:   docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md
+	modified:   docs/control/07-GIT-DEPLOY-HIGIENE.md
+	deleted:    docs/control/audit/03-clean-files.txt
+	deleted:    docs/control/audit/frontend-package-lock-backup-20260421-062422.txt
+	deleted:    docs/control/audit/frontend-yarn.lock-backup-20260421-062422.txt
+	deleted:    frontend/README.md
+	modified:   frontend/src/App.js
+	modified:   frontend/src/components/GoogleSignInButton.js
+	modified:   frontend/src/features/home/HomePage.js
+	modified:   frontend/src/features/home/components/BuilderInputPanel.js
+	modified:   frontend/src/features/home/sections/BuilderShowcaseSection.js
+	deleted:    frontend/src/pages/AuthCallback.js
+	deleted:    frontend/src/pages/Billing.js
+	deleted:    frontend/src/pages/Dashboard.js
+	deleted:    frontend/src/pages/Flow.js
+	deleted:    frontend/src/pages/Home.js
+	deleted:    frontend/src/pages/Login.js
+	deleted:    frontend/src/pages/Opportunities.js
+	deleted:    frontend/src/pages/ProjectDetail.js
+	deleted:    frontend/src/pages/Projects.js
+	deleted:    frontend/src/pages/Register.js
+	deleted:    frontend/src/pages/ReportPreview.js
+	deleted:    frontend/src/pages/ReportPrintPage.js
+	deleted:    frontend/src/pages/Settings.js
+	deleted:    memory/.gitkeep
+	deleted:    memory/PRD.md
+	deleted:    railway/requirements.txt
+	deleted:    railway/server_railway.py
+	deleted:    test_reports/.gitkeep
+	deleted:    test_reports/iteration_1.json
+	deleted:    test_reports/iteration_2.json
+	deleted:    test_reports/pytest/.gitkeep
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	docs/control/audit/14-docs-integrity.txt
+	docs/control/audit/15-docs-headings.txt
+	docs/control/audit/16-docs-semantic-check.txt
+	docs/control/audit/17-docs-integrity-full.txt
+	docs/control/audit/18-docs-integrity-full-after-05-06.txt
+	docs/control/audit/19-docs-headings-full-after-05-06-fixed.txt
+	docs/control/audit/19-docs-headings-full-after-05-06.txt
+	docs/control/audit/20-docs-semantic-check-full.txt
+	docs/control/audit/21-docs-integrity-full-after-03-fix.txt
+	docs/control/audit/22-docs-semantic-check-full-after-03-fix.txt
+	docs/control/audit/23-docs-headings-full-after-03-fix.txt
+	docs/control/audit/27-docs-integrity-final.txt
+	docs/control/audit/28-docs-headings-final.txt
+	docs/control/audit/29-docs-semantic-final.txt
+	docs/control/audit/30-backend-tree-topology.txt
+	docs/control/audit/32-backend-extension-summary.txt
+	docs/control/audit/33-backend-key-files-preview.txt
+	docs/control/audit/42-pendientes-priorizados-check-minimo.txt
+	docs/control/audit/44-aux-routes-classification-scan.txt
+	docs/control/audit/45-volume-hotspots-scan.txt
+	docs/control/audit/46-predelete-readiness-check.txt
+	docs/control/audit/47-npm-diagnostic.txt
+	docs/control/audit/48-npm-execution-isolation.txt
+	docs/control/audit/49-volume-hotspots-after-wave1.txt
+	docs/control/audit/50-volume-hotspots-after-wave2.txt
+	docs/control/audit/59-frontend-root-hygiene-targeted-audit.txt
+	docs/control/audit/62-frontend-plugin-wiring-audit.txt
+	docs/control/audit/63-safety-external-policy-audit.txt
+	docs/control/audit/64-ai-credits-structural-audit.txt
+	docs/control/audit/65-ai-live-bridge-prepared-audit.txt
+	docs/control/audit/66-ai-credits-doc-update-dump.txt
+	frontend/src/features/app-shell/
+	frontend/src/features/auth/
+	frontend/src/features/builder/
+	frontend/src/features/dashboard/
+	frontend/src/features/home/components/HomeCapabilityChips.js
+	frontend/src/features/home/components/HomeEntryPanel.js
+	frontend/src/features/home/components/HomeFlowPreview.js
+	frontend/src/features/home/components/HomeIntentTabs.js
+	frontend/src/features/home/components/HomeOutputsPreview.js
+	frontend/src/features/home/components/HomeTypeTabs.js
+	frontend/src/features/home/data/homeEntryIntents.js
+	frontend/src/features/home/data/homeEntryOutputs.js
+	frontend/src/features/home/data/homeEntryStages.js
+	frontend/src/features/home/data/homeEntryTypes.js
+	frontend/src/features/home/sections/HomeEntrySection.js
+	frontend/src/features/opportunities/
+	frontend/src/features/projects/ProjectsPage.js
+	frontend/src/features/reports/
+	frontend/src/features/settings/
+
+
+[DIFF NAME ONLY]
+warning: in the working copy of 'docs/control/00-INDICE-MAESTRO.md', LF will be replaced by CRLF the next time Git touches it
+DEPLOY_RAILWAY.md
+README.md
+backend/app/main.py
+backend/app/routers/public.py
+backend/server.py
+docs/architecture/04-runtime-and-deploy-truth.md
+docs/control/00-INDICE-MAESTRO.md
+docs/control/01-DECISIONES-CERRADAS.md
+docs/control/02-PENDIENTES-PRIORIZADOS.md
+docs/control/03-INVENTARIO-TECNICO.md
+docs/control/04-RUTAS-CANONICAS.md
+docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md
+docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md
+docs/control/07-GIT-DEPLOY-HIGIENE.md
+docs/control/audit/03-clean-files.txt
+docs/control/audit/frontend-package-lock-backup-20260421-062422.txt
+docs/control/audit/frontend-yarn.lock-backup-20260421-062422.txt
+frontend/README.md
+frontend/src/App.js
+frontend/src/components/GoogleSignInButton.js
+frontend/src/features/home/HomePage.js
+frontend/src/features/home/components/BuilderInputPanel.js
+frontend/src/features/home/sections/BuilderShowcaseSection.js
+frontend/src/pages/AuthCallback.js
+frontend/src/pages/Billing.js
+frontend/src/pages/Dashboard.js
+frontend/src/pages/Flow.js
+frontend/src/pages/Home.js
+frontend/src/pages/Login.js
+frontend/src/pages/Opportunities.js
+frontend/src/pages/ProjectDetail.js
+frontend/src/pages/Projects.js
+frontend/src/pages/Register.js
+frontend/src/pages/ReportPreview.js
+frontend/src/pages/ReportPrintPage.js
+frontend/src/pages/Settings.js
+memory/.gitkeep
+memory/PRD.md
+railway/requirements.txt
+railway/server_railway.py
+test_reports/.gitkeep
+test_reports/iteration_1.json
+test_reports/iteration_2.json
+test_reports/pytest/.gitkeep

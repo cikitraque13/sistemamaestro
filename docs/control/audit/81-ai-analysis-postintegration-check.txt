@@ -1,0 +1,85 @@
+﻿=== 81-AI-ANALYSIS-POSTINTEGRATION-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+
+[PY_COMPILE]
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\ai_analysis.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\ai_analysis_decision_rules.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\ai_analysis_decision_signals.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\ai_analysis_decision.py
+RESULT: OK
+
+[IMPORT CHECK]
+backend.app.services.ai_analysis | IMPORT_OK
+backend.app.services.ai_analysis | analyze_with_ai=True
+backend.app.services.ai_analysis_decision | IMPORT_OK
+backend.app.services.ai_analysis_decision | build_decision_bundle=True
+backend.app.services.ai_analysis_decision | apply_decision_to_normalized_result=True
+backend.app.services.ai_analysis_decision | decide_and_apply_analysis_result=True
+
+[FRONTIER TEST]
+OUTPUT_JSON_FILE: C:\Users\lucas\Desktop\sistemamaestro\docs\control\audit\81-ai-analysis-frontier-results.json
+
+[sell_existing_offer]
+route: sell | expected: sell | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+summary: El usuario busca mejorar la presentaci¾n de su oferta de servicios de auditorÝa web para aumentar el cierre de clientes.
+main_finding: La presentaci¾n de la oferta no estß alineada con las expectativas del cliente.
+main_weakness: Falta de enfoque en los beneficios especÝficos para el cliente.
+main_leverage: Reformular la propuesta de valor con un enfoque en resultados tangibles.
+immediate_action_title: Definir beneficios claros
+continuity_reason: La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+refine_count: 3
+
+[improve_diagnostic_tool]
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+summary: El usuario busca crear una herramienta que identifique fricciones de conversi¾n en negocios y sugiera mejoras estructurales utilizando IA.
+main_finding: Falta de concreci¾n en los elementos evaluados y en el formato de las recomendaciones.
+main_weakness: Indefinici¾n de las fricciones especÝficas y del formato de salida.
+main_leverage: Definir claramente los tipos de fricciones y el formato de las recomendaciones.
+immediate_action_title: Definir los tipos de fricciones de conversi¾n
+continuity_reason: La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+refine_count: 3
+
+[automate_ops]
+route: automate | expected: automate | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+summary: El usuario busca automatizar la clasificaci¾n de leads y el envÝo de respuestas iniciales.
+main_finding: El proceso actual de gesti¾n de leads es manual y consume tiempo.
+main_weakness: Falta de un sistema automatizado para la clasificaci¾n y respuesta inicial de leads.
+main_leverage: Automatizar la clasificaci¾n y respuesta inicial mediante reglas predefinidas.
+immediate_action_title: Definir criterios de clasificaci¾n de leads
+continuity_reason: La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+refine_count: 3
+
+[open_idea]
+route: idea | expected: idea | pass=True
+continuity: stay | expected: stay | pass=True
+summary: El usuario estß considerando crear una soluci¾n con IA para empresas, pero no tiene claridad sobre el enfoque especÝfico.
+main_finding: Falta de enfoque en un problema empresarial concreto.
+main_weakness: Indefinici¾n del caso de uso y del valor que la IA aportarß.
+main_leverage: Concentrarse en identificar un problema empresarial especÝfico que la IA pueda resolver eficazmente.
+immediate_action_title: Identificar problemas empresariales comunes
+continuity_reason: Antes de intensificar, hace falta una definici¾n mßs clara de utilidad, problema u output.
+refine_count: 3
+
+[diagnostic_system]
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+summary: El usuario quiere crear un sistema de anßlisis para webs o procesos digitales que entregue diagn¾sticos claros con prioridades y siguientes pasos.
+main_finding: Falta de definici¾n en los criterios de anßlisis.
+main_weakness: Indefinici¾n del formato de entrega del diagn¾stico.
+main_leverage: Definir criterios de evaluaci¾n y formato del diagn¾stico.
+immediate_action_title: Definir criterios de anßlisis
+continuity_reason: La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+refine_count: 3
+
+ROUTE_PASS_TOTAL: 5/5
+CONTINUITY_PASS_TOTAL: 5/5

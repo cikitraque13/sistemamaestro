@@ -1,0 +1,28 @@
+﻿=== 80-AI-DECISION-PREINTEGRATION-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+SERVICES: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+
+[FILE EXISTENCE]
+ai_analysis_decision_rules.py | exists=True | bytes=10019
+ai_analysis_decision_signals.py | exists=True | bytes=19613
+ai_analysis_decision.py | exists=True | bytes=16439
+
+[PY_COMPILE]
+FILE: ai_analysis_decision_rules.py
+RESULT: OK
+
+FILE: ai_analysis_decision_signals.py
+RESULT: OK
+
+FILE: ai_analysis_decision.py
+RESULT: OK
+
+[IMPORT CHECK]
+backend.app.services.ai_analysis_decision_rules | IMPORT_OK
+backend.app.services.ai_analysis_decision_signals | IMPORT_OK
+backend.app.services.ai_analysis_decision_signals | build_decision_signals=True
+backend.app.services.ai_analysis_decision | IMPORT_OK
+backend.app.services.ai_analysis_decision | build_decision_bundle=True
+backend.app.services.ai_analysis_decision | apply_decision_to_normalized_result=True
+backend.app.services.ai_analysis_decision | decide_and_apply_analysis_result=True

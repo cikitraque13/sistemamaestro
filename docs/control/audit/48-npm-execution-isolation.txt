@@ -1,0 +1,19 @@
+﻿=== 48-NPM-EXECUTION-ISOLATION ===
+
+[PATHS]
+npm.cmd exists: True
+node.exe exists: True
+npm-cli.js exists: True
+
+[TEST 1 :: direct npm.cmd]
+11.12.1
+
+[TEST 2 :: cmd /c npm -v]
+11.12.1
+
+[TEST 3 :: cmd /c npm.cmd -v]
+11.12.1
+
+[TEST 4 :: node + npm-cli.js -v]
+11.12.1
+

@@ -1,0 +1,46 @@
+﻿=== 46-PREDELETE-READINESS-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+SAFETY DIR: C:\Users\lucas\Desktop\sistemamaestro_predelete_safety
+REPORT: C:\Users\lucas\Desktop\sistemamaestro\docs\control\audit\46-predelete-readiness-check.txt
+
+[FRONTEND PREREQUISITES]
+package.json exists: True
+package-lock.json exists: True
+frontend/src exists: True
+frontend/public exists: True
+node_modules exists: True
+node_modules bytes: 572102573
+node_modules files: 69806
+
+[TOOLING]
+node ok: True
+node version: v24.15.0
+npm ok: False
+npm version: 
+node process count: 0
+
+[AUXILIARY TARGETS]
+memory exists: True
+memory bytes: 2256
+memory files: 2
+test_reports exists: True
+test_reports bytes: 5017
+test_reports files: 4
+
+[SAFETY ARCHIVES]
+name: memory
+source: C:\Users\lucas\Desktop\sistemamaestro\memory
+zip: C:\Users\lucas\Desktop\sistemamaestro_predelete_safety\memory-20260421-140120.zip
+zip exists: True
+zip bytes: 1408
+
+name: test_reports
+source: C:\Users\lucas\Desktop\sistemamaestro\test_reports
+zip: C:\Users\lucas\Desktop\sistemamaestro_predelete_safety\test_reports-20260421-140120.zip
+zip exists: True
+zip bytes: 2848
+
+[DECISION FLAGS]
+SAFE_TO_DELETE_NODE_MODULES: False
+SAFE_TO_DELETE_MEMORY: True
+SAFE_TO_DELETE_TEST_REPORTS: True

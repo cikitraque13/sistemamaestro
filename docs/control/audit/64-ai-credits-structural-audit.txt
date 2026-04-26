@@ -1,0 +1,1412 @@
+﻿=== 64-AI-CREDITS-STRUCTURAL-AUDIT ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+TARGET: backend\app\ai
+EXISTS: True
+TYPE: directory
+DIR COUNT: 8
+FILE COUNT: 33
+TOTAL BYTES: 25085
+
+[TREE]
+backend\app\ai\__init__.py
+backend\app\ai\agents
+backend\app\ai\agents\__init__.py
+backend\app\ai\agents\algorithmic_auditor_agent.py
+backend\app\ai\agents\audit_agent.py
+backend\app\ai\agents\builder_agent.py
+backend\app\ai\agents\cro_agent.py
+backend\app\ai\agents\deploy_agent.py
+backend\app\ai\agents\discovery_agent.py
+backend\app\ai\agents\growth_agent.py
+backend\app\ai\agents\red_team_agent.py
+backend\app\ai\agents\report_agent.py
+backend\app\ai\agents\rescue_sre_agent.py
+backend\app\ai\agents\security_architect_agent.py
+backend\app\ai\agents\seo_architect_agent.py
+backend\app\ai\agents\system_architect_agent.py
+backend\app\ai\evals
+backend\app\ai\evals\__init__.py
+backend\app\ai\evals\agent_eval_registry.py
+backend\app\ai\guards
+backend\app\ai\guards\__init__.py
+backend\app\ai\guards\abuse_guard.py
+backend\app\ai\guards\cost_guard.py
+backend\app\ai\guards\output_guard.py
+backend\app\ai\guards\policy_guard.py
+backend\app\ai\guards\security_guard.py
+backend\app\ai\memory
+backend\app\ai\memory\__init__.py
+backend\app\ai\memory\project_memory.py
+backend\app\ai\orchestrators
+backend\app\ai\orchestrators\__init__.py
+backend\app\ai\orchestrators\master_orchestrator.py
+backend\app\ai\schemas
+backend\app\ai\schemas\__init__.py
+backend\app\ai\schemas\agent_envelope.py
+backend\app\ai\telemetry
+backend\app\ai\telemetry\__init__.py
+backend\app\ai\telemetry\agent_trace.py
+backend\app\ai\tools
+backend\app\ai\tools\__init__.py
+backend\app\ai\tools\tool_registry.py
+
+[HEAD PREVIEW]
+
+FILE: backend\app\ai\__init__.py
+[VACIO]
+
+FILE: backend\app\ai\agents\__init__.py
+[VACIO]
+
+FILE: backend\app\ai\agents\algorithmic_auditor_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\audit_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\builder_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\cro_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\deploy_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\discovery_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\growth_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\red_team_agent.py
+"""
+red_team_agent.py
+
+Agente puente de seguridad adversarial defensiva.
+No ejecuta ataques.
+No interactua con produccion.
+No tiene logica viva todavia.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, List, Tuple
+
+
+AGENT_KEY = "red_team_agent"
+AGENT_ROLE = "adversarial_security"
+AGENT_PHASE = "next"
+
+
+@dataclass(frozen=True)
+class RedTeamFinding:
+    vector: str
+    severity: str
+    affected_surface: str
+    recommended_mitigation: str
+    requires_human_review: bool
+
+
+ALLOWED_TOOLS: Tuple[str, ...] = (
+    "policy_validator",
+    "session_audit",
+    "abuse_patterns",
+    "output_sampler",
+    "consistency_checker",
+)
+
+FORBIDDEN_DOMAINS: Tuple[str, ...] = (
+    "repo_writer",
+    "autonomous_deploy",
+    "live_attack_execution",
+    "payment_mutation",
+    "production_access",
+)
+
+
+def get_red_team_manifest() -> Dict[str, object]:
+    return {
+        "key": AGENT_KEY,
+        "role": AGENT_ROLE,
+        "phase": AGENT_PHASE,
+        "mission": "Detect hostile patterns, abuse vectors and security gaps from a defensive adversarial perspective.",
+        "allowed_tools": list(ALLOWED_TOOLS),
+        "forbidden_domains": list(FORBIDDEN_DOMAINS),
+        "output_type": "red_team_findings",
+    }
+
+
+def build_red_team_finding(
+    vector: str,
+    severity: str,
+    affected_surface: str,
+    recommended_mitigation: str,
+    requires_human_review: bool = True,
+) -> Dict[str, object]:
+    finding = RedTeamFinding(
+        vector=vector,
+        severity=severity,
+        affected_surface=affected_surface,
+        recommended_mitigation=recommended_mitigation,
+        requires_human_review=requires_human_review,
+    )
+    return asdict(finding)
+
+FILE: backend\app\ai\agents\report_agent.py
+[VACIO]
+
+FILE: backend\app\ai\agents\rescue_sre_agent.py
+[VACIO]
+
+==============================================================
+TARGET: backend\config\credits
+EXISTS: True
+TYPE: directory
+DIR COUNT: 1
+FILE COUNT: 6
+TOTAL BYTES: 14510
+
+[TREE]
+backend\config\credits\action_catalog.json
+backend\config\credits\contracts
+backend\config\credits\contracts\consumption_request.schema.json
+backend\config\credits\contracts\consumption_response.schema.json
+backend\config\credits\plan_levels.json
+backend\config\credits\threshold_rules.json
+backend\config\credits\tier_amounts.json
+
+[HEAD PREVIEW]
+
+FILE: backend\config\credits\action_catalog.json
+[
+  {
+    "action_key": "idea_analysis",
+    "visible_name": "Análisis inicial de idea",
+    "family": "analysis",
+    "layer": "analysis",
+    "base_tier": "T1",
+    "plan_requirement": "free",
+    "consumption_type_allowed": "standard",
+    "can_scale_with_complexity": true,
+    "can_scale_with_depth": false,
+    "can_scale_with_repetition": true,
+    "requires_special_credit_by_default": false,
+    "is_protected_output": false
+  },
+  {
+    "action_key": "url_analysis",
+    "visible_name": "Análisis inicial de URL",
+    "family": "analysis",
+    "layer": "analysis",
+    "base_tier": "T1",
+    "plan_requirement": "free",
+    "consumption_type_allowed": "standard",
+    "can_scale_with_complexity": true,
+    "can_scale_with_depth": false,
+    "can_scale_with_repetition": true,
+    "requires_special_credit_by_default": false,
+    "is_protected_output": false
+  },
+  {
+    "action_key": "refine_round",
+    "visible_name": "Afinado del caso",
+    "family": "analysis",
+    "layer": "analysis",
+    "base_tier": "T1",
+    "plan_requirement": "free",
+    "consumption_type_allowed": "standard",
+    "can_scale_with_complexity": true,
+    "can_scale_with_depth": true,
+    "can_scale_with_repetition": true,
+    "requires_special_credit_by_default": false,
+    "is_protected_output": false
+  },
+  {
+    "action_key": "premium_preview_view",
+    "visible_name": "Vista previa premium",
+    "family": "single_report",
+    "layer": "conversion",
+    "base_tier": "T1",
+    "plan_requirement": "free",
+    "consumption_type_allowed": "none",
+    "can_scale_with_complexity": false,
+    "can_scale_with_depth": false,
+    "can_scale_with_repetition": false,
+    "requires_special_credit_by_default": false,
+    "is_protected_output": false
+  },
+  {
+    "action_key": "single_report_purchase",
+    "visible_name": "Informe puntual 6,99",
+    "family": "single_report",
+    "layer": "single_report",
+    "base_tier": "T1",
+    "plan_requirement": "free",
+    "consumption_type_allowed": "none",
+    "can_scale_with_complexity": false,
+    "can_scale_with_depth": false,
+    "can_scale_with_repetition": false,
+    "requires_special_credit_by_default": false,
+    "is_protected_output": false
+  },
+  {
+    "action_key": "builder_first_run",
+    "visible_name": "Primera construcción guiada",
+    "family": "builder",
+    "layer": "builder",
+    "base_tier": "T1",
+    "plan_requirement": "free",
+    "consumption_type_allowed": "standard",
+    "can_scale_with_complexity": true,
+
+FILE: backend\config\credits\contracts\consumption_request.schema.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "consumption_request.schema.json",
+  "title": "ConsumptionRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mode",
+    "action_key",
+    "user_context",
+    "project_context"
+  ],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["simulate", "execute"]
+    },
+    "action_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "user_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "user_id",
+        "user_plan",
+        "credit_balance",
+        "special_credit_balance"
+      ],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "user_plan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "credit_balance": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "special_credit_balance": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "project_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "project_complexity_score",
+        "journey_depth_score",
+        "output_value_score",
+        "operational_cost_score"
+      ],
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_complexity_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "journey_depth_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "output_value_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "operational_cost_score": {
+
+FILE: backend\config\credits\contracts\consumption_response.schema.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "consumption_response.schema.json",
+  "title": "ConsumptionResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "action_key",
+    "mode",
+    "decision",
+    "gates",
+    "ux",
+    "trace"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "allowed",
+        "blocked_plan",
+        "blocked_balance",
+        "blocked_special_credit",
+        "blocked_invalid_action"
+      ]
+    },
+    "action_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["simulate", "execute"]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumption_type",
+        "consumption_amount"
+      ],
+      "properties": {
+        "base_tier": {
+          "type": ["string", "null"],
+          "enum": ["T1", "T2", "T3", null]
+        },
+        "final_tier": {
+          "type": ["string", "null"],
+          "enum": ["T1", "T2", "T3", null]
+        },
+        "decision_mode": {
+          "type": ["string", "null"],
+          "enum": [
+            "base",
+            "reinforced",
+            "escalated",
+            "special_gated",
+            null
+          ]
+        },
+        "consumption_type": {
+          "type": "string",
+          "enum": ["none", "standard", "special"]
+        },
+        "consumption_amount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scale_reason": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_gate_triggered",
+        "balance_gate_triggered",
+        "special_credit_gate_triggered"
+
+FILE: backend\config\credits\plan_levels.json
+{
+  "free": 0,
+  "blueprint": 1,
+  "sistema": 2,
+  "premium": 3
+}
+
+FILE: backend\config\credits\threshold_rules.json
+{
+  "score_range": {
+    "min": 1,
+    "max": 4
+  },
+  "repetition": {
+    "medium_in_session": 3,
+    "medium_on_project": 5,
+    "intense_in_session": 5,
+    "intense_on_project": 8
+  },
+  "reinforced": {
+    "critical_signals_min": 1,
+    "high_signals_min": 2
+  },
+  "escalated": {
+    "critical_and_high": true,
+    "high_signals_min": 3
+  },
+  "special_credit": {
+    "protected_action_keys": [
+      "project_export",
+      "project_deploy"
+    ]
+  }
+}
+
+FILE: backend\config\credits\tier_amounts.json
+{
+  "standard": {
+    "T1": 1,
+    "T2": 3,
+    "T3": 6
+  },
+  "special": {
+    "T1": 0,
+    "T2": 0,
+    "T3": 1
+  },
+  "multipliers": {
+    "base": 1.0,
+    "reinforced": 1.5,
+    "intensive_t3": 2.0
+  }
+}
+
+==============================================================
+TARGET: backend\app\routers\consumption.py
+EXISTS: True
+TYPE: file
+SIZE: 5073 bytes
+
+[PATTERN HITS]
+L7 :: from backend.app.core.credits_config_loader import get_credits_config_bundle
+L8 :: from backend.app.schemas.consumption import (
+L9 :: ConsumptionErrorEnvelope,
+L10 :: ConsumptionExecutionEnvelope,
+L11 :: ConsumptionRequest,
+L12 :: ConsumptionSimulationEnvelope,
+L14 :: from backend.app.services.consumption_engine import evaluate_consumption
+L17 :: prefix="/consumption",
+L18 :: tags=["consumption"],
+L42 :: def get_consumption_config_summary() -> Dict[str, Any]:
+L44 :: bundle = get_credits_config_bundle()
+L46 :: action_catalog = bundle.get("action_catalog", [])
+L47 :: tier_amounts = bundle.get("tier_amounts", {})
+L48 :: threshold_rules = bundle.get("threshold_rules", {})
+L49 :: plan_levels = bundle.get("plan_levels", {})
+L50 :: contracts = bundle.get("contracts", {})
+L55 :: "engine_version": "consumption_v1",
+L56 :: "catalog_version": "credits_v1",
+L58 :: "action_catalog_count": len(action_catalog) if isinstance(action_catalog, list) else 0,
+L59 :: "has_tier_amounts": bool(tier_amounts),
+L60 :: "has_threshold_rules": bool(threshold_rules),
+L61 :: "has_plan_levels": bool(plan_levels),
+L62 :: "has_request_schema": bool(contracts.get("consumption_request")),
+L63 :: "has_response_schema": bool(contracts.get("consumption_response")),
+L79 :: response_model=ConsumptionSimulationEnvelope,
+L82 :: def simulate_consumption(payload: ConsumptionRequest) -> ConsumptionSimulationEnvelope:
+L87 :: ConsumptionErrorEnvelope(
+L99 :: result = evaluate_consumption(payload)
+L100 :: return ConsumptionSimulationEnvelope(ok=True, data=result)
+L105 :: ConsumptionErrorEnvelope(
+L107 :: error="consumption_simulation_failed",
+L116 :: response_model=ConsumptionExecutionEnvelope,
+L117 :: summary="Evalúa una acción en modo ejecución",
+L119 :: def execute_consumption(payload: ConsumptionRequest) -> ConsumptionExecutionEnvelope:
+L124 :: ConsumptionErrorEnvelope(
+L136 :: result = evaluate_consumption(payload)
+L137 :: return ConsumptionExecutionEnvelope(ok=True, data=result)
+L142 :: ConsumptionErrorEnvelope(
+L144 :: error="consumption_execution_failed",
+
+[HEAD]
+from __future__ import annotations
+
+from typing import Any, Dict
+
+from fastapi import APIRouter, HTTPException, status
+
+from backend.app.core.credits_config_loader import get_credits_config_bundle
+from backend.app.schemas.consumption import (
+    ConsumptionErrorEnvelope,
+    ConsumptionExecutionEnvelope,
+    ConsumptionRequest,
+    ConsumptionSimulationEnvelope,
+)
+from backend.app.services.consumption_engine import evaluate_consumption
+
+router = APIRouter(
+    prefix="/consumption",
+    tags=["consumption"],
+)
+
+
+def _serialize_engine_error(exc: Exception) -> Dict[str, Any]:
+    return {
+        "type": exc.__class__.__name__,
+        "message": str(exc),
+    }
+
+
+def _model_to_dict(model: Any) -> Dict[str, Any]:
+    if hasattr(model, "model_dump"):
+        return model.model_dump()
+    if hasattr(model, "dict"):
+        return model.dict()
+    return {"error": "serialization_failed"}
+
+
+@router.get(
+    "/config-summary",
+    response_model=Dict[str, Any],
+    summary="Resumen de configuración del motor de consumo",
+)
+def get_consumption_config_summary() -> Dict[str, Any]:
+    try:
+        bundle = get_credits_config_bundle()
+
+        action_catalog = bundle.get("action_catalog", [])
+        tier_amounts = bundle.get("tier_amounts", {})
+        threshold_rules = bundle.get("threshold_rules", {})
+        plan_levels = bundle.get("plan_levels", {})
+        contracts = bundle.get("contracts", {})
+        paths = bundle.get("paths", {})
+
+        return {
+            "ok": True,
+            "engine_version": "consumption_v1",
+            "catalog_version": "credits_v1",
+            "summary": {
+                "action_catalog_count": len(action_catalog) if isinstance(action_catalog, list) else 0,
+                "has_tier_amounts": bool(tier_amounts),
+                "has_threshold_rules": bool(threshold_rules),
+                "has_plan_levels": bool(plan_levels),
+                "has_request_schema": bool(contracts.get("consumption_request")),
+                "has_response_schema": bool(contracts.get("consumption_response")),
+            },
+            "paths": paths,
+        }
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error": "No se pudo cargar la configuración del motor de consumo.",
+                "details": _serialize_engine_error(exc),
+            },
+        ) from exc
+
+
+@router.post(
+    "/simulate",
+    response_model=ConsumptionSimulationEnvelope,
+    summary="Simula una acción del motor de consumo",
+)
+def simulate_consumption(payload: ConsumptionRequest) -> ConsumptionSimulationEnvelope:
+    if payload.mode != "simulate":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_model_to_dict(
+                ConsumptionErrorEnvelope(
+                    ok=False,
+                    error="invalid_mode",
+                    details={
+                        "message": "El endpoint /simulate requiere mode='simulate'.",
+                        "received_mode": payload.mode,
+                    },
+                )
+            ),
+        )
+
+    try:
+        result = evaluate_consumption(payload)
+        return ConsumptionSimulationEnvelope(ok=True, data=result)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_model_to_dict(
+                ConsumptionErrorEnvelope(
+                    ok=False,
+                    error="consumption_simulation_failed",
+                    details=_serialize_engine_error(exc),
+                )
+            ),
+        ) from exc
+
+
+@router.post(
+    "/execute",
+    response_model=ConsumptionExecutionEnvelope,
+    summary="Evalúa una acción en modo ejecución",
+)
+def execute_consumption(payload: ConsumptionRequest) -> ConsumptionExecutionEnvelope:
+    if payload.mode != "execute":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_model_to_dict(
+                ConsumptionErrorEnvelope(
+                    ok=False,
+                    error="invalid_mode",
+                    details={
+                        "message": "El endpoint /execute requiere mode='execute'.",
+                        "received_mode": payload.mode,
+                    },
+                )
+            ),
+        )
+
+    try:
+        result = evaluate_consumption(payload)
+        return ConsumptionExecutionEnvelope(ok=True, data=result)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_model_to_dict(
+                ConsumptionErrorEnvelope(
+                    ok=False,
+                    error="consumption_execution_failed",
+                    details=_serialize_engine_error(exc),
+                )
+            ),
+        ) from exc
+
+==============================================================
+TARGET: backend\app\services\consumption_engine.py
+EXISTS: True
+TYPE: file
+SIZE: 14726 bytes
+
+[PATTERN HITS]
+L5 :: from backend.app.core.credits_config_loader import (
+L7 :: get_credits_config_bundle,
+L10 :: from backend.app.schemas.consumption import (
+L11 :: ConsumptionDecision,
+L12 :: ConsumptionGates,
+L13 :: ConsumptionRequest,
+L14 :: ConsumptionResponse,
+L15 :: ConsumptionResponse,
+L16 :: ConsumptionUX,
+L19 :: from backend.app.services.credits import (
+L20 :: apply_manual_credit_adjustment,
+L21 :: get_user_credit_summary,
+L40 :: def _clone_request(payload: ConsumptionRequest) -> Dict[str, Any]:
+L45 :: payload: ConsumptionRequest,
+L47 :: runtime_credit_summary: Dict[str, Any],
+L48 :: ) -> ConsumptionRequest:
+L54 :: "credit_balance": int(runtime_credit_summary.get("credit_balance", 0) or 0),
+L55 :: "special_credit_balance": int(runtime_credit_summary.get("special_credit_balance", 0) or 0),
+L58 :: return ConsumptionRequest(**data)
+L61 :: def _score_snapshot(payload: ConsumptionRequest) -> Dict[str, int]:
+L70 :: def _repetition_snapshot(payload: ConsumptionRequest) -> Dict[str, int]:
+L77 :: def _build_trace(payload: ConsumptionRequest) -> TraceSnapshot:
+L80 :: engine_version="consumption_v1",
+L81 :: catalog_version="credits_v1",
+L89 :: payload: ConsumptionRequest,
+L91 :: decision: ConsumptionDecision,
+L92 :: gates: ConsumptionGates | None = None,
+L93 :: ux: ConsumptionUX | None = None,
+L94 :: ) -> ConsumptionResponse:
+L95 :: return ConsumptionResponse(
+L100 :: gates=gates or ConsumptionGates(),
+L101 :: ux=ux or ConsumptionUX(),
+L106 :: def _resolve_base_tier(payload: ConsumptionRequest) -> str:
+L121 :: def _resolve_decision_mode(payload: ConsumptionRequest, threshold_rules: Dict[str, Any]) -> str:
+L128 :: repetition_rules = threshold_rules.get("repetition", {})
+L129 :: reinforced_rules = threshold_rules.get("reinforced", {})
+L130 :: escalated_rules = threshold_rules.get("escalated", {})
+L186 :: def _resolve_consumption_type(
+L187 :: payload: ConsumptionRequest,
+L189 :: threshold_rules: Dict[str, Any],
+L191 :: raw_type = action_config.get("consumption_type")
+L196 :: threshold_rules.get("special_credit", {})
+L208 :: consumption_type: str,
+L212 :: if isinstance(action_config.get("consumption_amount"), int):
+L213 :: return max(0, int(action_config["consumption_amount"]))
+L215 :: tier_amounts = bundle.get("tier_amounts", {})
+L216 :: type_table = tier_amounts.get(consumption_type, {})
+L222 :: multipliers = tier_amounts.get("multipliers", {})
+L233 :: def evaluate_consumption(payload: ConsumptionRequest) -> ConsumptionResponse:
+L234 :: bundle = get_credits_config_bundle()
+L235 :: threshold_rules = bundle.get("threshold_rules", {})
+L242 :: decision=ConsumptionDecision(consumption_type="none", consumption_amount=0),
+L243 :: ux=ConsumptionUX(
+L255 :: decision=ConsumptionDecision(consumption_type="none", consumption_amount=0),
+L256 :: gates=ConsumptionGates(plan_gate_triggered=True),
+L257 :: ux=ConsumptionUX(
+L265 :: decision_mode = _resolve_decision_mode(payload, threshold_rules)
+L267 :: consumption_type = _resolve_consumption_type(payload, action_config, threshold_rules)
+L268 :: consumption_amount = _resolve_amount(
+L271 :: consumption_type=consumption_type,
+L276 :: decision = ConsumptionDecision(
+L280 :: consumption_type=consumption_type,
+L281 :: consumption_amount=consumption_amount,
+L285 :: if consumption_type == "special":
+L286 :: special_balance = _safe_int(payload.user_context.special_credit_balance, 0)
+L287 :: if special_balance < consumption_amount:
+L290 :: status="blocked_special_credit",
+L292 :: gates=ConsumptionGates(special_credit_gate_triggered=True),
+L293 :: ux=ConsumptionUX(
+L294 :: ux_label="Credito premium requerido",
+L295 :: message="Esta accion requiere credito premium disponible.",
+L300 :: if consumption_type == "standard":
+L301 :: credit_balance = _safe_int(payload.user_context.credit_balance, 0)
+L302 :: if credit_balance < consumption_amount:
+L307 :: gates=ConsumptionGates(balance_gate_triggered=True),
+L308 :: ux=ConsumptionUX(
+L309 :: ux_label="Creditos insuficientes",
+L311 :: next_step_hint="buy_credit_pack",
+L319 :: ux=ConsumptionUX(
+L328 :: response: ConsumptionResponse,
+L330 :: message: str = "Necesitas mas creditos para seguir avanzando.",
+L331 :: ) -> ConsumptionResponse:
+L334 :: data["gates"]["balance_gate_triggered"] = True
+L335 :: data["ux"]["ux_label"] = "Creditos insuficientes"
+L337 :: data["ux"]["next_step_hint"] = "buy_credit_pack"
+L338 :: return ConsumptionResponse(**data)
+L342 :: response: ConsumptionResponse,
+L344 :: message: str = "La capa de credito premium todavia no esta activa en ejecucion real.",
+L345 :: ) -> ConsumptionResponse:
+L347 :: data["status"] = "blocked_special_credit"
+L348 :: data["gates"]["special_credit_gate_triggered"] = True
+L349 :: data["ux"]["ux_label"] = "Credito premium requerido"
+L352 :: return ConsumptionResponse(**data)
+L355 :: async def execute_consumption_for_user(
+L357 :: payload: ConsumptionRequest,
+L358 :: ) -> ConsumptionResponse:
+L363 :: runtime_credit_summary = await get_user_credit_summary(runtime_user_id)
+L367 :: runtime_credit_summary=runtime_credit_summary,
+L370 :: decision = evaluate_consumption(runtime_request)
+L375 :: consumption_type = decision.decision.consumption_type
+L376 :: consumption_amount = int(decision.decision.consumption_amount or 0)
+L379 :: if consumption_type == "none" or consumption_amount <= 0:
+L382 :: if consumption_type == "special":
+L385 :: if consumption_type != "standard":
+L389 :: adjustment_result = await apply_manual_credit_adjustment(
+L391 :: credits_delta=-consumption_amount,
+L392 :: reason_code="consumption_execute",
+L403 :: "consumption_type": decision.decision.consumption_type,
+L415 :: or adjustment_result.get("credit_balance")
+L423 :: data["trace"]["ledger_reason_code"] = "consumption_execute"
+L426 :: return ConsumptionResponse(**data)
+
+[HEAD]
+from __future__ import annotations
+
+from typing import Any, Dict
+
+from backend.app.core.credits_config_loader import (
+    get_action_config,
+    get_credits_config_bundle,
+    has_required_plan,
+)
+from backend.app.schemas.consumption import (
+    ConsumptionDecision,
+    ConsumptionGates,
+    ConsumptionRequest,
+    ConsumptionResponse,
+    ConsumptionResponse,
+    ConsumptionUX,
+    TraceSnapshot,
+)
+from backend.app.services.credits import (
+    apply_manual_credit_adjustment,
+    get_user_credit_summary,
+)
+
+
+def _model_to_dict(model: Any) -> Dict[str, Any]:
+    if hasattr(model, "model_dump"):
+        return model.model_dump()
+    if hasattr(model, "dict"):
+        return model.dict()
+    raise TypeError("Unsupported model serialization")
+
+
+def _safe_int(value: Any, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _clone_request(payload: ConsumptionRequest) -> Dict[str, Any]:
+    return _model_to_dict(payload)
+
+
+def _force_runtime_user_context(
+    payload: ConsumptionRequest,
+    runtime_user: Dict[str, Any],
+    runtime_credit_summary: Dict[str, Any],
+) -> ConsumptionRequest:
+    data = _clone_request(payload)
+
+    data["user_context"] = {
+        "user_id": runtime_user["user_id"],
+        "user_plan": runtime_user.get("plan", "free"),
+        "credit_balance": int(runtime_credit_summary.get("credit_balance", 0) or 0),
+        "special_credit_balance": int(runtime_credit_summary.get("special_credit_balance", 0) or 0),
+    }
+
+    return ConsumptionRequest(**data)
+
+
+def _score_snapshot(payload: ConsumptionRequest) -> Dict[str, int]:
+    return {
+        "project_complexity_score": payload.project_context.project_complexity_score,
+        "journey_depth_score": payload.project_context.journey_depth_score,
+        "output_value_score": payload.project_context.output_value_score,
+        "operational_cost_score": payload.project_context.operational_cost_score,
+    }
+
+
+def _repetition_snapshot(payload: ConsumptionRequest) -> Dict[str, int]:
+    return {
+        "action_count_in_session": payload.usage_context.action_count_in_session,
+        "action_count_on_project": payload.usage_context.action_count_on_project,
+    }
+
+
+def _build_trace(payload: ConsumptionRequest) -> TraceSnapshot:
+    return TraceSnapshot(
+        trace_id=payload.meta.trace_id,
+        engine_version="consumption_v1",
+        catalog_version="credits_v1",
+        scores_snapshot=_score_snapshot(payload),
+        repetition_snapshot=_repetition_snapshot(payload),
+    )
+
+
+def _build_response(
+    *,
+    payload: ConsumptionRequest,
+    status: str,
+    decision: ConsumptionDecision,
+    gates: ConsumptionGates | None = None,
+    ux: ConsumptionUX | None = None,
+) -> ConsumptionResponse:
+    return ConsumptionResponse(
+        status=status,
+        action_key=payload.action_key,
+        mode=payload.mode,
+        decision=decision,
+        gates=gates or ConsumptionGates(),
+        ux=ux or ConsumptionUX(),
+        trace=_build_trace(payload),
+    )
+
+
+def _resolve_base_tier(payload: ConsumptionRequest) -> str:
+    total = (
+        payload.project_context.project_complexity_score
+        + payload.project_context.journey_depth_score
+        + payload.project_context.output_value_score
+        + payload.project_context.operational_cost_score
+    )
+
+    if total >= 13:
+        return "T3"
+    if total >= 9:
+        return "T2"
+    return "T1"
+
+
+def _resolve_decision_mode(payload: ConsumptionRequest, threshold_rules: Dict[str, Any]) -> str:
+    scores = _score_snapshot(payload)
+    repetition = _repetition_snapshot(payload)
+
+    high_signals = sum(1 for value in scores.values() if value >= 3)
+    critical_signals = sum(1 for value in scores.values() if value >= 4)
+
+    repetition_rules = threshold_rules.get("repetition", {})
+    reinforced_rules = threshold_rules.get("reinforced", {})
+    escalated_rules = threshold_rules.get("escalated", {})
+
+    intense_session = repetition["action_count_in_session"] >= _safe_int(
+        repetition_rules.get("intense_in_session"),
+        5,
+    )
+    intense_project = repetition["action_count_on_project"] >= _safe_int(
+        repetition_rules.get("intense_on_project"),
+        8,
+    )
+    medium_session = repetition["action_count_in_session"] >= _safe_int(
+        repetition_rules.get("medium_in_session"),
+        3,
+    )
+    medium_project = repetition["action_count_on_project"] >= _safe_int(
+        repetition_rules.get("medium_on_project"),
+        5,
+    )
+
+    if intense_session or intense_project:
+        return "escalated"
+
+    if (
+        (
+            bool(escalated_rules.get("critical_and_high", True))
+            and critical_signals >= 1
+            and high_signals >= 2
+        )
+        or high_signals >= _safe_int(escalated_rules.get("high_signals_min"), 3)
+    ):
+        return "escalated"
+
+    if (
+        critical_signals >= _safe_int(reinforced_rules.get("critical_signals_min"), 1)
+        or high_signals >= _safe_int(reinforced_rules.get("high_signals_min"), 2)
+        or medium_session
+        or medium_project
+    ):
+        return "reinforced"
+
+    return "base"
+
+
+def _resolve_final_tier(base_tier: str, decision_mode: str) -> str:
+    rank = {"T1": 1, "T2": 2, "T3": 3}.get(base_tier, 1)
+
+    if decision_mode == "base":
+        final_rank = rank
+    elif decision_mode == "reinforced":
+        final_rank = min(rank + 1, 3)
+    else:
+        final_rank = 3
+
+    return {1: "T1", 2: "T2", 3: "T3"}[final_rank]
+
+
+def _resolve_consumption_type(
+    payload: ConsumptionRequest,
+    action_config: Dict[str, Any],
+    threshold_rules: Dict[str, Any],
+) -> str:
+    raw_type = action_config.get("consumption_type")
+    if raw_type in {"none", "standard", "special"}:
+        return raw_type
+
+    protected = (
+        threshold_rules.get("special_credit", {})
+        .get("protected_action_keys", [])
+    )
+    if payload.action_key in protected:
+        return "special"
+
+    return "standard"
+
+
+def _resolve_amount(
+    action_config: Dict[str, Any],
+    bundle: Dict[str, Any],
+    consumption_type: str,
+    final_tier: str,
+    decision_mode: str,
+) -> int:
+    if isinstance(action_config.get("consumption_amount"), int):
+        return max(0, int(action_config["consumption_amount"]))
+
+    tier_amounts = bundle.get("tier_amounts", {})
+    type_table = tier_amounts.get(consumption_type, {})
+    base_amount = _safe_int(
+        type_table.get(final_tier, type_table.get(final_tier.lower(), 0)),
+        0,
+    )
+
+==============================================================
+TARGET: backend\app\routers\billing.py
+EXISTS: True
+TYPE: file
+SIZE: 3294 bytes
+
+[PATTERN HITS]
+L6 :: from backend.app.services.credits import get_plan_included_credits, get_user_credit_summary
+L8 :: router = APIRouter(prefix="/api/user", tags=["billing"])
+L11 :: @router.get("/billing")
+L12 :: async def get_billing(request: Request):
+L22 :: credit_summary = await get_user_credit_summary(user["user_id"])
+L30 :: "included_credits": get_plan_included_credits(current_plan_id)
+L32 :: "credit_summary": {
+L34 :: "balance": credit_summary["credit_balance"],
+L35 :: "lifetime_granted": credit_summary["credit_lifetime_granted"],
+L36 :: "lifetime_used": credit_summary["credit_lifetime_used"],
+L37 :: "included_credits_for_current_plan": get_plan_included_credits(current_plan_id),
+L38 :: "next_phase": "topups_and_consumption_pending"
+L47 :: "included_credits": get_plan_included_credits(k)
+L87 :: credit_summary = await get_user_credit_summary(user["user_id"])
+L93 :: "credit_balance": credit_summary["credit_balance"]
+
+[HEAD]
+from fastapi import APIRouter, Request
+
+from backend.app.core.security import get_current_user
+from backend.app.db.mongodb import db
+from backend.app.domain.plans import ONE_TIME_OFFERS, PLANS
+from backend.app.services.credits import get_plan_included_credits, get_user_credit_summary
+
+router = APIRouter(prefix="/api/user", tags=["billing"])
+
+
+@router.get("/billing")
+async def get_billing(request: Request):
+    user = await get_current_user(request)
+
+    transactions = await db.payment_transactions.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+
+    current_plan_id = user.get("plan", "free")
+    current_plan = PLANS.get(current_plan_id, PLANS["free"])
+    credit_summary = await get_user_credit_summary(user["user_id"])
+
+    return {
+        "current_plan": {
+            "id": current_plan_id,
+            "name": current_plan["name"],
+            "price": current_plan["price"],
+            "features": current_plan["features"],
+            "included_credits": get_plan_included_credits(current_plan_id)
+        },
+        "credit_summary": {
+            "enabled": True,
+            "balance": credit_summary["credit_balance"],
+            "lifetime_granted": credit_summary["credit_lifetime_granted"],
+            "lifetime_used": credit_summary["credit_lifetime_used"],
+            "included_credits_for_current_plan": get_plan_included_credits(current_plan_id),
+            "next_phase": "topups_and_consumption_pending"
+        },
+        "transactions": transactions,
+        "available_plans": [
+            {
+                "id": k,
+                "name": v["name"],
+                "price": v["price"],
+                "features": v["features"],
+                "included_credits": get_plan_included_credits(k)
+            }
+            for k, v in PLANS.items()
+        ],
+        "available_one_time_offers": [
+            {"id": k, "name": v["name"], "price": v["price"], "description": v["description"]}
+            for k, v in ONE_TIME_OFFERS.items()
+        ]
+    }
+
+
+@router.put("/profile")
+async def update_profile(request: Request):
+    user = await get_current_user(request)
+    body = await request.json()
+
+    allowed_fields = ["name"]
+    update_data = {k: v for k, v in body.items() if k in allowed_fields}
+
+    if update_data:
+        await db.users.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": update_data}
+        )
+
+    updated_user = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "password_hash": 0}
+    )
+    return updated_user
+
+
+@router.get("/stats")
+async def get_user_stats(request: Request):
+    user = await get_current_user(request)
+
+    project_count = await db.projects.count_documents({"user_id": user["user_id"]})
+    blueprint_count = await db.projects.count_documents(
+        {"user_id": user["user_id"], "status": "blueprint_generated"}
+    )
+    credit_summary = await get_user_credit_summary(user["user_id"])
+
+    return {
+        "total_projects": project_count,
+        "blueprints_generated": blueprint_count,
+        "plan": user.get("plan", "free"),
+        "credit_balance": credit_summary["credit_balance"]
+    }
+
+==============================================================
+TARGET: backend\app\routers\payments.py
+EXISTS: True
+TYPE: file
+SIZE: 8692 bytes
+
+[PATTERN HITS]
+L6 :: import stripe
+L9 :: from backend.app.core.config import STRIPE_SECRET_KEY
+L13 :: from backend.app.schemas.payments import CheckoutCreate
+L14 :: from backend.app.services.credits import grant_plan_credits
+L21 :: def resolve_checkout_item(checkout_data: CheckoutCreate):
+L22 :: if checkout_data.item_type == "one_time_offer":
+L23 :: offer_id = checkout_data.item_id
+L36 :: plan_id = checkout_data.plan_id or checkout_data.item_id
+L66 :: grant_result = await grant_plan_credits(
+L74 :: tx_updates["credits_grant_status"] = grant_status
+L75 :: tx_updates["credits_grant_delta"] = grant_result.get("credits_delta", 0)
+L78 :: tx_updates["credits_granted_at"] = grant_result["created_at"]
+L81 :: {"stripe_session_id": session_id},
+L86 :: @router.post("/checkout")
+L87 :: async def create_checkout(checkout_data: CheckoutCreate, request: Request):
+L90 :: if not STRIPE_SECRET_KEY:
+L91 :: raise HTTPException(status_code=500, detail="Missing Stripe secret key")
+L93 :: item = resolve_checkout_item(checkout_data)
+L96 :: stripe.api_key = STRIPE_SECRET_KEY
+L98 :: host_url = checkout_data.origin_url.rstrip("/")
+L99 :: success_url = f"{host_url}/dashboard/billing?session_id={{CHECKOUT_SESSION_ID}}"
+L100 :: cancel_url = f"{host_url}/dashboard/billing"
+L103 :: session = stripe.checkout.Session.create(
+L135 :: "stripe_session_id": session.id,
+L138 :: "credits_grant_status": "not_applicable" if item["item_type"] != "plan" else "pending",
+L154 :: logger.error(f"Stripe checkout error: {e}")
+L163 :: {"stripe_session_id": session_id, "user_id": user["user_id"]},
+L170 :: if transaction.get("item_type", "plan") == "plan" and transaction.get("credits_grant_status") != "granted":
+L180 :: if not STRIPE_SECRET_KEY:
+L188 :: stripe.api_key = STRIPE_SECRET_KEY
+L191 :: session = stripe.checkout.Session.retrieve(session_id)
+L213 :: @router.post("/webhook/stripe")
+L214 :: async def stripe_webhook(request: Request):
+L216 :: signature = request.headers.get("Stripe-Signature")
+L218 :: webhook_secret = None
+L221 :: webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+L223 :: webhook_secret = None
+L226 :: if webhook_secret and signature and STRIPE_SECRET_KEY:
+L227 :: stripe.api_key = STRIPE_SECRET_KEY
+L228 :: event = stripe.Webhook.construct_event(body, signature, webhook_secret)
+L232 :: if event.get("type") == "checkout.session.completed":
+L237 :: transaction = await db.payment_transactions.find_one({"stripe_session_id": session_id}, {"_id": 0})
+L245 :: logger.error(f"Webhook error: {e}")
+
+[HEAD]
+import json
+import logging
+import uuid
+from datetime import datetime, timezone
+
+import stripe
+from fastapi import APIRouter, HTTPException, Request
+
+from backend.app.core.config import STRIPE_SECRET_KEY
+from backend.app.core.security import get_current_user
+from backend.app.db.mongodb import db
+from backend.app.domain.plans import ONE_TIME_OFFERS, PLANS
+from backend.app.schemas.payments import CheckoutCreate
+from backend.app.services.credits import grant_plan_credits
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/api/payments", tags=["payments"])
+
+
+def resolve_checkout_item(checkout_data: CheckoutCreate):
+    if checkout_data.item_type == "one_time_offer":
+        offer_id = checkout_data.item_id
+        offer = ONE_TIME_OFFERS.get(offer_id)
+        if not offer:
+            raise HTTPException(status_code=400, detail="Invalid one-time offer")
+
+        return {
+            "item_type": "one_time_offer",
+            "item_id": offer_id,
+            "name": offer["name"],
+            "price": offer["price"],
+            "description": offer["description"]
+        }
+
+    plan_id = checkout_data.plan_id or checkout_data.item_id
+    plan = PLANS.get(plan_id)
+
+    if not plan or plan_id == "free":
+        raise HTTPException(status_code=400, detail="Invalid plan")
+
+    return {
+        "item_type": "plan",
+        "item_id": plan_id,
+        "name": plan["name"],
+        "price": plan["price"],
+        "description": f"Acceso al plan {plan['name']}"
+    }
+
+
+async def finalize_paid_transaction(transaction: dict, session_id: str):
+    tx_updates = {
+        "status": "complete",
+        "payment_status": "paid"
+    }
+
+    if transaction.get("item_type", "plan") == "plan":
+        plan_id = transaction.get("item_id") or transaction.get("plan_id")
+
+        if plan_id:
+            await db.users.update_one(
+                {"user_id": transaction["user_id"]},
+                {"$set": {"plan": plan_id}}
+            )
+
+            grant_result = await grant_plan_credits(
+                user_id=transaction["user_id"],
+                plan_id=plan_id,
+                source_ref=session_id,
+                source_type="plan_payment"
+            )
+
+            grant_status = "granted" if grant_result.get("effective") else grant_result.get("reason", "unknown")
+            tx_updates["credits_grant_status"] = grant_status
+            tx_updates["credits_grant_delta"] = grant_result.get("credits_delta", 0)
+
+            if grant_result.get("created_at"):
+                tx_updates["credits_granted_at"] = grant_result["created_at"]
+
+    await db.payment_transactions.update_one(
+        {"stripe_session_id": session_id},
+        {"$set": tx_updates}
+    )
+
+
+@router.post("/checkout")
+async def create_checkout(checkout_data: CheckoutCreate, request: Request):
+    user = await get_current_user(request)
+
+    if not STRIPE_SECRET_KEY:
+        raise HTTPException(status_code=500, detail="Missing Stripe secret key")
+
+    item = resolve_checkout_item(checkout_data)
+    amount = int(item["price"] * 100)
+
+    stripe.api_key = STRIPE_SECRET_KEY
+
+    host_url = checkout_data.origin_url.rstrip("/")
+    success_url = f"{host_url}/dashboard/billing?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{host_url}/dashboard/billing"
+
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": "eur",
+                    "product_data": {
+                        "name": f"Sistema Maestro - {item['name']}",
+                        "description": item["description"]
+                    },
+                    "unit_amount": amount
+                },
+                "quantity": 1
+            }],
+            mode="payment",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "user_id": user["user_id"],
+                "user_email": user["email"],
+                "item_type": item["item_type"],
+                "item_id": item["item_id"]
+            }
+        )
+
+        transaction_doc = {
+            "transaction_id": f"txn_{uuid.uuid4().hex[:12]}",
+            "user_id": user["user_id"],
+            "user_email": user["email"],
+            "item_type": item["item_type"],
+            "item_id": item["item_id"],
+            "amount": item["price"],
+            "currency": "eur",
+            "stripe_session_id": session.id,
+            "status": "pending",
+            "payment_status": "initiated",
+            "credits_grant_status": "not_applicable" if item["item_type"] != "plan" else "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+
+        if item["item_type"] == "plan":
+            transaction_doc["plan_id"] = item["item_id"]
+        else:
+            transaction_doc["offer_id"] = item["item_id"]
+
+        await db.payment_transactions.insert_one(transaction_doc)
+
+        return {"url": session.url, "session_id": session.id}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Stripe checkout error: {e}")
+        raise HTTPException(status_code=500, detail="Error al crear sesión de pago")
+
+
+@router.get("/status/{session_id}")
+async def get_payment_status(session_id: str, request: Request):
+    user = await get_current_user(request)
+
+    transaction = await db.payment_transactions.find_one(
+        {"stripe_session_id": session_id, "user_id": user["user_id"]},
+        {"_id": 0}
+    )
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    if transaction.get("payment_status") == "paid":
+        if transaction.get("item_type", "plan") == "plan" and transaction.get("credits_grant_status") != "granted":
+            await finalize_paid_transaction(transaction, session_id)
+
+        return {
+            "status": "complete",
+            "payment_status": "paid",
+            "item_type": transaction.get("item_type", "plan"),
+            "item_id": transaction.get("item_id") or transaction.get("plan_id")
+        }
+
+    if not STRIPE_SECRET_KEY:
+        return {
+            "status": transaction.get("status"),
+            "payment_status": transaction.get("payment_status"),
+            "item_type": transaction.get("item_type", "plan"),
+            "item_id": transaction.get("item_id") or transaction.get("plan_id")
+        }
+
+    stripe.api_key = STRIPE_SECRET_KEY
+
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+
+        if session.payment_status == "paid":
+            await finalize_paid_transaction(transaction, session_id)
+
+        return {
+            "status": session.status,
+            "payment_status": session.payment_status,
+            "item_type": transaction.get("item_type", "plan"),
+            "item_id": transaction.get("item_id") or transaction.get("plan_id")
+        }
+
+    except Exception as e:
+        logger.error(f"Payment status check error: {e}")
+        return {
+            "status": transaction.get("status"),
+            "payment_status": transaction.get("payment_status"),
+            "item_type": transaction.get("item_type", "plan"),
+            "item_id": transaction.get("item_id") or transaction.get("plan_id")
+        }
+
+
+@router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    body = await request.body()
+    signature = request.headers.get("Stripe-Signature")
+
+    webhook_secret = None
+    try:
+        import os
+

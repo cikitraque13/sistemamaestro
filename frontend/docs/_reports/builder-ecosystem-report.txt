@@ -1,0 +1,338 @@
+SISTEMA MAESTRO — BUILDER ECOSYSTEM REPORT
+Generado: 04/25/2026 01:10:56
+
+==================================================
+1. DIRECTORIOS RELACIONADOS CON BUILDER
+==================================================
+src\features\builder
+src\features\builder\components
+src\features\builder\data
+src\features\builder\intelligence
+src\features\builder\panels
+src\features\builder\playbooks
+src\features\builder\presets
+src\features\builder\tabs
+src\features\builder\utils
+src\features\builder\workspace
+src\features\builder\workspace\hooks
+src\features\builder\workspace\state
+
+==================================================
+2. ARCHIVOS CANDIDATOS DEL ECOSISTEMA BUILDER
+==================================================
+src\features\app-shell\components\BuilderCreditBar.js | 1684 bytes | modificado: 04/24/2026 11:06:21
+src\features\app-shell\navigation\BuilderProjectTabs.js | 2254 bytes | modificado: 04/24/2026 11:06:57
+src\features\app-shell\navigation\BuilderWorkspaceTabs.js | 872 bytes | modificado: 04/24/2026 11:15:00
+src\features\builder\components\BuilderAgentPane.js | 9495 bytes | modificado: 04/24/2026 20:18:03
+src\features\builder\components\BuilderCanvasPane.js | 32086 bytes | modificado: 04/24/2026 23:57:06
+src\features\builder\components\BuilderChatDock.js | 3077 bytes | modificado: 04/20/2026 06:15:15
+src\features\builder\data\builderBuildPhases.js | 7129 bytes | modificado: 04/24/2026 19:46:20
+src\features\builder\data\builderCodeFrames.js | 4127 bytes | modificado: 04/20/2026 05:28:48
+src\features\builder\data\builderProjects.js | 398 bytes | modificado: 04/20/2026 05:17:31
+src\features\builder\data\builderVisualStates.js | 2953 bytes | modificado: 04/20/2026 05:29:31
+src\features\builder\data\builderWorkspaceTabs.js | 316 bytes | modificado: 04/24/2026 15:30:22
+src\features\builder\intelligence\builderAgentResponseComposer.js | 16183 bytes | modificado: 04/24/2026 23:38:23
+src\features\builder\intelligence\builderCroPlaybooks.js | 14548 bytes | modificado: 04/24/2026 19:02:48
+src\features\builder\intelligence\builderHubOrchestrator.js | 13555 bytes | modificado: 04/24/2026 23:30:38
+src\features\builder\intelligence\builderIntentInterpreter.js | 6426 bytes | modificado: 04/24/2026 18:51:56
+src\features\builder\intelligence\builderIterationInterpreter.js | 28221 bytes | modificado: 04/24/2026 23:27:51
+src\features\builder\intelligence\builderPlaybookSelector.js | 23107 bytes | modificado: 04/24/2026 23:23:37
+src\features\builder\intelligence\builderProjectClassifier.js | 22114 bytes | modificado: 04/24/2026 23:20:26
+src\features\builder\intelligence\builderResponsePolicy.js | 7460 bytes | modificado: 04/24/2026 19:02:19
+src\features\builder\intelligence\builderVisualIntelligence.js | 11695 bytes | modificado: 04/24/2026 19:07:51
+src\features\builder\intelligence\index.js | 3192 bytes | modificado: 04/24/2026 23:33:18
+src\features\builder\panels\BuilderCodePreview.js | 3432 bytes | modificado: 04/20/2026 06:18:55
+src\features\builder\panels\BuilderDeployPreview.js | 2695 bytes | modificado: 04/20/2026 06:16:13
+src\features\builder\panels\BuilderExtractionPanel.js | 3026 bytes | modificado: 04/24/2026 20:21:29
+src\features\builder\panels\BuilderStructurePreview.js | 2635 bytes | modificado: 04/20/2026 06:16:40
+src\features\builder\panels\BuilderVisualPreview.js | 4033 bytes | modificado: 04/20/2026 06:19:33
+src\features\builder\playbooks\assistantCapabilityPlaybooks.js | 23911 bytes | modificado: 04/24/2026 23:14:45
+src\features\builder\playbooks\basicPlaybooks.js | 33933 bytes | modificado: 04/24/2026 23:04:01
+src\features\builder\playbooks\expertPlaybooks.js | 26840 bytes | modificado: 04/24/2026 23:08:08
+src\features\builder\playbooks\index.js | 8030 bytes | modificado: 04/24/2026 23:17:14
+src\features\builder\playbooks\sectorPlaybooks.js | 30368 bytes | modificado: 04/24/2026 23:11:49
+src\features\builder\playbooks\userLevelPlaybooks.js | 9192 bytes | modificado: 04/24/2026 22:59:17
+src\features\builder\presets\builderCtaPresets.js | 2325 bytes | modificado: 04/24/2026 18:53:00
+src\features\builder\presets\builderQuestionPresets.js | 2760 bytes | modificado: 04/24/2026 18:53:27
+src\features\builder\presets\builderVisualPresets.js | 5539 bytes | modificado: 04/24/2026 18:52:33
+src\features\builder\utils\builderCodeTemplates.js | 10972 bytes | modificado: 04/24/2026 19:08:31
+src\features\builder\utils\builderLandingCopy.js | 10797 bytes | modificado: 04/24/2026 19:46:46
+src\features\builder\workspace\BuilderWorkspaceDemo.js | 1717 bytes | modificado: 04/21/2026 01:12:40
+src\features\builder\workspace\BuilderWorkspaceLayout.js | 3473 bytes | modificado: 04/24/2026 23:53:03
+src\features\builder\workspace\BuilderWorkspacePage.js | 8195 bytes | modificado: 04/24/2026 12:59:13
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js | 10037 bytes | modificado: 04/24/2026 23:45:56
+src\features\builder\workspace\state\builderWorkspaceState.js | 11575 bytes | modificado: 04/24/2026 18:58:42
+src\features\dashboard\components\DashboardBuilderLauncher.js | 10841 bytes | modificado: 04/24/2026 12:58:31
+src\features\home\components\BuilderCapabilityChips.js | 588 bytes | modificado: 04/20/2026 03:19:17
+src\features\home\components\BuilderChatDock.js | 3077 bytes | modificado: 04/20/2026 06:15:15
+src\features\home\components\BuilderCodePreview.js | 3432 bytes | modificado: 04/20/2026 06:18:55
+src\features\home\components\BuilderCreditBar.js | 1580 bytes | modificado: 04/20/2026 06:15:36
+src\features\home\components\BuilderDeployPreview.js | 2695 bytes | modificado: 04/20/2026 06:16:13
+src\features\home\components\BuilderFlowPreview.js | 1402 bytes | modificado: 04/20/2026 03:26:40
+src\features\home\components\BuilderInputPanel.js | 4714 bytes | modificado: 04/20/2026 12:10:46
+src\features\home\components\BuilderIntentTabs.js | 878 bytes | modificado: 04/20/2026 03:18:18
+src\features\home\components\BuilderOutputsPreview.js | 1061 bytes | modificado: 04/20/2026 03:27:05
+src\features\home\components\BuilderProjectTabs.js | 2215 bytes | modificado: 04/20/2026 06:17:39
+src\features\home\components\BuilderStructurePreview.js | 2635 bytes | modificado: 04/20/2026 06:16:40
+src\features\home\components\BuilderTypeTabs.js | 922 bytes | modificado: 04/20/2026 03:18:48
+src\features\home\components\BuilderVisualPreview.js | 4033 bytes | modificado: 04/20/2026 06:19:33
+src\features\home\components\BuilderWorkspaceTabs.js | 872 bytes | modificado: 04/20/2026 06:14:44
+src\features\home\data\builderCodeFrames.js | 4127 bytes | modificado: 04/20/2026 05:28:48
+src\features\home\data\builderIntents.js | 878 bytes | modificado: 04/20/2026 03:15:50
+src\features\home\data\builderOutputs.js | 715 bytes | modificado: 04/20/2026 03:17:22
+src\features\home\data\builderProjects.js | 398 bytes | modificado: 04/20/2026 05:17:31
+src\features\home\data\builderStages.js | 877 bytes | modificado: 04/20/2026 03:16:57
+src\features\home\data\builderTypes.js | 571 bytes | modificado: 04/20/2026 03:16:13
+src\features\home\data\builderVisualStates.js | 2953 bytes | modificado: 04/20/2026 05:29:31
+src\features\home\data\builderWorkspaceTabs.js | 197 bytes | modificado: 04/20/2026 06:14:02
+src\features\home\sections\BuilderShowcaseSection.js | 3260 bytes | modificado: 04/21/2026 01:22:37
+src\features\home\sections\HeroBuilderSection.js | 5920 bytes | modificado: 04/20/2026 06:20:29
+
+==================================================
+3. REFERENCIAS CLAVE EN EL PROYECTO
+==================================================
+src\features\app-shell\layout\AppShellLayout.js : línea 33 : Gema Maestra
+src\features\builder\components\BuilderAgentPane.js : línea 117 : Código en construcción
+src\features\builder\components\BuilderAgentPane.js : línea 186 : export default function BuilderAgentPane({
+src\features\builder\components\BuilderAgentPane.js : línea 193 : agentStatus = 'Agente preparado',
+src\features\builder\components\BuilderAgentPane.js : línea 194 : onSubmitMessage,
+src\features\builder\components\BuilderAgentPane.js : línea 195 : onStartBuild,
+src\features\builder\components\BuilderAgentPane.js : línea 204 : onSubmitMessage(value);
+src\features\builder\components\BuilderAgentPane.js : línea 228 : <AgentCapsule status={agentStatus} />
+src\features\builder\components\BuilderAgentPane.js : línea 268 : Gema Maestra: acciones estimadas 8–18 créditos.
+src\features\builder\components\BuilderAgentPane.js : línea 274 : onClick={onStartBuild}
+src\features\builder\components\BuilderCanvasPane.js : línea 24 : const getBuilderIntelligenceParts = (builderIntelligence = {}) => {
+src\features\builder\components\BuilderCanvasPane.js : línea 25 : const hubSummary = builderIntelligence?.hubSummary || {};
+src\features\builder\components\BuilderCanvasPane.js : línea 26 : const lastDelta = builderIntelligence?.lastDelta || {};
+src\features\builder\components\BuilderCanvasPane.js : línea 27 : const lastOperation = builderIntelligence?.lastOperation || {};
+src\features\builder\components\BuilderCanvasPane.js : línea 29 : hubSummary?.visiblePlan ||
+src\features\builder\components\BuilderCanvasPane.js : línea 30 : lastOperation?.visiblePlan ||
+src\features\builder\components\BuilderCanvasPane.js : línea 31 : builderIntelligence?.hubState?.visiblePlan ||
+src\features\builder\components\BuilderCanvasPane.js : línea 35 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 36 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 37 : lastOperation,
+src\features\builder\components\BuilderCanvasPane.js : línea 42 : const resolvePreviewTone = (builderIntelligence = {}) => {
+src\features\builder\components\BuilderCanvasPane.js : línea 43 : const { hubSummary, lastDelta } = getBuilderIntelligenceParts(builderIntelligence);
+src\features\builder\components\BuilderCanvasPane.js : línea 44 : const visualTone = lastDelta?.visual?.tone;
+src\features\builder\components\BuilderCanvasPane.js : línea 45 : const category = hubSummary?.category;
+src\features\builder\components\BuilderCanvasPane.js : línea 46 : const projectType = hubSummary?.projectType;
+src\features\builder\components\BuilderCanvasPane.js : línea 47 : const businessModel = hubSummary?.businessModel;
+src\features\builder\components\BuilderCanvasPane.js : línea 48 : const intent = hubSummary?.iterationIntent;
+src\features\builder\components\BuilderCanvasPane.js : línea 186 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 187 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 188 : lastOperation,
+src\features\builder\components\BuilderCanvasPane.js : línea 190 : lastDelta?.cta?.primaryCTA ||
+src\features\builder\components\BuilderCanvasPane.js : línea 191 : lastOperation?.primaryCTA ||
+src\features\builder\components\BuilderCanvasPane.js : línea 192 : hubSummary?.primaryCTA ||
+src\features\builder\components\BuilderCanvasPane.js : línea 198 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 200 : lastDelta?.cta?.secondaryCTA ||
+src\features\builder\components\BuilderCanvasPane.js : línea 206 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 207 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 209 : const intent = hubSummary?.iterationIntent;
+src\features\builder\components\BuilderCanvasPane.js : línea 210 : const conversionTarget = hubSummary?.conversionTarget;
+src\features\builder\components\BuilderCanvasPane.js : línea 211 : const primaryPlaybook = hubSummary?.primaryPlaybook;
+src\features\builder\components\BuilderCanvasPane.js : línea 233 : if (lastDelta?.copy?.headlineStrategy && primaryPlaybook) {
+src\features\builder\components\BuilderCanvasPane.js : línea 242 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 243 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 245 : const focus = hubSummary?.operationalFocus;
+src\features\builder\components\BuilderCanvasPane.js : línea 246 : const agentMessage = hubSummary?.agentMessage;
+src\features\builder\components\BuilderCanvasPane.js : línea 248 : if (lastDelta?.copy?.subheadlineStrategy && focus) {
+src\features\builder\components\BuilderCanvasPane.js : línea 249 : return `El Hub está aplicando una mejora sobre ${focus}. ${lastDelta.copy.subheadlineStrategy}`;
+src\features\builder\components\BuilderCanvasPane.js : línea 252 : if (agentMessage && hubSummary?.iterationIntent) {
+src\features\builder\components\BuilderCanvasPane.js : línea 266 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 294 : if (hubSummary?.primaryPlaybook) {
+src\features\builder\components\BuilderCanvasPane.js : línea 297 : title: hubSummary.primaryPlaybook,
+src\features\builder\components\BuilderCanvasPane.js : línea 298 : text: `Playbook principal activo para ${hubSummary.conversionTarget || 'conversión cualificada'}.`,
+src\features\builder\components\BuilderCanvasPane.js : línea 302 : text: hubSummary.primaryCTA || 'Acción principal pendiente de confirmar.',
+src\features\builder\components\BuilderCanvasPane.js : línea 306 : text: hubSummary.firstQuestion || 'Ajustar diseño, copy, CTA o estructura.',
+src\features\builder\components\BuilderCanvasPane.js : línea 331 : builderIntelligence,
+src\features\builder\components\BuilderCanvasPane.js : línea 334 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 335 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 336 : lastOperation,
+src\features\builder\components\BuilderCanvasPane.js : línea 338 : } = getBuilderIntelligenceParts(builderIntelligence);
+src\features\builder\components\BuilderCanvasPane.js : línea 343 : hubSummary?.primaryPlaybook ||
+src\features\builder\components\BuilderCanvasPane.js : línea 348 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 349 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 353 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 354 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 358 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 359 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 360 : lastOperation,
+src\features\builder\components\BuilderCanvasPane.js : línea 364 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 367 : hubSummary?.operationalFocus ||
+src\features\builder\components\BuilderCanvasPane.js : línea 371 : lastDelta?.structure?.strategy ||
+src\features\builder\components\BuilderCanvasPane.js : línea 372 : lastDelta?.visual?.direction ||
+src\features\builder\components\BuilderCanvasPane.js : línea 377 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 383 : const HubSignalStrip = ({ builderIntelligence }) => {
+src\features\builder\components\BuilderCanvasPane.js : línea 385 : hubSummary,
+src\features\builder\components\BuilderCanvasPane.js : línea 386 : lastDelta,
+src\features\builder\components\BuilderCanvasPane.js : línea 387 : } = getBuilderIntelligenceParts(builderIntelligence);
+src\features\builder\components\BuilderCanvasPane.js : línea 389 : if (!hubSummary?.primaryPlaybook && !lastDelta) return null;
+src\features\builder\components\BuilderCanvasPane.js : línea 391 : const tone = resolvePreviewTone(builderIntelligence);
+src\features\builder\components\BuilderCanvasPane.js : línea 392 : const affectedLayers = getArray(hubSummary?.affectedLayers);
+src\features\builder\components\BuilderCanvasPane.js : línea 401 : {hubSummary?.primaryPlaybook && (
+src\features\builder\components\BuilderCanvasPane.js : línea 403 : {hubSummary.primaryPlaybook}
+src\features\builder\components\BuilderCanvasPane.js : línea 407 : {hubSummary?.primaryCTA && (
+src\features\builder\components\BuilderCanvasPane.js : línea 409 : CTA: {hubSummary.primaryCTA}
+src\features\builder\components\BuilderCanvasPane.js : línea 538 : const CreationPreview = ({ copy, progress, builderIntelligence }) => {
+src\features\builder\components\BuilderCanvasPane.js : línea 540 : const tone = resolvePreviewTone(builderIntelligence);
+src\features\builder\components\BuilderCanvasPane.js : línea 543 : builderIntelligence,
+src\features\builder\components\BuilderCanvasPane.js : línea 548 : <HubSignalStrip builderIntelligence={builderIntelligence} />
+src\features\builder\components\BuilderCanvasPane.js : línea 650 : const TransformPreview = ({ copy, progress, builderIntelligence }) => {
+src\features\builder\components\BuilderCanvasPane.js : línea 653 : const tone = resolvePreviewTone(builderIntelligence);
+src\features\builder\components\BuilderCanvasPane.js : línea 656 : builderIntelligence,
+src\features\builder\components\BuilderCanvasPane.js : línea 661 : <HubSignalStrip builderIntelligence={builderIntelligence} />
+src\features\builder\components\BuilderCanvasPane.js : línea 874 : export default function BuilderCanvasPane({
+src\features\builder\components\BuilderCanvasPane.js : línea 881 : builderIntelligence = null,
+src\features\builder\components\BuilderCanvasPane.js : línea 887 : builderIntelligence,
+src\features\builder\components\BuilderCanvasPane.js : línea 891 : builderIntelligence,
+src\features\builder\components\BuilderCanvasPane.js : línea 895 : const { hubSummary, lastDelta } = getBuilderIntelligenceParts(
+src\features\builder\components\BuilderCanvasPane.js : línea 896 : builderIntelligence
+src\features\builder\components\BuilderCanvasPane.js : línea 907 : intent={hubSummary}
+src\features\builder\components\BuilderCanvasPane.js : línea 908 : visualState={lastDelta?.visual || {}}
+src\features\builder\components\BuilderCanvasPane.js : línea 919 : builderIntelligence={builderIntelligence}
+src\features\builder\components\BuilderCanvasPane.js : línea 941 : builderIntelligence={builderIntelligence}
+src\features\builder\components\BuilderCanvasPane.js : línea 948 : builderIntelligence={builderIntelligence}
+src\features\builder\components\BuilderChatDock.js : línea 18 : const BuilderChatDock = ({ activeIntent, projectLabel }) => {
+src\features\builder\components\BuilderChatDock.js : línea 29 : Chat de trabajo
+src\features\builder\components\BuilderChatDock.js : línea 77 : export default BuilderChatDock;
+src\features\builder\data\builderBuildPhases.js : línea 180 : export const getAgentStatusFromBuildPhase = ({
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 25 : getBuilderHubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 26 : } from './builderHubOrchestrator';
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 200 : hubSummary: null,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 249 : hubSummary: null,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 257 : hubSummary = {},
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 261 : hubSummary.firstQuestion ||
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 281 : hubSummary = {},
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 288 : projectType: hubSummary.projectType,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 289 : category: hubSummary.category,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 290 : businessModel: hubSummary.businessModel,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 291 : conversionTarget: hubSummary.conversionTarget,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 292 : primaryPlaybook: hubSummary.primaryPlaybook,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 293 : secondaryPlaybooks: hubSummary.secondaryPlaybooks || [],
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 294 : primaryCTA: hubSummary.primaryCTA,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 295 : firstQuestion: hubSummary.firstQuestion,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 296 : operationalFocus: hubSummary.operationalFocus,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 297 : iterationIntent: hubSummary.iterationIntent,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 298 : affectedLayers: hubSummary.affectedLayers || [],
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 299 : requiredAgents: hubSummary.requiredAgents || [],
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 302 : const buildHubSummaryText = ({
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 303 : hubSummary = {},
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 307 : hubSummary.primaryPlaybook
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 308 : ? `Playbook principal: ${hubSummary.primaryPlaybook}`
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 310 : hubSummary.operationalFocus
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 311 : ? `Foco: ${hubSummary.operationalFocus}`
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 313 : hubSummary.primaryCTA
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 314 : ? `CTA: ${hubSummary.primaryCTA}`
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 350 : const hubSummary = getBuilderHubSummary(hub);
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 354 : hubSummary?.visiblePlan?.shouldShowClarifyingQuestion ||
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 361 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 376 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 380 : hubSummary.agentMessage ||
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 391 : summary: buildHubSummaryText({
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 392 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 397 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 400 : requiredAgents: hubSummary.requiredAgents || [],
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 401 : primaryCTA: hubSummary.primaryCTA || '',
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 402 : primaryPlaybook: hubSummary.primaryPlaybook || '',
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 403 : secondaryPlaybooks: hubSummary.secondaryPlaybooks || [],
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 404 : firstQuestion: hubSummary.firstQuestion || '',
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 405 : operationalFocus: hubSummary.operationalFocus || '',
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 406 : visiblePlan: hubSummary.visiblePlan || {},
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 407 : agentInstruction: hubSummary.agentInstruction || hub?.agent?.instruction || '',
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 472 : const hubSummary = getBuilderHubSummary(hub);
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 479 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 482 : hubSummary.agentMessage ||
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 485 : summary: buildHubSummaryText({
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 486 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 491 : hubSummary,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 500 : hubSummary: null,
+src\features\builder\intelligence\builderAgentResponseComposer.js : línea 539 : export const composeAgentStatusLabel = ({
+src\features\builder\intelligence\builderHubOrchestrator.js : línea 4 : } from './builderProjectClassifier';
+src\features\builder\intelligence\builderHubOrchestrator.js : línea 10 : } from './builderPlaybookSelector';
+src\features\builder\intelligence\builderHubOrchestrator.js : línea 16 : } from './builderIterationInterpreter';
+src\features\builder\intelligence\builderHubOrchestrator.js : línea 459 : export const getBuilderHubSummary = (hubResult = {}) => ({
+src\features\builder\intelligence\builderIterationInterpreter.js : línea 8 : } from './builderPlaybookSelector';
+src\features\builder\intelligence\builderPlaybookSelector.js : línea 9 : } from './builderProjectClassifier';
+src\features\builder\intelligence\index.js : línea 1 : export * from './builderProjectClassifier';
+src\features\builder\intelligence\index.js : línea 2 : export * from './builderPlaybookSelector';
+src\features\builder\intelligence\index.js : línea 3 : export * from './builderIterationInterpreter';
+src\features\builder\intelligence\index.js : línea 4 : export * from './builderHubOrchestrator';
+src\features\builder\intelligence\index.js : línea 10 : } from './builderProjectClassifier';
+src\features\builder\intelligence\index.js : línea 15 : } from './builderPlaybookSelector';
+src\features\builder\intelligence\index.js : línea 20 : } from './builderIterationInterpreter';
+src\features\builder\intelligence\index.js : línea 26 : getBuilderHubSummary,
+src\features\builder\intelligence\index.js : línea 27 : } from './builderHubOrchestrator';
+src\features\builder\intelligence\index.js : línea 45 : summary: getBuilderHubSummary(hub),
+src\features\builder\intelligence\index.js : línea 65 : summary: getBuilderHubSummary(hub),
+src\features\builder\intelligence\index.js : línea 87 : summary: getBuilderHubSummary(hub),
+src\features\builder\panels\BuilderCodePreview.js : línea 59 : Código en construcción
+src\features\builder\workspace\BuilderWorkspaceDemo.js : línea 3 : import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
+src\features\builder\workspace\BuilderWorkspaceDemo.js : línea 38 : <BuilderWorkspaceLayout
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 3 : import BuilderAgentPane from '../components/BuilderAgentPane';
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 4 : import BuilderCanvasPane from '../components/BuilderCanvasPane';
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 5 : import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 51 : export default function BuilderWorkspaceLayout({
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 58 : const runtime = useBuilderWorkspaceRuntime({
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 72 : <BuilderAgentPane
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 79 : agentStatus={runtime.agentStatus}
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 80 : onSubmitMessage={runtime.submitMessage}
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 81 : onStartBuild={runtime.startBuild}
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 87 : <BuilderCanvasPane
+src\features\builder\workspace\BuilderWorkspaceLayout.js : línea 94 : builderIntelligence={runtime.builderIntelligence}
+src\features\builder\workspace\BuilderWorkspacePage.js : línea 8 : import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
+src\features\builder\workspace\BuilderWorkspacePage.js : línea 262 : <BuilderWorkspaceLayout
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 10 : getAgentStatusFromBuildPhase,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 16 : } from '../../intelligence/builderAgentResponseComposer';
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 62 : initialHubSummary = null,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 81 : hubSummary: initialHubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 106 : export default function useBuilderWorkspaceRuntime({
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 119 : const [hubSummary, setHubSummary] = useState(null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 121 : const [lastDelta, setLastDelta] = useState(null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 122 : const [lastOperation, setLastOperation] = useState(null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 222 : hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 223 : lastDelta,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 224 : lastOperation,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 228 : hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 229 : lastDelta,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 230 : lastOperation,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 237 : setHubSummary(response.hubSummary || null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 239 : setLastDelta(response.delta || null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 240 : setLastOperation(response.operation || null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 251 : hubSummary: response.hubSummary || null,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 276 : hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 278 : lastDelta,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 279 : lastOperation,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 300 : initialAgentText: hubSummary?.agentMessage || '',
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 301 : initialAgentSummary: hubSummary?.operationalFocus || '',
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 302 : initialHubSummary: hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 310 : hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 331 : const agentStatus = useMemo(
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 333 : getAgentStatusFromBuildPhase({
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 362 : setHubSummary(initialAgent.hubSummary || null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 364 : setLastDelta(null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 365 : setLastOperation(null);
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 405 : agentStatus,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 411 : hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 413 : lastDelta,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 414 : lastOperation,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 415 : builderIntelligence: {
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 417 : hubSummary,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 419 : lastDelta,
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js : línea 420 : lastOperation,
+src\features\home\components\BuilderChatDock.js : línea 18 : const BuilderChatDock = ({ activeIntent, projectLabel }) => {
+src\features\home\components\BuilderChatDock.js : línea 29 : Chat de trabajo
+src\features\home\components\BuilderChatDock.js : línea 77 : export default BuilderChatDock;
+src\features\home\components\BuilderCodePreview.js : línea 59 : Código en construcción
+src\features\home\sections\HeroBuilderSection.js : línea 10 : import BuilderChatDock from '../components/BuilderChatDock';
+src\features\home\sections\HeroBuilderSection.js : línea 92 : <BuilderChatDock
+
+==================================================
+4. POSIBLES ARCHIVOS PRINCIPALES A REVISAR
+==================================================
+src\features\builder\components\BuilderAgentPane.js
+src\features\builder\components\BuilderCanvasPane.js
+src\features\builder\components\BuilderChatDock.js
+src\features\builder\workspace\BuilderWorkspaceLayout.js
+src\features\builder\workspace\hooks\useBuilderWorkspaceRuntime.js
+src\features\home\components\BuilderChatDock.js

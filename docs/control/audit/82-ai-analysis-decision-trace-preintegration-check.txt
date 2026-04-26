@@ -1,0 +1,17 @@
+﻿=== 82-AI-ANALYSIS-DECISION-TRACE-PREINTEGRATION-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\ai_analysis_decision_trace.py
+
+[FILE EXISTENCE]
+EXISTS: True
+BYTES: 6579
+
+[PY_COMPILE]
+RESULT: OK
+
+[IMPORT CHECK]
+backend.app.services.ai_analysis_decision_trace | IMPORT_OK
+backend.app.services.ai_analysis_decision_trace | should_emit_decision_trace=True
+backend.app.services.ai_analysis_decision_trace | build_decision_trace_payload=True
+backend.app.services.ai_analysis_decision_trace | emit_decision_trace=True

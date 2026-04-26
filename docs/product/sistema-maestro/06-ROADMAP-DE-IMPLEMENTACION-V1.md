@@ -1,732 +1,684 @@
-\# 06 — Roadmap de Implementación V1
+# 06 — Roadmap de Implementación V1
 
-
-
-\## 1. Función de esta pieza
-
-
+## 1. Función de esta pieza
 
 Este documento traduce la arquitectura de producto de Sistema Maestro V2 a una secuencia de implementación real.
-
-
 
 No define solo deseos.
 
 Define orden, dependencias, prioridad y criterio de ejecución.
 
-
-
 Su objetivo es impedir:
 
+- improvisación;
+- mezcla de capas;
+- inflación de tareas;
+- cambios prematuros en pricing o UI;
+- deuda estructural por querer implementar demasiado a la vez;
+- simulación de construcción sin salida real;
+- monetización de acciones que no entregan valor verificable.
 
+---
 
-\- improvisación
-
-\- mezcla de capas
-
-\- inflación de tareas
-
-\- cambios prematuros en pricing o UI
-
-\- deuda estructural por querer implementar demasiado a la vez
-
-
-
-\---
-
-
-
-\## 2. Principio rector
-
-
+## 2. Principio rector
 
 Sistema Maestro debe implementarse en capas.
-
-
 
 No se debe construir primero lo más vistoso.
 
 Se debe construir primero lo que garantice:
 
+- continuidad real;
+- estructura estable;
+- construcción visible verificable;
+- preview, código y estructura sincronizados;
+- monetización coherente;
+- ejecución sin fricción;
+- capacidad de crecer sin rehacer el sistema.
 
+### Regla principal
 
-\- continuidad real
+Antes de activar créditos, exportación, deploy o nuevas promesas comerciales, el Builder debe poder demostrar construcción real.
 
-\- estructura estable
+El núcleo de esa construcción es:
 
-\- monetización coherente
+```text
+input usuario
+→ interpretación IA
+→ mutación normalizada
+→ BuilderBuildState
+→ preview
+→ código
+→ estructura
+→ siguientes decisiones
+```
 
-\- ejecución sin fricción
+---
 
-\- capacidad de crecer sin rehacer el sistema
+## 3. Secuencia maestra de implementación
 
+La secuencia correcta, desde el estado actual, queda así:
 
+1. Cierre documental y canónico del Builder vivo.
+2. Creación de `frontend/src/features/builder/state/`.
+3. Creación de BuilderBuildKernel y BuilderBuildState.
+4. Conexión del runtime del Builder al estado vivo.
+5. Conexión de preview, código y estructura al estado vivo.
+6. Reordenación visual del Builder y del agente.
+7. Revisión de pricing y billing según nueva lógica.
+8. Conexión progresiva de créditos sobre acciones reales.
+9. Activación funcional reutilizable.
+10. Exportación / transferencia.
+11. Deployment / GitHub / salida operativa.
+12. Modo operador.
+13. SEO fundacional y expansión.
 
-\---
+---
 
+## 4. Fase 0 — Cierre doctrinal y DOC-LOCK
 
+### Estado
 
-\## 3. Secuencia maestra de implementación
+En curso avanzado.
 
-
-
-La secuencia correcta es esta:
-
-
-
-1\. Consolidación documental y doctrinal
-
-2\. Contratos técnicos y datos base
-
-3\. Revisión de pricing y billing según nueva lógica
-
-4\. Capa de créditos
-
-5\. Capa de activación real
-
-6\. Constructor visible V1
-
-7\. Exportación / transferencia
-
-8\. Deployment / GitHub / salida operativa
-
-9\. SEO fundacional y expansión
-
-
-
-\---
-
-
-
-\## 4. Fase 0 — Cierre doctrinal
-
-
-
-\### Estado
-
-En curso / prácticamente cerrada.
-
-
-
-\### Objetivo
+### Objetivo
 
 Dejar fijadas estas piezas:
 
-\- Producto Maestro V2
+- decisiones cerradas;
+- rutas canónicas;
+- incidencias y diagnósticos;
+- pendientes priorizados;
+- contratos técnicos;
+- procedimientos operativos;
+- roadmap de implementación.
 
-\- Activación
+### Documentos afectados
 
-\- Créditos y economía
+- `docs/control/01-DECISIONES-CERRADAS.md`
+- `docs/control/02-PENDIENTES-PRIORIZADOS.md`
+- `docs/control/04-RUTAS-CANONICAS.md`
+- `docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md`
+- `docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md`
+- `docs/product/sistema-maestro/05-CONTRATOS-TECNICOS-V1.md`
+- `docs/product/sistema-maestro/06-ROADMAP-DE-IMPLEMENTACION-V1.md`
 
-\- Constructor visible
-
-\- Contratos técnicos
-
-\- Roadmap de implementación
-
-
-
-\### Resultado esperado
+### Resultado esperado
 
 Base canónica para decidir sin contradicciones.
 
-
-
-\### Regla
+### Regla
 
 No abrir implementación superior sin esta fase cerrada y sincronizada.
 
+---
 
+## 5. Fase 1 — Crear la piedra angular del Builder visible
 
-\---
+### Estado
 
+Siguiente fase técnica autorizable después del cierre documental.
 
+### Objetivo
 
-\## 5. Fase 1 — Consolidación técnica base
+Crear la subcapa canónica interna del Builder:
 
+```text
+frontend/src/features/builder/state/
+```
 
+### Archivos previstos
 
-\### Objetivo
+- `builderBuildKernel.js`
+- `builderBuildState.js`
+- `builderMutationRegistry.js`
+- `builderOutputMap.js`
+- `builderQuestionFlowRegistry.js`
+- `builderStructureRegistry.js`
+- `builderKnowledgeIndex.js`
 
-Asegurar que la base actual del sistema está estable antes de abrir nuevas capas mayores.
+### Función
 
+Esta capa debe permitir que el Builder deje de depender de:
 
+- copy suelto;
+- mensajes del agente;
+- `hubSummary`;
+- `lastDelta`;
+- `lastOperation`;
+- fases de progreso;
+- plantillas aisladas.
 
-\### Incluye
+Y pase a gobernarse por:
 
-\- backend canónico consolidado
+- estado vivo;
+- mutaciones;
+- preview;
+- código;
+- estructura;
+- siguientes decisiones.
 
-\- frontend de flow estable
+### Criterio de cierre
 
-\- continuidad de proyecto por `project\_id`
+Una petición como:
 
-\- blueprint estable
+```text
+Añade acceso con Google
+```
 
-\- billing actual funcionando sin roturas
+debe poder traducirse a:
 
-\- rutas principales operativas
+- mutación normalizada;
+- estado vivo actualizado;
+- preview con bloque real;
+- código con componente real;
+- estructura con archivo real;
+- siguiente mejora distinta.
 
-\- deploy Railway estable
+### Regla
 
-\- observabilidad mínima y logs suficientes
+No crear megaarchivo.
 
+El kernel coordina.
 
+El conocimiento vive en registros, playbooks, presets, mapas de output, mutaciones, estructura y flujos de preguntas.
 
-\### Estado actual
+---
 
-Muy avanzado.
+## 6. Fase 2 — Conectar runtime del Builder al estado vivo
 
+### Objetivo
 
+Conectar el runtime actual del Builder con `BuilderBuildKernel` y `BuilderBuildState`.
 
-\### Criterio de cierre
+### Ruta principal
 
-\- análisis funciona
+```text
+frontend/src/features/builder/workspace/hooks/useBuilderWorkspaceRuntime.js
+```
 
-\- refine funciona
+### Debe conseguir
 
-\- blueprint funciona
+- inicializar estado vivo;
+- interpretar input del usuario;
+- enviar acciones al kernel;
+- aplicar mutaciones;
+- conservar acciones ya aplicadas;
+- exponer `appliedBuildState`;
+- generar siguientes decisiones desde el estado real.
 
-\- billing carga
+### No debe hacer todavía
 
-\- flow no pierde continuidad básica
+- rediseñar UI;
+- tocar créditos reales;
+- activar deploy;
+- mezclar backend;
+- convertir IA puente en runtime vivo completo.
 
-\- backend canónico es la ruta viva real
+### Criterio de cierre
 
+El runtime deja de ser:
 
+```text
+mensaje → progreso → señales
+```
 
-\---
+y pasa a ser:
 
+```text
+input → mutación → estado vivo → salida coordinada
+```
 
+---
 
-\## 6. Fase 2 — Revisión estructural de pricing y billing
+## 7. Fase 3 — Conectar preview, código y estructura
 
+### Objetivo
 
+Hacer que preview, código y estructura salgan de la misma fuente viva.
 
-\### Objetivo
+### Rutas principales
+
+```text
+frontend/src/features/builder/components/BuilderCanvasPane.js
+frontend/src/features/builder/utils/builderCodeTemplates.js
+```
+
+### Debe conseguir
+
+- preview renderizada desde `BuilderBuildState`;
+- código generado desde `BuilderBuildState`;
+- estructura derivada desde `BuilderBuildState`;
+- coherencia entre pestañas;
+- eliminación de preview decorativa;
+- eliminación de código que no representa lo que se ve.
+
+### Criterio de cierre
+
+Si una mutación activa un bloque, ese bloque debe aparecer en:
+
+- preview;
+- código;
+- estructura;
+- siguientes decisiones.
+
+### Regla
+
+No hay Builder Gold mientras preview, código y estructura no compartan la misma verdad.
+
+---
+
+## 8. Fase 4 — Reordenar BuilderAgentPane y experiencia visual
+
+### Objetivo
+
+Ajustar la capa visual del Builder después de tener estado vivo.
+
+### Ruta principal
+
+```text
+frontend/src/features/builder/components/BuilderAgentPane.js
+```
+
+### Incluye
+
+- evitar solapes de agentes;
+- ordenar la cápsula del agente;
+- reforzar el dock inferior;
+- hacer que sugerencias salgan del estado vivo;
+- evitar preguntas genéricas repetidas;
+- mantener chat como control del usuario;
+- hacer que el lado izquierdo sea código/proceso y no bloque decorativo.
+
+### Dependencia
+
+No se ejecuta antes de que exista `BuilderBuildState`.
+
+### Criterio de cierre
+
+El Builder debe transmitir:
+
+- construcción real;
+- proceso visible;
+- preview viva;
+- código coherente;
+- agente útil;
+- siguientes decisiones contextuales.
+
+---
+
+## 9. Fase 5 — Revisión estructural de pricing y billing
+
+### Objetivo
 
 Adaptar el sistema comercial actual a la nueva doctrina.
 
+### Debe cerrar
 
+- papel de Gratis;
+- papel del informe 6,99;
+- papel real de Pro 29;
+- papel real de Growth 79;
+- papel real de Master 199;
+- posición de créditos;
+- posición de exportación;
+- narrativa correcta de continuidad interna vs salida;
+- diferencia entre construir dentro del sistema y sacar el proyecto fuera.
 
-\### Debe cerrar
+### Entregables
 
-\- papel de Gratis
+- revisión de `pricingContent`;
+- revisión de `Billing`;
+- revisión de mensajes de recomendación;
+- contratos semánticos de planes.
 
-\- papel del informe 6,99
-
-\- papel real de Pro 29
-
-\- papel real de Growth 79
-
-\- papel real de Master 199
-
-\- posición de créditos
-
-\- posición de exportación
-
-\- narrativa correcta de continuidad interna vs salida
-
-
-
-\### Entregables
-
-\- revisión de `pricingContent`
-
-\- revisión de `Billing`
-
-\- revisión de mensajes de recomendación
-
-\- contratos semánticos de planes
-
-
-
-\### Regla
+### Regla
 
 No meter créditos operativos en UI sin revisar primero la arquitectura comercial.
 
+No prometer exportación, deploy o construcción premium sin salida técnica verificable.
 
+---
 
-\---
+## 10. Fase 6 — Modelo técnico de créditos
 
+### Objetivo
 
+Introducir la economía de créditos como pieza real del sistema, conectada solo a acciones con salida verificable.
 
-\## 7. Fase 3 — Modelo técnico de créditos
+### Debe incluir
 
+- saldo por usuario;
+- ledger de movimientos;
+- créditos incluidos por plan;
+- recargas;
+- validación de saldo;
+- bloqueo suave por falta de saldo;
+- visibilidad de saldo en frontend;
+- coste estimado por acción del Builder.
 
+### Entidades mínimas
 
-\### Objetivo
+- `credit_balance`;
+- `credit_ledger`;
+- tipos de movimiento;
+- lógica de otorgamiento por plan;
+- lógica de compra de recarga;
+- coste de acción;
+- vínculo con mutaciones reales del Builder.
 
-Introducir la economía de créditos como pieza real del sistema.
+### Endpoints mínimos futuros
 
+- saldo;
+- ledger;
+- checkout de recarga;
+- validación de coste de acción.
 
+### Regla
 
-\### Debe incluir
+No gastar créditos en simulaciones.
 
-\- saldo por usuario
+Créditos solo deben conectarse a acciones que produzcan:
 
-\- ledger de movimientos
+- preview;
+- código;
+- estructura;
+- archivo;
+- bloque;
+- exportación;
+- deploy;
+- salida real verificable.
 
-\- créditos incluidos por plan
+---
 
-\- recargas
+## 11. Fase 7 — Activación real
 
-\- validación de saldo
-
-\- bloqueo suave por falta de saldo
-
-\- visibilidad de saldo en frontend
-
-
-
-\### Entidades mínimas
-
-\- `credit\_balance`
-
-\- `credit\_ledger`
-
-\- tipos de movimiento
-
-\- lógica de otorgamiento por plan
-
-\- lógica de compra de recarga
-
-
-
-\### Endpoints mínimos futuros
-
-\- saldo
-
-\- ledger
-
-\- checkout de recarga
-
-\- validación de coste de acción
-
-
-
-\### Regla
-
-No gastar créditos aún en demasiadas acciones.
-
-Empezar con pocos casos claros.
-
-
-
-\---
-
-
-
-\## 8. Fase 4 — Activación real
-
-
-
-\### Objetivo
+### Objetivo
 
 Convertir la doctrina de Activación en objeto funcional del sistema.
 
+### Debe incluir
 
+- generación de activación por proyecto;
+- stack sugerido;
+- plantilla sugerida;
+- checklist;
+- secuencia;
+- prompts estructurales;
+- ruta técnico / no técnico.
 
-\### Debe incluir
-
-\- generación de activación por proyecto
-
-\- stack sugerido
-
-\- plantilla sugerida
-
-\- checklist
-
-\- secuencia
-
-\- prompts estructurales
-
-\- ruta técnico / no técnico
-
-
-
-\### Regla
+### Regla
 
 La activación no debe quedar enterrada en texto largo.
 
 Debe pasar a ser una capa usable y reutilizable.
 
+### Resultado esperado
 
+El sistema deja de orientar solo con blueprint y empieza a entregar una base de ejecución más concreta.
 
-\### Resultado esperado
+### Dependencia
 
-El sistema deja de orientarte solo con blueprint y empieza a entregarte una base de ejecución más concreta.
+La activación puede preparar el proyecto, pero no sustituye al Builder.
 
+El Builder ejecuta y muestra.
 
+---
 
-\---
+## 12. Fase 8 — Exportación / transferencia
 
-
-
-\## 9. Fase 5 — Constructor Visible V1
-
-
-
-\### Objetivo
-
-Abrir la primera versión real del constructor visible.
-
-
-
-\### Debe incluir
-
-\- pantalla dividida
-
-\- estado del sistema
-
-\- fase de build
-
-\- señal visible de ejecución
-
-\- preview base
-
-\- acciones limitadas y claras
-
-\- integración con créditos en acciones seleccionadas
-
-
-
-\### V1 debe ser contenida
-
-No hace falta abrir la versión máxima desde el día uno.
-
-
-
-\### La V1 debe resolver
-
-\- percepción de ejecución real
-
-\- continuidad visible
-
-\- valor claro del sistema
-
-\- puente entre activación y construcción
-
-
-
-\### Regla
-
-Primero una versión simple, estable y seria.
-
-No una versión inflada.
-
-
-
-\---
-
-
-
-\## 10. Fase 6 — Exportación / transferencia
-
-
-
-\### Objetivo
+### Objetivo
 
 Convertir la salida del proyecto en capacidad real y monetizable.
 
+### Debe incluir
 
+- solicitud de exportación;
+- valoración;
+- precio cerrado o por banda;
+- checkout;
+- estado de preparación;
+- entrega.
 
-\### Debe incluir
-
-\- solicitud de exportación
-
-\- valoración
-
-\- precio cerrado o por banda
-
-\- checkout
-
-\- estado de preparación
-
-\- entrega
-
-
-
-\### Principio
+### Principio
 
 La exportación no forma parte del uso ordinario del sistema.
 
 Es una acción premium separada.
 
+### Dependencia
 
+No se activa exportación sobre una preview simulada.
 
-\### Resultado esperado
+Debe existir:
+
+- estado vivo;
+- estructura coherente;
+- código representativo;
+- valoración.
+
+### Resultado esperado
 
 El usuario puede seguir dentro del sistema o sacar el proyecto con proceso claro y profesional.
 
+---
 
+## 13. Fase 9 — Deployment y conexión operativa
 
-\---
-
-
-
-\## 11. Fase 7 — Deployment y conexión operativa
-
-
-
-\### Objetivo
+### Objetivo
 
 Preparar la salida viva del proyecto cuando proceda.
 
+### Posibles piezas
 
+- botón de despliegue;
+- GitHub connect;
+- destino de deployment;
+- estados de deploy;
+- preparación de salida técnica.
 
-\### Posibles piezas
-
-\- botón de despliegue
-
-\- GitHub connect
-
-\- destino de deployment
-
-\- estados de deploy
-
-\- preparación de salida técnica
-
-
-
-\### Regla
+### Regla
 
 No abrir esta fase antes de:
 
-\- créditos
+- BuilderBuildState;
+- preview/código/estructura sincronizados;
+- créditos claros;
+- exportación básica;
+- estructura técnica coherente.
 
-\- activación
-
-\- builder visible V1
-
-\- exportación básica
-
-
-
-\### Motivo
+### Motivo
 
 Deployment sin estructura previa generaría más ruido que valor.
 
+---
 
+## 14. Fase 10 — Modo operador
 
-\---
-
-
-
-\## 12. Fase 8 — Modo operador
-
-
-
-\### Objetivo
+### Objetivo
 
 Convertir el sistema en herramienta fuerte para trabajar sobre activos de terceros.
 
+### Casos
 
+- analizar URL de negocio local;
+- proponer mejora;
+- construir nueva base;
+- vender propuesta;
+- entregar o exportar el resultado.
 
-\### Casos
-
-\- analizar URL de negocio local
-
-\- proponer mejora
-
-\- construir nueva base
-
-\- vender propuesta
-
-\- entregar o exportar el resultado
-
-
-
-\### Relevancia
+### Relevancia
 
 Alta.
 
 Pero debe apoyarse en fases anteriores ya resueltas.
 
+### Regla
 
+Modo operador no debe abrir otro frente de Builder paralelo.
 
-\---
+Debe consumir el mismo BuilderBuildKernel y el mismo BuilderBuildState.
 
+---
 
+## 15. Fase 11 — SEO fundacional
 
-\## 13. Fase 9 — SEO fundacional
-
-
-
-\### Objetivo
+### Objetivo
 
 Asegurar una base SEO limpia una vez que la arquitectura principal de producto esté estable.
 
+### Debe incluir
 
+- naming consistente “Sistema Maestro”;
+- titles;
+- meta descriptions;
+- H1 correctos;
+- indexación básica;
+- canonical;
+- sitemap;
+- robots;
+- home bien definida.
 
-\### Debe incluir
-
-\- naming consistente “Sistema Maestro”
-
-\- titles
-
-\- meta descriptions
-
-\- H1 correctos
-
-\- indexación básica
-
-\- canonical
-
-\- sitemap
-
-\- robots
-
-\- home bien definida
-
-
-
-\### Regla
+### Regla
 
 No abrir una fase SEO grande antes de que el núcleo del producto esté coherente.
 
+---
 
+## 16. Priorización ejecutiva
 
-\---
+## Prioridad crítica estructural
 
+1. cierre documental y DOC-LOCK;
+2. `frontend/src/features/builder/state/`;
+3. BuilderBuildKernel;
+4. BuilderBuildState;
+5. mutaciones;
+6. runtime del Builder;
+7. preview/código/estructura sincronizados.
 
+## Prioridad estratégica
 
-\## 14. Priorización ejecutiva
+8. BuilderAgentPane y experiencia visual;
+9. pricing y billing según nueva doctrina;
+10. créditos sobre acciones reales;
+11. activación real;
+12. exportación / transferencia;
+13. deployment / GitHub;
+14. modo operador.
 
+## Prioridad de expansión
 
+15. SEO fundacional y crecimiento.
 
-\## Prioridad crítica estructural
+---
 
-1\. consolidación técnica base
+## 17. Orden operativo recomendado inmediato
 
-2\. pricing y billing según nueva doctrina
+### Paso 1
 
-3\. créditos
+Cerrar y validar esta capa documental completa.
 
-4\. activación real
+### Paso 2
 
+Crear la subcapa:
 
+```text
+frontend/src/features/builder/state/
+```
 
-\## Prioridad estratégica
+### Paso 3
 
-5\. constructor visible V1
+Crear archivos pequeños del kernel modular:
 
-6\. exportación / transferencia
+- `builderBuildKernel.js`;
+- `builderBuildState.js`;
+- `builderMutationRegistry.js`;
+- `builderOutputMap.js`;
+- `builderQuestionFlowRegistry.js`;
+- `builderStructureRegistry.js`;
+- `builderKnowledgeIndex.js`.
 
-7\. deployment / GitHub
+### Paso 4
 
-8\. modo operador
+Conectar runtime del Builder al estado vivo.
 
+### Paso 5
 
+Conectar preview, código y estructura.
 
-\## Prioridad de expansión
+### Paso 6
 
-9\. SEO fundacional y crecimiento
+Ajustar visualmente BuilderAgentPane.
 
+### Paso 7
 
+Reabrir pricing, créditos, exportación y deploy solo sobre una base real.
 
-\---
+---
 
-
-
-\## 15. Orden operativo recomendado inmediato
-
-
-
-\### Paso 1
-
-Sincronizar esta capa documental completa con GitHub.
-
-
-
-\### Paso 2
-
-Hacer auditoría quirúrgica de:
-
-\- `pricingContent`
-
-\- `Billing.js`
-
-\- rutas y narrativa comercial
-
-
-
-\### Paso 3
-
-Diseñar la versión V2 de pricing y billing en base a:
-
-\- activación
-
-\- créditos
-
-\- exportación
-
-
-
-\### Paso 4
-
-Cerrar contratos mínimos de créditos para backend y frontend.
-
-
-
-\### Paso 5
-
-Empezar implementación controlada de créditos.
-
-
-
-\---
-
-
-
-\## 16. Regla de ejecución
-
-
+## 18. Regla de ejecución
 
 Cada fase debe cerrarse con:
 
-\- diagnóstico
-
-\- objetivo
-
-\- archivos implicados
-
-\- criterios de validación
-
-\- cierre técnico limpio
-
-
+- diagnóstico;
+- objetivo;
+- archivos implicados;
+- criterios de validación;
+- cierre técnico limpio.
 
 No se debe abrir una fase nueva si la anterior sigue ambigua.
 
+### Regla específica del Builder
 
+No se toca visualmente el Builder si el cambio no está conectado, directa o indirectamente, con:
 
-\---
+- estado vivo;
+- preview;
+- código;
+- estructura;
+- siguiente decisión;
+- futura monetización verificable.
 
+---
 
+## 19. Riesgos bloqueantes
 
-\## 17. Cierre doctrinal
+Quedan bloqueados hasta nueva fase formal:
 
+- deploy final;
+- push orientado a release;
+- producción;
+- créditos UI conectados a acciones simuladas;
+- exportación basada en preview no sincronizada;
+- deploy basado en estructura no generada por estado vivo;
+- cambios visuales amplios del Builder sin BuilderBuildState;
+- activación de IA puente como si fuera runtime completo;
+- commits mezclados de documentación, runtime, UI, créditos y deploy.
 
+---
+
+## 20. Cierre doctrinal
 
 Sistema Maestro ya no debe avanzar como experimento.
 
-
-
 Debe avanzar como producto serio con secuencia clara de implementación.
-
-
 
 Este roadmap fija esa secuencia.
 
-
-
 A partir de aquí, toda implementación debe justificarse por:
 
-\- prioridad real
+- prioridad real;
+- coherencia con la arquitectura;
+- reducción de fricción;
+- aumento de potencia del sistema;
+- salida verificable para el usuario;
+- protección de reputación y monetización.
 
-\- coherencia con la arquitectura
+La siguiente fase autorizada después del cierre documental es:
 
-\- reducción de fricción
+```text
+frontend/src/features/builder/state/
+```
 
-\- aumento de potencia del sistema
-
+No se aprueba invertir este orden.

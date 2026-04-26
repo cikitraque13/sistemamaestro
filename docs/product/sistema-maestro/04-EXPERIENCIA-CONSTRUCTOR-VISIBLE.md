@@ -6,17 +6,27 @@
 
 
 
-Este documento define la experiencia visible que debe convertir Sistema Maestro en un producto que no solo analiza, sino que construye de forma perceptible.
+Este documento define la experiencia visible que debe convertir Sistema Maestro en un producto que no solo analiza, sino que construye de forma perceptible y verificable.
 
 
 
-No regula todavía la implementación técnica final.
+No regula toda la implementación técnica final.
 
-Regula la experiencia que el usuario debe vivir cuando pasa de diagnóstico y activación a construcción real.
+
+
+Regula la experiencia que el usuario debe vivir cuando pasa de diagnóstico, activación o prompt inicial a construcción real.
 
 
 
 La experiencia del constructor visible es una de las piezas de mayor potencia del sistema.
+
+
+
+Su función no es decorar.
+
+
+
+Su función es demostrar que Sistema Maestro entiende, decide, construye, muestra y permite continuar.
 
 
 
@@ -32,15 +42,43 @@ Si el usuario recibe análisis, activación y blueprint, pero no ve construcció
 
 
 
-\- esto piensa bien
+\- esto piensa bien;
 
-\- esto orienta bien
+\- esto orienta bien;
 
-\- pero todavía no siento que me lo esté montando
+\- esto parece potente;
+
+\- pero todavía no siento que me lo esté montando.
 
 
 
 El constructor visible existe para cerrar esa brecha de percepción y convertir el sistema en algo claramente superior.
+
+
+
+\### Problema crítico detectado
+
+
+
+Durante la reapertura del Builder se detectó una desviación estructural:
+
+
+
+```text
+
+el sistema parecía construir
+
+pero preview, código y estructura no cambiaban de forma real y acumulativa
+
+```
+
+
+
+Ese patrón no puede repetirse.
+
+
+
+El constructor visible debe evitar la simulación de construcción.
 
 
 
@@ -56,23 +94,33 @@ El constructor visible es la experiencia en la que el usuario ve cómo el sistem
 
 
 
-\- interpreta su caso
+\- interpreta su caso;
 
-\- divide el trabajo
+\- clasifica intención, tipo de proyecto, sector y objetivo;
 
-\- activa agentes o módulos
+\- divide el trabajo;
 
-\- genera estructura
+\- activa agentes o módulos;
 
-\- construye pantallas, piezas o lógica
+\- genera estructura;
 
-\- muestra preview o resultado en evolución
+\- construye pantallas, piezas o lógica;
 
-\- prepara continuidad, despliegue o salida
+\- muestra preview o resultado en evolución;
+
+\- actualiza código;
+
+\- actualiza estructura;
+
+\- propone siguientes decisiones;
+
+\- prepara continuidad, despliegue o salida.
 
 
 
 No debe sentirse como una caja negra.
+
+
 
 Debe sentirse como un sistema que trabaja delante del usuario.
 
@@ -88,19 +136,83 @@ Debe sentirse como un sistema que trabaja delante del usuario.
 
 El usuario no debe limitarse a recibir una respuesta.
 
+
+
 Debe sentir que el sistema entra en modo ejecución.
 
 
 
 \### Regla
 
+
+
 Sistema Maestro debe pasar de:
 
-\- “te analizo”
 
-a
 
-\- “te construyo una base real delante de ti”
+```text
+
+te analizo
+
+```
+
+
+
+a:
+
+
+
+```text
+
+te construyo una base real delante de ti
+
+```
+
+
+
+\### Regla antisimulación
+
+
+
+Una acción del Builder no se considera válida si solo produce:
+
+
+
+\- texto del agente;
+
+\- animación de progreso;
+
+\- cambios de copy no persistentes;
+
+\- código decorativo no conectado;
+
+\- preview que no refleja mutación;
+
+\- estructura que no cambia;
+
+\- preguntas repetidas sin memoria.
+
+
+
+Una acción del Builder se considera válida cuando produce al menos uno de estos efectos:
+
+
+
+\- estado vivo actualizado;
+
+\- preview modificada;
+
+\- código modificado;
+
+\- estructura modificada;
+
+\- CTA modificado;
+
+\- bloque nuevo;
+
+\- archivo nuevo;
+
+\- siguiente decisión contextual distinta.
 
 
 
@@ -108,7 +220,73 @@ a
 
 
 
-\## 5. Resultado psicológico buscado
+\## 5. Piedra angular de la experiencia
+
+
+
+La experiencia visible debe apoyarse en una fuente viva de construcción:
+
+
+
+```text
+
+BuilderBuildState
+
+```
+
+
+
+La experiencia no debe depender solo de:
+
+
+
+\- copy suelto;
+
+\- mensajes del agente;
+
+\- `hubSummary`;
+
+\- `lastDelta`;
+
+\- `lastOperation`;
+
+\- fases de progreso;
+
+\- plantillas visuales aisladas.
+
+
+
+Debe apoyarse en este contrato:
+
+
+
+```text
+
+input usuario
+
+→ interpretación IA
+
+→ mutación normalizada
+
+→ BuilderBuildState
+
+→ preview
+
+→ código
+
+→ estructura
+
+→ siguientes decisiones
+
+```
+
+
+
+\---
+
+
+
+\## 6. Resultado psicológico buscado
 
 
 
@@ -116,21 +294,27 @@ La experiencia correcta debe provocar esta sensación:
 
 
 
-\- esto es serio
+\- esto es serio;
 
-\- esto no es solo un chat
+\- esto no es solo un chat;
 
-\- esto está montando algo real
+\- esto está montando algo real;
 
-\- puedo ver cómo toma forma
+\- puedo ver cómo toma forma;
 
-\- puedo seguir dentro del sistema
+\- puedo entender qué está haciendo;
 
-\- esto justifica plan, créditos y continuidad
+\- puedo seguir dentro del sistema;
+
+\- puedo mejorar lo construido;
+
+\- esto justifica plan, créditos y continuidad.
 
 
 
 El objetivo no es espectáculo vacío.
+
+
 
 El objetivo es percepción de capacidad real.
 
@@ -140,7 +324,7 @@ El objetivo es percepción de capacidad real.
 
 
 
-\## 6. Principio de diseño
+\## 7. Principio de diseño
 
 
 
@@ -148,25 +332,31 @@ La experiencia del constructor visible debe cumplir estas condiciones:
 
 
 
-\- clara
+\- clara;
 
-\- profesional
+\- profesional;
 
-\- sin caos visual
+\- sin caos visual;
 
-\- con sensación de sistema en marcha
+\- con sensación de sistema en marcha;
 
-\- con jerarquía
+\- con jerarquía;
 
-\- con avance visible
+\- con avance visible;
 
-\- sin fricción innecesaria
+\- con preview real;
 
-\- sin inflar de paneles inútiles
+\- con código o estructura coherente;
+
+\- sin fricción innecesaria;
+
+\- sin inflar de paneles inútiles.
 
 
 
 No debe parecer un juguete.
+
+
 
 Debe parecer una herramienta seria de construcción asistida.
 
@@ -176,7 +366,7 @@ Debe parecer una herramienta seria de construcción asistida.
 
 
 
-\## 7. Estructura general de la pantalla
+\## 8. Estructura general de la pantalla
 
 
 
@@ -184,43 +374,99 @@ La arquitectura visual correcta debe tender a una pantalla dividida.
 
 
 
-\### Columna A — Sistema / agentes / proceso
+\## 8.1 Columna A — Proceso, código, agente y control
+
+
 
 Debe mostrar:
 
-\- qué está haciendo el sistema
-
-\- qué módulo o agente está activo
-
-\- en qué fase está el proyecto
-
-\- qué tarea se está ejecutando
-
-\- logs o señales de progreso inteligibles
 
 
+\- código o estructura en evolución;
 
-\### Columna B — Resultado / preview
+\- qué está haciendo el sistema;
 
-Debe mostrar:
+\- qué módulo o agente está activo;
 
-\- vista del resultado
+\- en qué fase está el proyecto;
 
-\- estructura en construcción
+\- qué tarea se está ejecutando;
 
-\- pantalla, web, herramienta o bloque visible
+\- señales de progreso inteligibles;
 
-\- evolución del proyecto en tiempo razonable
+\- chat de control del usuario;
+
+\- siguientes decisiones contextuales.
 
 
 
 \### Regla
 
+
+
+El panel izquierdo no debe convertirse en una acumulación de bloques.
+
+
+
+Debe ordenar:
+
+
+
+```text
+
+código/proceso
+
+→ agente como cápsula operativa
+
+→ chat/control del usuario
+
+→ siguientes decisiones
+
+```
+
+
+
+El agente puede descansar, esperar respuesta o mostrar actividad, pero no debe solaparse ni competir con el chat.
+
+
+
+\## 8.2 Columna B — Resultado / preview
+
+
+
+Debe mostrar:
+
+
+
+\- vista del resultado;
+
+\- pantalla, web, herramienta o bloque visible;
+
+\- estructura visual del proyecto;
+
+\- evolución del proyecto en tiempo razonable;
+
+\- cambios reales derivados de las acciones aplicadas.
+
+
+
+\### Regla
+
+
+
 El usuario debe poder leer simultáneamente:
 
-\- proceso
 
-\- resultado
+
+```text
+
+proceso
+
+\+
+
+resultado
+
+```
 
 
 
@@ -228,25 +474,41 @@ El usuario debe poder leer simultáneamente:
 
 
 
-\## 8. Componentes de la experiencia
+\## 9. Componentes de la experiencia
 
 
 
-\### 8.1 Cabecera de proyecto
+\## 9.1 Cabecera de proyecto
+
+
 
 Debe mostrar:
 
-\- nombre del proyecto o caso
 
-\- tipo de entrada: idea o URL
 
-\- estado actual
+\- nombre del proyecto o caso;
 
-\- plan activo si aplica
+\- tipo de entrada: idea, URL o prompt;
 
-\- saldo de créditos si aplica
+\- estado actual;
 
-\- acción principal disponible
+\- plan activo si aplica;
+
+\- saldo de créditos si aplica;
+
+\- acción principal disponible.
+
+
+
+\### Regla
+
+
+
+La cabecera no debe absorber la lógica del Builder.
+
+
+
+Debe orientar sin invadir.
 
 
 
@@ -254,35 +516,55 @@ Debe mostrar:
 
 
 
-\### 8.2 Panel de progreso
+\## 9.2 Panel de progreso
+
+
 
 Debe mostrar:
 
-\- fase actual
-
-\- pasos ya completados
-
-\- siguiente paso
-
-\- estado de construcción
 
 
+\- fase actual;
 
-Ejemplos de fases futuras:
+\- pasos completados;
 
-\- análisis
+\- siguiente paso;
 
-\- activación
+\- estado de construcción.
 
-\- preparación de build
 
-\- construcción
 
-\- iteración
+Ejemplos de fases:
 
-\- despliegue
 
-\- exportación
+
+\- interpretación;
+
+\- planificación;
+
+\- mutación;
+
+\- construcción;
+
+\- preview lista;
+
+\- código listo;
+
+\- estructura lista;
+
+\- esperando decisión;
+
+\- exportación futura;
+
+\- despliegue futuro.
+
+
+
+\### Regla
+
+
+
+El progreso debe ser consecuencia del estado vivo, no una animación independiente.
 
 
 
@@ -290,33 +572,49 @@ Ejemplos de fases futuras:
 
 
 
-\### 8.3 Panel de agentes o módulos
+\## 9.3 Panel de agentes o módulos
+
+
 
 No es obligatorio mostrar agentes con exceso de ficción.
+
+
 
 Pero sí debe quedar claro que el sistema divide el trabajo.
 
 
 
-Debe mostrar algo como:
+Debe mostrar capacidades como:
 
-\- estructura
 
-\- copy
 
-\- interfaz
+\- estructura;
 
-\- lógica
+\- copy;
 
-\- validación
+\- interfaz;
 
-\- despliegue
+\- lógica;
+
+\- validación;
+
+\- despliegue futuro.
 
 
 
 \### Regla
 
+
+
 La visualización de agentes debe aumentar percepción de capacidad, no introducir ruido infantil.
+
+
+
+El agente no debe sustituir a la construcción.
+
+
+
+El agente debe explicar, acompañar y proponer decisiones útiles.
 
 
 
@@ -324,7 +622,9 @@ La visualización de agentes debe aumentar percepción de capacidad, no introduc
 
 
 
-\### 8.4 Consola o log inteligible
+\## 9.4 Consola o log inteligible
+
+
 
 Debe existir una capa visual de actividad.
 
@@ -332,21 +632,31 @@ Debe existir una capa visual de actividad.
 
 No tiene que ser terminal real compleja.
 
+
+
 Pero sí debe transmitir:
 
-\- acción
 
-\- progreso
 
-\- lectura técnica o semitécnica
+\- acción;
 
-\- sensación de sistema operativo real
+\- progreso;
+
+\- lectura técnica o semitécnica;
+
+\- sensación de sistema operativo real.
 
 
 
 \### Regla
 
+
+
 El log debe ser entendible y visualmente sobrio.
+
+
+
+No debe fingir actividad que no se refleje en preview, código o estructura.
 
 
 
@@ -354,7 +664,9 @@ El log debe ser entendible y visualmente sobrio.
 
 
 
-\### 8.5 Preview en vivo
+\## 9.5 Preview en vivo
+
+
 
 Debe ser una de las piezas centrales.
 
@@ -362,55 +674,95 @@ Debe ser una de las piezas centrales.
 
 El usuario debe poder ver:
 
-\- una web
 
-\- una interfaz
 
-\- una herramienta
+\- una web;
 
-\- un bloque
+\- una interfaz;
 
-\- una estructura viva
+\- una herramienta;
 
-\- o una representación visible de lo que se está montando
+\- un bloque;
+
+\- una estructura viva;
+
+\- o una representación visible de lo que se está montando.
 
 
 
 \### Principio
 
+
+
 El preview no es adorno.
+
+
 
 Es prueba visible de ejecución.
 
 
 
+\### Regla
+
+
+
+Si el usuario pide una mejora visible, la preview debe cambiar.
+
+
+
+Si el usuario pide un bloque, la preview debe mostrarlo.
+
+
+
+Si el usuario pide una app, la preview debe representar la app.
+
+
+
+Si el usuario pide una estructura técnica, el sistema debe poder enseñar estructura aunque la preview visual sea parcial.
+
+
+
 \---
 
 
 
-\### 8.6 Acciones de control
+\## 9.6 Código
 
-La experiencia debe incluir acciones claras y limitadas, por ejemplo:
 
-\- continuar construcción
 
-\- iterar
+El código debe representar lo que el usuario está viendo o lo que el sistema está construyendo.
 
-\- mejorar
 
-\- desplegar
 
-\- solicitar exportación
+No debe ser código decorativo.
 
-\- comprar más créditos si aplica
+
+
+Debe poder explicar:
+
+
+
+\- qué componente existe;
+
+\- qué archivo representa;
+
+\- qué bloque visual genera;
+
+\- qué estructura necesita;
+
+\- qué cambio acaba de aplicar.
 
 
 
 \### Regla
 
-No saturar de botones.
 
-Cada acción debe responder a un siguiente paso claro.
+
+No debe existir una preview que muestre algo que el código no pueda representar.
+
+
+
+No debe existir código que sugiera cambios que la preview y la estructura no reciben.
 
 
 
@@ -418,11 +770,101 @@ Cada acción debe responder a un siguiente paso claro.
 
 
 
-\## 9. Relación con la Activación
+\## 9.7 Estructura
+
+
+
+La estructura debe mostrar:
+
+
+
+\- carpetas;
+
+\- archivos;
+
+\- componentes;
+
+\- rutas;
+
+\- posibles rutas API;
+
+\- módulos relevantes;
+
+\- relación con exportación futura.
+
+
+
+\### Regla
+
+
+
+La estructura debe evolucionar con el estado vivo.
+
+
+
+No debe quedarse como blueprint estático si el Builder ya aplicó mutaciones.
+
+
+
+\---
+
+
+
+\## 9.8 Acciones de control
+
+
+
+La experiencia debe incluir acciones claras y limitadas, por ejemplo:
+
+
+
+\- continuar construcción;
+
+\- iterar;
+
+\- mejorar;
+
+\- añadir bloque;
+
+\- añadir autenticación;
+
+\- generar estructura;
+
+\- preparar exportación;
+
+\- desplegar cuando proceda;
+
+\- comprar más créditos si aplica.
+
+
+
+\### Regla
+
+
+
+No saturar de botones.
+
+
+
+Cada acción debe responder a un siguiente paso claro.
+
+
+
+Cada acción debe poder traducirse a una mutación o a una operación trazable.
+
+
+
+\---
+
+
+
+\## 10. Relación con la Activación
 
 
 
 La activación prepara la ejecución.
+
+
 
 El constructor visible la materializa.
 
@@ -430,23 +872,45 @@ El constructor visible la materializa.
 
 \### Secuencia correcta
 
-\- entrada
 
-\- diagnóstico
 
-\- activación
+\- entrada;
 
-\- constructor visible
+\- diagnóstico;
 
-\- continuidad o salida
+\- activación;
+
+\- constructor visible;
+
+\- continuidad o salida.
 
 
 
 \### Regla
 
+
+
 El constructor visible no debe arrancar sin una dirección razonable.
 
+
+
 Debe apoyarse en la activación para no construir de forma arbitraria.
+
+
+
+\### Matiz importante
+
+
+
+La activación no sustituye al Builder.
+
+
+
+La activación orienta.
+
+
+
+El Builder ejecuta y muestra.
 
 
 
@@ -454,7 +918,7 @@ Debe apoyarse en la activación para no construir de forma arbitraria.
 
 
 
-\## 10. Relación con los Créditos
+\## 11. Relación con los Créditos
 
 
 
@@ -464,31 +928,49 @@ El constructor visible es uno de los lugares donde más sentido tiene la econom�
 
 \### Principio
 
+
+
 Ver construir hace visible el valor del crédito.
 
 
 
 \### Ejemplos de acciones que pueden consumir créditos
 
-\- iniciar build
 
-\- iterar una nueva versión
 
-\- regenerar módulo
+\- iniciar build;
 
-\- rehacer pantalla
+\- iterar una nueva versión;
 
-\- ejecutar mejora intensiva
+\- regenerar módulo;
 
-\- lanzar despliegue
+\- rehacer pantalla;
 
-\- ejecutar operación avanzada
+\- ejecutar mejora intensiva;
+
+\- generar estructura avanzada;
+
+\- preparar exportación;
+
+\- lanzar despliegue;
+
+\- ejecutar operación avanzada.
 
 
 
 \### Regla
 
+
+
 El consumo debe ser visible y comprensible.
+
+
+
+No se debe consumir crédito sobre una acción que no produzca salida real, visible o técnicamente verificable.
+
+
+
+No se monetiza una simulación.
 
 
 
@@ -496,7 +978,7 @@ El consumo debe ser visible y comprensible.
 
 
 
-\## 11. Relación con continuidad dentro del sistema
+\## 12. Relación con continuidad dentro del sistema
 
 
 
@@ -506,25 +988,39 @@ La experiencia debe empujar de forma natural a seguir dentro del sistema.
 
 \### Motivo
 
+
+
 Dentro del sistema el usuario obtiene:
 
-\- continuidad
 
-\- agentes
 
-\- mejora constante
+\- continuidad;
 
-\- evolución
+\- agentes;
 
-\- nuevas iteraciones
+\- mejora constante;
 
-\- más capacidad de construcción
+\- evolución;
+
+\- nuevas iteraciones;
+
+\- más capacidad de construcción.
 
 
 
 \### Regla
 
+
+
 Trabajar dentro del sistema debe sentirse cómodo, potente y lógico.
+
+
+
+El usuario no debe sentir que el sistema lo retiene artificialmente.
+
+
+
+Debe sentir que seguir dentro tiene sentido operativo.
 
 
 
@@ -532,7 +1028,7 @@ Trabajar dentro del sistema debe sentirse cómodo, potente y lógico.
 
 
 
-\## 12. Relación con exportación
+\## 13. Relación con exportación
 
 
 
@@ -542,69 +1038,47 @@ La experiencia también debe preparar psicológicamente la salida del proyecto.
 
 \### Principio
 
+
+
 Si el usuario quiere sacar el proyecto fuera, debe percibir que:
 
-\- existe una vía clara
 
-\- no está bloqueado
 
-\- exportar es una acción distinta
+\- existe una vía clara;
 
-\- la salida tiene valoración y proceso
+\- no está bloqueado;
+
+\- exportar es una acción distinta;
+
+\- la salida tiene valoración y proceso;
+
+\- el proyecto tiene estructura suficiente para salir.
 
 
 
 \### Regla
 
+
+
 La exportación debe aparecer como acción seria y profesional, no como escape confuso.
 
 
 
-\---
+No se debe exportar sobre una preview simulada.
 
 
 
-\## 13. Diferencia por perfil de usuario
+Exportación exige:
 
 
 
-\### 13.1 Usuario no técnico
+\- estado vivo;
 
-Debe sentir:
+\- código coherente;
 
-\- claridad
+\- estructura coherente;
 
-\- progreso
-
-\- facilidad
-
-\- que el sistema le construye algo sin exigirle saber programar
-
-
-
-\### 13.2 Usuario técnico
-
-Debe sentir:
-
-\- aceleración
-
-\- estructura
-
-\- control
-
-\- capacidad de usar el sistema como multiplicador
-
-
-
-\### 13.3 Operador / consultor / agencia
-
-Debe sentir:
-
-\- potencia para trabajar sobre activos ajenos
-
-\- capacidad de enseñar proceso o resultado
-
-\- facilidad para convertir análisis en propuesta o entrega
+\- valoración.
 
 
 
@@ -612,7 +1086,115 @@ Debe sentir:
 
 
 
-\## 14. Principio visual
+\## 14. Relación con deploy
+
+
+
+El deploy debe ser una fase posterior y más exigente que la preview.
+
+
+
+\### Regla
+
+
+
+No se despliega si no existe:
+
+
+
+\- estructura coherente;
+
+\- código coherente;
+
+\- estado del proyecto;
+
+\- criterio de entorno;
+
+\- validación técnica.
+
+
+
+Deployment sin estructura previa genera ruido, coste y riesgo.
+
+
+
+\---
+
+
+
+\## 15. Diferencia por perfil de usuario
+
+
+
+\## 15.1 Usuario no técnico
+
+
+
+Debe sentir:
+
+
+
+\- claridad;
+
+\- progreso;
+
+\- facilidad;
+
+\- que el sistema le construye algo sin exigirle saber programar.
+
+
+
+La interfaz debe traducir complejidad sin ocultar que hay construcción real.
+
+
+
+\## 15.2 Usuario técnico
+
+
+
+Debe sentir:
+
+
+
+\- aceleración;
+
+\- estructura;
+
+\- control;
+
+\- capacidad de usar el sistema como multiplicador.
+
+
+
+Debe poder ver código, estructura o arquitectura sin fricción.
+
+
+
+\## 15.3 Operador / consultor / agencia
+
+
+
+Debe sentir:
+
+
+
+\- potencia para trabajar sobre activos ajenos;
+
+\- capacidad de enseñar proceso o resultado;
+
+\- facilidad para convertir análisis en propuesta o entrega.
+
+
+
+Debe poder usar el Builder como herramienta de venta, diagnóstico, construcción y continuidad.
+
+
+
+\---
+
+
+
+\## 16. Principio visual
 
 
 
@@ -622,31 +1204,41 @@ La experiencia debe ser visualmente fuerte, pero disciplinada.
 
 \### Debe transmitir
 
-\- autoridad
 
-\- ejecución
 
-\- sistema
+\- autoridad;
 
-\- orden
+\- ejecución;
 
-\- tecnología aplicada
+\- sistema;
 
-\- valor operativo
+\- orden;
+
+\- tecnología aplicada;
+
+\- valor operativo.
 
 
 
 \### Debe evitar
 
-\- ruido innecesario
 
-\- exceso de colores
 
-\- efectos infantiles
+\- ruido innecesario;
 
-\- sensación de demo vacía
+\- exceso de colores;
 
-\- sobrecarga de microcomponentes
+\- efectos infantiles;
+
+\- sensación de demo vacía;
+
+\- sobrecarga de microcomponentes;
+
+\- bloques que compiten con el chat;
+
+\- agentes solapados;
+
+\- botones muertos.
 
 
 
@@ -654,7 +1246,7 @@ La experiencia debe ser visualmente fuerte, pero disciplinada.
 
 
 
-\## 15. Principio narrativo
+\## 17. Principio narrativo
 
 
 
@@ -662,15 +1254,15 @@ La experiencia debe contar una historia operativa clara:
 
 
 
-\- el sistema ha entendido el caso
+\- el sistema ha entendido el caso;
 
-\- ha activado una lógica de trabajo
+\- ha activado una lógica de trabajo;
 
-\- está construyendo
+\- está construyendo;
 
-\- el usuario ve tomar forma el resultado
+\- el usuario ve tomar forma el resultado;
 
-\- puede seguir, iterar, desplegar o sacar el proyecto
+\- puede seguir, iterar, desplegar o sacar el proyecto.
 
 
 
@@ -678,11 +1270,23 @@ Esa narrativa es parte central del valor del producto.
 
 
 
+\### Regla
+
+
+
+La narrativa no debe sustituir a la ejecución.
+
+
+
+Debe acompañarla.
+
+
+
 \---
 
 
 
-\## 16. Estados del constructor visible
+\## 18. Estados del constructor visible
 
 
 
@@ -692,33 +1296,53 @@ La arquitectura debe prever estados claros.
 
 \### Estados mínimos
 
-\- listo para construir
 
-\- construyendo
 
-\- iterando
+\- listo para construir;
 
-\- pausado
+\- interpretando;
 
-\- listo para desplegar
+\- planificando;
 
-\- listo para exportar
+\- construyendo;
 
-\- bloqueado por créditos
+\- iterando;
 
-\- bloqueado por plan si aplica
+\- pausado;
+
+\- esperando decisión del usuario;
+
+\- preview lista;
+
+\- código listo;
+
+\- estructura lista;
+
+\- listo para desplegar;
+
+\- listo para exportar;
+
+\- bloqueado por créditos;
+
+\- bloqueado por plan si aplica;
+
+\- error controlado.
 
 
 
 \### Regla
 
+
+
 Cada estado debe tener:
 
-\- mensaje claro
 
-\- acción siguiente
 
-\- continuidad legible
+\- mensaje claro;
+
+\- acción siguiente;
+
+\- continuidad legible.
 
 
 
@@ -726,7 +1350,133 @@ Cada estado debe tener:
 
 
 
-\## 17. Principio de control de fricción
+\## 19. Preguntas y siguientes mejoras
+
+
+
+Después de una construcción o mutación, el sistema debe proponer siguientes decisiones contextuales.
+
+
+
+\### Regla
+
+
+
+Las preguntas no deben repetirse mecánicamente.
+
+
+
+No deben volver siempre a:
+
+
+
+\- más premium;
+
+\- más claridad;
+
+\- más conversión.
+
+
+
+Deben depender de:
+
+
+
+\- tipo de proyecto;
+
+\- sector;
+
+\- intención;
+
+\- estado vivo;
+
+\- acciones ya aplicadas;
+
+\- bloques disponibles;
+
+\- potencial de conversión;
+
+\- coste o valor de la siguiente acción.
+
+
+
+\### Ejemplo
+
+
+
+Si el usuario ya añadió acceso con Google, el sistema no vuelve a preguntarlo.
+
+
+
+Debe proponer algo como:
+
+
+
+\- añadir bloque de confianza;
+
+\- explicar Gema Maestra;
+
+\- crear sección cómo funciona;
+
+\- preparar suscripción;
+
+\- generar estructura exportable.
+
+
+
+\---
+
+
+
+\## 20. Acciones rápidas y modos
+
+
+
+Las opciones rápidas deben ayudar, no saturar.
+
+
+
+Pueden existir accesos como:
+
+
+
+\- servicio;
+
+\- objetivo;
+
+\- modo;
+
+\- prompt;
+
+\- agente;
+
+\- modelo;
+
+\- ajustes.
+
+
+
+\### Regla
+
+
+
+Estas opciones deben integrarse en la experiencia sin romper el foco.
+
+
+
+Deben actuar como ayuda para construir mejor, no como decoración.
+
+
+
+Si una opción no modifica input, contexto, mutación o estado, no debe mostrarse como acción principal.
+
+
+
+\---
+
+
+
+\## 21. Principio de control de fricción
 
 
 
@@ -736,13 +1486,15 @@ La experiencia no debe exigir pasos innecesarios para impresionar.
 
 Debe impresionar porque:
 
-\- trabaja
 
-\- muestra
 
-\- ordena
+\- trabaja;
 
-\- deja continuar
+\- muestra;
+
+\- ordena;
+
+\- deja continuar.
 
 
 
@@ -754,7 +1506,7 @@ No porque obligue al usuario a atravesar muchas pantallas.
 
 
 
-\## 18. Papel del efecto wow
+\## 22. Papel del efecto wow
 
 
 
@@ -764,15 +1516,21 @@ El constructor visible sí debe generar efecto wow.
 
 Pero ese wow debe apoyarse en:
 
-\- ejecución visible
 
-\- percepción de sistema
 
-\- progreso real
+\- ejecución visible;
 
-\- preview real
+\- percepción de sistema;
 
-\- continuidad real
+\- progreso real;
+
+\- preview real;
+
+\- código coherente;
+
+\- estructura coherente;
+
+\- continuidad real.
 
 
 
@@ -784,7 +1542,7 @@ No en puro decorado.
 
 
 
-\## 19. Regla de producto
+\## 23. Regla de producto
 
 
 
@@ -794,11 +1552,15 @@ Cada vez que se añada una pieza al constructor visible, debe pasar esta prueba:
 
 \### A
 
+
+
 ¿Hace más visible la ejecución real?
 
 
 
 \### B
+
+
 
 ¿Mejora continuidad, claridad o capacidad de acción?
 
@@ -806,7 +1568,17 @@ Cada vez que se añada una pieza al constructor visible, debe pasar esta prueba:
 
 \### C
 
+
+
 ¿Evita ruido y mantiene la percepción de herramienta seria?
+
+
+
+\### D
+
+
+
+¿Puede conectarse con estado vivo, preview, código o estructura?
 
 
 
@@ -818,11 +1590,77 @@ Si no pasa esta prueba, no debe entrar.
 
 
 
-\## 20. Cierre doctrinal
+\## 24. Criterio de cierre del Builder visible
+
+
+
+El constructor visible estará correctamente alineado cuando una petición como:
+
+
+
+```text
+
+Añade acceso con Google
+
+```
+
+
+
+produzca simultáneamente:
+
+
+
+\- estado vivo actualizado;
+
+\- preview con bloque real;
+
+\- código con componente real;
+
+\- estructura con archivo real;
+
+\- siguiente mejora distinta.
+
+
+
+Y cuando una petición como:
+
+
+
+```text
+
+Crea una app con dashboard y backend
+
+```
+
+
+
+produzca simultáneamente:
+
+
+
+\- estructura frontend/backend;
+
+\- páginas, rutas y componentes;
+
+\- preview coherente con la app;
+
+\- código alineado con la estructura;
+
+\- siguientes decisiones técnicas no repetidas.
+
+
+
+\---
+
+
+
+\## 25. Cierre doctrinal
 
 
 
 El constructor visible no es un añadido cosmético.
+
+
 
 Es una de las piezas que convierte Sistema Maestro en algo claramente superior.
 
@@ -830,21 +1668,55 @@ Es una de las piezas que convierte Sistema Maestro en algo claramente superior.
 
 Su función no es adornar el sistema.
 
+
+
 Su función es hacer visible que el sistema:
 
-\- entiende
 
-\- activa
 
-\- construye
+\- entiende;
 
-\- evoluciona
+\- activa;
 
-\- y puede llevar el proyecto hacia continuidad o salida
+\- construye;
+
+\- evoluciona;
+
+\- y puede llevar el proyecto hacia continuidad o salida.
 
 
 
 Sin esta pieza, el sistema puede parecer una IA que orienta.
 
+
+
 Con esta pieza, el sistema empieza a parecer una plataforma que realmente monta proyectos.
+
+
+
+La siguiente etapa del constructor visible debe apoyarse en:
+
+
+
+```text
+
+BuilderBuildKernel
+
+\+
+
+BuilderBuildState
+
+\+
+
+mutaciones
+
+\+
+
+preview/código/estructura sincronizados
+
+```
+
+
+
+No se aprueba volver a tratar el Builder como una pantalla aislada.
 

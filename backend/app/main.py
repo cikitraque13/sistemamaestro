@@ -56,6 +56,7 @@ async def startup_event():
     await db.user_sessions.create_index("user_id")
     await db.payment_transactions.create_index("stripe_session_id")
     await db.login_attempts.create_index("identifier")
+    await db.newsletter_subscribers.create_index("email", unique=True)
 
 
 @app.get("/health")

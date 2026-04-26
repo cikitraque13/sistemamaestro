@@ -1,0 +1,8 @@
+﻿.gitignore
+frontend\.env.local
+frontend\.gitignore
+frontend\jsconfig.json
+frontend\package.json
+frontend\package-lock.json
+frontend\README.md
+README.md

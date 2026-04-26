@@ -1,0 +1,115 @@
+﻿=== 45-VOLUME-HOTSPOTS-SCAN ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+=== TOP LEVEL DIRECTORIES ===
+frontend | bytes=577818935 | files=69999
+docs | bytes=10770732 | files=78
+backend | bytes=221092 | files=71
+railway | bytes=57467 | files=2
+tests | bytes=9202 | files=2
+test_reports | bytes=5017 | files=4
+memory | bytes=2256 | files=2
+
+=== TOP SUBDIRECTORIES (DEPTH <= 3) ===
+frontend | bytes=577818935 | files=69999
+frontend\node_modules | bytes=572102573 | files=69806
+frontend\node_modules\.cache | bytes=200711339 | files=5182
+frontend\node_modules\typescript | bytes=66849652 | files=108
+frontend\node_modules\lucide-react | bytes=33416030 | files=3630
+frontend\node_modules\@phosphor-icons | bytes=33027417 | files=9089
+frontend\node_modules\date-fns | bytes=22153202 | files=4782
+frontend\node_modules\@babel | bytes=11544977 | files=1744
+docs | bytes=10770732 | files=78
+docs\control | bytes=10666260 | files=58
+docs\control\audit | bytes=10582337 | files=50
+frontend\node_modules\react-scripts | bytes=8930085 | files=1659
+frontend\node_modules\@reduxjs | bytes=7927548 | files=286
+frontend\node_modules\recharts | bytes=6715678 | files=767
+frontend\node_modules\rollup | bytes=6452533 | files=20
+frontend\node_modules\tailwindcss | bytes=6316770 | files=502
+frontend\node_modules\webpack | bytes=5808393 | files=724
+frontend\node_modules\framer-motion | bytes=4730874 | files=379
+frontend\node_modules\react-dom | bytes=4502126 | files=32
+frontend\public | bytes=4244041 | files=3
+frontend\node_modules\@radix-ui | bytes=3873750 | files=625
+frontend\node_modules\@types | bytes=3740473 | files=375
+frontend\node_modules\zod | bytes=3594196 | files=596
+frontend\node_modules\postcss-svgo | bytes=3491193 | files=265
+frontend\node_modules\motion-dom | bytes=3118402 | files=447
+frontend\node_modules\axe-core | bytes=2969356 | files=28
+frontend\node_modules\csso | bytes=2949146 | files=212
+frontend\node_modules\eslint | bytes=2896473 | files=420
+frontend\node_modules\@jest | bytes=2886646 | files=273
+frontend\node_modules\jsdom | bytes=2846921 | files=471
+frontend\node_modules\es-abstract | bytes=2786378 | files=2481
+frontend\node_modules\react-router | bytes=2585576 | files=42
+frontend\node_modules\es-toolkit | bytes=2546978 | files=2655
+frontend\node_modules\workbox-build | bytes=2352157 | files=697
+frontend\node_modules\terser | bytes=2324438 | files=48
+frontend\node_modules\@typescript-eslint | bytes=2319811 | files=1222
+frontend\node_modules\caniuse-lite | bytes=2307774 | files=837
+frontend\node_modules\axios | bytes=2292298 | files=86
+frontend\node_modules\jiti | bytes=2003102 | files=14
+frontend\node_modules\css-tree | bytes=1799985 | files=145
+
+=== TOP FILES ===
+frontend\node_modules\.cache\default-development\1.pack | 93253840 bytes
+frontend\node_modules\.cache\default-development\0.pack | 63279288 bytes
+frontend\node_modules\typescript\lib\tsserver.js | 11676702 bytes
+frontend\node_modules\typescript\lib\tsserverlibrary.js | 11615475 bytes
+frontend\node_modules\typescript\lib\typescriptServices.js | 10945736 bytes
+frontend\node_modules\typescript\lib\typescript.js | 10945729 bytes
+docs\control\audit\36-backend-runtime-entry-audit-05.txt | 8797931 bytes
+frontend\node_modules\typescript\lib\typingsInstaller.js | 8148122 bytes
+frontend\node_modules\.cache\default-development\index.pack | 7649273 bytes
+frontend\node_modules\.cache\default-development\index.pack.old | 7649134 bytes
+frontend\node_modules\typescript\lib\tsc.js | 6157210 bytes
+frontend\node_modules\@phosphor-icons\react\dist\index.cjs.js | 5054876 bytes
+frontend\node_modules\@phosphor-icons\react\dist\index.umd.js | 5036841 bytes
+frontend\node_modules\lucide-react\dist\umd\lucide-react.js.map | 5022493 bytes
+frontend\node_modules\lucide-react\dist\cjs\lucide-react.js.map | 4919339 bytes
+frontend\node_modules\tailwindcss\peers\index.js | 4501254 bytes
+frontend\node_modules\lucide-react\dist\umd\lucide-react.min.js.map | 4075757 bytes
+frontend\node_modules\rollup\dist\rollup.browser.js.map | 3398069 bytes
+frontend\node_modules\.cache\babel-loader\f172fb46e08c97d17bb401f99bf92426486b92ac2f9cfb588ab2e8b3e0cf07bb.json | 2940507 bytes
+frontend\node_modules\recharts\umd\Recharts.js.map | 2482175 bytes
+frontend\node_modules\date-fns\locale\cdn.js.map | 2212540 bytes
+frontend\public\logo-sm.png | 2117575 bytes
+frontend\public\logo.png | 2117575 bytes
+frontend\node_modules\lucide-react\dynamic.d.ts | 2094481 bytes
+frontend\node_modules\lucide-react\dynamicIconImports.d.ts | 2093275 bytes
+frontend\node_modules\lucide-react\dist\lucide-react.d.ts | 2019613 bytes
+frontend\node_modules\lucide-react\dist\lucide-react.prefixed.d.ts | 1939743 bytes
+frontend\node_modules\lucide-react\dist\lucide-react.suffixed.d.ts | 1936153 bytes
+frontend\node_modules\jiti\dist\babel.js | 1736792 bytes
+frontend\node_modules\date-fns\locale\cdn.min.js.map | 1578343 bytes
+frontend\node_modules\@babel\parser\lib\index.js.map | 1432668 bytes
+frontend\node_modules\axe-core\axe.js | 1257439 bytes
+frontend\node_modules\language-subtag-registry\data\json\registry.json | 1111658 bytes
+frontend\node_modules\.cache\babel-loader\20855f9fed5c16fac704985ed5af73268563cd4068a77b2b50cd98974a7362fd.json | 1079548 bytes
+frontend\node_modules\react-dom\umd\react-dom.development.js | 1077022 bytes
+frontend\node_modules\terser\dist\bundle.min.js | 1060208 bytes
+frontend\node_modules\react-dom\cjs\react-dom.development.js | 1026501 bytes
+frontend\node_modules\date-fns\locale\cdn.js | 1010783 bytes
+frontend\node_modules\rollup\dist\shared\rollup.js | 895737 bytes
+frontend\node_modules\rollup\dist\es\shared\rollup.js | 893974 bytes
+frontend\node_modules\lucide-react\dist\umd\lucide-react.js | 888317 bytes
+frontend\node_modules\jsonpath\node_modules\esprima\test\test.js | 851559 bytes
+frontend\node_modules\lucide-react\dist\cjs\lucide-react.js | 844161 bytes
+frontend\node_modules\typescript\lib\lib.dom.d.ts | 816787 bytes
+frontend\node_modules\date-fns\locale\cdn.min.js | 799250 bytes
+frontend\package-lock.json | 795075 bytes
+docs\control\audit\frontend-package-lock-backup-20260421-062422.txt | 795075 bytes
+frontend\node_modules\.package-lock.json | 791610 bytes
+frontend\node_modules\graphemer\lib\Graphemer.js | 786010 bytes
+frontend\node_modules\motion-dom\dist\cjs\index.js.map | 752780 bytes
+frontend\node_modules\framer-motion\dist\size-rollup-motion.js.map | 688382 bytes
+frontend\node_modules\@babel\types\lib\index.d.ts | 666005 bytes
+frontend\node_modules\typescript\lib\tsserverlibrary.d.ts | 660384 bytes
+frontend\node_modules\framer-motion\dist\framer-motion.dev.js | 658060 bytes
+frontend\node_modules\.cache\babel-loader\818c577d55879809e3188bf984fc12fcf5cbc48c8739d92069cca023e797a705.json | 624788 bytes
+frontend\node_modules\.cache\babel-loader\e0a4e6b3d3e57d29aef2e46072333b0dce1a0a2e38a6f0049711a212eafd9deb.json | 611855 bytes
+frontend\node_modules\core-js-compat\entries.json | 592760 bytes
+frontend\node_modules\postcss-svgo\node_modules\svgo\dist\svgo.browser.js | 587155 bytes
+frontend\node_modules\@emergentbase\visual-edits\dist\server\index.js | 568850 bytes
+frontend\node_modules\axe-core\axe.min.js | 559816 bytes

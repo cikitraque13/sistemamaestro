@@ -1,0 +1,24 @@
+﻿=== BACKEND TREE TOPOLOGY ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro\backend
+
+[DIRECTORIOS]
+backend
+  - app
+    - app\ai
+      - app\ai\agents
+      - app\ai\evals
+      - app\ai\guards
+      - app\ai\memory
+      - app\ai\orchestrators
+      - app\ai\schemas
+      - app\ai\telemetry
+      - app\ai\tools
+    - app\core
+    - app\db
+    - app\domain
+    - app\routers
+    - app\schemas
+    - app\services
+  - config
+    - config\credits
+      - config\credits\contracts

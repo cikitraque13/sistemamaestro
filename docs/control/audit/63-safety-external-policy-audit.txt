@@ -1,0 +1,33 @@
+﻿=== 63-SAFETY-EXTERNAL-POLICY-AUDIT ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+SAFETY: C:\Users\lucas\Desktop\sistemamaestro_predelete_safety
+
+[SAFETY EXISTS]
+True
+
+[SUMMARY]
+DIR COUNT: 2
+FILE COUNT: 5
+TOTAL BYTES: 119054
+
+[TOP LEVEL]
+DIR  :: backend_legacy_retired | files=1 | bytes=57331
+FILE :: memory-20260421-140120.zip | bytes=1408
+DIR  :: railway_legacy_retired | files=2 | bytes=57467
+FILE :: test_reports-20260421-140120.zip | bytes=2848
+
+[TREE]
+DIR  :: sistemamaestro_predelete_safety\backend_legacy_retired
+FILE :: sistemamaestro_predelete_safety\backend_legacy_retired\server.py | 57331 bytes
+FILE :: sistemamaestro_predelete_safety\memory-20260421-140120.zip | 1408 bytes
+DIR  :: sistemamaestro_predelete_safety\railway_legacy_retired
+FILE :: sistemamaestro_predelete_safety\railway_legacy_retired\requirements.txt | 239 bytes
+FILE :: sistemamaestro_predelete_safety\railway_legacy_retired\server_railway.py | 57228 bytes
+FILE :: sistemamaestro_predelete_safety\test_reports-20260421-140120.zip | 2848 bytes
+
+[FILES DETAIL]
+sistemamaestro_predelete_safety\backend_legacy_retired\server.py | bytes=57331 | modified=2026-04-16 03:35:33
+sistemamaestro_predelete_safety\memory-20260421-140120.zip | bytes=1408 | modified=2026-04-21 14:01:21
+sistemamaestro_predelete_safety\railway_legacy_retired\requirements.txt | bytes=239 | modified=2026-04-11 23:16:06
+sistemamaestro_predelete_safety\railway_legacy_retired\server_railway.py | bytes=57228 | modified=2026-04-14 03:36:52
+sistemamaestro_predelete_safety\test_reports-20260421-140120.zip | bytes=2848 | modified=2026-04-21 14:01:21

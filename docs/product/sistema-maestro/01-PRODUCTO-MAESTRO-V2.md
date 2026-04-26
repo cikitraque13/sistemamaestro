@@ -12,13 +12,29 @@ Sistema Maestro es una plataforma de análisis, activación, construcción visib
 
 No debe quedarse en informes.
 
-Debe convertir una necesidad, una idea o una URL existente en una estructura activable, construible, monetizable y escalable.
+
+
+No debe quedarse en orientación.
+
+
+
+No debe parecer una IA que responde bien pero no construye.
+
+
+
+Debe convertir una necesidad, una idea, una URL o un prompt en una estructura activable, construible, monetizable, escalable y, cuando proceda, exportable o desplegable.
 
 
 
 El producto no vende solo lectura.
 
-Vende transición real desde diagnóstico hasta construcción y, cuando proceda, despliegue o transferencia.
+
+
+Vende transición real desde diagnóstico hasta construcción visible y continuidad.
+
+
+
+Cuando proceda, también vende salida profesional mediante exportación, transferencia o despliegue.
 
 
 
@@ -34,25 +50,53 @@ La versión ya operativa del sistema dispone de una base funcional de producto:
 
 
 
-\- análisis inicial
+\- análisis inicial;
 
-\- diagnóstico visible
+\- diagnóstico visible;
 
-\- preguntas de afinado
+\- preguntas de afinado;
 
-\- recomendación de plan
+\- recomendación de plan;
 
-\- facturación contextual
+\- facturación contextual;
 
-\- blueprint
+\- blueprint;
 
-\- flujo estabilizado de análisis y resultado
+\- flujo estabilizado de análisis y resultado;
+
+\- Home;
+
+\- Dashboard;
+
+\- App Shell;
+
+\- Builder;
+
+\- backend canónico;
+
+\- capa de créditos estructural;
+
+\- documentación canónica en reconducción avanzada.
 
 
 
 Eso confirma que el sistema ya no está en fase de idea difusa.
 
+
+
 Está en fase de evolución estructural hacia un producto superior.
+
+
+
+\### Lectura actual
+
+
+
+El sistema ya piensa y orienta.
+
+
+
+La siguiente etapa crítica es que construya de forma visible, acumulativa y verificable.
 
 
 
@@ -68,23 +112,67 @@ El sistema ya piensa mejor de lo que ejecuta.
 
 
 
-Hoy puede detectar, diagnosticar y orientar.
-
-Pero todavía no ha cerrado del todo el puente entre:
+Puede detectar, diagnosticar y orientar.
 
 
 
-\- entender
+Pero el punto crítico del producto es cerrar completamente el puente entre:
 
-\- activar
 
-\- construir
 
-\- sacar valor real del sistema
+\- entender;
+
+\- activar;
+
+\- construir;
+
+\- mostrar;
+
+\- iterar;
+
+\- monetizar;
+
+\- exportar o desplegar cuando proceda.
 
 
 
 Ese puente es la siguiente capa crítica del producto.
+
+
+
+\### Riesgo principal
+
+
+
+Si el Builder parece trabajar pero preview, código y estructura no cambian de forma real, el usuario percibe simulación.
+
+
+
+Eso afecta a:
+
+
+
+\- valor percibido;
+
+\- confianza;
+
+\- reputación;
+
+\- conversión;
+
+\- uso de créditos;
+
+\- futura exportación;
+
+\- futura promesa de deploy.
+
+
+
+Por tanto, la siguiente etapa no es estética.
+
+
+
+Es estructural.
 
 
 
@@ -96,7 +184,7 @@ Ese puente es la siguiente capa crítica del producto.
 
 
 
-\### Entrada A — URL existente
+\## 4.1 Entrada A — URL existente
 
 
 
@@ -104,39 +192,61 @@ El usuario introduce una URL para analizar, rediseñar, elevar o reestructurar u
 
 
 
-\#### Objetivos
-
-\- detectar fricciones visibles y comerciales
-
-\- encontrar oportunidades de mejora
-
-\- proponer una nueva estructura
-
-\- activar una reconstrucción o mejora vendible
+\### Objetivos
 
 
 
-\#### Casos de uso
+\- detectar fricciones visibles y comerciales;
 
-\- negocio propio
+\- encontrar oportunidades de mejora;
 
-\- negocio de un cliente
+\- proponer una nueva estructura;
 
-\- modo operador / consultor / agencia
+\- activar una reconstrucción o mejora vendible;
 
-\- rediseño de activos existentes para vender una propuesta
+\- preparar una posible construcción visible;
+
+\- preparar continuidad, exportación o propuesta externa cuando proceda.
 
 
 
-\#### Valor esperado
+\### Casos de uso
+
+
+
+\- negocio propio;
+
+\- negocio de un cliente;
+
+\- modo operador / consultor / agencia;
+
+\- rediseño de activos existentes para vender una propuesta;
+
+\- mejora de conversión;
+
+\- diagnóstico comercial;
+
+\- reconstrucción de landing, web o app.
+
+
+
+\### Valor esperado
+
+
 
 El usuario debe sentir:
 
-\- que el sistema entiende lo que falla
 
-\- que detecta potencial real
 
-\- que puede convertir esa lectura en una propuesta accionable o en una reconstrucción
+\- que el sistema entiende lo que falla;
+
+\- que detecta potencial real;
+
+\- que puede convertir esa lectura en una propuesta accionable;
+
+\- que puede construir una nueva base;
+
+\- que puede continuar dentro del sistema o preparar salida profesional.
 
 
 
@@ -144,7 +254,7 @@ El usuario debe sentir:
 
 
 
-\### Entrada B — Idea a proyecto
+\## 4.2 Entrada B — Idea a proyecto
 
 
 
@@ -152,39 +262,109 @@ El usuario introduce una idea, necesidad o problema y el sistema la convierte en
 
 
 
-\#### Objetivos
-
-\- reducir niebla mental
-
-\- ordenar la idea
-
-\- convertirla en estructura
-
-\- preparar activación y construcción visible
+\### Objetivos
 
 
 
-\#### Casos de uso
+\- reducir niebla mental;
 
-\- usuario no técnico con idea
+\- ordenar la idea;
 
-\- usuario técnico que quiere acelerar
+\- convertirla en estructura;
 
-\- operador que quiere prototipar rápido
+\- preparar activación;
 
-\- creación de web, herramienta o producto digital desde cero
+\- preparar construcción visible;
+
+\- definir siguiente decisión;
+
+\- conectar con Builder, créditos y continuidad.
 
 
 
-\#### Valor esperado
+\### Casos de uso
+
+
+
+\- usuario no técnico con idea;
+
+\- usuario técnico que quiere acelerar;
+
+\- operador que quiere prototipar rápido;
+
+\- creación de web, herramienta, landing o producto digital desde cero;
+
+\- generación de estructura de proyecto desde prompt experto.
+
+
+
+\### Valor esperado
+
+
 
 El usuario debe sentir:
 
-\- que su idea deja de ser humo
 
-\- que existe una vía concreta
 
-\- que el sistema no solo analiza, sino que empieza a construir
+\- que su idea deja de ser humo;
+
+\- que existe una vía concreta;
+
+\- que el sistema no solo analiza;
+
+\- que empieza a preparar o construir una base real.
+
+
+
+\---
+
+
+
+\## 4.3 Entrada C — Prompt experto
+
+
+
+El usuario introduce un prompt avanzado para crear una aplicación, estructura técnica, frontend, backend, dashboard, automatización o blueprint detallado.
+
+
+
+\### Objetivos
+
+
+
+\- interpretar intención técnica;
+
+\- clasificar tipo de proyecto;
+
+\- generar estructura de carpetas;
+
+\- proponer páginas, componentes y rutas;
+
+\- preparar código coherente;
+
+\- mostrar preview cuando aplique;
+
+\- preparar continuidad, exportación o deploy futuro.
+
+
+
+\### Valor esperado
+
+
+
+El usuario técnico debe sentir:
+
+
+
+\- aceleración;
+
+\- estructura;
+
+\- control;
+
+\- capacidad de convertir un prompt en una base seria;
+
+\- posibilidad de sacar el proyecto o seguir iterando dentro del sistema.
 
 
 
@@ -200,17 +380,27 @@ La capa superior de Sistema Maestro no es solo diagnóstico.
 
 
 
-Es la unión de estas cuatro piezas:
+Es la unión de estas piezas:
 
 
 
-1\. Diagnóstico
+1\. Diagnóstico.
 
-2\. Activación
+2\. Activación.
 
-3\. Construcción visible
+3\. Builder visible.
 
-4\. Continuidad interna o exportación
+4\. Estado vivo de construcción.
+
+5\. Preview, código y estructura sincronizados.
+
+6\. Continuidad interna.
+
+7\. Créditos para acciones intensivas.
+
+8\. Exportación / transferencia.
+
+9\. Deployment cuando proceda.
 
 
 
@@ -219,6 +409,8 @@ Esta es la evolución correcta del producto.
 
 
 No se debe seguir añadiendo valor como bloques dispersos.
+
+
 
 Debe crecer como secuencia lógica.
 
@@ -236,21 +428,29 @@ Sistema Maestro debe transformar:
 
 
 
-\- confusión en claridad
+\- confusión en claridad;
 
-\- idea en estructura
+\- idea en estructura;
 
-\- URL en oportunidad de rediseño
+\- URL en oportunidad de rediseño;
 
-\- análisis en activación
+\- análisis en activación;
 
-\- blueprint en construcción visible
+\- blueprint en construcción visible;
 
-\- proyecto interno en activo evolutivo o exportable
+\- prompt en estructura;
+
+\- input en BuilderBuildState;
+
+\- BuilderBuildState en preview, código y estructura;
+
+\- proyecto interno en activo evolutivo o exportable.
 
 
 
 Esta transformación debe ser visible para el usuario.
+
+
 
 No solo declarativa.
 
@@ -260,11 +460,239 @@ No solo declarativa.
 
 
 
-\## 7. Modalidades de valor del sistema
+\## 7. Secuencia maestra del producto
 
 
 
-\### A. Valor dentro del sistema
+La secuencia de valor de Sistema Maestro queda fijada así:
+
+
+
+```text
+
+entrada
+
+→ diagnóstico
+
+→ activación
+
+→ BuilderBuildKernel
+
+→ BuilderBuildState
+
+→ preview/código/estructura
+
+→ continuidad
+
+→ créditos si hay acción intensiva
+
+→ exportación o deploy si procede
+
+```
+
+
+
+\### Regla
+
+
+
+Cada capa debe preparar la siguiente.
+
+
+
+Ninguna capa debe prometer lo que la siguiente todavía no puede sostener.
+
+
+
+\---
+
+
+
+\## 8. Builder como núcleo de valor percibido
+
+
+
+El Builder es el centro operativo del producto.
+
+
+
+No es una pantalla secundaria.
+
+
+
+No es una demo.
+
+
+
+No es un chat decorado.
+
+
+
+Debe ser el lugar donde el usuario ve que el sistema:
+
+
+
+\- interpreta;
+
+\- decide;
+
+\- construye;
+
+\- modifica;
+
+\- genera;
+
+\- muestra;
+
+\- propone;
+
+\- evoluciona.
+
+
+
+\### Regla antisimulación
+
+
+
+El Builder no puede limitarse a:
+
+
+
+\- mensajes del agente;
+
+\- progreso visual;
+
+\- código animado sin conexión;
+
+\- preview fija;
+
+\- estructura estática;
+
+\- preguntas repetidas.
+
+
+
+Una acción válida debe producir al menos uno de estos efectos:
+
+
+
+\- estado vivo actualizado;
+
+\- preview modificada;
+
+\- código modificado;
+
+\- estructura modificada;
+
+\- CTA modificado;
+
+\- bloque nuevo;
+
+\- archivo nuevo;
+
+\- siguiente decisión contextual distinta.
+
+
+
+\---
+
+
+
+\## 9. Piedra angular técnica del producto visible
+
+
+
+La piedra angular del Builder visible es:
+
+
+
+```text
+
+BuilderBuildKernel
+
+\+
+
+BuilderBuildState
+
+```
+
+
+
+\### Función
+
+
+
+El BuilderBuildKernel coordina.
+
+
+
+El BuilderBuildState sostiene lo construido.
+
+
+
+La experiencia visible debe salir de ese estado vivo.
+
+
+
+\### Contrato de producto
+
+
+
+```text
+
+input usuario
+
+→ interpretación IA
+
+→ mutación normalizada
+
+→ BuilderBuildState
+
+→ preview
+
+→ código
+
+→ estructura
+
+→ siguientes decisiones
+
+```
+
+
+
+\### Regla
+
+
+
+No se aprueba seguir corrigiendo el Builder como si fuera solo un problema visual.
+
+
+
+Primero estado vivo.
+
+
+
+Después runtime.
+
+
+
+Después preview, código y estructura.
+
+
+
+Después UI visual del agente.
+
+
+
+\---
+
+
+
+\## 10. Modalidades de valor del sistema
+
+
+
+\## 10.1 Valor dentro del sistema
 
 
 
@@ -272,29 +700,41 @@ El usuario trabaja dentro de la aplicación y obtiene:
 
 
 
-\- análisis
+\- análisis;
 
-\- activación
+\- activación;
 
-\- agentes
+\- agentes;
 
-\- construcción visible
+\- construcción visible;
 
-\- continuidad
+\- continuidad;
 
-\- iteración
+\- iteración;
 
-\- mejoras progresivas
+\- mejoras progresivas;
 
-\- uso de créditos para acciones intensivas
+\- uso de créditos para acciones intensivas;
 
-\- evolución del proyecto dentro del ecosistema
+\- evolución del proyecto dentro del ecosistema;
+
+\- historial;
+
+\- siguientes decisiones;
+
+\- posibilidad de exportación futura.
 
 
 
-\#### Principio
+\### Principio
+
+
 
 Permanecer dentro del sistema debe ser una modalidad valiosa, no una limitación.
+
+
+
+El usuario debe sentir que seguir dentro le da potencia, continuidad y control.
 
 
 
@@ -302,7 +742,7 @@ Permanecer dentro del sistema debe ser una modalidad valiosa, no una limitación
 
 
 
-\### B. Valor fuera del sistema
+\## 10.2 Valor fuera del sistema
 
 
 
@@ -310,23 +750,55 @@ Cuando el usuario quiere sacar el proyecto fuera del entorno del sistema, entra 
 
 
 
-\- exportación
+\- exportación;
 
-\- empaquetado
+\- empaquetado;
 
-\- preparación de salida
+\- preparación de salida;
 
-\- transferencia
+\- transferencia;
 
-\- entrega del activo
+\- entrega del activo;
+
+\- posible conexión con GitHub;
+
+\- posible despliegue.
 
 
 
-\#### Principio
+\### Principio
+
+
 
 La salida del sistema no debe tratarse como una función gratuita por defecto.
 
+
+
 Debe tratarse como una acción premium y operativa con valoración propia.
+
+
+
+\### Regla
+
+
+
+No se exporta sobre una preview simulada.
+
+
+
+La salida profesional exige:
+
+
+
+\- estado vivo;
+
+\- código coherente;
+
+\- estructura coherente;
+
+\- valoración;
+
+\- proceso de entrega.
 
 
 
@@ -334,7 +806,7 @@ Debe tratarse como una acción premium y operativa con valoración propia.
 
 
 
-\## 8. Principio de monetización estructural
+\## 11. Principio de monetización estructural
 
 
 
@@ -342,29 +814,63 @@ Sistema Maestro debe sostenerse sobre tres motores de monetización:
 
 
 
-1\. Suscripción
+1\. Suscripción.
 
-2\. Créditos
+2\. Créditos.
 
-3\. Exportación / transferencia
+3\. Exportación / transferencia.
 
 
 
-\### 8.1 Suscripción
+\## 11.1 Suscripción
+
+
 
 La suscripción da acceso al sistema, a un nivel de intervención y a una base de uso según plan.
 
 
 
-\### 8.2 Créditos
-
-Los créditos financian construcción, acciones intensivas, uso de agentes y operaciones de alto consumo.
+\## 11.2 Créditos
 
 
 
-\### 8.3 Exportación / transferencia
+Los créditos financian construcción, acciones intensivas, uso de agentes, iteraciones, regeneraciones y operaciones de alto consumo.
+
+
+
+\## 11.3 Exportación / transferencia
+
+
 
 La exportación se cobra aparte cuando el usuario decide sacar el proyecto del sistema y convertirlo en activo externo entregable.
+
+
+
+\### Regla madre
+
+
+
+```text
+
+suscripción = acceso y continuidad
+
+créditos = ejecución intensiva real
+
+exportación = salida profesional
+
+```
+
+
+
+\### Protección reputacional
+
+
+
+No se consumen créditos sobre simulaciones.
+
+
+
+No se cobra por una acción que no produzca salida real, visible o técnicamente verificable.
 
 
 
@@ -372,11 +878,13 @@ La exportación se cobra aparte cuando el usuario decide sacar el proyecto del s
 
 
 
-\## 9. Política de exportación
+\## 12. Política de exportación
 
 
 
 La exportación no debe presentarse como castigo por salir.
+
+
 
 Debe presentarse como un servicio claro y profesional de liberación y transferencia.
 
@@ -384,35 +892,49 @@ Debe presentarse como un servicio claro y profesional de liberación y transfere
 
 \### Regla
 
-\- permanecer dentro del sistema es una modalidad válida
 
-\- sacar el proyecto fuera también es posible
 
-\- la salida requiere una valoración y un precio cerrado
+\- permanecer dentro del sistema es una modalidad válida;
+
+\- sacar el proyecto fuera también es posible;
+
+\- la salida requiere valoración y precio claro.
 
 
 
 \### Principios
 
-\- facilidad
 
-\- transparencia
 
-\- precio claro
+\- facilidad;
 
-\- proceso limpio
+\- transparencia;
 
-\- sin fricción artificial
+\- precio claro;
 
-\- sin sensación de bloqueo opaco
+\- proceso limpio;
+
+\- sin fricción artificial;
+
+\- sin sensación de bloqueo opaco;
+
+\- sin regalar una operación premium;
+
+\- sin exportar estructura incoherente.
 
 
 
 \### Narrativa correcta
 
-El sistema no “retiene”.
+
+
+El sistema no retiene.
+
+
 
 El sistema ofrece continuidad.
+
+
 
 Si el usuario quiere salida, se la facilita mediante una capa de exportación y transferencia valorada profesionalmente.
 
@@ -422,7 +944,7 @@ Si el usuario quiere salida, se la facilita mediante una capa de exportación y 
 
 
 
-\## 10. Tipos de salida futura
+\## 13. Tipos de salida futura
 
 
 
@@ -430,11 +952,17 @@ La arquitectura debe prever, como mínimo, varios niveles de salida:
 
 
 
-\- exportación básica
+\- exportación básica;
 
-\- transferencia estándar
+\- transferencia estándar;
 
-\- salida avanzada con mayor complejidad
+\- salida avanzada con mayor complejidad;
+
+\- preparación de repositorio;
+
+\- despliegue asistido;
+
+\- integración futura con GitHub.
 
 
 
@@ -442,11 +970,19 @@ Los niveles exactos, criterios y precios cerrados se definirán en el documento 
 
 
 
+\### Regla
+
+
+
+La salida debe depender de la complejidad real del proyecto y de la coherencia entre estado, código y estructura.
+
+
+
 \---
 
 
 
-\## 11. Papel del modo operador
+\## 14. Papel del modo operador
 
 
 
@@ -460,17 +996,23 @@ También debe servir para usuarios que trabajan sobre activos de terceros.
 
 \### Ejemplo
 
-\- detectar una web mejorable
 
-\- analizar la URL
 
-\- proponer una estructura superior
+\- detectar una web mejorable;
 
-\- construir una nueva base
+\- analizar la URL;
 
-\- vender esa mejora a un tercero
+\- proponer una estructura superior;
 
-\- continuar dentro del sistema o exportar el resultado
+\- construir una nueva base;
+
+\- vender esa mejora a un tercero;
+
+\- continuar dentro del sistema;
+
+\- exportar el resultado;
+
+\- preparar una entrega o propuesta.
 
 
 
@@ -478,11 +1020,41 @@ Esto convierte a Sistema Maestro en una herramienta de producción, venta y tran
 
 
 
+\### Regla
+
+
+
+Modo operador debe apoyarse en la misma arquitectura central.
+
+
+
+No debe crear un Builder paralelo.
+
+
+
+Debe consumir:
+
+
+
+```text
+
+BuilderBuildKernel
+
+BuilderBuildState
+
+mutaciones
+
+preview/código/estructura
+
+```
+
+
+
 \---
 
 
 
-\## 12. Dirección correcta del producto
+\## 15. Dirección correcta del producto
 
 
 
@@ -494,29 +1066,53 @@ La dirección correcta es consolidar esta secuencia:
 
 
 
-entrada → diagnóstico → activación → construcción visible → continuidad o exportación
+```text
+
+entrada
+
+→ diagnóstico
+
+→ activación
+
+→ construcción visible
+
+→ continuidad o exportación
+
+```
 
 
 
-Esa es la arquitectura maestra que debe gobernar:
+Esa arquitectura maestra debe gobernar:
 
 
 
-\- pricing
+\- pricing;
 
-\- billing
+\- billing;
 
-\- builder
+\- Builder;
 
-\- créditos
+\- créditos;
 
-\- exportación
+\- exportación;
 
-\- despliegue
+\- despliegue;
 
-\- experiencia visible
+\- experiencia visible;
 
-\- contratos técnicos
+\- contratos técnicos;
+
+\- roadmap;
+
+\- documentación canónica.
+
+
+
+\### Regla
+
+
+
+No se aprueban módulos nuevos que no sepan dónde encajan dentro de esa secuencia.
 
 
 
@@ -524,15 +1120,207 @@ Esa es la arquitectura maestra que debe gobernar:
 
 
 
-\## 13. Regla de diseño de producto
+\## 16. Relación entre Home, Dashboard, App Shell y Builder
 
 
 
-Toda mejora futura debe responder a una de estas dos preguntas:
+\## 16.1 Home
+
+
+
+Home debe orientar, generar confianza y convertir.
+
+
+
+No debe absorber lógica interna del Builder.
+
+
+
+\## 16.2 Dashboard
+
+
+
+Dashboard debe activar al usuario y conducirlo hacia:
+
+
+
+\- proyectos;
+
+\- Builder;
+
+\- créditos;
+
+\- informes;
+
+\- oportunidades;
+
+\- continuidad.
+
+
+
+\## 16.3 App Shell
+
+
+
+App Shell debe ordenar navegación, módulos, estados y sensación premium interna.
+
+
+
+\## 16.4 Builder
+
+
+
+Builder debe construir.
+
+
+
+Debe ser el centro visible de valor operativo.
+
+
+
+\### Regla
+
+
+
+La cadena correcta es:
+
+
+
+```text
+
+Home
+
+→ Dashboard
+
+→ App Shell
+
+→ Builder
+
+→ Orquestador IA
+
+→ Backend
+
+→ Monetización
+
+```
+
+
+
+Ninguna capa debe prometer lo que otra no soporta.
+
+
+
+\---
+
+
+
+\## 17. Relación con IA
+
+
+
+La IA de Sistema Maestro debe actuar como orquestador, no como generador genérico de texto.
+
+
+
+Debe:
+
+
+
+\- interpretar intención;
+
+\- clasificar tipo de proyecto;
+
+\- detectar sector;
+
+\- identificar objetivo;
+
+\- decidir flujo;
+
+\- coordinar agentes;
+
+\- normalizar salida;
+
+\- reducir alucinaciones;
+
+\- proponer siguientes decisiones;
+
+\- alimentar el BuilderBuildKernel;
+
+\- evitar respuestas repetidas.
+
+
+
+\### Regla
+
+
+
+La IA no debe considerarse exitosa solo por responder bien.
+
+
+
+Debe producir contexto útil para construir.
+
+
+
+\---
+
+
+
+\## 18. Relación con Backend
+
+
+
+Backend debe sostener:
+
+
+
+\- auth;
+
+\- proyectos;
+
+\- pagos;
+
+\- créditos;
+
+\- persistencia;
+
+\- informes;
+
+\- consumo;
+
+\- futura continuidad avanzada;
+
+\- futura exportación;
+
+\- futuro despliegue;
+
+\- futura persistencia del BuilderState.
+
+
+
+\### Regla
+
+
+
+La primera fase del estado vivo puede empezar en frontend, pero toda acción que afecte créditos, exportación, deploy o continuidad avanzada debe tener camino hacia backend.
+
+
+
+\---
+
+
+
+\## 19. Regla de diseño de producto
+
+
+
+Toda mejora futura debe responder a una de estas preguntas:
 
 
 
 \### A
+
+
 
 ¿Esto aumenta la capacidad del sistema para convertir análisis en acción real?
 
@@ -540,11 +1328,29 @@ Toda mejora futura debe responder a una de estas dos preguntas:
 
 \### B
 
+
+
 ¿Esto mejora la continuidad, la construcción visible, la monetización o la salida del proyecto?
 
 
 
-Si no mejora una de esas dos capas, no debe priorizarse.
+\### C
+
+
+
+¿Esto mejora la coherencia entre preview, código y estructura?
+
+
+
+\### D
+
+
+
+¿Esto reduce riesgo reputacional, técnico o económico?
+
+
+
+Si no mejora una de esas capas, no debe priorizarse.
 
 
 
@@ -552,7 +1358,119 @@ Si no mejora una de esas dos capas, no debe priorizarse.
 
 
 
-\## 14. Cierre doctrinal de esta pieza
+\## 20. Riesgos que el producto debe evitar
+
+
+
+Sistema Maestro debe evitar:
+
+
+
+\- parecer una IA de informes;
+
+\- prometer construcción sin construir;
+
+\- consumir créditos sin salida;
+
+\- exportar sin estructura;
+
+\- desplegar sin coherencia técnica;
+
+\- duplicar Builders;
+
+\- crear rutas paralelas;
+
+\- mezclar Home con lógica interna;
+
+\- hacer del agente un elemento decorativo;
+
+\- repetir preguntas genéricas;
+
+\- tratar Builder como pantalla aislada;
+
+\- usar el chat como memoria canónica;
+
+\- crecer por impulsos visuales.
+
+
+
+\---
+
+
+
+\## 21. Criterio de producto Sistema Maestro Gold
+
+
+
+Sistema Maestro empieza a estar en nivel Gold cuando una entrada como:
+
+
+
+```text
+
+Quiero una landing de Sistema Maestro con acceso Google, CTA y suscripción
+
+```
+
+
+
+produce:
+
+
+
+\- interpretación clara;
+
+\- activación adecuada;
+
+\- BuilderBuildState actualizado;
+
+\- preview con bloques reales;
+
+\- código coherente;
+
+\- estructura coherente;
+
+\- siguientes decisiones útiles;
+
+\- coste claro si aplica;
+
+\- continuidad posible.
+
+
+
+Y cuando una entrada como:
+
+
+
+```text
+
+Crea una app con dashboard y backend
+
+```
+
+
+
+produce:
+
+
+
+\- estructura frontend/backend;
+
+\- páginas, rutas y componentes;
+
+\- preview coherente con la app;
+
+\- código alineado con la estructura;
+
+\- siguientes decisiones técnicas no repetidas.
+
+
+
+\---
+
+
+
+\## 22. Cierre doctrinal de esta pieza
 
 
 
@@ -560,31 +1478,67 @@ Sistema Maestro V2 debe entenderse como:
 
 
 
-\- plataforma de entrada por idea o URL
+\- plataforma de entrada por idea, URL o prompt;
 
-\- sistema de activación real
+\- sistema de diagnóstico real;
 
-\- entorno de construcción visible
+\- capa de activación productizada;
 
-\- producto de continuidad
+\- entorno de construcción visible;
 
-\- herramienta de transformación para usuarios propios y operadores
+\- sistema vivo basado en estado;
 
-\- plataforma con salida profesional valorada por separado
+\- producto de continuidad;
+
+\- herramienta de transformación para usuarios propios y operadores;
+
+\- plataforma con salida profesional valorada por separado.
 
 
 
 Este documento fija la arquitectura maestra del producto.
 
-Los siguientes documentos desarrollan:
+
+
+Los documentos derivados desarrollan:
 
 
 
-\- Activación
+\- Activación;
 
-\- economía de créditos
+\- economía de créditos;
 
-\- experiencia del constructor visible
+\- experiencia del constructor visible;
 
-\- contratos técnicos
+\- contratos técnicos;
+
+\- roadmap de implementación;
+
+\- procedimientos operativos.
+
+
+
+La fórmula central queda cerrada:
+
+
+
+```text
+
+diagnóstico
+
+→ activación
+
+→ BuilderBuildKernel
+
+→ BuilderBuildState
+
+→ preview/código/estructura
+
+→ continuidad, créditos, exportación o deploy
+
+```
+
+
+
+No se aprueba volver a tratar Sistema Maestro como una suma de pantallas, informes o respuestas aisladas.
 

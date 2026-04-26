@@ -1,0 +1,103 @@
+﻿=== 89-SEMANTIC-ADMISSION-EXPANDED-SUITE ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+SEMANTIC_ADMISSION_TRACE_ENABLED: 1
+SEMANTIC_ADMISSION_TRACE_VERBOSE: 0
+
+=== 89-SEMANTIC-ADMISSION-EXPANDED-SUITE ===
+OUTPUT_JSON_FILE: C:\Users\lucas\Desktop\sistemamaestro\docs\control\audit\89-semantic-admission-expanded-suite.json
+
+[A01_text_clear_commercial]
+status: ready_for_analysis | expected: ready_for_analysis | pass=True
+input_nature: service_offer | expected: service_offer | pass=True
+user_intent: sell_this | expected: sell_this | pass=True
+maturity: existing_offer | expected: existing_offer | pass=True
+needs_clarification: False | expected: False | pass=True
+confidence: high
+clarification_question: 
+active_signals: ['audit_signal', 'conversion_goal_signal', 'existing_offer_signal', 'explicit_sell_intent_signal', 'offer_language_signal', 'premium_signal']
+guardrails_triggered: []
+
+[A02_text_technical_ambiguous]
+status: clarification_required | expected: clarification_required | pass=True
+input_nature: mixed_input | expected: mixed_input | pass=True
+user_intent: unclear | expected: unclear | pass=True
+maturity: defined_solution | expected: defined_solution | pass=True
+needs_clarification: True | expected: True | pass=True
+confidence: low
+clarification_question: Quieres automatizar el proceso o vender esta solucion como oferta?
+active_signals: ['architecture_signal', 'automation_signal', 'integration_signal', 'ops_signal', 'strong_nature_without_explicit_intent_signal', 'system_signal']
+guardrails_triggered: ['strong_nature_without_explicit_intent_requires_clarification', 'low_confidence_requires_single_question']
+
+[A03_early_idea_validation]
+status: ready_for_analysis | expected: ready_for_analysis | pass=True
+input_nature: idea_validation | expected: idea_validation | pass=True
+user_intent: validate_this | expected: validate_this | pass=True
+maturity: early_idea | expected: early_idea | pass=True
+needs_clarification: False | expected: False | pass=True
+confidence: high
+clarification_question: 
+active_signals: ['explicit_validate_intent_signal', 'format_missing_signal', 'idea_signal', 'uncertainty_signal', 'validation_signal']
+guardrails_triggered: []
+
+[A04_sell_vs_build_mix]
+status: clarification_required | expected: clarification_required | pass=True
+input_nature: mixed_input | expected: mixed_input | pass=True
+user_intent: unclear | expected: unclear | pass=True
+maturity: concept_in_definition | expected: concept_in_definition | pass=True
+needs_clarification: True | expected: True | pass=True
+confidence: low
+clarification_question: Quieres construir este sistema o venderlo como oferta a clientes?
+active_signals: ['build_signal', 'explicit_build_intent_signal', 'explicit_sell_intent_signal', 'mixed_intent_signal', 'offer_language_signal', 'premium_signal', 'system_signal']
+guardrails_triggered: ['mixed_build_sell_requires_clarification', 'low_confidence_requires_single_question']
+
+[A05_validate_vs_build_mix]
+status: clarification_required | expected: clarification_required | pass=True
+input_nature: idea_validation | expected: idea_validation | pass=True
+user_intent: validate_this | expected: validate_this | pass=True
+maturity: early_idea | expected: early_idea | pass=True
+needs_clarification: True | expected: True | pass=True
+confidence: low
+clarification_question: Quieres construir este sistema o venderlo como oferta a clientes?
+active_signals: ['explicit_validate_intent_signal', 'mixed_intent_signal', 'system_signal', 'uncertainty_signal']
+guardrails_triggered: ['mixed_validate_build_requires_clarification', 'low_confidence_requires_single_question']
+
+[A06_voice_disordered_mixed]
+status: clarification_required | expected: clarification_required | pass=True
+input_nature: idea_validation | expected: idea_validation | pass=True
+user_intent: validate_this | expected: validate_this | pass=True
+maturity: early_idea | expected: early_idea | pass=True
+needs_clarification: True | expected: True | pass=True
+confidence: low
+clarification_question: Quieres construirlo o venderlo como oferta?
+active_signals: ['explicit_build_intent_signal', 'explicit_sell_intent_signal', 'explicit_validate_intent_signal', 'fragmented_sentence_signal', 'idea_signal', 'mixed_intent_signal', 'spoken_disfluency_signal', 'system_signal', 'uncertainty_signal']
+guardrails_triggered: ['mixed_validate_build_requires_clarification', 'low_confidence_requires_single_question']
+
+[A07_text_clear_automation]
+status: ready_for_analysis | expected: ready_for_analysis | pass=True
+input_nature: automation_flow | expected: automation_flow | pass=True
+user_intent: automate_this | expected: automate_this | pass=True
+maturity: defined_solution | expected: defined_solution | pass=True
+needs_clarification: False | expected: False | pass=True
+confidence: high
+clarification_question: 
+active_signals: ['automation_signal', 'explicit_automate_intent_signal', 'feature_density_signal', 'integration_signal', 'output_defined_signal']
+guardrails_triggered: []
+
+[A08_text_clear_diagnostic]
+status: ready_for_analysis | expected: ready_for_analysis | pass=True
+input_nature: audit_request | expected: audit_request | pass=True
+user_intent: diagnose_this | expected: diagnose_this | pass=True
+maturity: defined_solution | expected: defined_solution | pass=True
+needs_clarification: False | expected: False | pass=True
+confidence: high
+clarification_question: 
+active_signals: ['audit_signal', 'diagnostic_signal', 'explicit_diagnose_intent_signal', 'friction_signal', 'improvement_signal', 'output_defined_signal']
+guardrails_triggered: []
+
+STATUS_PASS_TOTAL: 8/8
+INPUT_NATURE_PASS_TOTAL: 8/8
+USER_INTENT_PASS_TOTAL: 8/8
+MATURITY_PASS_TOTAL: 8/8
+NEEDS_CLARIFICATION_PASS_TOTAL: 8/8
+FULL_CASES_PASS: 8/8

@@ -1,0 +1,111 @@
+﻿=== 50-VOLUME-HOTSPOTS-AFTER-WAVE2 ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+=== TOP LEVEL DIRECTORIES ===
+frontend | bytes=5716362 | files=193
+docs | bytes=394719 | files=78
+backend | bytes=221092 | files=71
+railway | bytes=57467 | files=2
+tests | bytes=9202 | files=2
+
+=== TOP SUBDIRECTORIES (DEPTH <= 3) ===
+frontend | bytes=5716362 | files=193
+frontend\public | bytes=4244041 | files=3
+frontend\src | bytes=653657 | files=178
+docs | bytes=394719 | files=78
+frontend\src\features | bytes=375852 | files=113
+docs\control | bytes=290247 | files=58
+backend | bytes=221092 | files=71
+frontend\src\components | bytes=214896 | files=53
+docs\control\audit | bytes=206324 | files=50
+backend\app | bytes=147161 | files=63
+docs\product | bytes=87427 | files=10
+docs\product\sistema-maestro | bytes=73467 | files=8
+backend\app\services | bytes=62204 | files=8
+railway | bytes=57467 | files=2
+backend\app\routers | bytes=33899 | files=8
+backend\app\ai | bytes=25085 | files=33
+frontend\src\pages | bytes=22244 | files=3
+frontend\src\content | bytes=17907 | files=1
+backend\config\credits | bytes=14510 | files=6
+backend\config | bytes=14510 | files=6
+backend\app\core | bytes=13741 | files=4
+frontend\plugins\health-check | bytes=10886 | files=2
+frontend\plugins | bytes=10886 | files=2
+tests | bytes=9202 | files=2
+tests\backend | bytes=9202 | files=1
+frontend\src\hooks | bytes=7251 | files=2
+docs\architecture | bytes=6586 | files=4
+docs\design | bytes=5583 | files=1
+frontend\src\context | bytes=4993 | files=1
+docs\qa | bytes=4876 | files=1
+backend\app\domain | bytes=4742 | files=3
+backend\app\schemas | bytes=4105 | files=4
+backend\app\db | bytes=172 | files=2
+frontend\src\lib | bytes=143 | files=1
+docs\system\credits | bytes=0 | files=4
+frontend\src\shared | bytes=0 | files=0
+docs\system | bytes=0 | files=4
+frontend\src\app | bytes=0 | files=0
+
+=== TOP FILES ===
+frontend\public\logo-sm.png | 2117575 bytes
+frontend\public\logo.png | 2117575 bytes
+frontend\package-lock.json | 795075 bytes
+backend\server.py | 57331 bytes
+railway\server_railway.py | 57228 bytes
+frontend\src\components\reports\PremiumReportPdfTemplate.js | 34381 bytes
+frontend\src\components\reports\premium\screen\PremiumReportScreenTemplate.js | 32197 bytes
+docs\control\audit\11-regenerable-zones.txt | 32061 bytes
+frontend\src\features\flow\FlowPage.js | 31918 bytes
+docs\control\audit\34-backend-canonicity-audit-03.txt | 29296 bytes
+backend\app\services\ai_analysis.py | 26288 bytes
+docs\control\audit\35-backend-entrypoint-resolution-04.txt | 22456 bytes
+frontend\src\components\reports\premium\print\PremiumReportPrintTemplate.js | 20889 bytes
+frontend\src\content\pricingContent.js | 17907 bytes
+frontend\src\features\reports\ReportPreviewPage.js | 17702 bytes
+frontend\src\components\GoogleSignInButton.js | 17585 bytes
+docs\control\audit\43-backend-runtime-final-sweep.txt | 17367 bytes
+docs\control\audit\44-aux-routes-classification-scan.txt | 15254 bytes
+backend\app\services\consumption_engine.py | 14726 bytes
+README.md | 14610 bytes
+docs\control\audit\28-docs-headings-final.txt | 14042 bytes
+docs\control\audit\03-clean-files.txt | 13982 bytes
+docs\product\sistema-maestro\05-CONTRATOS-TECNICOS-V1.md | 13640 bytes
+frontend\src\features\flow\steps\FlowResultStep.js | 13562 bytes
+frontend\src\features\opportunities\OpportunitiesPage.js | 12068 bytes
+frontend\src\features\billing\BillingPage.js | 11862 bytes
+docs\control\04-RUTAS-CANONICAS.md | 11801 bytes
+docs\product\sistema-maestro\03-CREDITOS-Y-ECONOMIA.md | 11597 bytes
+docs\control\05-INCIDENCIAS-Y-DIAGNOSTICOS.md | 11397 bytes
+docs\control\03-INVENTARIO-TECNICO.md | 11287 bytes
+docs\control\02-PENDIENTES-PRIORIZADOS.md | 11050 bytes
+docs\control\07-GIT-DEPLOY-HIGIENE.md | 11049 bytes
+docs\product\sistema-maestro\02-ACTIVACION-DOCTRINA.md | 11030 bytes
+frontend\src\features\reports\ReportPrintPage.js | 10723 bytes
+docs\product\sistema-maestro\04-EXPERIENCIA-CONSTRUCTOR-VISIBLE.md | 10715 bytes
+docs\control\01-DECISIONES-CERRADAS.md | 10500 bytes
+frontend\src\features\dashboard\DashboardPage.js | 10172 bytes
+docs\control\06-PROCEDIMIENTOS-OPERATIVOS.md | 9867 bytes
+backend\app\routers\auth.py | 9400 bytes
+tests\backend\backend_test.py | 9202 bytes
+docs\product\sistema-maestro\06-ROADMAP-DE-IMPLEMENTACION-V1.md | 9175 bytes
+frontend\public\index.html | 8891 bytes
+docs\product\sistema-maestro\01-PRODUCTO-MAESTRO-V2.md | 8778 bytes
+backend\app\routers\payments.py | 8692 bytes
+frontend\src\pages\Terms.js | 8471 bytes
+frontend\src\features\auth\AuthCallbackPage.js | 8422 bytes
+frontend\src\features\projects\ProjectsPage.js | 8083 bytes
+backend\app\services\plan_recommendation.py | 7796 bytes
+frontend\src\features\flow\components\MatrixTransitionOverlay.js | 7690 bytes
+frontend\plugins\health-check\health-endpoints.js | 7625 bytes
+docs\control\audit\37-runtime-alignment-focus.txt | 7513 bytes
+frontend\src\pages\Cookies.js | 7499 bytes
+docs\product\02-PDF-INFORME-PUNTUAL-SALIDA-VISUAL.md | 7466 bytes
+docs\control\audit\45-volume-hotspots-scan.txt | 7271 bytes
+backend\app\core\credits_config_loader.py | 7103 bytes
+frontend\src\components\ui\menubar.jsx | 7072 bytes
+docs\control\00-INDICE-MAESTRO.md | 6972 bytes
+frontend\src\components\DashboardLayout.js | 6687 bytes
+frontend\src\features\billing\components\PlanCard.js | 6597 bytes
+frontend\src\components\ui\dropdown-menu.jsx | 6501 bytes

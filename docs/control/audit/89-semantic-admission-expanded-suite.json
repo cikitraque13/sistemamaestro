@@ -1,0 +1,278 @@
+[
+  {
+    "id": "A01_text_clear_commercial",
+    "input_mode": "text",
+    "expected_status": "ready_for_analysis",
+    "actual_status": "ready_for_analysis",
+    "expected_input_nature": "service_offer",
+    "actual_input_nature": "service_offer",
+    "expected_user_intent": "sell_this",
+    "actual_user_intent": "sell_this",
+    "expected_maturity": "existing_offer",
+    "actual_maturity": "existing_offer",
+    "expected_needs_clarification": false,
+    "actual_needs_clarification": false,
+    "clarification_question": "",
+    "confidence": "high",
+    "active_signals": [
+      "audit_signal",
+      "conversion_goal_signal",
+      "existing_offer_signal",
+      "explicit_sell_intent_signal",
+      "offer_language_signal",
+      "premium_signal"
+    ],
+    "guardrails_triggered": [],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A02_text_technical_ambiguous",
+    "input_mode": "text",
+    "expected_status": "clarification_required",
+    "actual_status": "clarification_required",
+    "expected_input_nature": "mixed_input",
+    "actual_input_nature": "mixed_input",
+    "expected_user_intent": "unclear",
+    "actual_user_intent": "unclear",
+    "expected_maturity": "defined_solution",
+    "actual_maturity": "defined_solution",
+    "expected_needs_clarification": true,
+    "actual_needs_clarification": true,
+    "clarification_question": "Quieres automatizar el proceso o vender esta solucion como oferta?",
+    "confidence": "low",
+    "active_signals": [
+      "architecture_signal",
+      "automation_signal",
+      "integration_signal",
+      "ops_signal",
+      "strong_nature_without_explicit_intent_signal",
+      "system_signal"
+    ],
+    "guardrails_triggered": [
+      "strong_nature_without_explicit_intent_requires_clarification",
+      "low_confidence_requires_single_question"
+    ],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A03_early_idea_validation",
+    "input_mode": "text",
+    "expected_status": "ready_for_analysis",
+    "actual_status": "ready_for_analysis",
+    "expected_input_nature": "idea_validation",
+    "actual_input_nature": "idea_validation",
+    "expected_user_intent": "validate_this",
+    "actual_user_intent": "validate_this",
+    "expected_maturity": "early_idea",
+    "actual_maturity": "early_idea",
+    "expected_needs_clarification": false,
+    "actual_needs_clarification": false,
+    "clarification_question": "",
+    "confidence": "high",
+    "active_signals": [
+      "explicit_validate_intent_signal",
+      "format_missing_signal",
+      "idea_signal",
+      "uncertainty_signal",
+      "validation_signal"
+    ],
+    "guardrails_triggered": [],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A04_sell_vs_build_mix",
+    "input_mode": "text",
+    "expected_status": "clarification_required",
+    "actual_status": "clarification_required",
+    "expected_input_nature": "mixed_input",
+    "actual_input_nature": "mixed_input",
+    "expected_user_intent": "unclear",
+    "actual_user_intent": "unclear",
+    "expected_maturity": "concept_in_definition",
+    "actual_maturity": "concept_in_definition",
+    "expected_needs_clarification": true,
+    "actual_needs_clarification": true,
+    "clarification_question": "Quieres construir este sistema o venderlo como oferta a clientes?",
+    "confidence": "low",
+    "active_signals": [
+      "build_signal",
+      "explicit_build_intent_signal",
+      "explicit_sell_intent_signal",
+      "mixed_intent_signal",
+      "offer_language_signal",
+      "premium_signal",
+      "system_signal"
+    ],
+    "guardrails_triggered": [
+      "mixed_build_sell_requires_clarification",
+      "low_confidence_requires_single_question"
+    ],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A05_validate_vs_build_mix",
+    "input_mode": "text",
+    "expected_status": "clarification_required",
+    "actual_status": "clarification_required",
+    "expected_input_nature": "idea_validation",
+    "actual_input_nature": "idea_validation",
+    "expected_user_intent": "validate_this",
+    "actual_user_intent": "validate_this",
+    "expected_maturity": "early_idea",
+    "actual_maturity": "early_idea",
+    "expected_needs_clarification": true,
+    "actual_needs_clarification": true,
+    "clarification_question": "Quieres construir este sistema o venderlo como oferta a clientes?",
+    "confidence": "low",
+    "active_signals": [
+      "explicit_validate_intent_signal",
+      "mixed_intent_signal",
+      "system_signal",
+      "uncertainty_signal"
+    ],
+    "guardrails_triggered": [
+      "mixed_validate_build_requires_clarification",
+      "low_confidence_requires_single_question"
+    ],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A06_voice_disordered_mixed",
+    "input_mode": "voice_transcript",
+    "expected_status": "clarification_required",
+    "actual_status": "clarification_required",
+    "expected_input_nature": "idea_validation",
+    "actual_input_nature": "idea_validation",
+    "expected_user_intent": "validate_this",
+    "actual_user_intent": "validate_this",
+    "expected_maturity": "early_idea",
+    "actual_maturity": "early_idea",
+    "expected_needs_clarification": true,
+    "actual_needs_clarification": true,
+    "clarification_question": "Quieres construirlo o venderlo como oferta?",
+    "confidence": "low",
+    "active_signals": [
+      "explicit_build_intent_signal",
+      "explicit_sell_intent_signal",
+      "explicit_validate_intent_signal",
+      "fragmented_sentence_signal",
+      "idea_signal",
+      "mixed_intent_signal",
+      "spoken_disfluency_signal",
+      "system_signal",
+      "uncertainty_signal"
+    ],
+    "guardrails_triggered": [
+      "mixed_validate_build_requires_clarification",
+      "low_confidence_requires_single_question"
+    ],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A07_text_clear_automation",
+    "input_mode": "text",
+    "expected_status": "ready_for_analysis",
+    "actual_status": "ready_for_analysis",
+    "expected_input_nature": "automation_flow",
+    "actual_input_nature": "automation_flow",
+    "expected_user_intent": "automate_this",
+    "actual_user_intent": "automate_this",
+    "expected_maturity": "defined_solution",
+    "actual_maturity": "defined_solution",
+    "expected_needs_clarification": false,
+    "actual_needs_clarification": false,
+    "clarification_question": "",
+    "confidence": "high",
+    "active_signals": [
+      "automation_signal",
+      "explicit_automate_intent_signal",
+      "feature_density_signal",
+      "integration_signal",
+      "output_defined_signal"
+    ],
+    "guardrails_triggered": [],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  },
+  {
+    "id": "A08_text_clear_diagnostic",
+    "input_mode": "text",
+    "expected_status": "ready_for_analysis",
+    "actual_status": "ready_for_analysis",
+    "expected_input_nature": "audit_request",
+    "actual_input_nature": "audit_request",
+    "expected_user_intent": "diagnose_this",
+    "actual_user_intent": "diagnose_this",
+    "expected_maturity": "defined_solution",
+    "actual_maturity": "defined_solution",
+    "expected_needs_clarification": false,
+    "actual_needs_clarification": false,
+    "clarification_question": "",
+    "confidence": "high",
+    "active_signals": [
+      "audit_signal",
+      "diagnostic_signal",
+      "explicit_diagnose_intent_signal",
+      "friction_signal",
+      "improvement_signal",
+      "output_defined_signal"
+    ],
+    "guardrails_triggered": [],
+    "checks": {
+      "status_pass": true,
+      "input_nature_pass": true,
+      "user_intent_pass": true,
+      "maturity_pass": true,
+      "needs_clarification_pass": true,
+      "full_pass": true
+    }
+  }
+]

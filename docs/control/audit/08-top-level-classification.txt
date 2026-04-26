@@ -1,0 +1,14 @@
+﻿
+Folder       Classification    
+------       --------------    
+.git         REVISAR           
+backend      FUENTE / SISTEMA  
+docs         FUENTE / SISTEMA  
+frontend     FUENTE / SISTEMA  
+memory       AUXILIAR / REVISAR
+railway      REVISAR           
+test_reports AUXILIAR / REVISAR
+tests        REVISAR           
+
+
+

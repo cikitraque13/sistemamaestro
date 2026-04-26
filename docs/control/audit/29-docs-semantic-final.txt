@@ -1,0 +1,53 @@
+﻿===== 00-INDICE-MAESTRO.md =====
+REQ OK  :: # 00-INDICE-MAESTRO
+REQ OK  :: ## 3. Documentos canónicos del sistema
+REQ OK  :: ## 6. Regla antisolape
+FORB OK :: frontend/src/features/
+FORB OK :: frontend/node_modules/
+FORB OK :: frontend/package-lock.json
+
+===== 01-DECISIONES-CERRADAS.md =====
+REQ OK  :: # 01-DECISIONES-CERRADAS
+REQ OK  :: ## 2. Regla de gobierno del sistema
+REQ OK  :: ## 18. Regla de deploy
+
+===== 02-PENDIENTES-PRIORIZADOS.md =====
+REQ OK  :: # 02-PENDIENTES-PRIORIZADOS
+REQ OK  :: ## PRIORIDAD 1 — CRÍTICA ESTRUCTURAL
+REQ OK  :: ## PRIORIDAD 8 — OPTIMIZACIÓN ESTRATÉGICA
+
+===== 03-INVENTARIO-TECNICO.md =====
+REQ OK  :: # 03-INVENTARIO-TECNICO
+REQ OK  :: ## 4. Inventario técnico por áreas
+REQ OK  :: ## 4.11 Motor, IA e integraciones
+FORB OK :: ## 6. Política de lockfiles y gestor de paquetes
+FORB OK :: qué entra en Git
+
+===== 04-RUTAS-CANONICAS.md =====
+REQ OK  :: # 04-RUTAS-CANONICAS
+REQ OK  :: ## 7. Ruta residual temporal aprobada
+REQ OK  :: ## 21. Veredicto de canonicidad actual
+FORB OK :: ## 6. Política de lockfiles y gestor de paquetes
+FORB OK :: ¿Qué existe realmente hoy?
+
+===== 05-INCIDENCIAS-Y-DIAGNOSTICOS.md =====
+REQ OK  :: # 05-INCIDENCIAS-Y-DIAGNOSTICOS
+REQ OK  :: ## 4. Incidencias registradas
+REQ OK  :: ## INCIDENCIA 001 — CRECIMIENTO SIN GOBIERNO TÉCNICO PREVIO
+FORB OK :: ## PRIORIDAD 1 — CRÍTICA ESTRUCTURAL
+FORB OK :: ## 6. Política de lockfiles y gestor de paquetes
+
+===== 06-PROCEDIMIENTOS-OPERATIVOS.md =====
+REQ OK  :: # 06-PROCEDIMIENTOS-OPERATIVOS
+REQ OK  :: ## 3. Procedimiento de apertura de frente técnico
+REQ OK  :: ## 16. Procedimiento previo a deploy
+FORB OK :: ## INCIDENCIA 001 — CRECIMIENTO SIN GOBIERNO TÉCNICO PREVIO
+FORB OK :: ## PRIORIDAD 1 — CRÍTICA ESTRUCTURAL
+
+===== 07-GIT-DEPLOY-HIGIENE.md =====
+REQ OK  :: # 07-GIT-DEPLOY-HIGIENE
+REQ OK  :: ## 6. Política de lockfiles y gestor de paquetes
+REQ OK  :: ## 9. Política de deploy
+FORB OK :: ## 4. Inventario técnico por áreas
+FORB OK :: ¿Qué existe realmente hoy?
+

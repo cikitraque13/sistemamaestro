@@ -1,0 +1,17 @@
+﻿===== 02-PENDIENTES-PRIORIZADOS.md =====
+
+[REQUIRED]
+OK  :: # 02-PENDIENTES-PRIORIZADOS
+OK  :: ## PRIORIDAD 1 — CRÍTICA ESTRUCTURAL
+OK  :: ### Validación operativa final del arranque canónico del backend
+OK  :: backend.app.main:app
+OK  :: ## PRIORIDAD 2 — CRÍTICA ESTRUCTURAL
+OK  :: ### Clasificar definitivamente rutas auxiliares
+OK  :: ## 7. Orden operativo inmediato
+OK  :: 1. validar operativamente el arranque canónico del backend
+
+[FORBIDDEN]
+OK  :: ### Consolidar documentación canónica en el árbol real
+OK  :: ### Auditar topología interna real de backend
+OK  :: ### Localizar motor, IA e integraciones con ruta exacta
+OK  :: 1. consolidar los 4 documentos críticos en `docs/control/`

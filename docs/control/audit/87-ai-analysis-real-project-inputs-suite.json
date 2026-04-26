@@ -1,0 +1,268 @@
+[
+  {
+    "id": "R01",
+    "kind": "text",
+    "expected_route": "sell",
+    "actual_route": "idea",
+    "route_pass": false,
+    "expected_continuity": "blueprint",
+    "actual_continuity": "blueprint",
+    "continuity_pass": true,
+    "expected_reason": "Transformar caracteristicas tecnicas en beneficios emocionales para maximizar la conversion en preventa.",
+    "summary": "Auriculares de diadema con cancelación de ruido activa e inteligencia artificial para profesionales.",
+    "main_finding": "La propuesta no se distingue suficientemente de otros productos similares.",
+    "main_weakness": "Falta de un mensaje de valor claro y convincente.",
+    "main_leverage": "Enfatizar la carga rápida y la duración de la batería en la comunicación de marketing.",
+    "immediate_action_title": "Definir mensajes clave",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "has_clear_utility_false",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined_false"
+    ],
+    "route_scores": {
+      "sell": 0,
+      "improve": 0,
+      "automate": 0,
+      "idea": 5
+    },
+    "continuity_scores": {
+      "stay": 6,
+      "blueprint": 9,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El caso sigue demasiado abierto o ambiguo para salir de idea. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "R02",
+    "kind": "text",
+    "expected_route": "sell",
+    "actual_route": "automate",
+    "route_pass": false,
+    "expected_continuity": "premium",
+    "actual_continuity": "blueprint",
+    "continuity_pass": false,
+    "expected_reason": "Posicionar una oferta de alto valor mediante escasez, autoridad y resultados garantizados.",
+    "summary": "Programa de mentoring exclusivo para CEOs que buscan automatizar operaciones y recuperar tiempo.",
+    "main_finding": "Falta de definición en los procesos de automatización y métricas de éxito.",
+    "main_weakness": "Riesgo asociado a la garantía de resultados sin un plan claro.",
+    "main_leverage": "Clarificar y comunicar los procesos específicos de automatización y las métricas de éxito.",
+    "immediate_action_title": "Especificar métricas de éxito",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "automation_language_present",
+      "goal_automate_present",
+      "has_clear_utility",
+      "implementation_pressure_present",
+      "needs_definition_first",
+      "needs_output_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 0,
+      "improve": 1,
+      "automate": 10,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 10,
+      "sistema": 2,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es automatizar una operativa o trabajo repetitivo. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "R03",
+    "kind": "text",
+    "expected_route": "sell",
+    "actual_route": "improve",
+    "route_pass": false,
+    "expected_continuity": "premium",
+    "actual_continuity": "blueprint",
+    "continuity_pass": false,
+    "expected_reason": "Generar urgencia mediante un diagnostico preventivo que justifica la inversion en seguridad de alto nivel.",
+    "summary": "Auditoría 360 de ciberseguridad utilizando tecnología de Gemelo Digital para simular ataques y detectar vulnerabilidades.",
+    "main_finding": "Falta de definición en la integración y uso del Gemelo Digital.",
+    "main_weakness": "Incertidumbre sobre la priorización de vulnerabilidades detectadas.",
+    "main_leverage": "Definir el proceso de simulación y priorización de riesgos.",
+    "immediate_action_title": "Especificar los tipos de ataques simulados",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "conversion_language_present",
+      "diagnostic_language_present",
+      "goal_improve_present",
+      "has_clear_utility",
+      "needs_definition_first",
+      "needs_output_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 11,
+      "automate": 0,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 10,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "R04",
+    "kind": "text",
+    "expected_route": "sell",
+    "actual_route": "automate",
+    "route_pass": false,
+    "expected_continuity": "premium",
+    "actual_continuity": "blueprint",
+    "continuity_pass": false,
+    "expected_reason": "Escalar la capacidad de respuesta comercial sin aumentar la nomina, garantizando que ningun cliente potencial sea ignorado.",
+    "summary": "Sistema de gestión de leads con IA que integra CRM, WhatsApp y correo electrónico para calificar y agendar citas rápidamente.",
+    "main_finding": "La integración de plataformas y la precisión en la calificación de leads son los principales desafíos.",
+    "main_weakness": "La complejidad técnica de integrar CRM, WhatsApp y correo electrónico.",
+    "main_leverage": "Definir y ajustar los algoritmos de calificación de leads y respuestas automatizadas.",
+    "immediate_action_title": "Definir criterios de calificación de leads",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "conversion_language_present",
+      "goal_automate_present",
+      "has_clear_utility",
+      "needs_definition_first",
+      "needs_output_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 3,
+      "automate": 5,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 10,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es automatizar una operativa o trabajo repetitivo. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "R05",
+    "kind": "text",
+    "expected_route": "sell",
+    "actual_route": "idea",
+    "route_pass": false,
+    "expected_continuity": "premium",
+    "actual_continuity": "blueprint",
+    "continuity_pass": false,
+    "expected_reason": "Validar el interes del mercado high-performance en una solucion cientifica que promete extender la juventud.",
+    "summary": "Plataforma de biohacking que utiliza datos genéticos y análisis de sangre en tiempo real para personalizar dieta, suplementación y rutinas de sueño mediante IA médica.",
+    "main_finding": "La integración de datos en tiempo real es el mayor desafío técnico.",
+    "main_weakness": "Falta de claridad en la definición de datos y procesos de integración.",
+    "main_leverage": "Clarificar y validar el proceso de integración de datos y la generación de recomendaciones.",
+    "immediate_action_title": "Definir los tipos de datos genéticos y de sangre",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "conversion_language_present",
+      "has_clear_utility_false",
+      "needs_definition_first",
+      "needs_output_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 2,
+      "automate": 0,
+      "idea": 3
+    },
+    "continuity_scores": {
+      "stay": 4,
+      "blueprint": 7,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El caso sigue demasiado abierto o ambiguo para salir de idea. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "R06",
+    "kind": "text",
+    "expected_route": "sell",
+    "actual_route": "idea",
+    "route_pass": false,
+    "expected_continuity": "premium",
+    "actual_continuity": "blueprint",
+    "continuity_pass": false,
+    "expected_reason": "Convertir una herramienta de productividad en el sistema operativo indispensable para el crecimiento acelerado de una empresa.",
+    "summary": "Notion para Startups es un espacio de trabajo unificado que centraliza la hoja de ruta del producto, manuales de ingeniería y gestión de inversores, ofreciendo plantillas y créditos gratuitos para startups.",
+    "main_finding": "La propuesta no se diferencia claramente de otras soluciones de gestión colaborativa.",
+    "main_weakness": "Dependencia de plantillas que podrían no adaptarse a todas las necesidades específicas de las startups.",
+    "main_leverage": "Enfatizar y comunicar claramente los beneficios únicos de las plantillas y créditos gratuitos.",
+    "immediate_action_title": "Identificar casos de éxito específicos",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "has_clear_utility_false",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined_false"
+    ],
+    "route_scores": {
+      "sell": 0,
+      "improve": 0,
+      "automate": 0,
+      "idea": 5
+    },
+    "continuity_scores": {
+      "stay": 6,
+      "blueprint": 9,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El caso sigue demasiado abierto o ambiguo para salir de idea. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  }
+]

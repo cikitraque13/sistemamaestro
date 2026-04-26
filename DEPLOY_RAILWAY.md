@@ -1,195 +1,311 @@
-# Guía de Despliegue en Railway — Sistema Maestro
+# DEPLOY_RAILWAY
 
-## Requisitos Previos
+## Estado de este documento
 
-Necesitas 3 cuentas (todas tienen plan gratuito):
-1. **Railway** → [railway.app](https://railway.app)
-2. **MongoDB Atlas** → [cloud.mongodb.com](https://cloud.mongodb.com)
-3. **GitHub** → Tu repositorio ya guardado
-
----
-
-## PASO 1: Crear Base de Datos en MongoDB Atlas (5 min)
-
-1. Ve a [cloud.mongodb.com](https://cloud.mongodb.com) y crea cuenta (o inicia sesión)
-2. Haz clic en **"Build a Database"**
-3. Elige **M0 FREE** (512MB, suficiente para empezar)
-4. Región: **Europe (Ireland)** o la más cercana a ti
-5. Nombre del cluster: `sistemamaestro`
-6. Haz clic en **"Create"**
-
-### Configurar acceso:
-7. En **Database Access** → **Add New Database User**:
-   - Username: `sistemamaestro`
-   - Password: genera una segura y **cópiala**
-   - Role: `Read and write to any database`
-8. En **Network Access** → **Add IP Address** → **Allow Access from Anywhere** (0.0.0.0/0)
-9. En **Databases** → haz clic en **"Connect"** → **"Drivers"**
-10. Copia la connection string. Se ve así:
-    ```
-    mongodb+srv://sistemamaestro:TU_PASSWORD@sistemamaestro.xxxxx.mongodb.net/?retryWrites=true&w=majority
-    ```
+- Estado: activo
+- Tipo: guía operativa de despliegue
+- Alcance: despliegue y mantenimiento de `Sistema Maestro` en Railway
+- Objetivo: reflejar la vía real de despliegue actual sin arrastres heredados ni rutas falsas
 
 ---
 
-## PASO 2: Configurar Railway (10 min)
+## 1. Verdad actual de despliegue
 
-1. Ve a [railway.app](https://railway.app) y crea cuenta con GitHub
-2. Haz clic en **"New Project"** → **"Deploy from GitHub Repo"**
-3. Selecciona tu repositorio de Sistema Maestro
-4. Railway detectará el `Dockerfile` automáticamente
+La vía canónica actual de despliegue en Railway es esta:
 
-### Añadir Variables de Entorno:
-5. Ve a tu servicio → pestaña **"Variables"**
-6. Añade estas variables (una por una):
+1. `railway.json`
+2. `Dockerfile`
+3. `backend.app.main:app`
 
-```
-MONGO_URL=mongodb+srv://sistemamaestro:TU_PASSWORD@sistemamaestro.xxxxx.mongodb.net/?retryWrites=true&w=majority
-DB_NAME=sistemamaestro
-JWT_SECRET=genera-una-cadena-aleatoria-larga-de-32-caracteres-minimo
-OPENAI_API_KEY=sk-proj-tu-key-de-openai
-STRIPE_SECRET_KEY=sk_test_tu-key-de-stripe
-ADMIN_EMAIL=tu-email-real@tudominio.com
-ADMIN_PASSWORD=UnaContraseñaMuySegura2026!
-ALLOWED_ORIGINS=https://sistemamaestro.com,https://www.sistemamaestro.com
-```
+### Lectura correcta
 
-7. Railway hace redeploy automáticamente al añadir variables
+Railway no debe interpretarse ya como un despliegue basado en:
 
----
+- `railway/server_railway.py`
+- ni `backend/server.py`
 
-## PASO 3: Verificar Despliegue (2 min)
-
-1. Espera a que el build termine (2-3 minutos)
-2. Railway te asignará una URL tipo `sistemamaestro-production.up.railway.app`
-3. Abre esa URL y verifica:
-   - La home carga correctamente
-   - Puedes iniciar sesión con tus credenciales admin
-   - El análisis de URL funciona
-
----
-
-## PASO 4: Conectar Dominio sistemamaestro.com (10 min)
-
-### En Railway:
-1. Ve a tu servicio → pestaña **"Settings"**
-2. Busca **"Custom Domain"**
-3. Añade `sistemamaestro.com`
-4. Railway te mostrará un **CNAME record** que necesitas configurar
-
-### En Hostinger:
-1. Ve a **Panel de Hostinger** → **Dominios** → `sistemamaestro.com`
-2. Ve a **DNS / Zona DNS**
-3. **Elimina** cualquier registro A existente para `@` (el dominio raíz)
-4. Añade un registro **CNAME**:
-   - Tipo: `CNAME`
-   - Nombre: `@` (o déjalo vacío)
-   - Valor: el que Railway te indicó (ej: `sistemamaestro-production.up.railway.app`)
-   - TTL: 3600
-
-5. Para www, añade otro CNAME:
-   - Tipo: `CNAME`
-   - Nombre: `www`
-   - Valor: `sistemamaestro.com`
-
-**Nota:** Algunos registradores no permiten CNAME en el dominio raíz (@). Si Hostinger no lo permite, Railway también te da opciones con registros A. Consulta lo que Railway te indique.
-
-6. Espera propagación DNS (5-30 minutos, máximo 24 horas)
-
-### SSL/HTTPS:
-- Railway configura certificado SSL automáticamente una vez el dominio esté conectado
-
----
-
-## PASO 5: Actualizar ALLOWED_ORIGINS (1 min)
-
-Una vez el dominio esté activo, actualiza la variable en Railway:
-```
-ALLOWED_ORIGINS=https://sistemamaestro.com,https://www.sistemamaestro.com
-```
-
----
-
-## PASO 6: Configurar Google OAuth (Opcional)
-
-Si quieres mantener Google Login:
-
-1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un proyecto o usa uno existente
-3. Ve a **APIs & Services** → **Credentials**
-4. Crea **OAuth 2.0 Client ID**:
-   - Tipo: Web application
-   - Authorized JavaScript origins: `https://sistemamaestro.com`
-   - Authorized redirect URIs: `https://sistemamaestro.com/auth/callback`
-5. Copia el **Client ID** y **Client Secret**
-
-**Nota:** Por ahora, el login con email/password funciona perfectamente. Google OAuth se puede configurar después del lanzamiento.
-
----
-
-## Estructura de Archivos para Railway
-
-```
-tu-repo/
-├── Dockerfile              ← Build monolítico
-├── railway.json            ← Configuración Railway
-├── railway/
-│   ├── server_railway.py   ← Backend sin emergentintegrations
-│   └── requirements.txt    ← Dependencias limpias
-├── frontend/               ← React app (se compila en el build)
-│   ├── src/
-│   ├── public/
-│   └── package.json
-└── backend/                ← Backend original (Emergent)
-    ├── server.py
-    └── requirements.txt
-```
-
----
-
-## Costes Estimados
-
-| Servicio | Plan | Coste |
-|----------|------|-------|
-| Railway | Hobby | ~$5/mes |
-| MongoDB Atlas | M0 Free | $0/mes |
-| OpenAI | Pay-per-use | ~$1-5/mes (según uso) |
-| Stripe | Comisión | 1.4% + 0.25€ por transacción |
-| **Total** | | **~$6-10/mes** |
-
----
-
-## Comandos Útiles
+La referencia real de runtime actual es:
 
 ```bash
-# Ver logs en Railway
-railway logs
-
-# Ejecutar shell remoto
-railway shell
-
-# Variables de entorno
-railway variables
+uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}
 ```
 
 ---
 
-## Diferencias con la versión de Emergent
+## 2. Qué usa realmente Railway hoy
 
-| Aspecto | Emergent | Railway |
-|---------|----------|---------|
-| LLM | emergentintegrations (LlmChat) | openai SDK directo |
-| Stripe | emergentintegrations (StripeCheckout) | stripe SDK directo |
-| Modelo IA | gpt-5.2 | gpt-4o (cambiar a gpt-5.2 si tu API key lo permite) |
-| Cookies | secure=False | secure=True |
-| Frontend | Servido por dev server separado | Servido por FastAPI como estáticos |
-| Google OAuth | Emergent Auth | Google directo (configurar aparte) |
+### `railway.json`
+
+Railway está configurado para construir con:
+
+- `builder: DOCKERFILE`
+- `dockerfilePath: Dockerfile`
+
+Y para verificar salud con:
+
+- `healthcheckPath: /health`
+
+### `Dockerfile`
+
+El `Dockerfile` actual:
+
+- compila el frontend;
+- instala dependencias del backend;
+- copia el backend;
+- copia el build del frontend;
+- y arranca el sistema con `backend.app.main:app`.
+
+### Backend real de runtime
+
+La entrada real del backend es:
+
+- `backend/app/main.py`
+
+La referencia canónica de runtime es:
+
+- `backend.app.main:app`
 
 ---
 
-## Soporte
+## 3. Legacy de deploy ya retirado del repo activo
 
-Si algo falla:
-1. Revisa los **logs** en Railway (pestaña "Deployments" → "View Logs")
-2. Verifica que todas las variables de entorno estén correctas
-3. Comprueba que MongoDB Atlas permite conexiones desde cualquier IP (0.0.0.0/0)
+Las siguientes piezas ya no forman parte del perímetro activo de runtime/deploy dentro del repo:
+
+- `backend/server.py`
+- `railway/server_railway.py`
+- `railway/requirements.txt`
+
+### Estado real
+
+Estas piezas fueron retiradas del repo activo y movidas a un área de safety externa para cierre controlado del legado.
+
+### Regla
+
+- no reintroducirlas en el runtime;
+- no documentarlas como vía activa;
+- no volver a abrir una segunda verdad de despliegue.
+
+---
+
+## 4. Requisitos previos reales
+
+Antes de dar por válido el despliegue, deben existir y estar alineados:
+
+- `Dockerfile`
+- `railway.json`
+- `backend/app/main.py`
+- `backend/requirements.txt`
+- `frontend/package.json`
+
+Además, el proyecto debe estar en un estado estructural suficientemente estable.
+
+### Regla
+
+No abrir deploy final si el sistema sigue mezclando:
+
+- higiene pendiente;
+- documentación desalineada;
+- frentes estructurales abiertos;
+- y decisiones no cerradas.
+
+---
+
+## 5. Variables de entorno mínimas
+
+En Railway, la base mínima de variables del backend debe cubrir al menos:
+
+```env
+MONGO_URL=mongodb+srv://usuario:password@cluster.mongodb.net/?retryWrites=true&w=majority
+DB_NAME=sistemamaestro
+JWT_SECRET=una_cadena_larga_segura
+OPENAI_API_KEY=sk-xxx
+STRIPE_SECRET_KEY=sk_xxx
+ADMIN_EMAIL=tu-email-real@dominio.com
+ADMIN_PASSWORD=una_password_segura
+ALLOWED_ORIGINS=https://sistemamaestro.com,https://www.sistemamaestro.com
+```
+
+### Notas
+
+- no subir secretos al repositorio;
+- no usar placeholders en producción;
+- `ALLOWED_ORIGINS` debe reflejar el dominio real activo;
+- `PORT` lo gestiona Railway junto al runtime del contenedor.
+
+---
+
+## 6. Flujo real de build
+
+El build actual hace esto:
+
+### Etapa frontend
+
+- usa imagen Node;
+- copia `frontend/package*.json`;
+- ejecuta `npm install`;
+- copia `frontend/`;
+- ejecuta `npm run build`.
+
+### Etapa backend
+
+- usa imagen Python;
+- copia `backend/requirements.txt`;
+- instala dependencias del backend;
+- copia `backend/`;
+- copia el build del frontend al contenedor final;
+- expone el puerto `8080`;
+- arranca con `uvicorn backend.app.main:app`.
+
+### Consecuencia
+
+El frontend en Railway se sirve como build estático dentro del backend FastAPI, no como dev server separado.
+
+---
+
+## 7. Ruta de despliegue en Railway
+
+### Paso 1 — Proyecto conectado
+
+Railway debe estar conectado al repositorio correcto y detectar:
+
+- `railway.json`
+- `Dockerfile`
+
+### Paso 2 — Builder correcto
+
+Railway debe usar:
+
+- `Dockerfile` como fuente de build
+
+No debe configurarse una orden paralela que arranque:
+
+- `server.py`
+- ni `server_railway.py`
+
+### Paso 3 — Variables cargadas
+
+El servicio debe tener cargadas las variables mínimas del bloque anterior.
+
+### Paso 4 — Build y arranque
+
+Railway construye la imagen, arranca el backend y sirve el frontend compilado desde el mismo contenedor.
+
+### Paso 5 — Verificación de salud
+
+El healthcheck esperado es:
+
+```text
+/health
+```
+
+---
+
+## 8. Qué comprobar después del deploy
+
+La verificación mínima debe cubrir esto:
+
+### Backend
+
+- `/health` responde correctamente;
+- el proceso levanta sin error de imports;
+- Mongo conecta;
+- el arranque depende de `backend.app.main:app`;
+- no hay error de variables de entorno faltantes.
+
+### Frontend
+
+- la home carga;
+- el `index.html` del build se sirve correctamente;
+- las rutas del frontend no rompen;
+- los estáticos se sirven desde `/static`.
+
+### Integración general
+
+- auth no rompe el arranque;
+- billing no rompe imports;
+- OpenAI no rompe startup por configuración ausente si no se invoca todavía;
+- Stripe no rompe startup por configuración ausente si no se invoca todavía.
+
+---
+
+## 9. Estado del dominio
+
+El dominio no debe tratarse aquí como hipótesis abstracta. Puede haber dos estados válidos.
+
+### Caso A — Dominio ya conectado
+
+Si el dominio ya está conectado y el sistema ya ha respondido correctamente al refresco y carga de páginas, la validación correcta es esta:
+
+- el dominio principal resuelve;
+- el certificado SSL responde correctamente;
+- `/health` responde por la vía desplegada;
+- la home carga sin depender de entorno local;
+- `ALLOWED_ORIGINS` coincide con el dominio real activo.
+
+### Caso B — Dominio aún no conectado o no validado
+
+Si todavía no está confirmado del todo:
+
+- conectar dominio personalizado en Railway;
+- apuntar DNS correctamente;
+- esperar propagación;
+- actualizar `ALLOWED_ORIGINS`;
+- volver a validar `/health`, home y rutas.
+
+### Regla
+
+La documentación debe reflejar el estado real del despliegue y no una narrativa antigua.
+
+---
+
+## 10. Errores típicos a evitar
+
+### Error 1
+Tomar `railway/server_railway.py` como vía activa de deploy actual.
+
+### Error 2
+Tomar `backend/server.py` como entrada principal del sistema desplegado.
+
+### Error 3
+Mezclar una orden manual de arranque con la referencia canónica del `Dockerfile`.
+
+### Error 4
+Olvidar variables críticas como:
+
+- `MONGO_URL`
+- `JWT_SECRET`
+- `OPENAI_API_KEY`
+- `STRIPE_SECRET_KEY`
+
+### Error 5
+Dar por hecho que Railway despliega un dev server de frontend.
+
+No. El frontend actual se sirve como build estático integrado en el contenedor final.
+
+### Error 6
+Seguir documentando el deploy como si el legacy siguiera vivo dentro del repo activo.
+
+---
+
+## 11. Veredicto operativo
+
+La verdad actual del despliegue en Railway queda fijada así:
+
+- `railway.json` configura Railway;
+- `Dockerfile` construye y arranca;
+- `backend/app/main.py` es la entrada backend real;
+- `backend.app.main:app` es la referencia canónica de runtime;
+- `/health` es la ruta de healthcheck;
+- el frontend se sirve como build estático desde FastAPI;
+- el legacy de deploy ya fue retirado del repo activo.
+
+---
+
+## 12. Conclusión operativa
+
+A partir de este documento:
+
+- Railway queda alineado con la arquitectura real actual;
+- se elimina la confusión entre deploy heredado y deploy canónico;
+- `server.py` y `server_railway.py` dejan de presentarse como eje actual del despliegue;
+- y cualquier ajuste futuro de deploy debe partir de `Dockerfile` + `railway.json` + `backend.app.main:app`.

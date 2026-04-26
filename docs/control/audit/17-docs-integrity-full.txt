@@ -1,0 +1,14 @@
+﻿
+File                             Exists Lines Bytes Empty
+----                             ------ ----- ----- -----
+00-INDICE-MAESTRO.md             YES      240  7450 NO   
+01-DECISIONES-CERRADAS.md        YES      246  9288 NO   
+02-PENDIENTES-PRIORIZADOS.md     YES      276 11099 NO   
+03-INVENTARIO-TECNICO.md         YES      280 12159 NO   
+04-RUTAS-CANONICAS.md            YES      239 10765 NO   
+05-INCIDENCIAS-Y-DIAGNOSTICOS.md YES        1    34 NO   
+06-PROCEDIMIENTOS-OPERATIVOS.md  YES        1    32 NO   
+07-GIT-DEPLOY-HIGIENE.md         YES      325 12143 NO   
+
+
+

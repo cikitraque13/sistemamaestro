@@ -1,0 +1,70 @@
+================================================================
+CIERRE ESTRUCTURAL VALIDADO — ADAPTADOR IA
+================================================================
+
+ESTADO
+Cerrada y congelada la arquitectura operativa del adaptador IA.
+
+CAPAS VALIDADAS
+1. lectura generativa
+2. normalización
+3. microfase algorítmica de decisión
+4. trazabilidad interna opcional por entorno
+5. validación final con contrato público estable
+
+DECISIÓN ESTRUCTURAL
+El adaptador IA ya no decide solo por prompt + normalización.
+La decisión final de route y continuity queda gobernada por una capa algorítmica separada, trazable y validada.
+
+PIEZAS CANÓNICAS
+- backend/app/services/ai_analysis.py
+- backend/app/services/ai_analysis_decision_rules.py
+- backend/app/services/ai_analysis_decision_signals.py
+- backend/app/services/ai_analysis_decision.py
+- backend/app/services/ai_analysis_decision_trace.py
+
+ARQUITECTURA OPERATIVA
+1. ai_analysis.py coordina el pipeline público
+2. la lectura generativa produce el análisis base
+3. ai_analysis_normalization.py sanea el payload
+4. ai_analysis_decision_signals.py extrae señales
+5. ai_analysis_decision_rules.py define pesos, precedencias y guardrails
+6. ai_analysis_decision.py resuelve route + continuity y aplica la decisión
+7. ai_analysis_decision_trace.py emite trazabilidad opcional por entorno
+8. ai_analysis.py valida y devuelve el contrato final estable
+
+REGLA DE DECISIÓN
+- la IA interpreta
+- el sistema decide
+
+TRAZABILIDAD
+La trazabilidad interna queda activable por entorno.
+
+ESTADO DE LA TRAZABILIDAD
+- desactivada por defecto
+- activable mediante flags de entorno
+- no altera el contrato público
+- no rompe runtime si falla
+
+FLAGS DE ENTORNO
+- AI_ANALYSIS_TRACE_ENABLED
+- AI_ANALYSIS_TRACE_VERBOSE
+
+RECALIBRACIÓN VALIDADA
+Queda cerrada la recalibración fina de continuity para premium:
+- ajuste de pesos en ai_analysis_decision_rules.py
+- guardrail específico en ai_analysis_decision.py
+- sin regresión en el resto de casos de la suite ampliada
+
+VALIDACIÓN FINAL
+- trazabilidad activable validada
+- suite ampliada cerrada
+- route = 10/10
+- continuity = 10/10
+
+ESTADO OPERATIVO
+Microfase congelada.
+No procede seguir tocando el motor en esta fase.
+
+SIGUIENTE FRENTE CORRECTO
+Cerrar documentación estructural y pasar después a una microfase separada de uso real o casos productivos del sistema.

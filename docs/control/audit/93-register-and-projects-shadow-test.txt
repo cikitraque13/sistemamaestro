@@ -1,0 +1,68 @@
+﻿=== 93-REGISTER-AND-PROJECTS-SHADOW-TEST ===
+BASE_URL: http://127.0.0.1:8000
+
+[BACKEND_PRECHECK]
+PORT_8000_UP_BEFORE: False
+STARTED_BACKEND_PID: 6132
+PORT_8000_UP_AFTER_START: True
+
+[REGISTER_REQUEST]
+{
+    "email":  "shadowtest_20260423055859@example.com",
+    "name":  "Shadow Test",
+    "password":  "ShadowTest123!"
+}
+[REGISTER_RESULT]
+FAIL
+Operación cancelada debido a problemas de seguridad. Usa el parámetro -UseBasicParsing para el análisis de HTML seguro sin ejecución de scripts.
+
+[RTE01_text_clear_commercial]
+REQUEST_JSON:
+{
+    "input_content":  "Ya vendo un servicio de auditoria web y quiero vender mejor mi oferta para cerrar mas clientes con una propuesta premium.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[RTE02_text_technical_ambiguous]
+REQUEST_JSON:
+{
+    "input_content":  "Plataforma con dashboard, modulos, integraciones, analitica en tiempo real y automatizaciones para equipos de operaciones.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[RTE03_text_sell_build_mix]
+REQUEST_JSON:
+{
+    "input_content":  "Quiero construir esta plataforma para gestion de leads, pero tambien venderla como oferta premium a clientes.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[RTE04_voice_transcript_disordered]
+REQUEST_JSON:
+{
+    "input_mode":  "voice_transcript",
+    "input_content":  "Bueno, a ver, seria como una especie de sistema con IA para empresas, o sea, no se si venderlo, validarlo o construirlo primero.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[BACKEND_FINAL_STATE]
+PID: 6132
+PROCESS_EXISTS: False
+PORT_8000_UP_FINAL: False
+
+[BACKEND_STDOUT_LAST_60]
+INFO:     127.0.0.1:56526 - "POST /api/auth/register HTTP/1.1" 200 OK
+
+[BACKEND_STDERR_LAST_80]
+INFO:     Started server process [60716]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)

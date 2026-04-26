@@ -1,0 +1,46 @@
+﻿=== 68-AI-RUNTIME-WIRING-SCAN ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+FILE: backend\app\ai\evals\agent_eval_registry.py
+L2 :: agent_eval_registry.py
+L24 :: target_agent="master_orchestrator",
+
+FILE: backend\app\ai\guards\abuse_guard.py
+L2 :: abuse_guard.py
+
+FILE: backend\app\ai\guards\cost_guard.py
+L2 :: cost_guard.py
+
+FILE: backend\app\ai\guards\output_guard.py
+L2 :: output_guard.py
+
+FILE: backend\app\ai\guards\policy_guard.py
+L2 :: policy_guard.py
+
+FILE: backend\app\ai\guards\security_guard.py
+L2 :: security_guard.py
+
+FILE: backend\app\ai\memory\project_memory.py
+L2 :: project_memory.py
+L25 :: def build_project_memory(
+
+FILE: backend\app\ai\orchestrators\master_orchestrator.py
+L2 :: master_orchestrator.py
+L17 :: ORCHESTRATOR_NAME = "master_orchestrator"
+L155 :: "policy_guard",
+L156 :: "security_guard",
+L157 :: "abuse_guard",
+L158 :: "output_guard",
+L159 :: "cost_guard",
+
+FILE: backend\app\ai\schemas\agent_envelope.py
+L2 :: agent_envelope.py
+
+FILE: backend\app\ai\telemetry\agent_trace.py
+L2 :: agent_trace.py
+
+FILE: backend\app\ai\tools\tool_registry.py
+L2 :: tool_registry.py
+L20 :: TOOL_REGISTRY: Dict[str, ToolContract] = {
+L169 :: return {key: asdict(value) for key, value in TOOL_REGISTRY.items()}
+

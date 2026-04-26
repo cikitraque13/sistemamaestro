@@ -1,0 +1,49 @@
+﻿=== 71-AI-ANALYSIS-INTEGRITY-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+SERVICES: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services
+
+[FILE EXISTENCE]
+ai_analysis.py | exists=True | bytes=4985
+ai_analysis_common.py | exists=True | bytes=2847
+ai_analysis_context.py | exists=True | bytes=6086
+ai_analysis_prompts.py | exists=True | bytes=9011
+ai_analysis_runtime.py | exists=True | bytes=7545
+ai_analysis_normalization.py | exists=True | bytes=16732
+ai_analysis_fallback.py | exists=True | bytes=3752
+
+[PY_COMPILE]
+FILE: ai_analysis.py
+RESULT: OK
+
+FILE: ai_analysis_common.py
+RESULT: OK
+
+FILE: ai_analysis_context.py
+RESULT: OK
+
+FILE: ai_analysis_prompts.py
+RESULT: OK
+
+FILE: ai_analysis_runtime.py
+RESULT: OK
+
+FILE: ai_analysis_normalization.py
+RESULT: OK
+
+FILE: ai_analysis_fallback.py
+RESULT: OK
+
+[IMPORT CHECK]
+backend.app.services.ai_analysis_common | IMPORT_OK
+backend.app.services.ai_analysis_context | IMPORT_OK
+backend.app.services.ai_analysis_prompts | IMPORT_OK
+backend.app.services.ai_analysis_runtime | IMPORT_FAIL | ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "<stdin>", line 21, in <module>
+ModuleNotFoundError: No module named 'openai'
+backend.app.services.ai_analysis_normalization | IMPORT_OK
+backend.app.services.ai_analysis_fallback | IMPORT_OK
+backend.app.services.ai_analysis | IMPORT_FAIL | ModuleNotFoundError: No module named 'dotenv'
+Traceback (most recent call last):
+  File "<stdin>", line 21, in <module>
+ModuleNotFoundError: No module named 'dotenv'

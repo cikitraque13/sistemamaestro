@@ -1,0 +1,749 @@
+﻿=== 66-AI-CREDITS-DOC-UPDATE-DUMP ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+FILE: docs\control\01-DECISIONES-CERRADAS.md
+EXISTS: True
+
+[CONTENT]
+# 01-DECISIONES-CERRADAS
+
+## Estado del documento
+
+- Estado: activo
+- Tipo: decisiones cerradas canónicas
+- Alcance: proyecto completo `Sistema Maestro`
+- Objetivo: congelar las decisiones estructurales ya aprobadas para evitar solapes, regresiones y reaperturas innecesarias.
+
+---
+
+## 1. Función de este documento
+
+Este documento existe para registrar únicamente decisiones ya cerradas.
+
+No contiene:
+
+- hipótesis
+- ideas abiertas
+- tareas pendientes
+- pruebas
+- borradores
+- discusiones
+
+Toda entrada aquí debe cumplir esta regla:
+
+**decisión ya tomada + criterio claro + efecto operativo real**
+
+---
+
+## 2. Regla de gobierno del sistema
+
+### Decisión cerrada 01
+
+Sistema Maestro no debe crecer por acumulación de arreglos.
+
+### Regla aprobada
+
+El proyecto se gobierna con esta secuencia:
+
+1. control estructural
+2. clasificación
+3. canonicidad
+4. higiene técnica
+5. reanudación del producto
+
+### Efecto operativo
+
+No se aprueban cambios que rompan este orden.
+
+---
+
+## 3. Carpeta canónica de gobierno documental
+
+### Decisión cerrada 02
+
+La carpeta canónica de gobierno del proyecto es:
+
+`docs/control/`
+
+### Efecto operativo
+
+No se aprueban:
+
+- carpetas paralelas de control
+- memorias estructurales repartidas
+- usar el chat como memoria canónica del sistema
+
+---
+
+## 4. Fuente real del sistema
+
+### Decisión cerrada 03
+
+A nivel de sistema, las rutas reconocidas como base real actual son:
+
+- `frontend/`
+- `backend/`
+- `docs/`
+
+### Efecto operativo
+
+El proyecto deja de interpretarse como el volumen bruto del árbol local.
+
+---
+
+## 5. Fuente real del frontend
+
+### Decisión cerrada 04
+
+Dentro del frontend, las rutas fuente reales aprobadas son:
+
+- `frontend/src/`
+- `frontend/public/`
+
+### Efecto operativo
+
+Las decisiones de producto visible y evolución cliente deben referirse a esas rutas y no a artefactos regenerables.
+
+---
+
+## 6. Capa principal del producto frontend
+
+### Decisión cerrada 05
+
+La capa principal de producto enrutable del frontend es:
+
+`frontend/src/features/`
+
+### Efecto operativo
+
+Todo lo nuevo enrutable del producto debe nacer en `features` o en una ruta canónica equivalente aprobada.
+
+---
+
+## 7. Estado de `frontend/src/pages`
+
+### Decisión cerrada 06
+
+`frontend/src/pages/` deja de ser capa principal de producto.
+
+Queda aprobada solo como residual temporal para contenido no principal ya validado.
+
+### Efecto operativo
+
+No se aprueban nuevas páginas de producto dentro de `frontend/src/pages/`.
+
+---
+
+## 8. Módulos funcionales reconocidos
+
+### Decisión cerrada 07
+
+Se reconocen como módulos reales del producto dentro de `frontend/src/features/`:
+
+- `activation-flow`
+- `app-shell`
+- `auth`
+- `billing`
+- `builder`
+- `dashboard`
+- `flow`
+- `home`
+- `opportunities`
+- `projects`
+- `reports`
+- `settings`
+
+### Efecto operativo
+
+Estos módulos forman parte del sistema real.
+
+---
+
+## 9. Builder como núcleo de producto
+
+### Decisión cerrada 08
+
+`builder` queda reconocido como pieza central del producto.
+
+### Efecto operativo
+
+Builder no debe tratarse como adorno ni demo secundaria.
+
+---
+
+## 10. App Shell como carcasa operativa
+
+### Decisión cerrada 09
+
+`app-shell` queda reconocido como carcasa operativa del sistema.
+
+### Efecto operativo
+
+Debe actuar como base para navegación, proyectos, créditos y módulos internos.
+
+---
+
+## 11. Home como entrada canónica del sistema
+
+### Decisión cerrada 10
+
+`home` queda reconocido como módulo canónico de entrada, activación y presentación del sistema.
+
+### Efecto operativo
+
+La Home deja de tratarse como landing aislada.
+
+---
+
+## 12. Backend como capa real
+
+### Decisión cerrada 11
+
+`backend/` queda reconocido como capa real y canónica del sistema a nivel raíz.
+
+### Efecto operativo
+
+Backend deja de tratarse como caja negra irrelevante.
+
+---
+
+## 13. Arquitectura modular interna del backend
+
+### Decisión cerrada 12
+
+La arquitectura canónica interna del backend se apoya en:
+
+- `backend/app/`
+- `backend/app/core/`
+- `backend/app/db/`
+- `backend/app/routers/`
+- `backend/app/services/`
+
+### Efecto operativo
+
+La lógica servidora nueva debe crecer desde esta arquitectura modular.
+
+---
+
+## 14. Entrada canónica del backend
+
+### Decisión cerrada 13
+
+La entrada canónica del backend es:
+
+- `backend/app/main.py`
+
+### Referencia canónica de runtime
+
+- `backend.app.main:app`
+
+### Efecto operativo
+
+Toda referencia principal de arranque, runtime o despliegue debe alinearse con esta verdad canónica.
+
+---
+
+## 15. Capa de IA como estructura activa del sistema
+
+### Decisión cerrada 14
+
+La ruta `backend/app/ai/` queda reconocida como parte estructural activa del sistema.
+
+### Efecto operativo
+
+La capa de IA deja de tratarse como idea externa al sistema.
+
+---
+
+## 16. Capa de créditos y consumo como estructura activa del sistema
+
+### Decisión cerrada 15
+
+La ruta `backend/config/credits/` queda reconocida como parte estructural activa del sistema.
+
+### Efecto operativo
+
+El sistema de créditos, consumo, contratos y reglas forma parte de la arquitectura real.
+
+---
+
+## 17. Gestor de paquetes aprobado en frontend
+
+### Decisión cerrada 16
+
+El gestor de paquetes aprobado para el frontend es:
+
+**npm**
+
+### Lockfile canónico
+
+- `frontend/package-lock.json`
+
+### Efecto operativo
+
+No deben convivir dos verdades activas de dependencias.
+
+---
+
+## 18. Higiene mínima ya aprobada
+
+### Decisión cerrada 17
+
+Quedan fuera de Git las rutas sensibles y regenerables críticas ya identificadas.
+
+### Incluye
+
+- `frontend/.env.local`
+- `frontend/node_modules/`
+
+### Efecto operativo
+
+El repo no debe absorber entorno local ni secretos.
+
+---
+
+## 19. Regla de commits
+
+### Decisión cerrada 18
+
+No se mezclan en un mismo commit:
+
+- higiene técnica
+- migración estructural
+- cambios de producto
+- cambios visuales
+- documentación
+- refactor paralelo
+
+### Efecto operativo
+
+Cada commit debe tener una finalidad principal única.
+
+---
+
+## 20. Regla de deploy
+
+### Decisión cerrada 19
+
+**No procede deploy final todavía.**
+
+### Efecto operativo
+
+Quedan bloqueados:
+
+- deploy final
+- release
+- producción
+- push con intención de entrega final
+
+hasta que el sistema esté afinado, validado y sin frentes mezclados.
+
+---
+
+## 21. Legacy runtime retirado del repo activo
+
+### Decisión cerrada 20
+
+Las siguientes piezas legacy ya fueron retiradas del repo activo:
+
+- `backend/server.py`
+- `railway/server_railway.py`
+- `railway/requirements.txt`
+
+### Estado real
+
+Quedaron movidas a un área externa de safety para cierre controlado del legado.
+
+### Efecto operativo
+
+- no forman parte del perímetro activo de runtime;
+- no deben reintroducir una segunda verdad de arranque;
+- no deben documentarse como vía activa del sistema.
+
+---
+
+## 22. Rutas retiradas del repo activo por saneo
+
+### Decisión cerrada 21
+
+Las siguientes rutas ya no forman parte del repo activo:
+
+- `memory/`
+- `test_reports/`
+
+### Efecto operativo
+
+No deben seguir tratándose como capas vivas del sistema.
+
+---
+
+## 23. Ruta auxiliar válida restante
+
+### Decisión cerrada 22
+
+La ruta `tests/` queda reconocida como auxiliar válida de soporte técnico.
+
+### Efecto operativo
+
+No es núcleo canónico, pero puede seguir utilizándose como soporte interno.
+
+---
+
+## 24. Regla de prudencia estructural
+
+### Decisión cerrada 23
+
+No se borra, mueve o reclasifica una ruta no auditada a ciegas.
+
+### Efecto operativo
+
+Toda salida del repo activo debe basarse en clasificación y validación previa.
+
+---
+
+## 25. Regla de avance
+
+### Decisión cerrada 24
+
+No se abre el siguiente frente mientras el anterior no tenga:
+
+- alcance claro
+- criterio de cierre
+- efecto estructural entendido
+- riesgo controlado
+
+### Efecto operativo
+
+Sistema Maestro avanza por cierres sucesivos.
+
+---
+
+## 26. Regla documental
+
+### Decisión cerrada 25
+
+`docs/control/audit/` puede contener soporte de auditoría, pero no sustituye a los documentos canónicos principales.
+
+### Efecto operativo
+
+La autoridad doctrinal sigue viviendo en los documentos canónicos, no en dumps de trabajo.
+
+---
+
+## 27. Veredicto operativo actual
+
+A fecha de este documento, queda oficialmente cerrado que:
+
+- la fuente real ya está separada del entorno regenerable;
+- `frontend/src/features/` es la capa principal del frontend;
+- `builder`, `home` y `app-shell` forman parte del núcleo real del producto;
+- `backend/` es una capa canónica del sistema;
+- `backend/app/` es la arquitectura modular interna del backend;
+- `backend/app/main.py` es la entrada canónica del backend;
+- `backend.app.main:app` es la referencia canónica de runtime;
+- el legacy runtime ya fue retirado del repo activo;
+- `backend/app/ai/` y `backend/config/credits/` forman parte de la estructura real del sistema;
+- deploy final sigue bloqueado;
+- el trabajo debe continuar de forma quirúrgica y por prioridades.
+
+---
+
+## 28. Regla de mantenimiento
+
+Toda nueva decisión estructural aprobada debe añadirse aquí.
+
+No entra en este documento nada provisional.
+No entra nada pendiente.
+No entra nada no validado.
+
+==============================================================
+FILE: docs\control\02-PENDIENTES-PRIORIZADOS.md
+EXISTS: True
+
+[CONTENT]
+# 02-PENDIENTES-PRIORIZADOS
+
+## Estado del documento
+
+- Estado: activo
+- Tipo: backlog priorizado canónico
+- Alcance: proyecto completo `Sistema Maestro`
+- Objetivo: ordenar el trabajo pendiente por prioridad real, dependencia y criterio de cierre, sin mezclar estructura, higiene, producto y despliegue.
+
+---
+
+## 1. Función de este documento
+
+Este documento existe para responder con claridad a una sola pregunta:
+
+**¿Qué hay que hacer ahora, en qué orden y con qué dependencia?**
+
+No fija rutas canónicas.
+No sustituye decisiones cerradas.
+No actúa como inventario técnico.
+No reemplaza procedimientos operativos.
+
+Su función es ordenar la ejecución a partir del estado real ya cerrado del proyecto.
+
+---
+
+## 2. Regla de priorización
+
+Toda acción pendiente debe clasificarse como una de estas tres:
+
+1. **crítica estructural**
+2. **optimización estratégica**
+3. **ajuste cosmético**
+
+### Regla operativa
+
+Solo procede actuar si la acción es:
+
+- crítica estructural
+- o optimización estratégica
+
+Los ajustes cosméticos no deben abrir frente mientras el sistema siga en afinado técnico.
+
+---
+
+## 3. Estado operativo actual
+
+La situación actual del proyecto queda resumida así:
+
+- la base documental canónica ya está operativa;
+- `docs/control/` ya funciona como memoria estructural real;
+- `frontend/src/features/` queda reconocido como capa principal del frontend;
+- `builder`, `home` y `app-shell` ya deben leerse como núcleo real del producto;
+- `backend/app/` queda reconocido como arquitectura modular interna del backend;
+- `backend/app/main.py` y `backend.app.main:app` quedan fijados como entrada canónica del backend;
+- el legacy runtime ya fue retirado del repo activo;
+- `backend/app/ai/` y `backend/config/credits/` ya existen como estructura real del sistema;
+- `tests/` sigue como auxiliar válida;
+- deploy final sigue bloqueado.
+
+---
+
+## 4. Pendientes priorizados actuales
+
+## PRIORIDAD 1 — CRÍTICA ESTRUCTURAL
+
+### Auditar y sanear la raíz de `frontend/`
+
+**Objetivo**
+
+Cerrar qué debe permanecer, moverse o salir de la raíz de `frontend/` sin tocar producto visible a ciegas.
+
+**Foco inmediato**
+
+- `frontend/components`
+- `frontend/README.md`
+- `frontend/plugins`
+
+**Criterio de cierre**
+
+- root de `frontend/` con piezas técnicas justificadas;
+- sin residuos estructurales mal ubicados;
+- sin mover nada útil por intuición.
+
+---
+
+## PRIORIDAD 2 — CRÍTICA ESTRUCTURAL
+
+### Purgar auditoría amortizada del legacy runtime
+
+**Objetivo**
+
+Retirar de `docs/control/audit/` los artefactos ya amortizados del runtime legacy.
+
+**Incluye**
+
+- rastros de `backend/server.py`
+- rastros de `railway/server_railway.py`
+- rastros de `railway/requirements.txt`
+- chequeos ya superados de canonicidad y retirada
+
+**Criterio de cierre**
+
+- `audit/` deja de arrastrar ruido del legacy ya resuelto;
+- los documentos canónicos mandan;
+- los dumps amortizados salen.
+
+---
+
+## PRIORIDAD 3 — CRÍTICA ESTRUCTURAL
+
+### Consolidar política final de safety externo
+
+**Objetivo**
+
+Decidir cuándo se mantiene y cuándo se retira la carpeta externa de safety:
+
+- `sistemamaestro_predelete_safety/`
+
+**Incluye**
+
+- validar que no se necesita rollback;
+- decidir si se archiva fuera del escritorio;
+- o si se elimina al cerrar esta fase.
+
+**Criterio de cierre**
+
+- el safety deja de quedar indefinido;
+- no se borra por impulso;
+- no se queda flotando sin política.
+
+---
+
+## PRIORIDAD 4 — OPTIMIZACIÓN ESTRATÉGICA
+
+### Cerrar lectura técnica real de IA y créditos
+
+**Objetivo**
+
+Pasar de “existencia estructural” a “lectura técnica clara” en estas capas:
+
+- `backend/app/ai/`
+- `backend/config/credits/`
+
+**Incluye**
+
+- distinguir piezas activas, puente o preparadas;
+- relacionar IA, guards, memoria, orquestación y herramientas;
+- relacionar créditos, consumo, billing y acciones del sistema.
+
+**Criterio de cierre**
+
+- IA y créditos dejan de estar en zona semivaga;
+- se sabe qué parte ya forma sistema real y qué parte sigue en siguiente fase.
+
+---
+
+## PRIORIDAD 5 — OPTIMIZACIÓN ESTRATÉGICA
+
+### Preparar criterio de commit limpio por bloques
+
+**Objetivo**
+
+Definir commits limpios por finalidad, sin mezclar frentes.
+
+**Bloques previstos**
+
+1. saneo e higiene técnica
+2. documentación canónica
+3. backend y runtime
+4. auditoría y safety
+5. producto visible
+6. IA / créditos cuando proceda
+
+**Criterio de cierre**
+
+- existe orden de commits;
+- se sabe qué entra y qué no entra en cada uno;
+- no hay staging mezclado.
+
+---
+
+## PRIORIDAD 6 — OPTIMIZACIÓN ESTRATÉGICA
+
+### Reabrir producto visible con base estable
+
+**Objetivo**
+
+Reabrir Home, Builder y App Shell con base estructural más segura.
+
+**Incluye**
+
+- Home como entrada real del sistema;
+- Builder como centro operativo del producto;
+- App Shell como carcasa operativa;
+- continuidad entre Home, Builder, Auth, Dashboard y experiencia interior.
+
+**Criterio de cierre**
+
+- el núcleo visible del producto vuelve a abrirse sin mezclarse con saneo estructural duro.
+
+---
+
+## 5. Pendientes explícitamente bloqueados
+
+Los siguientes frentes quedan bloqueados hasta nueva apertura formal:
+
+- deploy final
+- push orientado a release
+- producción
+- reactivación del legacy runtime
+- limpieza destructiva del safety externo sin validación final
+- cambios visuales amplios sin base técnica suficiente
+- commits mezclados de estructura + producto + diseño
+
+---
+
+## 6. Pendientes no prioritarios todavía
+
+Quedan fuera del foco inmediato:
+
+- optimización cosmética
+- microajustes visuales
+- refinado fino de copy
+- maquetación no bloqueante
+- detalles estéticos secundarios
+- ajustes de presentación no estructurales
+
+---
+
+## 7. Orden operativo inmediato
+
+El orden real de ejecución, desde este punto, queda así:
+
+1. auditar y sanear la raíz de `frontend/`
+2. purgar auditoría amortizada del legacy runtime
+3. cerrar política final del safety externo
+4. consolidar lectura real de IA y créditos
+5. preparar criterio de commit limpio
+6. reabrir producto visible con base estable
+7. dejar deploy final para una fase posterior validada
+
+---
+
+## 8. Regla de avance
+
+No se abre el siguiente frente mientras el anterior no tenga:
+
+- alcance claro
+- criterio de cierre
+- efecto estructural entendido
+- riesgo controlado
+
+El proyecto no puede seguir creciendo por acumulación.
+
+Debe avanzar por cierres sucesivos.
+
+---
+
+## 9. Veredicto operativo actual
+
+Sistema Maestro no está en fase de despliegue final.
+
+Está en fase de:
+
+- cierre estructural real;
+- limpieza documental de legacy ya retirado;
+- higiene del root de frontend;
+- consolidación técnica de capas activas;
+- preparación seria de commits;
+- y estabilización del núcleo real del sistema completo.
+
+---
+
+## 10. Conclusión operativa
+
+A partir de este documento, el trabajo pendiente queda ordenado así:
+
+- primero cerrar higiene estructural del repo y docs;
+- después consolidar IA, créditos y lectura interna real;
+- después preparar commits e higiene operativa;
+- y solo entonces reabrir producto visible con más libertad.
+
+No se aprueba invertir este orden.
+

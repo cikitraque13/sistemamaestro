@@ -1,0 +1,462 @@
+﻿=== 44-AUX-ROUTES-CLASSIFICATION-SCAN ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+TARGET: memory
+PATH: C:\Users\lucas\Desktop\sistemamaestro\memory
+EXISTS: True
+TYPE: directory
+DIR COUNT: 0
+FILE COUNT: 2
+TOTAL BYTES: 2256
+
+[TREE]
+memory\.gitkeep
+memory\PRD.md
+
+[TOP FILES]
+memory\PRD.md | 2256 bytes
+memory\.gitkeep | 0 bytes
+
+[KEY PREVIEW]
+
+FILE: memory\.gitkeep
+[VACIO]
+
+FILE: memory\PRD.md
+# Sistema Maestro - Product Requirements Document
+
+## Informacion General
+- **Nombre**: Sistema Maestro
+- **Dominio**: sistemamaestro.com
+- **Categoria**: Plataforma guiada de transformacion digital
+- **Version**: V1.0 (FEATURE FREEZE)
+- **Estado**: V1 completa. Archivos de Railway listos para despliegue.
+
+## Core Requirements (V1) - COMPLETADO
+- [x] Landing page con Hero, Input module, Rutas, Pricing, FAQ
+- [x] Autenticacion JWT + Google OAuth
+- [x] Dashboard completo (Resumen, Proyectos, Oportunidades, Facturacion, Ajustes)
+- [x] Analisis con IA via OpenAI
+- [x] Analisis real de URLs (scraping server-side)
+- [x] Generacion de Blueprint
+- [x] Stripe integrado (4 planes, checkout)
+- [x] Modulo Oportunidades (5 opciones, logica free vs premium/admin)
+- [x] Newsletter, Cookie banner, Paginas legales
+- [x] Voice V1, Branding completo, Proteccion brute force
+- [x] Endurecimiento codigo (console.error, array keys, catch blocks)
+- [x] Boton Google profesional con SVG, formularios limpios
+- [x] Archivos Railway deployment (Dockerfile, server_railway.py, guia)
+
+## Despliegue Railway
+- Dockerfile: Build monolitico (frontend build + backend Python)
+- server_railway.py: Backend sin emergentintegrations (usa openai + stripe SDK directos)
+- Guia completa: DEPLOY_RAILWAY.md
+
+## Variables de Entorno (Railway)
+```
+MONGO_URL=mongodb+srv://xxx
+DB_NAME=sistemamaestro
+JWT_SECRET=xxx
+OPENAI_API_KEY=sk-proj-xxx
+STRIPE_SECRET_KEY=sk_live_xxx
+ADMIN_EMAIL=tu-email-real
+ADMIN_PASSWORD=ContraseñaSegura
+ALLOWED_ORIGINS=https://sistemamaestro.com,https://www.sistemamaestro.com
+```
+
+## Checklist Pre-Produccion
+- [x] Codigo V1 finalizado y testeado
+- [x] Archivos Railway creados
+- [ ] MongoDB Atlas configurado (usuario)
+- [ ] Railway deploy ejecutado (usuario)
+- [ ] Variables de entorno configuradas (usuario)
+- [ ] Dominio sistemamaestro.com conectado (usuario)
+
+## Backlog P1/P2
+### P1
+- [ ] Google OAuth directo (sin Emergent Auth)
+- [ ] Cookies JWT secure=True
+- [ ] Email transaccional
+- [ ] Analytics
+
+### P2
+- [ ] Descomposicion componentes
+- [ ] Export Blueprint PDF
+- [ ] Multi-idioma
+- [ ] Panel admin
+
+## Ultima actualizacion
+12 Febrero 2026 - Archivos Railway deployment creados
+
+==============================================================
+TARGET: railway
+PATH: C:\Users\lucas\Desktop\sistemamaestro\railway
+EXISTS: True
+TYPE: directory
+DIR COUNT: 0
+FILE COUNT: 2
+TOTAL BYTES: 57467
+
+[TREE]
+railway\requirements.txt
+railway\server_railway.py
+
+[TOP FILES]
+railway\server_railway.py | 57228 bytes
+railway\requirements.txt | 239 bytes
+
+[KEY PREVIEW]
+
+FILE: railway\requirements.txt
+fastapi==0.110.1
+uvicorn==0.25.0
+motor==3.3.1
+pymongo==4.5.0
+pydantic[email]==2.12.5
+python-dotenv==1.2.2
+bcrypt==4.1.3
+PyJWT==2.12.1
+httpx==0.28.1
+beautifulsoup4==4.14.3
+openai==1.99.9
+stripe==15.0.1
+python-multipart==0.0.24
+
+FILE: railway\server_railway.py
+from dotenv import load_dotenv
+load_dotenv()
+
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from starlette.middleware.cors import CORSMiddleware
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
+import logging
+from pathlib import Path
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional, Dict, Any
+import uuid
+from datetime import datetime, timezone, timedelta
+import bcrypt
+import jwt
+import secrets
+import httpx
+import re
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+import openai
+import stripe
+import json
+
+ROOT_DIR = Path(__file__).parent
+
+# MongoDB connection
+mongo_url = os.environ["MONGO_URL"]
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ.get("DB_NAME", "sistemamaestro")]
+
+# JWT Configuration
+JWT_ALGORITHM = "HS256"
+JWT_SECRET = os.environ.get("JWT_SECRET", secrets.token_hex(32))
+
+# OpenAI client
+def get_openai_client():
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("Missing OPENAI_API_KEY in environment")
+    return openai.AsyncOpenAI(api_key=api_key)
+
+# Stripe setup
+def get_stripe_key():
+    key = os.environ.get("STRIPE_SECRET_KEY") or os.environ.get("STRIPE_API_KEY")
+    if not key:
+        raise ValueError("Missing STRIPE_SECRET_KEY in environment")
+    return key
+
+# Google config
+def get_google_client_id():
+    return os.environ.get("REACT_APP_GOOGLE_CLIENT_ID") or os.environ.get("GOOGLE_CLIENT_ID") or ""
+
+# Plan Configuration
+PLANS = {
+    "free": {"name": "Gratis", "price": 0.0, "features": ["diagnosis", "route"]},
+    "blueprint": {"name": "Blueprint", "price": 29.0, "features": ["diagnosis", "route", "blueprint", "priorities"]},
+    "sistema": {"name": "Sistema", "price": 79.0, "features": ["diagnosis", "route", "blueprint", "priorities", "continuity", "deployment"]},
+    "premium": {"name": "Premium", "price": 199.0, "features": ["diagnosis", "route", "blueprint", "priorities", "continuity", "deployment", "support", "opportunities"]}
+}
+
+# Create the main app
+app = FastAPI(title="Sistema Maestro API", description="Plataforma guiada de transformación digital")
+api_router = APIRouter(prefix="/api")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+# ==================== MODELS ====================
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    name: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+
+==============================================================
+TARGET: test_reports
+PATH: C:\Users\lucas\Desktop\sistemamaestro\test_reports
+EXISTS: True
+TYPE: directory
+DIR COUNT: 1
+FILE COUNT: 4
+TOTAL BYTES: 5017
+
+[TREE]
+test_reports\.gitkeep
+test_reports\iteration_1.json
+test_reports\iteration_2.json
+test_reports\pytest
+test_reports\pytest\.gitkeep
+
+[TOP FILES]
+test_reports\iteration_2.json | 2938 bytes
+test_reports\iteration_1.json | 2079 bytes
+test_reports\pytest\.gitkeep | 0 bytes
+test_reports\.gitkeep | 0 bytes
+
+[KEY PREVIEW]
+
+FILE: test_reports\.gitkeep
+[VACIO]
+
+FILE: test_reports\iteration_1.json
+{
+  "summary": "Completed comprehensive testing of Sistema Maestro V1 platform. Backend APIs working at 93.3% success rate. Frontend UI and integration testing successful. All major features from rebranding (CERVACO to Sistema Maestro) are functional including real URL analysis, AI project classification, and Stripe billing integration.",
+  
+  "backend_issues": {
+    "critical_bugs": [],
+    "flaky_endpoints": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Blueprint generation in project flow",
+        "issue": "Blueprint generation button not consistently found during flow testing",
+        "affected_selectors": ["[data-testid=\"generate-blueprint-btn\"]"],
+        "fix_priority": "LOW"
+      }
+    ],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Home page loads with Sistema Maestro branding",
+    "Cookie banner appears on first visit and can be accepted",
+    "Newsletter subscription works",
+    "Login with admin@sistemamaestro.com / admin123 successful",
+    "Dashboard displays after login with user stats",
+    "Create project with TEXT input - AI analysis working",
+    "Create project with URL input (https://stripe.com) - real URL scraping working",
+    "Projects are saved and listed in dashboard (4 projects found)",
+    "Opportunities module shows content (5 opportunity cards)",
+    "Billing page shows all plans (Gratis €0, Blueprint €29, Sistema €79, Premium €199)",
+    "Navigation between all dashboard sections works",
+    "Backend API authentication flow (login, get user, logout)",
+    "Backend project creation and retrieval",
+    "Backend opportunities endpoint",
+    "Backend billing and user stats endpoints"
+  ],
+
+  "test_report_links": ["/app/backend_test.py"],
+
+  "action_item_for_main_agent": "",
+
+  "updated_files": ["/app/backend_test.py"],
+
+  "success_percentage": {
+    "backend": "93.3%",
+    "frontend": "95%"
+  },
+
+  "should_call_test_agent_after_fix": "false",
+  "should_main_agent_test_itself": "true"
+}
+
+FILE: test_reports\iteration_2.json
+{
+  "summary": "V1 production closure testing completed. All 6 changes verified successfully. Frontend-only testing as requested - backend was not modified.",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Login flow with admin@sistemamaestro.com / admin123 works correctly",
+    "Registration form renders cleanly without icon overlaps - fields are clean text inputs with labels above",
+    "Google login button shows proper Google multicolor icon (SVG) with text 'Continuar con Google'",
+    "Logo is visibly larger: navbar=64px (large), auth pages=88px (xlarge), sidebar visible",
+    "Dashboard loads correctly for premium user showing stats (9 Projects, 1 Blueprint, Plan: Premium)",
+    "Opportunities page shows ALL 5 opportunities for premium/admin user",
+    "No locked cards visible for premium/admin user",
+    "No 'Desbloquear más' button visible for premium/admin user",
+    "Opportunities detail modal opens when clicking on opportunity card",
+    "No 'Made with Emergent' badge visible on any page (#emergent-badge hidden via CSS)",
+    "Legal pages load correctly: /privacy, /cookies, /terms",
+    "Footer shows affiliate links: Systeme.io and SistemaMaestroIA",
+    "Error messages appear in Spanish (wrong credentials shows 'Credenciales incorrectas')",
+    "All UI text is in Spanish throughout the app",
+    "Cookie banner displays correctly with 'Aceptar' button"
+  ],
+
+  "test_report_links": [],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "Code changes verified: Empty catch blocks in Dashboard.js and AuthContext.js now properly handle errors",
+    "Array index keys replaced with stable IDs in ProjectDetail.js, Opportunities.js, Flow.js",
+    "Logo sizes correctly configured: small=40, default=52, large=64, xlarge=88",
+    "Google icon SVG component properly implemented with multicolor paths",
+    "Admin role check in Opportunities access logic working (canAccessAll = plan==='premium' || role==='admin')"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A (not tested per request)",
+    "frontend": "100%"
+  },
+
+  "test_credentials": {
+    "admin": "admin@sistemamaestro.com / admin123 (plan: premium, role: admin)"
+  },
+
+  "seed_data_creation": "None - used existing admin user",
+
+  "retest_needed": false,
+
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "V1 production closure complete. All 6 changes verified: (1) Empty catch blocks fixed, (2) Array index keys replaced with stable IDs, (3) Logo sizes increased, (4) Google login button has real multicolor SVG icon, (5) Registration/login forms cleaned up, (6) Admin role check in Opportunities working. Feature freeze in effect. Spanish language app fully functional."
+}
+
+FILE: test_reports\pytest\.gitkeep
+[VACIO]
+
+==============================================================
+TARGET: tests
+PATH: C:\Users\lucas\Desktop\sistemamaestro\tests
+EXISTS: True
+TYPE: directory
+DIR COUNT: 1
+FILE COUNT: 2
+TOTAL BYTES: 9202
+
+[TREE]
+tests\__init__.py
+tests\backend
+tests\backend\backend_test.py
+
+[TOP FILES]
+tests\backend\backend_test.py | 9202 bytes
+tests\__init__.py | 0 bytes
+
+[KEY PREVIEW]
+
+FILE: tests\__init__.py
+[VACIO]
+
+FILE: tests\backend\backend_test.py
+import requests
+import sys
+import json
+from datetime import datetime
+
+class SistemaMaestroAPITester:
+    def __init__(self, base_url="https://cervaco-platform.preview.emergentagent.com"):
+        self.base_url = base_url
+        self.session = requests.Session()
+        self.tests_run = 0
+        self.tests_passed = 0
+        self.admin_credentials = {
+            "email": "admin@sistemamaestro.com",
+            "password": "admin123"
+        }
+
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+        """Run a single API test"""
+        url = f"{self.base_url}/api/{endpoint}"
+        test_headers = {'Content-Type': 'application/json'}
+        if headers:
+            test_headers.update(headers)
+
+        self.tests_run += 1
+        print(f"\n🔍 Testing {name}...")
+        print(f"   URL: {url}")
+        
+        try:
+            if method == 'GET':
+                response = self.session.get(url, headers=test_headers)
+            elif method == 'POST':
+                response = self.session.post(url, json=data, headers=test_headers)
+            elif method == 'DELETE':
+                response = self.session.delete(url, headers=test_headers)
+
+            success = response.status_code == expected_status
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                try:
+                    response_data = response.json()
+                    if isinstance(response_data, dict) and len(str(response_data)) < 200:
+                        print(f"   Response: {response_data}")
+                except:
+                    pass
+            else:
+                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Response text: {response.text[:200]}")
+
+            return success, response.json() if response.content else {}
+
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False, {}
+
+    def test_auth_flow(self):
+        """Test complete authentication flow"""
+        print("\n" + "="*50)
+        print("TESTING AUTHENTICATION FLOW")
+        print("="*50)
+        
+        # Test login with admin credentials
+        success, response = self.run_test(
+            "Admin Login",
+            "POST",
+            "auth/login",
+            200,
+            data=self.admin_credentials
+        )
+        
+        if not success:
+            print("❌ Admin login failed - stopping auth tests")
+            return False
+            
+        # Test get current user
+        self.run_test(
+

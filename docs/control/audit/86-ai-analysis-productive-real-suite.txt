@@ -1,0 +1,181 @@
+﻿=== 86-AI-ANALYSIS-PRODUCTIVE-REAL-SUITE ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+AI_ANALYSIS_TRACE_ENABLED: 1
+AI_ANALYSIS_TRACE_VERBOSE: 0
+
+=== 86-AI-ANALYSIS-PRODUCTIVE-REAL-SUITE ===
+OUTPUT_JSON_FILE: C:\Users\lucas\Desktop\sistemamaestro\docs\control\audit\86-ai-analysis-productive-real-suite.json
+
+[P01_sell_existing_service_offer]
+kind: text
+route: sell | expected: sell | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: La oferta no estß suficientemente clara o atractiva para los clientes potenciales.
+main_weakness: Falta de diferenciaci¾n y claridad en la propuesta de valor.
+main_leverage: Reestructurar la presentaci¾n de la oferta para resaltar beneficios y casos de Úxito.
+immediate_action_title: Redactar un resumen de beneficios
+active_signals: ['audience_defined', 'goal_sell_present', 'has_clear_utility', 'has_existing_offer', 'needs_output_definition', 'offer_language_present', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 10, 'improve': 1, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 6, 'sistema': 0, 'premium': 3}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El caso gira en vender mejor una oferta existente y cerrar mßs. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[P02_sell_reposition_high_intensity]
+kind: text
+route: sell | expected: sell | pass=True
+continuity: premium | expected: premium | pass=True
+main_finding: La oferta no estß comunicando efectivamente su valor al mercado objetivo.
+main_weakness: Falta de claridad en el mensaje y estructura de la oferta.
+main_leverage: Reestructurar la presentaci¾n para alinear mejor con las necesidades del cliente.
+immediate_action_title: Identificar los puntos de valor ·nicos
+active_signals: ['executive_intensity_high', 'has_clear_utility', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'offer_language_present', 'output_defined_false', 'problem_defined_false']
+route_scores: {'sell': 3, 'improve': 1, 'automate': 0, 'idea': 2}
+continuity_scores: {'stay': 3, 'blueprint': 12, 'sistema': 0, 'premium': 11}
+guardrails_triggered: {'route': [], 'continuity': ['high_intensity_offer_cases_should_compete_for_premium']}
+decision_reason: El caso gira en vender mejor una oferta existente y cerrar mßs. El caso exige una capa de intensidad estructural o decisional mßs alta que un blueprint simple.
+
+[P03_improve_diagnostic_for_clients]
+kind: text
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: Falta de definici¾n en los criterios de evaluaci¾n de fricciones.
+main_weakness: Indefinici¾n de los criterios de evaluaci¾n de fricciones
+main_leverage: Definir claramente los tipos de fricciones y el formato de salida.
+immediate_action_title: Definir los tipos de fricciones a evaluar
+active_signals: ['audience_defined', 'diagnostic_language_present', 'has_clear_utility', 'has_existing_offer', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 3, 'improve': 5, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 12, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[P04_improve_conversion_friction_tool]
+kind: text
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: Indefinici¾n sobre las fricciones de conversi¾n a evaluar.
+main_weakness: Falta de claridad en el output de la herramienta.
+main_leverage: Definir el alcance especÝfico de las fricciones y el formato de las recomendaciones.
+immediate_action_title: Definir los tipos de fricciones de conversi¾n
+active_signals: ['audience_defined', 'conversion_language_present', 'diagnostic_language_present', 'goal_improve_present', 'has_clear_utility', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 1, 'improve': 11, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 12, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[P05_improve_diagnostic_system]
+kind: text
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: Falta de especificaci¾n en los criterios de anßlisis.
+main_weakness: Ambig³edad en el alcance y formato del diagn¾stico.
+main_leverage: Concretar los criterios y el formato del diagn¾stico.
+immediate_action_title: Definir ßreas clave de anßlisis
+active_signals: ['diagnostic_language_present', 'goal_improve_present', 'has_clear_utility', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined', 'problem_defined']
+route_scores: {'sell': 0, 'improve': 9, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 0, 'blueprint': 12, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[P06_automate_leads_simple]
+kind: text
+route: automate | expected: automate | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: La falta de automatizaci¾n en la gesti¾n de leads genera ineficiencia.
+main_weakness: Ausencia de un sistema automatizado para clasificaci¾n y respuesta.
+main_leverage: Definir y automatizar criterios de clasificaci¾n y respuestas.
+immediate_action_title: Definir criterios de clasificaci¾n de leads
+active_signals: ['audience_defined', 'automation_language_present', 'conversion_language_present', 'goal_automate_present', 'has_clear_utility', 'implementation_pressure_present', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 1, 'improve': 3, 'automate': 10, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 12, 'sistema': 2, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es automatizar una operativa o trabajo repetitivo. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[P07_automate_leads_with_flows]
+kind: text
+route: automate | expected: automate | pass=True
+continuity: sistema | expected: sistema | pass=True
+main_finding: Falta de claridad en la integraci¾n con flujos existentes.
+main_weakness: Criterios de enrutamiento y seguimiento no definidos.
+main_leverage: Definir y documentar los criterios de enrutamiento y seguimiento.
+immediate_action_title: Mapear flujos actuales
+active_signals: ['audience_defined', 'automation_language_present', 'conversion_language_present', 'goal_automate_present', 'has_clear_utility', 'implementation_pressure_present', 'needs_definition_first', 'needs_multilayer_architecture', 'needs_output_definition', 'output_defined_false', 'problem_defined', 'system_design_pressure_present']
+route_scores: {'sell': 1, 'improve': 3, 'automate': 10, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 10, 'sistema': 11, 'premium': 4}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es automatizar una operativa o trabajo repetitivo. El siguiente paso ya exige coordinar varias piezas, capas o flujos del sistema.
+
+[P08_open_idea_ia]
+kind: text
+route: idea | expected: idea | pass=True
+continuity: stay | expected: stay | pass=True
+main_finding: La idea carece de un problema empresarial especÝfico que la IA resolverß.
+main_weakness: Indefinici¾n del caso de uso y del valor que aportarß la soluci¾n.
+main_leverage: Concretar un problema empresarial especÝfico que la IA pueda abordar eficazmente.
+immediate_action_title: Identificar problemas empresariales comunes
+active_signals: ['ambiguity_high', 'audience_defined', 'conversion_language_present', 'goal_idea_present', 'has_clear_utility_false', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 1, 'improve': 2, 'automate': 0, 'idea': 11}
+continuity_scores: {'stay': 9, 'blueprint': 9, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El caso sigue demasiado abierto o ambiguo para salir de idea. Antes de intensificar, hace falta una definici¾n mßs clara de utilidad, problema u output.
+
+[P09_semi_open_idea_local_business]
+kind: text
+route: idea | expected: idea | pass=True
+continuity: stay | expected: stay | pass=True
+main_finding: Falta de definici¾n del formato y funcionalidad de la herramienta.
+main_weakness: Indefinici¾n del segmento de mercado y problema especÝfico a abordar.
+main_leverage: Definir el tipo de negocio local y el problema de captaci¾n especÝfico que resolverß la herramienta.
+immediate_action_title: Definir el problema especÝfico de captaci¾n a resolver
+active_signals: ['ambiguity_high', 'audience_defined', 'goal_idea_present', 'has_clear_utility_false', 'immature_commercial_idea', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined_false']
+route_scores: {'sell': 0, 'improve': 0, 'automate': 0, 'idea': 13}
+continuity_scores: {'stay': 11, 'blueprint': 9, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El caso sigue demasiado abierto o ambiguo para salir de idea. Antes de intensificar, hace falta una definici¾n mßs clara de utilidad, problema u output.
+
+[P10_improve_multilayer_system]
+kind: text
+route: improve | expected: improve | pass=True
+continuity: sistema | expected: sistema | pass=True
+main_finding: Falta de especificidad en los diagn¾sticos y mejoras que el sistema ofrecerß.
+main_weakness: Indefinici¾n en la funcionalidad especÝfica de cada m¾dulo.
+main_leverage: Concretar los diagn¾sticos y mejoras que el sistema proporcionarß.
+immediate_action_title: Definir ßreas de diagn¾stico
+active_signals: ['audience_defined', 'conversion_language_present', 'diagnostic_language_present', 'goal_improve_present', 'has_clear_utility', 'implementation_pressure_present', 'needs_definition_first', 'needs_multilayer_architecture', 'needs_output_definition', 'output_defined', 'problem_defined', 'system_design_pressure_present']
+route_scores: {'sell': 1, 'improve': 11, 'automate': 1, 'idea': 0}
+continuity_scores: {'stay': 0, 'blueprint': 10, 'sistema': 11, 'premium': 4}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. El siguiente paso ya exige coordinar varias piezas, capas o flujos del sistema.
+
+[P11_url_visible_audit_case]
+kind: url
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: La propuesta de valor no estß claramente comunicada.
+main_weakness: Definici¾n insuficiente de la propuesta de valor.
+main_leverage: Clarificar y comunicar efectivamente la propuesta de valor.
+immediate_action_title: Definir la propuesta de valor
+active_signals: ['diagnostic_language_present', 'goal_improve_present', 'has_clear_utility', 'needs_definition_first', 'needs_output_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 0, 'improve': 9, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 10, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[P12_url_offer_page_case]
+kind: url
+route: improve | expected: improve | pass=True
+continuity: blueprint | expected: blueprint | pass=True
+main_finding: La propuesta de valor no estß claramente definida en el sitio web.
+main_weakness: Falta de claridad en el mensaje de la oferta.
+main_leverage: Reformular el contenido para destacar beneficios especÝficos y diferenciadores.
+immediate_action_title: Revisar el mensaje principal
+active_signals: ['diagnostic_language_present', 'goal_improve_present', 'has_clear_utility', 'needs_output_definition', 'offer_language_present', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 3, 'improve': 9, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 6, 'sistema': 0, 'premium': 3}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+ROUTE_PASS_TOTAL: 12/12
+CONTINUITY_PASS_TOTAL: 12/12
+TEXT_CASES_FULL_PASS: 10/10
+URL_CASES_FULL_PASS: 2/2

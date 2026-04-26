@@ -1,0 +1,14 @@
+﻿
+Folder       Files    MB
+------       -----    --
+frontend     70000 551,5
+.git          1655   3,8
+backend         71  0,21
+docs            32  0,12
+railway          2  0,05
+tests            2  0,01
+memory           2     0
+test_reports     4     0
+
+
+

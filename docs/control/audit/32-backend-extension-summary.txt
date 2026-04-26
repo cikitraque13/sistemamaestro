@@ -1,0 +1,6 @@
+﻿=== BACKEND EXTENSION SUMMARY ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro\backend
+
+.py | count=64
+.json | count=6
+.txt | count=1

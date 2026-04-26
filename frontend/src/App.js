@@ -3,27 +3,29 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'sonner';
 
-// Pages
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Projects from './pages/Projects';
-import ProjectDetail from './pages/ProjectDetail';
-import ReportPreview from './pages/ReportPreview';
-import ReportPrintPage from './pages/ReportPrintPage';
-import Opportunities from './pages/Opportunities';
-import Billing from './pages/Billing';
-import Settings from './pages/Settings';
-import Flow from './pages/Flow';
-import AuthCallback from './pages/AuthCallback';
+// Feature entrypoints
+import Home from './features/home/HomePage';
+import Login from './features/auth/LoginPage';
+import Register from './features/auth/RegisterPage';
+import AuthCallback from './features/auth/AuthCallbackPage';
+import Dashboard from './features/dashboard/DashboardPage';
+import BuilderWorkspacePage from './features/builder/workspace/BuilderWorkspacePage';
+import Projects from './features/projects/ProjectsPage';
+import ProjectDetail from './features/projects/detail/ProjectDetailPage';
+import ReportPreview from './features/reports/ReportPreviewPage';
+import ReportPrintPage from './features/reports/ReportPrintPage';
+import Opportunities from './features/opportunities/OpportunitiesPage';
+import Billing from './features/billing/BillingPage';
+import Settings from './features/settings/SettingsPage';
+import Flow from './features/flow/FlowPage';
+
+// Public/legal pages kept in pages for now
 import Privacy from './pages/Privacy';
 import Cookies from './pages/Cookies';
 import Terms from './pages/Terms';
 
 import './App.css';
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -43,18 +45,15 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// App Router with OAuth handling
 const AppRouter = () => {
   const location = useLocation();
 
-  // Check URL fragment for session_id (OAuth callback)
   if (location.hash?.includes('session_id=')) {
     return <AuthCallback />;
   }
 
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -62,8 +61,8 @@ const AppRouter = () => {
       <Route path="/cookies" element={<Cookies />} />
       <Route path="/terms" element={<Terms />} />
 
-      {/* Protected Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/dashboard/builder" element={<ProtectedRoute><BuilderWorkspacePage /></ProtectedRoute>} />
       <Route path="/dashboard/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id/report-preview" element={<ProtectedRoute><ReportPreview /></ProtectedRoute>} />
@@ -72,11 +71,9 @@ const AppRouter = () => {
       <Route path="/dashboard/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-      {/* Flow Routes */}
       <Route path="/flow" element={<ProtectedRoute><Flow /></ProtectedRoute>} />
       <Route path="/flow/:step" element={<ProtectedRoute><Flow /></ProtectedRoute>} />
 
-      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

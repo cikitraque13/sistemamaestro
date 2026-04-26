@@ -1,1258 +1,1118 @@
-\# 05 — Contratos Técnicos V1
+# 05 — Contratos Técnicos V1
 
-
-
-\## 1. Función de esta pieza
-
-
+## 1. Función de esta pieza
 
 Este documento traduce la doctrina de producto a contratos técnicos iniciales.
 
+No define toda la implementación final.
 
+Define la base estructural que backend y frontend deberán respetar cuando se construyan o conecten:
 
-No define aún toda la implementación final.
-
-Define la base estructural que backend y frontend deberán respetar cuando se construyan:
-
-
-
-\- activación
-
-\- constructor visible
-
-\- créditos
-
-\- recargas
-
-\- exportación
-
-\- despliegue
-
-\- continuidad del proyecto
-
-
+- activación;
+- constructor visible;
+- BuilderBuildKernel;
+- BuilderBuildState;
+- créditos;
+- recargas;
+- exportación;
+- despliegue;
+- continuidad del proyecto.
 
 Su objetivo es evitar improvisación técnica futura.
 
+---
 
+## 2. Principio rector
 
-\---
-
-
-
-\## 2. Principio rector
-
-
-
-La implementación no debe crecer por pantallas sueltas ni por endpoints aislados.
-
-
+La implementación no debe crecer por pantallas sueltas, estados locales aislados, endpoints inconexos ni respuestas decorativas del agente.
 
 Debe crecer desde estas entidades centrales:
 
+- usuario;
+- plan;
+- créditos;
+- proyecto;
+- build;
+- estado vivo del Builder;
+- acción/mutación;
+- preview;
+- código;
+- estructura;
+- acción premium;
+- exportación;
+- despliegue.
 
+### Regla principal
 
-\- usuario
+Toda capacidad nueva debe poder responder:
 
-\- plan
+```text
+qué entidad la soporta
+qué estado modifica
+qué salida produce
+qué trazabilidad deja
+qué coste puede tener
+qué capa la renderiza
+qué capa la valida
+```
 
-\- créditos
+Si una capacidad no responde a esto, no está madura para implementarse.
 
-\- proyecto
+---
 
-\- build
+## 3. Entidades mínimas del sistema
 
-\- acción premium
-
-\- exportación
-
-\- despliegue
-
-
-
-\---
-
-
-
-\## 3. Entidades mínimas del sistema
-
-
-
-\## 3.1 User
-
-
+## 3.1 User
 
 Representa al usuario autenticado del sistema.
 
+### Campos base
 
+- `user_id`
+- `email`
+- `name`
+- `role`
+- `plan`
+- `created_at`
+- `updated_at`
 
-\### Campos base
+### Campos futuros recomendados
 
-\- `user\_id`
+- `credit_balance`
+- `credit_lifetime_used`
+- `default_workspace_id`
+- `export_profile`
+- `billing_profile_status`
 
-\- `email`
-
-\- `name`
-
-\- `role`
-
-\- `plan`
-
-\- `created\_at`
-
-\- `updated\_at`
-
-
-
-\### Campos futuros recomendados
-
-\- `credit\_balance`
-
-\- `credit\_lifetime\_used`
-
-\- `default\_workspace\_id`
-
-\- `export\_profile`
-
-\- `billing\_profile\_status`
-
-
-
-\### Regla
+### Regla
 
 El plan y los créditos no deben quedar desacoplados semánticamente.
 
+---
 
-
-\---
-
-
-
-\## 3.2 Plan
-
-
+## 3.2 Plan
 
 Representa el nivel de acceso del usuario.
 
+### Campos base doctrinales
 
+- `plan_id`
+- `name`
+- `price`
+- `features`
+- `activation_level`
+- `included_credits`
+- `builder_access`
+- `export_access_rule`
 
-\### Campos base doctrinales
-
-\- `plan\_id`
-
-\- `name`
-
-\- `price`
-
-\- `features`
-
-\- `activation\_level`
-
-\- `included\_credits`
-
-\- `builder\_access`
-
-\- `export\_access\_rule`
-
-
-
-\### Regla
+### Regla
 
 El plan no debe definirse solo por precio y textos de marketing.
 
 Debe tener una traducción técnica clara.
 
+---
 
-
-\---
-
-
-
-\## 3.3 CreditLedger
-
-
+## 3.3 CreditLedger
 
 Representa el movimiento de créditos.
 
-
-
-\### Función
+### Función
 
 Registrar:
 
-\- saldo
+- saldo;
+- consumo;
+- recargas;
+- ajustes;
+- bonificaciones;
+- acciones premium que consumen crédito.
 
-\- consumo
+### Campos recomendados
 
-\- recargas
+- `entry_id`
+- `user_id`
+- `project_id` opcional
+- `type`
+- `credits_delta`
+- `credits_balance_after`
+- `reason_code`
+- `meta`
+- `created_at`
 
-\- ajustes
+### Tipos posibles
 
-\- bonificaciones
+- `plan_grant`
+- `topup_purchase`
+- `build_consumption`
+- `iteration_consumption`
+- `deployment_consumption`
+- `export_consumption`
+- `adjustment`
+- `refund`
+- `bonus`
 
-\- acciones premium que consumen crédito
-
-
-
-\### Campos recomendados
-
-\- `entry\_id`
-
-\- `user\_id`
-
-\- `project\_id` opcional
-
-\- `type`
-
-\- `credits\_delta`
-
-\- `credits\_balance\_after`
-
-\- `reason\_code`
-
-\- `meta`
-
-\- `created\_at`
-
-
-
-\### Tipos posibles
-
-\- `plan\_grant`
-
-\- `topup\_purchase`
-
-\- `build\_consumption`
-
-\- `iteration\_consumption`
-
-\- `deployment\_consumption`
-
-\- `adjustment`
-
-\- `refund`
-
-\- `bonus`
-
-
-
-\### Regla
+### Regla
 
 No modificar saldo sin ledger.
 
 Todo movimiento debe quedar trazado.
 
+---
 
-
-\---
-
-
-
-\## 3.4 Project
-
-
+## 3.4 Project
 
 Representa el activo central de trabajo del usuario.
 
+### Campos base actuales
 
+- `project_id`
+- `user_id`
+- `input_type`
+- `input_content`
+- `route`
+- `diagnosis`
+- `refine_questions`
+- `refine_answers`
+- `plan_recommendation`
+- `blueprint`
+- `status`
+- `created_at`
+- `updated_at`
 
-\### Campos base actuales
+### Campos futuros recomendados
 
-\- `project\_id`
+- `activation`
+- `builder_state`
+- `current_preview`
+- `current_code_snapshot`
+- `current_structure_snapshot`
+- `stack_recommendation`
+- `template_recommendation`
+- `export_status`
+- `deployment_status`
+- `credit_state`
+- `workspace_mode`
+- `source_type` (`idea`, `url`, `operator_url`, `prompt`, `expert_prompt`)
 
-\- `user\_id`
-
-\- `input\_type`
-
-\- `input\_content`
-
-\- `route`
-
-\- `diagnosis`
-
-\- `refine\_questions`
-
-\- `refine\_answers`
-
-\- `plan\_recommendation`
-
-\- `blueprint`
-
-\- `status`
-
-\- `created\_at`
-
-\- `updated\_at`
-
-
-
-\### Campos futuros recomendados
-
-\- `activation`
-
-\- `builder\_state`
-
-\- `current\_preview`
-
-\- `stack\_recommendation`
-
-\- `template\_recommendation`
-
-\- `export\_status`
-
-\- `deployment\_status`
-
-\- `credit\_state`
-
-\- `workspace\_mode`
-
-\- `source\_type` (`idea`, `url`, `operator\_url`, etc.)
-
-
-
-\### Regla
+### Regla
 
 El proyecto debe convertirse en la unidad principal de continuidad.
 
+Toda construcción, iteración, preview, código, estructura, exportación o despliegue debe poder asociarse a un `project_id`.
 
+---
 
-\---
-
-
-
-\## 3.5 Activation
-
-
+## 3.5 Activation
 
 Representa la capa de activación ya traducida técnicamente.
 
+### Campos recomendados
 
+- `activation_id`
+- `project_id`
+- `user_id`
+- `level`
+- `stack`
+- `template`
+- `sequence`
+- `prompts`
+- `checklist`
+- `technical_path`
+- `non_technical_path`
+- `created_at`
+- `updated_at`
 
-\### Campos recomendados
-
-\- `activation\_id`
-
-\- `project\_id`
-
-\- `user\_id`
-
-\- `level`
-
-\- `stack`
-
-\- `template`
-
-\- `sequence`
-
-\- `prompts`
-
-\- `checklist`
-
-\- `technical\_path`
-
-\- `non\_technical\_path`
-
-\- `created\_at`
-
-\- `updated\_at`
-
-
-
-\### Regla
+### Regla
 
 La activación no debe quedar como texto disperso dentro del blueprint si va a operar de verdad.
 
+La activación prepara el proyecto.
 
+El Builder construye y muestra.
 
-\---
+---
 
+## 3.6 BuilderBuildState
 
+Representa el estado vivo de lo que el Builder está construyendo.
 
-\## 3.6 BuildJob
+### Función
 
+Mantener una representación única y acumulativa de lo construido por el Builder.
 
+Debe poder responder:
+
+- qué tipo de proyecto se está construyendo;
+- qué bloques existen;
+- qué componentes existen;
+- qué CTAs están activos;
+- qué archivos se han generado;
+- qué estructura se ha derivado;
+- qué acciones se han aplicado;
+- qué acciones quedan disponibles;
+- qué salida debe ver el usuario.
+
+### Campos recomendados
+
+- `project_id`
+- `build_state_id`
+- `project_kind`
+- `mode`
+- `blocks`
+- `components`
+- `pages`
+- `routes`
+- `api_routes`
+- `folders`
+- `files`
+- `ctas`
+- `theme`
+- `applied_actions`
+- `available_actions`
+- `preview_model`
+- `code_model`
+- `structure_model`
+- `credit_estimate`
+- `updated_at`
+
+### Regla
+
+El Builder no debe gobernarse por copy suelto, mensajes del agente, `hubSummary`, `lastDelta`, `lastOperation`, fases de progreso ni plantillas aisladas.
+
+El Builder debe gobernarse por un estado vivo.
+
+---
+
+## 3.7 BuilderBuildKernel
+
+Representa la piedra angular operativa del Builder visible.
+
+### Función
+
+Coordinar el contrato entre input de usuario, IA, mutaciones, estado vivo, preview, código, estructura y siguientes decisiones.
+
+### Contrato mínimo
+
+```text
+input usuario
+→ IA interpreta intención
+→ mutationRegistry normaliza acción
+→ builderBuildState aplica mutación
+→ preview renderiza estado vivo
+→ codeTemplates genera desde estado vivo
+→ structureRegistry deriva carpetas y archivos
+→ questionFlowRegistry propone siguientes decisiones
+```
+
+### Salida esperada
+
+El kernel debe devolver, como mínimo:
+
+- `nextState`
+- `previewModel`
+- `codeModel`
+- `structureModel`
+- `nextQuestions`
+- `creditEstimate`
+- `trace`
+
+### Regla
+
+El kernel no debe ser un megaarchivo.
+
+El kernel debe coordinar.
+
+El conocimiento debe vivir en registros, playbooks, presets, mapas de output, mutaciones, estructura y flujos de preguntas.
+
+---
+
+## 3.8 BuilderMutation
+
+Representa una acción normalizada que modifica el estado vivo del Builder.
+
+### Ejemplos
+
+- `add_google_access`
+- `add_subscription_box`
+- `add_gema_maestra_section`
+- `add_how_it_works`
+- `add_live_builder_section`
+- `add_trust_section`
+- `add_dashboard`
+- `add_auth_flow`
+- `add_api_layer`
+- `generate_folder_structure`
+- `prepare_export_plan`
+
+### Campos recomendados
+
+- `mutation_id`
+- `label`
+- `source`
+- `matched_input`
+- `affected_blocks`
+- `affected_components`
+- `affected_files`
+- `affected_routes`
+- `affected_ctas`
+- `credit_tier`
+- `next_actions`
+- `created_at`
+
+### Regla
+
+Ninguna sugerencia del agente es válida por sí misma si no puede traducirse a una mutación aplicable.
+
+Una acción que solo produce texto no se considera construcción válida.
+
+---
+
+## 3.9 BuildJob
 
 Representa una acción real de construcción visible.
 
-
-
-\### Función
+### Función
 
 Registrar cuándo el sistema está construyendo algo.
 
+### Campos recomendados
 
+- `build_id`
+- `project_id`
+- `user_id`
+- `build_type`
+- `status`
+- `requested_action`
+- `mutation_id`
+- `credits_cost`
+- `started_at`
+- `finished_at`
+- `logs`
+- `result_summary`
+- `preview_ref`
+- `state_ref`
 
-\### Campos recomendados
+### Estados mínimos
 
-\- `build\_id`
+- `queued`
+- `running`
+- `completed`
+- `failed`
+- `cancelled`
 
-\- `project\_id`
-
-\- `user\_id`
-
-\- `build\_type`
-
-\- `status`
-
-\- `requested\_action`
-
-\- `credits\_cost`
-
-\- `started\_at`
-
-\- `finished\_at`
-
-\- `logs`
-
-\- `result\_summary`
-
-\- `preview\_ref`
-
-
-
-\### Estados mínimos
-
-\- `queued`
-
-\- `running`
-
-\- `completed`
-
-\- `failed`
-
-\- `cancelled`
-
-
-
-\### Regla
+### Regla
 
 La construcción visible debe tener entidad propia, no solo estado local en frontend.
 
+---
 
-
-\---
-
-
-
-\## 3.7 Preview
-
-
+## 3.10 Preview
 
 Representa una vista generada o estado visible del proyecto.
 
+### Campos recomendados
 
+- `preview_id`
+- `project_id`
+- `build_id`
+- `version`
+- `preview_type`
+- `url_or_ref`
+- `status`
+- `preview_model`
+- `created_at`
 
-\### Campos recomendados
-
-\- `preview\_id`
-
-\- `project\_id`
-
-\- `build\_id`
-
-\- `version`
-
-\- `preview\_type`
-
-\- `url\_or\_ref`
-
-\- `status`
-
-\- `created\_at`
-
-
-
-\### Regla
+### Regla
 
 La preview debe poder versionarse o al menos quedar referenciada.
 
+La preview no debe ser una plantilla decorativa si el Builder promete construcción real.
 
+---
 
-\---
+## 3.11 CodeSnapshot
 
+Representa el código derivado del estado vivo del Builder.
 
+### Campos recomendados
 
-\## 3.8 DeploymentRequest
+- `code_snapshot_id`
+- `project_id`
+- `build_id`
+- `version`
+- `language`
+- `files`
+- `entry_file`
+- `generated_at`
+- `meta`
 
+### Regla
 
+El código debe generarse desde el mismo estado vivo que alimenta preview y estructura.
+
+No debe existir una preview que muestre algo que el código no pueda representar.
+
+---
+
+## 3.12 StructureSnapshot
+
+Representa la estructura de carpetas, archivos, rutas y componentes generada o prevista para el proyecto.
+
+### Campos recomendados
+
+- `structure_snapshot_id`
+- `project_id`
+- `build_id`
+- `version`
+- `folders`
+- `files`
+- `components`
+- `routes`
+- `api_routes`
+- `generated_at`
+- `meta`
+
+### Regla
+
+La estructura no debe depender solo de un blueprint inicial.
+
+Debe poder evolucionar con las mutaciones aplicadas en el Builder.
+
+---
+
+## 3.13 DeploymentRequest
 
 Representa una solicitud de despliegue.
 
+### Campos recomendados
 
+- `deployment_id`
+- `project_id`
+- `user_id`
+- `status`
+- `deployment_target`
+- `credits_cost` opcional
+- `price_amount` opcional
+- `requested_at`
+- `completed_at`
+- `meta`
 
-\### Campos recomendados
+### Estados mínimos
 
-\- `deployment\_id`
+- `ready`
+- `requested`
+- `processing`
+- `completed`
+- `failed`
 
-\- `project\_id`
-
-\- `user\_id`
-
-\- `status`
-
-\- `deployment\_target`
-
-\- `credits\_cost` opcional
-
-\- `price\_amount` opcional
-
-\- `requested\_at`
-
-\- `completed\_at`
-
-\- `meta`
-
-
-
-\### Estados mínimos
-
-\- `ready`
-
-\- `requested`
-
-\- `processing`
-
-\- `completed`
-
-\- `failed`
-
-
-
-\### Regla
+### Regla
 
 Despliegue no debe mezclarse semánticamente con exportación.
 
+---
 
-
-\---
-
-
-
-\## 3.9 ExportRequest
-
-
+## 3.14 ExportRequest
 
 Representa una solicitud de salida del proyecto fuera del sistema.
 
+### Campos recomendados
 
+- `export_id`
+- `project_id`
+- `user_id`
+- `complexity_band`
+- `price_quote`
+- `status`
+- `requested_at`
+- `paid_at`
+- `delivered_at`
+- `delivery_type`
+- `meta`
 
-\### Campos recomendados
+### Estados mínimos
 
-\- `export\_id`
+- `draft`
+- `quoted`
+- `awaiting_payment`
+- `paid`
+- `preparing`
+- `delivered`
+- `cancelled`
 
-\- `project\_id`
-
-\- `user\_id`
-
-\- `complexity\_band`
-
-\- `price\_quote`
-
-\- `status`
-
-\- `requested\_at`
-
-\- `paid\_at`
-
-\- `delivered\_at`
-
-\- `delivery\_type`
-
-\- `meta`
-
-
-
-\### Estados mínimos
-
-\- `draft`
-
-\- `quoted`
-
-\- `awaiting\_payment`
-
-\- `paid`
-
-\- `preparing`
-
-\- `delivered`
-
-\- `cancelled`
-
-
-
-\### Regla
+### Regla
 
 La exportación debe tener flujo propio y valoración propia.
 
+---
 
-
-\---
-
-
-
-\## 3.10 PremiumAction
-
-
+## 3.15 PremiumAction
 
 Representa acciones especiales fuera del uso ordinario.
 
+### Ejemplos
 
+- despliegue premium;
+- exportación especial;
+- regeneración intensiva;
+- auditoría avanzada futura;
+- migraciones o transferencias concretas;
+- construcción técnica profunda;
+- integración con GitHub;
+- creación de backend complejo.
 
-\### Ejemplos
-
-\- despliegue premium
-
-\- exportación especial
-
-\- regeneración intensiva
-
-\- auditoría avanzada futura
-
-\- migraciones o transferencias concretas
-
-
-
-\### Regla
+### Regla
 
 No mezclar todas las acciones premium en una sola lógica ambigua.
 
 Debe haber tipología.
 
+---
 
-
-\---
-
-
-
-\## 4. Estados del proyecto
-
-
+## 4. Estados del proyecto
 
 La entidad `Project` debe admitir una evolución clara.
 
+### Estados mínimos recomendados
 
+- `created`
+- `analyzed`
+- `refined`
+- `activation_ready`
+- `build_ready`
+- `building`
+- `build_available`
+- `blueprint_generated`
+- `deployment_ready`
+- `export_ready`
+- `archived`
 
-\### Estados mínimos recomendados
-
-\- `created`
-
-\- `analyzed`
-
-\- `refined`
-
-\- `activation\_ready`
-
-\- `build\_ready`
-
-\- `building`
-
-\- `build\_available`
-
-\- `blueprint\_generated`
-
-\- `deployment\_ready`
-
-\- `export\_ready`
-
-\- `archived`
-
-
-
-\### Regla
+### Regla
 
 El estado no debe ser decorativo.
 
 Debe gobernar qué puede hacer el usuario después.
 
+---
 
+## 5. Estados del Builder
 
-\---
+El Builder debe admitir una evolución propia, separada pero vinculada al proyecto.
 
+### Estados mínimos recomendados
 
+- `idle`
+- `interpreting`
+- `planning`
+- `mutating`
+- `building`
+- `preview_ready`
+- `code_ready`
+- `structure_ready`
+- `awaiting_user_decision`
+- `failed`
 
-\## 5. Contratos funcionales mínimos por capa
+### Regla
 
+El estado del Builder debe explicar al usuario qué está pasando sin convertir el panel en un chat redundante.
 
+---
 
-\## 5.1 Diagnóstico
+## 6. Contratos funcionales mínimos por capa
 
-Entrada:
-
-\- idea o URL
-
-
-
-Salida:
-
-\- `route`
-
-\- `diagnosis`
-
-\- `refine\_questions`
-
-\- `plan\_recommendation`
-
-
-
-\---
-
-
-
-\## 5.2 Afinado
+## 6.1 Diagnóstico
 
 Entrada:
 
-\- respuestas del usuario
-
-
+- idea o URL.
 
 Salida:
 
-\- proyecto actualizado
+- `route`
+- `diagnosis`
+- `refine_questions`
+- `plan_recommendation`
 
-\- recomendación revisada
+---
 
-\- mejor contexto para activación
-
-
-
-\---
-
-
-
-\## 5.3 Blueprint
+## 6.2 Afinado
 
 Entrada:
 
-\- proyecto refinado o analizado
-
-
+- respuestas del usuario.
 
 Salida:
 
-\- `blueprint`
+- proyecto actualizado;
+- recomendación revisada;
+- mejor contexto para activación.
 
-\- prioridades
+---
 
-\- pasos de despliegue
-
-\- lógica base de avance
-
-
-
-\---
-
-
-
-\## 5.4 Activación futura
+## 6.3 Blueprint
 
 Entrada:
 
-\- proyecto + plan + perfil de usuario
-
-
+- proyecto refinado o analizado.
 
 Salida:
 
-\- stack recomendado
+- `blueprint`;
+- prioridades;
+- pasos de despliegue;
+- lógica base de avance.
 
-\- template recomendado
+---
 
-\- secuencia
-
-\- prompts
-
-\- checklist
-
-\- ruta técnico / no técnico
-
-
-
-\---
-
-
-
-\## 5.5 Constructor visible futuro
+## 6.4 Activación
 
 Entrada:
 
-\- proyecto activado
-
-\- acción solicitada
-
-\- créditos disponibles
-
-
+- proyecto;
+- plan;
+- perfil de usuario.
 
 Salida:
 
-\- `build\_job`
+- stack recomendado;
+- template recomendado;
+- secuencia;
+- prompts;
+- checklist;
+- ruta técnica / no técnica.
 
-\- `preview`
+---
 
-\- logs
-
-\- estado de construcción
-
-
-
-\---
-
-
-
-\## 5.6 Despliegue futuro
+## 6.5 Constructor visible / Builder
 
 Entrada:
 
-\- proyecto construible
+- proyecto activado o input directo;
+- acción solicitada;
+- contexto IA;
+- créditos disponibles cuando proceda.
 
-\- permisos de plan
+Salida mínima:
 
-\- créditos o pago según modelo
+- `BuilderBuildState`;
+- `BuildJob`;
+- `Preview`;
+- `CodeSnapshot`;
+- `StructureSnapshot`;
+- siguientes decisiones;
+- logs o trace interno.
 
+### Regla
 
+El constructor visible ejecuta y muestra.
 
-Salida:
+No basta con que el agente responda.
 
-\- `deployment\_request`
+---
 
-\- estado
-
-\- resultado de despliegue
-
-
-
-\---
-
-
-
-\## 5.7 Exportación futura
+## 6.6 Despliegue futuro
 
 Entrada:
 
-\- proyecto exportable
-
-\- valoración
-
-\- pago si aplica
-
-
+- proyecto construible;
+- permisos de plan;
+- créditos o pago según modelo.
 
 Salida:
 
-\- `export\_request`
+- `DeploymentRequest`;
+- estado;
+- resultado de despliegue.
 
-\- cotización
+---
 
-\- estado de preparación
+## 6.7 Exportación futura
 
-\- entrega
+Entrada:
 
+- proyecto exportable;
+- valoración;
+- pago si aplica.
 
+Salida:
 
-\---
+- `ExportRequest`;
+- cotización;
+- estado de preparación;
+- entrega.
 
+---
 
+## 7. Contrato técnico del BuilderBuildKernel
 
-\## 6. Contratos de créditos
+## 7.1 Contrato aprobado
 
+Toda evolución del Builder visible debe respetar este contrato:
 
+```text
+input usuario
+→ IA interpreta intención
+→ mutationRegistry normaliza acción
+→ builderBuildState aplica mutación
+→ preview renderiza estado vivo
+→ codeTemplates genera desde estado vivo
+→ structureRegistry deriva carpetas y archivos
+→ questionFlowRegistry propone siguientes decisiones
+```
 
-\## 6.1 Regla de consumo
+## 7.2 Regla técnica
+
+Ningún playbook, agente, preset o sugerencia es válido por sí mismo si no puede traducirse a una mutación aplicable sobre el estado vivo del Builder.
+
+## 7.3 Salida mínima obligatoria
+
+Cada mutación debe declarar, cuando aplique:
+
+- bloques visuales afectados;
+- componentes afectados;
+- archivos generados;
+- rutas o carpetas generadas;
+- CTAs afectados;
+- coste estimado futuro;
+- siguientes preguntas.
+
+## 7.4 Criterio de cierre
+
+El Builder se considerará correctamente alineado cuando una petición como:
+
+```text
+Añade acceso con Google
+```
+
+produzca simultáneamente:
+
+```text
+preview con bloque real
+código con componente real
+estructura con archivo real
+siguiente mejora distinta
+```
+
+Y cuando una petición como:
+
+```text
+Crea una app con dashboard y backend
+```
+
+produzca simultáneamente:
+
+```text
+estructura frontend/backend
+páginas, rutas y componentes
+preview coherente con la app
+código alineado con la estructura
+siguientes decisiones técnicas no repetidas
+```
+
+---
+
+## 8. Contratos de créditos
+
+## 8.1 Regla de consumo
 
 Toda acción intensiva debe poder responder a estas preguntas:
 
+- qué consume;
+- cuánto consume;
+- por qué consume;
+- dónde queda registrado;
+- qué salida obtiene el usuario.
 
-
-\- qué consume
-
-\- cuánto consume
-
-\- por qué consume
-
-\- dónde queda registrado
-
-
-
-\---
-
-
-
-\## 6.2 Política técnica
+## 8.2 Política técnica
 
 Antes de ejecutar una acción con coste de créditos, el sistema debe validar:
 
+- usuario autenticado;
+- saldo suficiente;
+- permiso de plan si aplica;
+- acción disponible para ese proyecto;
+- trazabilidad en ledger.
 
-
-\- usuario autenticado
-
-\- saldo suficiente
-
-\- permiso de plan si aplica
-
-\- acción disponible para ese proyecto
-
-\- trazabilidad en ledger
-
-
-
-\---
-
-
-
-\## 6.3 Resultado esperado
+## 8.3 Resultado esperado
 
 Si hay saldo:
 
-\- la acción se ejecuta
-
-\- se registra el movimiento
-
-
+- la acción se ejecuta;
+- se registra el movimiento;
+- se devuelve una salida verificable.
 
 Si no hay saldo:
 
-\- la acción no rompe el sistema
+- la acción no rompe el sistema;
+- se devuelve estado claro;
+- se ofrece recarga o alternativa.
 
-\- se devuelve estado claro
+## 8.4 Regla de protección comercial
 
-\- se ofrece recarga o alternativa
+No se debe consumir crédito sobre una acción que no produzca salida real, visible o técnicamente verificable.
 
+---
 
-
-\---
-
-
-
-\## 7. Contratos de planes
-
-
+## 9. Contratos de planes
 
 La lógica técnica de planes debe poder responder:
 
+- qué puede hacer este usuario;
+- qué activación le corresponde;
+- cuántos créditos iniciales recibe;
+- qué build puede ejecutar;
+- si puede desplegar;
+- si puede solicitar exportación;
+- qué profundidad tiene su continuidad.
 
-
-\- qué puede hacer este usuario
-
-\- qué activación le corresponde
-
-\- cuántos créditos iniciales recibe
-
-\- qué build puede ejecutar
-
-\- si puede desplegar
-
-\- si puede solicitar exportación
-
-\- qué profundidad tiene su continuidad
-
-
-
-\### Regla
+### Regla
 
 Los permisos no deben depender solo de frontend.
 
 Backend debe ser fuente de verdad.
 
+---
 
-
-\---
-
-
-
-\## 8. Contratos de recarga
-
-
+## 10. Contratos de recarga
 
 Las recargas futuras deben quedar preparadas como tipo propio de operación.
 
+### Deben definir
 
+- paquete comprado;
+- créditos otorgados;
+- fecha;
+- usuario;
+- transacción asociada.
 
-\### Deben definir
-
-\- paquete comprado
-
-\- créditos otorgados
-
-\- fecha
-
-\- usuario
-
-\- transacción asociada
-
-
-
-\### Regla
+### Regla
 
 Recarga comprada = crédito trazado en ledger.
 
+---
 
-
-\---
-
-
-
-\## 9. Contratos de exportación
-
-
+## 11. Contratos de exportación
 
 La exportación futura debe pasar por estas capas:
 
+1. solicitud;
+2. valoración;
+3. cotización;
+4. pago;
+5. preparación;
+6. entrega.
 
-
-1\. solicitud
-
-2\. valoración
-
-3\. cotización
-
-4\. pago
-
-5\. preparación
-
-6\. entrega
-
-
-
-\### Regla
+### Regla
 
 No debe resolverse como un botón simple sin estructura.
 
+La exportación debe leer de una estructura, código y estado de proyecto coherentes.
 
+---
 
-\---
-
-
-
-\## 10. Contratos de integración GitHub y despliegue
-
-
+## 12. Contratos de integración GitHub y despliegue
 
 Cuando el sistema conecte con GitHub y deployment, debe poder registrar:
 
+- repositorio conectado;
+- estado de conexión;
+- proyecto asociado;
+- despliegues ejecutados;
+- errores;
+- exportación del código si aplica.
 
-
-\- repositorio conectado
-
-\- estado de conexión
-
-\- proyecto asociado
-
-\- despliegues ejecutados
-
-\- errores
-
-\- exportación del código si aplica
-
-
-
-\### Entidad futura recomendada
+### Entidad futura recomendada
 
 `ProjectIntegration`
 
+### Campos posibles
 
+- `integration_id`
+- `project_id`
+- `provider`
+- `status`
+- `repo_name`
+- `repo_url`
+- `deployment_target`
+- `meta`
 
-\### Campos posibles
+### Regla
 
-\- `integration\_id`
+GitHub y despliegue no deben conectarse sobre una estructura simulada.
 
-\- `project\_id`
+Deben conectarse sobre código y estructura derivados del estado vivo del Builder.
 
-\- `provider`
+---
 
-\- `status`
+## 13. Endpoints mínimos futuros
 
-\- `repo\_name`
+## 13.1 Proyectos
 
-\- `repo\_url`
+- `POST /api/projects`
+- `GET /api/projects`
+- `GET /api/projects/{project_id}`
+- `POST /api/projects/{project_id}/refine`
+- `POST /api/projects/{project_id}/blueprint`
 
-\- `deployment\_target`
+## 13.2 Activación
 
-\- `meta`
+- `POST /api/projects/{project_id}/activation`
+- `GET /api/projects/{project_id}/activation`
 
+## 13.3 Builder
 
+- `POST /api/projects/{project_id}/build`
+- `GET /api/projects/{project_id}/builds`
+- `GET /api/builds/{build_id}`
+- `POST /api/builds/{build_id}/retry`
+- `GET /api/projects/{project_id}/builder-state`
+- `POST /api/projects/{project_id}/builder-state/mutations`
 
-\---
+### Regla
 
+Los endpoints de Builder no deben exponer solo texto.
 
+Deben poder devolver estado, preview, código, estructura o referencias a esos recursos.
 
-\## 11. Endpoints mínimos futuros
+## 13.4 Créditos
 
+- `GET /api/user/credits`
+- `GET /api/user/credits/ledger`
+- `POST /api/payments/credits/checkout`
 
+## 13.5 Exportación
 
-\## 11.1 Proyectos
+- `POST /api/projects/{project_id}/export/quote`
+- `POST /api/projects/{project_id}/export/checkout`
+- `GET /api/projects/{project_id}/export/status`
 
-\- `POST /api/projects`
+## 13.6 Despliegue
 
-\- `GET /api/projects`
+- `POST /api/projects/{project_id}/deploy`
+- `GET /api/projects/{project_id}/deployments`
 
-\- `GET /api/projects/{project\_id}`
+---
 
-\- `POST /api/projects/{project\_id}/refine`
-
-\- `POST /api/projects/{project\_id}/blueprint`
-
-
-
-\## 11.2 Activación futura
-
-\- `POST /api/projects/{project\_id}/activation`
-
-\- `GET /api/projects/{project\_id}/activation`
-
-
-
-\## 11.3 Builder futuro
-
-\- `POST /api/projects/{project\_id}/build`
-
-\- `GET /api/projects/{project\_id}/builds`
-
-\- `GET /api/builds/{build\_id}`
-
-\- `POST /api/builds/{build\_id}/retry`
-
-
-
-\## 11.4 Créditos futuros
-
-\- `GET /api/user/credits`
-
-\- `GET /api/user/credits/ledger`
-
-\- `POST /api/payments/credits/checkout`
-
-
-
-\## 11.5 Exportación futura
-
-\- `POST /api/projects/{project\_id}/export/quote`
-
-\- `POST /api/projects/{project\_id}/export/checkout`
-
-\- `GET /api/projects/{project\_id}/export/status`
-
-
-
-\## 11.6 Despliegue futuro
-
-\- `POST /api/projects/{project\_id}/deploy`
-
-\- `GET /api/projects/{project\_id}/deployments`
-
-
-
-\---
-
-
-
-\## 12. Reglas de frontend derivadas
-
-
+## 14. Reglas de frontend derivadas
 
 El frontend debe asumir estas reglas:
 
+- no depender solo de estado local para continuidad;
+- usar `project_id` como referencia fuerte;
+- reconstruir estado desde backend cuando haga falta;
+- mostrar estados del proyecto y del build con claridad;
+- no asumir permisos solo por UI;
+- reflejar saldo y consumo de créditos de forma legible;
+- representar preview, código y estructura desde una misma fuente viva;
+- no tratar mensajes del agente como construcción real;
+- no repetir sugerencias ya aplicadas;
+- no prometer exportación o deploy si no existe estructura coherente.
 
+### Regla específica de Builder
 
-\- no depender solo de estado local para continuidad
+Toda evolución de Builder debe pasar por:
 
-\- usar `project\_id` como referencia fuerte
+```text
+BuilderBuildKernel
+→ BuilderBuildState
+→ preview/código/estructura
+```
 
-\- reconstruir estado desde backend cuando haga falta
+---
 
-\- mostrar estados del proyecto y del build con claridad
-
-\- no asumir permisos solo por UI
-
-\- reflejar saldo y consumo de créditos de forma legible
-
-
-
-\---
-
-
-
-\## 13. Reglas de backend derivadas
-
-
+## 15. Reglas de backend derivadas
 
 El backend debe asumir estas reglas:
 
+- validar plan y permisos en servidor;
+- validar saldo de créditos en servidor;
+- registrar movimientos en ledger;
+- registrar jobs de construcción;
+- separar exportación de despliegue;
+- usar el proyecto como unidad central de continuidad;
+- preparar persistencia futura de estado de Builder;
+- no tratar IA puente como runtime vivo completo hasta su fase formal.
 
+### Regla específica de persistencia
 
-\- validar plan y permisos en servidor
+La primera fase puede iniciar en frontend como estado vivo modular.
 
-\- validar saldo de créditos en servidor
+La fase backend debe persistir o reconstruir ese estado cuando el Builder pase a exportación, deploy, créditos reales o continuidad avanzada.
 
-\- registrar movimientos en ledger
+---
 
-\- registrar jobs de construcción
+## 16. Regla de implementación
 
-\- separar exportación de despliegue
+No se debe implementar ninguna nueva capacidad de Builder, créditos, exportación o despliegue sin responder antes:
 
-\- usar el proyecto como unidad central de continuidad
-
-
-
-\---
-
-
-
-\## 14. Regla de implementación
-
-
-
-No se debe implementar ninguna nueva capacidad de builder, créditos, exportación o despliegue sin responder antes:
-
-
-
-\- qué entidad la soporta
-
-\- qué estado introduce
-
-\- qué endpoint la expone
-
-\- qué acción consume
-
-\- qué validación requiere
-
-\- qué trazabilidad deja
-
-
+- qué entidad la soporta;
+- qué estado introduce;
+- qué endpoint la expone;
+- qué acción consume;
+- qué validación requiere;
+- qué trazabilidad deja;
+- qué preview modifica;
+- qué código modifica;
+- qué estructura modifica;
+- qué coste futuro puede tener.
 
 Si una nueva capacidad no responde a eso, no está madura para implementarse.
 
+---
 
+## 17. Regla antisimulación del Builder
 
-\---
+El Builder no puede limitarse a simular construcción.
 
+Se considera simulación cuando una acción produce solo:
 
+- texto del agente;
+- animación de progreso;
+- cambios de copy no persistentes;
+- código decorativo no conectado;
+- preview que no refleja mutación;
+- estructura que no cambia;
+- preguntas repetidas sin memoria.
 
-\## 15. Cierre doctrinal
+Se considera construcción válida cuando una acción produce al menos uno de estos efectos:
 
+- estado vivo actualizado;
+- preview modificada;
+- código modificado;
+- estructura modificada;
+- CTA modificado;
+- bloque nuevo;
+- archivo nuevo;
+- siguiente decisión contextual distinta.
 
+---
+
+## 18. Cierre doctrinal
 
 Sistema Maestro ya no puede crecer como conjunto de respuestas y pantallas aisladas.
 
-
-
 Debe crecer como sistema con contratos claros entre:
 
+- producto;
+- Builder;
+- IA;
+- backend;
+- frontend;
+- economía;
+- continuidad;
+- salida.
 
+Este documento fija la base técnica V1 para implementar la siguiente fase sin improvisación estructural.
 
-\- producto
+La siguiente fase técnica queda condicionada a que Builder deje de operar como pantalla aislada y pase a operar como sistema vivo:
 
-\- backend
-
-\- frontend
-
-\- economía
-
-\- continuidad
-
-\- salida
-
-
-
-Este documento fija la base técnica V1 que permitirá implementar la siguiente fase sin improvisación estructural.
-
+```text
+input
+→ intención
+→ mutación
+→ estado
+→ preview
+→ código
+→ estructura
+→ decisión siguiente
+```

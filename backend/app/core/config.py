@@ -1,12 +1,14 @@
-from dotenv import load_dotenv
-load_dotenv()
-
+﻿from pathlib import Path
 import os
 import secrets
-from pathlib import Path
+
+from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = PROJECT_ROOT / "backend"
+ENV_FILE = BACKEND_ROOT / ".env"
+
+load_dotenv(ENV_FILE)
 
 MONGO_URL = os.environ["MONGO_URL"]
 DB_NAME = os.environ.get("DB_NAME", "sistemamaestro")
@@ -28,7 +30,7 @@ PLAN_INCLUDED_CREDITS = {
     "free": int(os.environ.get("CREDITS_FREE", "0")),
     "blueprint": int(os.environ.get("CREDITS_BLUEPRINT", "60")),
     "sistema": int(os.environ.get("CREDITS_SISTEMA", "220")),
-    "premium": int(os.environ.get("CREDITS_PREMIUM", "600"))
+    "premium": int(os.environ.get("CREDITS_PREMIUM", "600")),
 }
 
 

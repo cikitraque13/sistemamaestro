@@ -5,6 +5,12 @@ import { useAuth } from '../context/AuthContext';
 
 const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 
+const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
+  .trim()
+  .replace(/\/$/, '');
+
+const PUBLIC_CONFIG_URL = `${BACKEND_URL}/api/public/config`;
+
 let googleScriptPromise = null;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -49,8 +55,14 @@ const loadGoogleScriptOnce = () => {
 };
 
 const getGoogleClientId = async () => {
+  const envClientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
+
+  if (envClientId) {
+    return envClientId;
+  }
+
   try {
-    const response = await fetch('/api/public/config', {
+    const response = await fetch(PUBLIC_CONFIG_URL, {
       method: 'GET',
       credentials: 'include',
       headers: { Accept: 'application/json' }
@@ -61,9 +73,9 @@ const getGoogleClientId = async () => {
     }
 
     const data = await response.json();
-    return data?.google_client_id || '';
+    return (data?.google_client_id || '').trim();
   } catch (error) {
-    console.error('Error cargando /api/public/config:', error);
+    console.error(`Error cargando ${PUBLIC_CONFIG_URL}:`, error);
     return '';
   }
 };
@@ -73,11 +85,15 @@ const MATRIX_CHARS = [
   'S', 'Y', 'S', 'Q', 'R', 'I', 'V', 'M', 'C', '8', '2', '5', 'F', 'P'
 ];
 
-const buildMatrixColumn = (length = 28) => {
-  return Array.from({ length }, (_, index) => ({
+const buildMatrixColumn = (length = 28) =>
+  Array.from({ length }, (_, index) => ({
     id: index,
     char: MATRIX_CHARS[(index * 7 + length) % MATRIX_CHARS.length]
   }));
+
+const hasRenderedGoogleButton = (node) => {
+  if (!node) return false;
+  return Boolean(node.querySelector('iframe, div[role="button"]'));
 };
 
 const MatrixRain = () => {
@@ -251,6 +267,8 @@ const GoogleConnectingOverlay = ({ stepText }) => {
               </div>
             </div>
           </div>
+
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#39ff88]/40 to-transparent" />
         </div>
       </div>
     </div>
@@ -262,6 +280,9 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   const wrapperRef = useRef(null);
   const initializedRef = useRef(false);
   const mountedRef = useRef(false);
+  const renderTimeoutRef = useRef(null);
+  const lastRenderedWidthRef = useRef(null);
+
   const authRef = useRef({
     loginWithGoogleCredential: null,
     redirectPath: '/dashboard',
@@ -286,13 +307,13 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   }, [loginWithGoogleCredential, redirectPath, redirectState]);
 
   useEffect(() => {
-    if (!wrapperRef.current) return;
+    if (!wrapperRef.current) return undefined;
 
     const updateWidth = () => {
       if (!wrapperRef.current) return;
       const width = wrapperRef.current.clientWidth;
       const safeWidth = Math.max(220, Math.min(360, width));
-      setButtonWidth(safeWidth);
+      setButtonWidth((current) => (current === safeWidth ? current : safeWidth));
     };
 
     updateWidth();
@@ -394,17 +415,36 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           initializedRef.current = true;
         }
 
-        containerRef.current.innerHTML = '';
+        const alreadyRendered =
+          lastRenderedWidthRef.current === buttonWidth &&
+          containerRef.current.childElementCount > 0 &&
+          hasRenderedGoogleButton(containerRef.current);
 
-        googleId.renderButton(containerRef.current, {
-          type: 'standard',
-          theme: 'outline',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          width: buttonWidth
-        });
+        if (!alreadyRendered) {
+          containerRef.current.innerHTML = '';
+
+          googleId.renderButton(containerRef.current, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: buttonWidth
+          });
+
+          lastRenderedWidthRef.current = buttonWidth;
+
+          window.clearTimeout(renderTimeoutRef.current);
+          renderTimeoutRef.current = window.setTimeout(() => {
+            const ok = hasRenderedGoogleButton(containerRef.current);
+
+            if (!ok && mountedRef.current) {
+              setStatus('error');
+              setErrorMessage('No se pudo dibujar el botón de Google.');
+            }
+          }, 220);
+        }
 
         if (mountedRef.current) {
           setStatus('ready');
@@ -424,6 +464,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 
     return () => {
       mountedRef.current = false;
+      window.clearTimeout(renderTimeoutRef.current);
     };
   }, [navigate, buttonWidth]);
 
@@ -446,11 +487,13 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
           )}
 
           <div className="flex justify-center">
-            <div
-              ref={wrapperRef}
-              className="w-full max-w-[360px] overflow-hidden rounded-xl"
-            >
-              <div ref={containerRef} className="min-h-[44px] flex justify-center" />
+            <div ref={wrapperRef} className="w-full max-w-[360px]">
+              <div className="rounded-xl border border-white/10 bg-white/95 p-[1px] shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+                <div
+                  ref={containerRef}
+                  className="min-h-[44px] rounded-[11px] bg-white flex items-center justify-center"
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,22 @@
+﻿=== 74-BACKEND-PYTHON-VERSION-PROBE ===
+
+[PY LAUNCHER]
+ -V:3.14 *        C:\Python314\python.exe
+
+[COMMON VERSION CHECKS]
+CHECK: py -3.11
+No suitable Python runtime found
+Pass --list (-0) to see all detected environments on your machine
+or set environment variable PYLAUNCHER_ALLOW_INSTALL to use winget
+or open the Microsoft Store to the requested version.
+
+CHECK: py -3.12
+No suitable Python runtime found
+Pass --list (-0) to see all detected environments on your machine
+or set environment variable PYLAUNCHER_ALLOW_INSTALL to use winget
+or open the Microsoft Store to the requested version.
+
+CHECK: python
+C:\Python314\python.exe
+3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]
+

@@ -1,0 +1,79 @@
+﻿===== 00-INDICE-MAESTRO.md =====
+
+===== 01-DECISIONES-CERRADAS.md =====
+
+===== 02-PENDIENTES-PRIORIZADOS.md =====
+
+===== 03-INVENTARIO-TECNICO.md =====
+# 03-INVENTARIO-TECNICO
+## Estado del documento
+## 1. Función de este documento
+## 2. Lectura general actual
+## 3. Capas del sistema
+## 3.1 Producto real
+## 3.2 Entorno regenerable
+## 3.3 Temporales y cachés
+## 3.4 Salida / build / deploy
+## 4. Inventario técnico por áreas
+## 4.1 Raíz del proyecto
+### Zonas identificadas como sistema real
+### Zonas auxiliares o pendientes de clasificación final
+### Infraestructura de repositorio
+## 4.2 Frontend
+### Función
+### Subcapas ya reconocidas
+### Observación clave
+## 4.3 Backend
+### Función esperada
+### Estado actual de inventario
+## 4.4 Documentación
+### Función
+### Decisión ya tomada
+## 4.5 Frontend funcional por módulos
+### Módulos detectados
+### Lectura
+## 4.6 Pages residuales
+### Estado actual
+### Interpretación correcta
+### Regla derivada
+## 4.7 Enrutado principal del producto
+### Lectura
+## 4.8 Auth
+### Alcance observado
+### Lectura
+## 4.9 Dashboard y operación
+### Áreas observadas
+### Lectura
+## 4.10 Builder / Build
+### Lectura estructural
+### Estado del inventario
+## 4.11 Motor, IA e integraciones
+### Estado actual del inventario
+### Regla de precisión
+## 4.12 Configuración y manifiestos
+### Elementos reconocidos
+### Lectura
+## 5. Clasificación del sistema
+## 5.1 Fuente real reconocida
+## 5.2 Fuente funcional principal del producto
+## 5.3 Fuente residual temporal aprobada
+## 5.4 Entorno regenerable reconocido
+## 5.5 Auxiliares por revisar
+## 6. Riesgos detectados por este inventario
+## 6.1 Riesgo de falsa percepción
+## 6.2 Riesgo de mezclar producto con entorno
+## 6.3 Riesgo de tocar piezas equivocadas
+## 6.4 Riesgo de crecer sin gobierno
+## 7. Qué no decide este documento
+## 8. Qué documentos dependen de este inventario
+## 9. Veredicto técnico actual
+## 10. Conclusión operativa
+
+===== 04-RUTAS-CANONICAS.md =====
+
+===== 05-INCIDENCIAS-Y-DIAGNOSTICOS.md =====
+
+===== 06-PROCEDIMIENTOS-OPERATIVOS.md =====
+
+===== 07-GIT-DEPLOY-HIGIENE.md =====
+

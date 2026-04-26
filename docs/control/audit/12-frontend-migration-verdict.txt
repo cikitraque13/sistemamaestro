@@ -1,0 +1,11 @@
+﻿VEREDICTO MIGRACION FRONTEND
+
+1. La migracion principal pages -> features esta practicamente cerrada.
+2. App.js ya enruta el producto principal desde frontend/src/features/*.
+3. frontend/src/pages queda reducido a excepcion temporal para:
+   - Privacy.js
+   - Cookies.js
+   - Terms.js
+4. No se aprueban nuevas paginas de producto en frontend/src/pages.
+5. Todo lo nuevo enrutable debe nacer en frontend/src/features.
+6. El siguiente paso es preparar criterio de commit limpio, no hacer deploy.

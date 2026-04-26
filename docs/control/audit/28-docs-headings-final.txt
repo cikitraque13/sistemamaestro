@@ -1,0 +1,507 @@
+﻿===== 00-INDICE-MAESTRO.md =====
+# 00-INDICE-MAESTRO
+## Estado del documento
+## 1. Función de este documento
+## 2. Regla maestra de gobierno
+## 3. Documentos canónicos del sistema
+## 3.1 Índice maestro
+### Documento
+### Función
+### No debe contener
+## 3.2 Decisiones cerradas
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 3.3 Pendientes priorizados
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 3.4 Inventario técnico
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 3.5 Rutas canónicas
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 3.6 Incidencias y diagnósticos
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 3.7 Procedimientos operativos
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 3.8 Git, deploy e higiene
+### Documento
+### Función
+### Debe contener
+### No debe contener
+## 4. Orden correcto de redacción
+## 5. Dependencias entre documentos
+### 5.1 Documento base
+### 5.2 Documento de realidad técnica
+### 5.3 Documento de autoridad estructural
+### 5.4 Documento de manipulación segura
+### 5.5 Documento de ejecución priorizada
+## 6. Regla antisolape
+## 7. Regla de canonicidad documental
+## 8. Estado actual de construcción documental
+## 9. Criterio de mantenimiento
+## 10. Veredicto operativo
+
+===== 01-DECISIONES-CERRADAS.md =====
+# 01-DECISIONES-CERRADAS
+## Estado del documento
+## 1. Función de este documento
+## 2. Regla de gobierno del sistema
+### Decisión cerrada 01
+### Regla aprobada
+### Efecto operativo
+## 3. Carpeta canónica de gobierno documental
+### Decisión cerrada 02
+### Efecto operativo
+## 4. Bloque documental crítico inicial
+### Decisión cerrada 03
+### Efecto operativo
+## 5. Orden correcto de construcción documental
+### Decisión cerrada 04
+### Efecto operativo
+## 6. Fuente real del sistema
+### Decisión cerrada 05
+### Efecto operativo
+## 7. Fuente real del frontend
+### Decisión cerrada 06
+### Efecto operativo
+## 8. Capa principal del producto frontend
+### Decisión cerrada 07
+### Efecto operativo
+## 9. Estado de `frontend/src/pages`
+### Decisión cerrada 08
+### Efecto operativo
+## 10. Módulos funcionales reconocidos
+### Decisión cerrada 09
+### Efecto operativo
+## 11. Builder como núcleo de producto
+### Decisión cerrada 10
+### Efecto operativo
+## 12. Backend como capa real
+### Decisión cerrada 11
+### Efecto operativo
+## 13. Motor, IA e integraciones
+### Decisión cerrada 12
+### Efecto operativo
+## 14. Entorno regenerable
+### Decisión cerrada 13
+### Efecto operativo
+## 15. Gestor de paquetes aprobado
+### Decisión cerrada 14
+### Lockfile canónico
+### Lockfile no aprobado como vía activa
+### Efecto operativo
+## 16. Higiene mínima ya aprobada
+### Decisión cerrada 15
+### Incluye
+### Efecto operativo
+## 17. Regla de commits
+### Decisión cerrada 16
+### Efecto operativo
+## 18. Regla de deploy
+### Decisión cerrada 17
+### Efecto operativo
+## 19. Regla de prudencia estructural
+### Decisión cerrada 18
+### Efecto operativo
+## 20. Regla de avance
+### Decisión cerrada 19
+### Efecto operativo
+## 21. Regla antidesviación
+### Decisión cerrada 20
+### Efecto operativo
+## 22. Veredicto operativo actual
+## 23. Regla de mantenimiento
+
+===== 02-PENDIENTES-PRIORIZADOS.md =====
+# 02-PENDIENTES-PRIORIZADOS
+## Estado del documento
+## 1. Función de este documento
+## 2. Regla de priorización
+### Regla operativa
+## 3. Estado operativo actual
+## 4. Pendientes priorizados actuales
+## PRIORIDAD 1 — CRÍTICA ESTRUCTURAL
+### Consolidar documentación canónica en el árbol real
+## PRIORIDAD 2 — CRÍTICA ESTRUCTURAL
+### Auditar topología interna real de backend
+## PRIORIDAD 3 — CRÍTICA ESTRUCTURAL
+### Localizar motor, IA e integraciones con ruta exacta
+## PRIORIDAD 4 — CRÍTICA ESTRUCTURAL
+### Clasificar definitivamente rutas auxiliares
+## PRIORIDAD 5 — CRÍTICA ESTRUCTURAL
+### Preparar criterio de commit limpio por bloques
+## PRIORIDAD 6 — OPTIMIZACIÓN ESTRATÉGICA
+### Cerrar migración estructural residual del frontend
+## PRIORIDAD 7 — OPTIMIZACIÓN ESTRATÉGICA
+### Definir política final de auditorías estables en `docs/control/audit/`
+## PRIORIDAD 8 — OPTIMIZACIÓN ESTRATÉGICA
+### Reabrir Home, Auth y Builder como frentes de producto
+## PRIORIDAD 9 — OPTIMIZACIÓN ESTRATÉGICA
+### Preparar capa de decisiones cerradas
+## PRIORIDAD 10 — OPTIMIZACIÓN ESTRATÉGICA
+### Preparar procedimientos operativos reales
+## 5. Pendientes explícitamente bloqueados
+## 6. Pendientes no prioritarios todavía
+## 7. Orden operativo inmediato
+## 8. Regla de avance
+## 9. Veredicto operativo actual
+## 10. Conclusión operativa
+
+===== 03-INVENTARIO-TECNICO.md =====
+# 03-INVENTARIO-TECNICO
+## Estado del documento
+## 1. Función de este documento
+## 2. Lectura general actual
+## 3. Capas del sistema
+## 3.1 Producto real
+## 3.2 Entorno regenerable
+## 3.3 Temporales y cachés
+## 3.4 Salida / build / deploy
+## 4. Inventario técnico por áreas
+## 4.1 Raíz del proyecto
+### Zonas identificadas como sistema real
+### Zonas auxiliares o pendientes de clasificación final
+### Infraestructura de repositorio
+## 4.2 Frontend
+### Función
+### Subcapas ya reconocidas
+### Observación clave
+## 4.3 Backend
+### Función esperada
+### Estado actual de inventario
+## 4.4 Documentación
+### Función
+### Decisión ya tomada
+## 4.5 Frontend funcional por módulos
+### Módulos detectados
+### Lectura
+## 4.6 Pages residuales
+### Estado actual
+### Interpretación correcta
+### Regla derivada
+## 4.7 Enrutado principal del producto
+### Lectura
+## 4.8 Auth
+### Alcance observado
+### Lectura
+## 4.9 Dashboard y operación
+### Áreas observadas
+### Lectura
+## 4.10 Builder / Build
+### Lectura estructural
+### Estado del inventario
+## 4.11 Motor, IA e integraciones
+### Estado actual del inventario
+### Regla de precisión
+## 4.12 Configuración y manifiestos
+### Elementos reconocidos
+### Lectura
+## 5. Clasificación del sistema
+## 5.1 Fuente real reconocida
+## 5.2 Fuente funcional principal del producto
+## 5.3 Fuente residual temporal aprobada
+## 5.4 Entorno regenerable reconocido
+## 5.5 Auxiliares por revisar
+## 6. Riesgos detectados por este inventario
+## 6.1 Riesgo de falsa percepción
+## 6.2 Riesgo de mezclar producto con entorno
+## 6.3 Riesgo de tocar piezas equivocadas
+## 6.4 Riesgo de crecer sin gobierno
+## 7. Qué no decide este documento
+## 8. Qué documentos dependen de este inventario
+## 9. Veredicto técnico actual
+## 10. Conclusión operativa
+
+===== 04-RUTAS-CANONICAS.md =====
+# 04-RUTAS-CANONICAS
+## Estado del documento
+## 1. Función de este documento
+## 2. Regla maestra de canonicidad
+## 3. Rutas canónicas de sistema
+### Lectura
+## 4. Rutas canónicas de frontend
+### Función
+### Regla
+## 5. Ruta canónica de producto enrutable
+### Lectura
+## 6. Módulos canónicos reconocidos en `frontend/src/features`
+### Regla
+## 7. Ruta residual temporal aprobada
+### Alcance actual aprobado
+### Regla
+### Interpretación
+## 8. Rutas auxiliares por revisar
+### Lectura
+### Regla
+## 9. Rutas regenerables / no canónicas
+### Incluye
+### Regla
+## 10. Ruta canónica de gobierno documental
+### Regla
+## 11. Ruta canónica de inventario y auditoría
+### Regla
+## 12. Canonicidad provisional de backend
+### Lectura
+### Límite
+## 13. Canonicidad estructural de Builder
+### Lectura
+### Límite
+## 14. Canonicidad estructural de Auth
+### Lectura
+## 15. Canonicidad estructural de Home
+### Lectura
+## 16. Canonicidad estructural de operación interna
+### Lectura
+## 17. Rutas pendientes de cierre exacto
+### Regla
+## 18. Reglas derivadas de canonicidad
+### 18.1 Regla de creación
+### 18.2 Regla de excepción
+### 18.3 Regla de lectura
+### 18.4 Regla documental
+### 18.5 Regla de backend
+## 19. Qué no decide este documento
+## 20. Dependencia y efecto
+### Este documento depende de
+### Este documento alimenta
+## 21. Veredicto de canonicidad actual
+### Canónico
+### Residual temporal
+### Auxiliar por revisar
+### No canónico / regenerable
+## 22. Conclusión operativa
+
+===== 05-INCIDENCIAS-Y-DIAGNOSTICOS.md =====
+# 05-INCIDENCIAS-Y-DIAGNOSTICOS
+## Estado del documento
+## 1. Función de este documento
+## 2. Regla de uso
+## 3. Estructura obligatoria de cada incidencia
+## 4. Incidencias registradas
+## INCIDENCIA 001 — CRECIMIENTO SIN GOBIERNO TÉCNICO PREVIO
+### Fase
+### Capa afectada
+### Síntoma observado
+### Diagnóstico
+### Causa raíz
+### Impacto
+### Estado
+### Resolución aplicada
+### Aprendizaje operativo
+## INCIDENCIA 002 — FALSA PERCEPCIÓN DEL PROYECTO POR VOLUMEN BRUTO
+### Fase
+### Capa afectada
+### Síntoma observado
+### Diagnóstico
+### Causa raíz
+### Impacto
+### Estado
+### Resolución aplicada
+### Aprendizaje operativo
+## INCIDENCIA 003 — DESVIACIÓN DE FOCO HACIA SÍNTOMAS LOCALES
+### Fase
+### Capa afectada
+### Síntoma observado
+### Diagnóstico
+### Causa raíz
+### Impacto
+### Estado
+### Resolución aplicada
+### Aprendizaje operativo
+## INCIDENCIA 004 — CONVIVENCIA DE DOS GESTORES DE PAQUETES EN FRONTEND
+### Fase
+### Capa afectada
+### Síntoma observado
+### Diagnóstico
+### Causa raíz
+### Impacto
+### Estado
+### Resolución aplicada
+### Aprendizaje operativo
+## INCIDENCIA 005 — MIGRACIÓN ESTRUCTURAL DEL FRONTEND SIN CIERRE FORMAL
+### Fase
+### Capa afectada
+### Síntoma observado
+### Diagnóstico
+### Causa raíz
+### Impacto
+### Estado
+### Resolución aplicada
+### Aprendizaje operativo
+## INCIDENCIA 006 — DOCUMENTACIÓN CANÓNICA NACIDA INCOMPLETA
+### Fase
+### Capa afectada
+### Síntoma observado
+### Diagnóstico
+### Causa raíz
+### Impacto
+### Estado
+### Resolución aplicada
+### Aprendizaje operativo
+## 5. Plantilla de registro futuro
+### INCIDENCIA XXX — NOMBRE CORTO
+## 6. Qué no debe entrar en este documento
+## 7. Dependencias y relación con otros documentos
+### Este documento depende de
+### Este documento alimenta
+## 8. Veredicto operativo
+
+===== 06-PROCEDIMIENTOS-OPERATIVOS.md =====
+# 06-PROCEDIMIENTOS-OPERATIVOS
+## Estado del documento
+## 1. Función de este documento
+## 2. Principios operativos generales
+## 2.1 Principio de no improvisación
+## 2.2 Principio de un frente por vez
+## 2.3 Principio de lectura antes de acción
+## 2.4 Principio de no destrucción
+## 2.5 Principio de cierre secuencial
+## 3. Procedimiento de apertura de frente técnico
+### Cuándo usarlo
+### Secuencia
+### Resultado esperado
+## 4. Procedimiento de auditoría
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 5. Procedimiento de clasificación
+### Cuándo usarlo
+### Secuencia
+### Resultado esperado
+## 6. Procedimiento de canonicidad
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 7. Procedimiento de higiene técnica
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 8. Procedimiento de staging limpio
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 9. Procedimiento de commit limpio
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 10. Procedimiento de tratamiento de incidencias
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 11. Procedimiento de tratamiento de documentación canónica
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 12. Procedimiento de rutas auxiliares por revisar
+### Cuándo usarlo
+### Secuencia
+## 13. Procedimiento de frontend en migración estructural
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 14. Procedimiento de backend por auditar
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 15. Procedimiento de motor, IA e integraciones
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 16. Procedimiento previo a deploy
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 17. Procedimiento de cierre de paso
+### Cuándo usarlo
+### Secuencia
+### Regla
+## 18. Qué no debe entrar en este documento
+## 19. Dependencias y relación con otros documentos
+### Este documento depende de
+### Este documento alimenta
+## 20. Veredicto operativo
+
+===== 07-GIT-DEPLOY-HIGIENE.md =====
+# 07-GIT-DEPLOY-HIGIENE
+## Estado del documento
+## 1. Función de este documento
+## 2. Principio rector
+## 3. Base estructural de esta política
+## 4. Qué entra en Git
+## 4.1 Sí entra en Git
+### Incluye
+## 4.2 Entra en Git con revisión
+### Regla
+## 5. Qué no entra en Git
+## 5.1 No entra nunca
+### Incluye
+## 5.2 Variables y secretos
+### Excepción
+## 6. Política de lockfiles y gestor de paquetes
+## 6.1 Gestor de paquetes aprobado
+### Regla
+## 6.2 Lockfile aprobado
+## 6.3 Lockfile no aprobado
+### Regla
+## 7. Qué puede borrarse
+## 7.1 Borrable regenerable
+### Incluye
+### Condición
+## 7.2 No borrable sin auditoría previa
+## 7.3 Auxiliares por revisar
+### Regla
+## 8. Política de ZIP
+## 8.1 Qué no debe entrar en ZIP
+## 8.2 Qué sí puede entrar en ZIP
+### Regla
+## 9. Política de deploy
+## 9.1 Regla principal
+### Nunca debe desplegarse
+## 9.2 Qué puede alimentar un deploy
+## 9.3 Estado actual del proyecto respecto a deploy
+### Motivos
+## 10. Política de staging y commits
+## 10.1 Regla de commits
+### Regla
+## 10.2 Regla de staging
+## 10.3 Regla de commits canónicos
+## 11. Política de backups y seguridad operativa
+## 11.1 Backups de trabajo
+### Regla
+## 11.2 Backups sensibles
+## 12. Relación con `docs/control/`
+## 12.1 Qué sí puede vivir en `docs/control/`
+## 12.2 Qué no debe quedarse ahí como canónico
+## 13. Reglas derivadas
+## 13.1 Regla de fuente
+## 13.2 Regla de entorno
+## 13.3 Regla de entrega
+## 13.4 Regla de prudencia
+## 14. Qué no decide este documento
+## 15. Dependencias de este documento
+### Depende de
+### Alimenta
+## 16. Veredicto operativo actual
+### Sí entra en Git
+### No entra en Git
+### Sí puede borrarse
+### No puede borrarse a ciegas
+### No entra en ZIP
+### No procede desplegar todavía
+## 17. Conclusión operativa
+

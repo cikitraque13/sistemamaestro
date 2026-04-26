@@ -1,0 +1,304 @@
+﻿=== 73-BACKEND-VENV-BOOTSTRAP-AND-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+BACKEND: C:\Users\lucas\Desktop\sistemamaestro\backend
+REQUIREMENTS: C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt
+VENV: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv
+
+[CREATE VENV]
+VENV EXISTS AFTER: True
+
+[VENV PYTHON]
+PYTHON EXE: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+PYTHON VERSION: 3.14.4 (tags/v3.14.4:23116f9, Apr  7 2026, 14:10:54) [MSC v.1944 64 bit (AMD64)]
+
+[UPGRADE PIP TOOLCHAIN]
+Requirement already satisfied: pip in .\backend\.venv\Lib\site-packages (26.0.1)
+Collecting setuptools
+  Downloading setuptools-82.0.1-py3-none-any.whl.metadata (6.5 kB)
+Collecting wheel
+  Downloading wheel-0.46.3-py3-none-any.whl.metadata (2.4 kB)
+Collecting packaging>=24.0 (from wheel)
+  Downloading packaging-26.1-py3-none-any.whl.metadata (3.5 kB)
+Downloading setuptools-82.0.1-py3-none-any.whl (1.0 MB)
+   ---------------------------------------- 1.0/1.0 MB 10.6 MB/s  0:00:00
+Downloading wheel-0.46.3-py3-none-any.whl (30 kB)
+Downloading packaging-26.1-py3-none-any.whl (95 kB)
+Installing collected packages: setuptools, packaging, wheel
+
+Successfully installed packaging-26.1 setuptools-82.0.1 wheel-0.46.3
+
+[INSTALL REQUIREMENTS]
+Collecting aiohappyeyeballs==2.6.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 1))
+  Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiohttp==3.13.5 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 2))
+  Downloading aiohttp-3.13.5-cp314-cp314-win_amd64.whl.metadata (8.4 kB)
+Collecting aiosignal==1.4.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 3))
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting annotated-doc==0.0.4 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 4))
+  Downloading annotated_doc-0.0.4-py3-none-any.whl.metadata (6.6 kB)
+Collecting annotated-types==0.7.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 5))
+  Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting anyio==4.13.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 6))
+  Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+Collecting attrs==26.1.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 7))
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting bcrypt==4.1.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 8))
+  Downloading bcrypt-4.1.3-cp39-abi3-win_amd64.whl.metadata (9.8 kB)
+Collecting beautifulsoup4==4.14.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 9))
+  Downloading beautifulsoup4-4.14.3-py3-none-any.whl.metadata (3.8 kB)
+Collecting boto3==1.42.86 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 10))
+  Downloading boto3-1.42.86-py3-none-any.whl.metadata (6.7 kB)
+Collecting botocore==1.42.86 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 11))
+  Downloading botocore-1.42.86-py3-none-any.whl.metadata (5.9 kB)
+Collecting certifi==2026.2.25 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 12))
+  Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+Collecting cffi==2.0.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 13))
+  Downloading cffi-2.0.0-cp314-cp314-win_amd64.whl.metadata (2.6 kB)
+Collecting charset-normalizer==3.4.7 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 14))
+  Downloading charset_normalizer-3.4.7-cp314-cp314-win_amd64.whl.metadata (41 kB)
+Collecting click==8.3.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 15))
+  Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
+Collecting cryptography==46.0.7 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 16))
+  Downloading cryptography-46.0.7-cp311-abi3-win_amd64.whl.metadata (5.7 kB)
+Collecting distro==1.9.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 17))
+  Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting dnspython==2.8.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 18))
+  Downloading dnspython-2.8.0-py3-none-any.whl.metadata (5.7 kB)
+Collecting ecdsa==0.19.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 19))
+  Downloading ecdsa-0.19.2-py2.py3-none-any.whl.metadata (29 kB)
+Collecting email-validator==2.3.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 20))
+  Downloading email_validator-2.3.0-py3-none-any.whl.metadata (26 kB)
+Collecting fastapi==0.110.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 21))
+  Downloading fastapi-0.110.1-py3-none-any.whl.metadata (24 kB)
+Collecting fastuuid==0.14.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 22))
+  Downloading fastuuid-0.14.0-cp314-cp314-win_amd64.whl.metadata (1.1 kB)
+Collecting filelock==3.25.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 23))
+  Downloading filelock-3.25.2-py3-none-any.whl.metadata (2.0 kB)
+Collecting frozenlist==1.8.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 24))
+  Downloading frozenlist-1.8.0-cp314-cp314-win_amd64.whl.metadata (21 kB)
+Collecting fsspec==2026.3.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 25))
+  Downloading fsspec-2026.3.0-py3-none-any.whl.metadata (10 kB)
+Collecting google-ai-generativelanguage==0.6.15 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 26))
+  Downloading google_ai_generativelanguage-0.6.15-py3-none-any.whl.metadata (5.7 kB)
+Collecting google-api-core==2.30.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 27))
+  Downloading google_api_core-2.30.2-py3-none-any.whl.metadata (3.1 kB)
+Collecting google-api-python-client==2.194.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 28))
+  Downloading google_api_python_client-2.194.0-py3-none-any.whl.metadata (7.0 kB)
+Collecting google-auth==2.49.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 29))
+  Downloading google_auth-2.49.1-py3-none-any.whl.metadata (6.2 kB)
+Collecting google-auth-httplib2==0.3.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 30))
+  Downloading google_auth_httplib2-0.3.1-py3-none-any.whl.metadata (3.0 kB)
+Collecting google-genai==1.71.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 31))
+  Downloading google_genai-1.71.0-py3-none-any.whl.metadata (52 kB)
+Collecting google-generativeai==0.8.6 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 32))
+  Downloading google_generativeai-0.8.6-py3-none-any.whl.metadata (3.9 kB)
+Collecting googleapis-common-protos==1.74.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 33))
+  Downloading googleapis_common_protos-1.74.0-py3-none-any.whl.metadata (9.2 kB)
+Collecting grpcio==1.80.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 34))
+  Downloading grpcio-1.80.0-cp314-cp314-win_amd64.whl.metadata (3.9 kB)
+Collecting grpcio-status==1.71.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 35))
+  Downloading grpcio_status-1.71.2-py3-none-any.whl.metadata (1.1 kB)
+Collecting h11==0.16.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 36))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting hf-xet==1.4.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 37))
+  Downloading hf_xet-1.4.3-cp37-abi3-win_amd64.whl.metadata (4.9 kB)
+Collecting httpcore==1.0.9 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 38))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting httplib2==0.31.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 39))
+  Downloading httplib2-0.31.2-py3-none-any.whl.metadata (2.2 kB)
+Collecting httpx==0.28.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 40))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting huggingface_hub==1.9.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 41))
+  Downloading huggingface_hub-1.9.2-py3-none-any.whl.metadata (14 kB)
+Collecting idna==3.11 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 42))
+  Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+Collecting importlib_metadata==9.0.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 43))
+  Downloading importlib_metadata-9.0.0-py3-none-any.whl.metadata (4.5 kB)
+Collecting Jinja2==3.1.6 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 44))
+  Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting jiter==0.13.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 45))
+  Downloading jiter-0.13.0-cp314-cp314-win_amd64.whl.metadata (5.3 kB)
+Collecting jmespath==1.1.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 46))
+  Downloading jmespath-1.1.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting jq==1.11.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 47))
+  Downloading jq-1.11.0-cp314-cp314-win_amd64.whl.metadata (7.3 kB)
+Collecting jsonschema==4.26.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 48))
+  Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting jsonschema-specifications==2025.9.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 49))
+  Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting librt==0.8.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 50))
+  Downloading librt-0.8.1-cp314-cp314-win_amd64.whl.metadata (1.4 kB)
+Collecting litellm==1.80.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 51))
+  Downloading litellm-1.80.0-py3-none-any.whl.metadata (30 kB)
+Collecting markdown-it-py==4.0.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 52))
+  Downloading markdown_it_py-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting MarkupSafe==3.0.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 53))
+  Downloading markupsafe-3.0.3-cp314-cp314-win_amd64.whl.metadata (2.8 kB)
+Collecting mdurl==0.1.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 54))
+  Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting motor==3.3.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 55))
+  Downloading motor-3.3.1-py3-none-any.whl.metadata (20 kB)
+Collecting multidict==6.7.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 56))
+  Downloading multidict-6.7.1-cp314-cp314-win_amd64.whl.metadata (5.5 kB)
+Collecting numpy==2.4.4 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 57))
+  Downloading numpy-2.4.4-cp314-cp314-win_amd64.whl.metadata (6.6 kB)
+Collecting oauthlib==3.3.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 58))
+  Downloading oauthlib-3.3.1-py3-none-any.whl.metadata (7.9 kB)
+Collecting openai==1.99.9 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 59))
+  Downloading openai-1.99.9-py3-none-any.whl.metadata (29 kB)
+Collecting packaging==26.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 60))
+  Downloading packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting pandas==3.0.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 61))
+  Downloading pandas-3.0.2-cp314-cp314-win_amd64.whl.metadata (19 kB)
+Collecting passlib==1.7.4 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 62))
+  Downloading passlib-1.7.4-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting pillow==12.2.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 63))
+  Downloading pillow-12.2.0-cp314-cp314-win_amd64.whl.metadata (9.0 kB)
+Collecting propcache==0.4.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 64))
+  Downloading propcache-0.4.1-cp314-cp314-win_amd64.whl.metadata (14 kB)
+Collecting proto-plus==1.27.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 65))
+  Downloading proto_plus-1.27.2-py3-none-any.whl.metadata (2.2 kB)
+Collecting protobuf==5.29.6 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 66))
+  Downloading protobuf-5.29.6-cp310-abi3-win_amd64.whl.metadata (592 bytes)
+Collecting pyasn1==0.6.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 67))
+  Downloading pyasn1-0.6.3-py3-none-any.whl.metadata (8.4 kB)
+Collecting pyasn1_modules==0.4.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 68))
+  Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+Collecting pycparser==3.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 69))
+  Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+Collecting pydantic==2.12.5 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 70))
+  Downloading pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
+Collecting pydantic_core==2.41.5 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 71))
+  Downloading pydantic_core-2.41.5-cp314-cp314-win_amd64.whl.metadata (7.4 kB)
+Collecting Pygments==2.20.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 72))
+  Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting PyJWT==2.12.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 73))
+  Downloading pyjwt-2.12.1-py3-none-any.whl.metadata (4.1 kB)
+Collecting pymongo==4.5.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 74))
+  Downloading pymongo-4.5.0.tar.gz (848 kB)
+     ---------------------------------------- 848.7/848.7 kB 17.3 MB/s  0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting pyparsing==3.3.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 75))
+  Downloading pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+Collecting python-dateutil==2.9.0.post0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 76))
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting python-dotenv==1.2.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 77))
+  Downloading python_dotenv-1.2.2-py3-none-any.whl.metadata (27 kB)
+Collecting python-jose==3.5.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 78))
+  Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+Collecting python-multipart==0.0.24 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 79))
+  Downloading python_multipart-0.0.24-py3-none-any.whl.metadata (1.8 kB)
+Collecting PyYAML==6.0.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 80))
+  Downloading pyyaml-6.0.3-cp314-cp314-win_amd64.whl.metadata (2.4 kB)
+Collecting referencing==0.37.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 81))
+  Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting regex==2026.4.4 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 82))
+  Downloading regex-2026.4.4-cp314-cp314-win_amd64.whl.metadata (41 kB)
+Collecting requests==2.33.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 83))
+  Downloading requests-2.33.1-py3-none-any.whl.metadata (4.8 kB)
+Collecting requests-oauthlib==2.0.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 84))
+  Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+Collecting rich==14.3.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 85))
+  Downloading rich-14.3.3-py3-none-any.whl.metadata (18 kB)
+Collecting rpds-py==0.30.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 86))
+  Downloading rpds_py-0.30.0-cp314-cp314-win_amd64.whl.metadata (4.2 kB)
+Collecting rsa==4.9.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 87))
+  Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting s3transfer==0.16.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 88))
+  Downloading s3transfer-0.16.0-py3-none-any.whl.metadata (1.7 kB)
+Collecting s5cmd==0.2.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 89))
+  Downloading s5cmd-0.2.0-py3-none-win_amd64.whl.metadata (5.7 kB)
+Collecting shellingham==1.5.4 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 90))
+  Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+Collecting six==1.17.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 91))
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting sniffio==1.3.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 92))
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting soupsieve==2.8.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 93))
+  Downloading soupsieve-2.8.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting starlette==0.37.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 94))
+  Downloading starlette-0.37.2-py3-none-any.whl.metadata (5.9 kB)
+Collecting stripe==15.0.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 95))
+  Downloading stripe-15.0.1-py3-none-any.whl.metadata (18 kB)
+Collecting tenacity==9.1.4 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 96))
+  Downloading tenacity-9.1.4-py3-none-any.whl.metadata (1.2 kB)
+Collecting tiktoken==0.12.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 97))
+  Downloading tiktoken-0.12.0-cp314-cp314-win_amd64.whl.metadata (6.9 kB)
+Collecting tokenizers==0.22.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 98))
+  Downloading tokenizers-0.22.2-cp39-abi3-win_amd64.whl.metadata (7.4 kB)
+Collecting tqdm==4.67.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 99))
+  Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+Collecting typer==0.24.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 100))
+  Downloading typer-0.24.1-py3-none-any.whl.metadata (16 kB)
+Collecting typing-inspection==0.4.2 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 101))
+  Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+Collecting typing_extensions==4.15.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 102))
+  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting tzdata==2026.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 103))
+  Downloading tzdata-2026.1-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting uritemplate==4.2.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 104))
+  Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting urllib3==2.6.3 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 105))
+  Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+Collecting uvicorn==0.25.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 106))
+  Downloading uvicorn-0.25.0-py3-none-any.whl.metadata (6.4 kB)
+Collecting watchfiles==1.1.1 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 107))
+  Downloading watchfiles-1.1.1-cp314-cp314-win_amd64.whl.metadata (5.0 kB)
+Collecting websockets==16.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 108))
+  Downloading websockets-16.0-cp314-cp314-win_amd64.whl.metadata (7.0 kB)
+Collecting yarl==1.23.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 109))
+  Downloading yarl-1.23.0-cp314-cp314-win_amd64.whl.metadata (82 kB)
+Collecting zipp==3.23.0 (from -r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 110))
+  Downloading zipp-3.23.0-py3-none-any.whl.metadata (3.6 kB)
+Collecting colorama (from click==8.3.2->-r C:\Users\lucas\Desktop\sistemamaestro\backend\requirements.txt (line 15))
+  Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+INFO: pip is looking at multiple versions of google-api-core[grpc] to determine which version is compatible with other requirements. This could take a while.
+ERROR: Cannot install google-api-core[grpc]==2.30.2 and grpcio-status==1.71.2 because these package versions have conflicting dependencies.
+
+The conflict is caused by:
+    The user requested grpcio-status==1.71.2
+    google-api-core[grpc] 2.30.2 depends on grpcio-status<2.0.0 and >=1.33.2; extra == "grpc"
+    google-api-core[grpc] 2.30.2 depends on grpcio-status<2.0.0 and >=1.49.1; python_version >= "3.11" and extra == "grpc"
+    google-api-core[grpc] 2.30.2 depends on grpcio-status<2.0.0 and >=1.75.1; python_version >= "3.14" and extra == "grpc"
+
+Additionally, some packages in these conflicts have no matching distributions available for your environment:
+    grpcio-status
+
+To fix this you could try to:
+1. loosen the range of package versions you've specified
+2. remove package versions to allow pip to attempt to solve the dependency conflict
+
+ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+
+[PACKAGE CHECK IN VENV]
+PACKAGE: openai
+INSTALLED: False
+
+PACKAGE: python-dotenv
+INSTALLED: False
+
+PACKAGE: fastapi
+INSTALLED: False
+
+PACKAGE: uvicorn
+INSTALLED: False
+
+[IMPORT CHECK WITH VENV]
+backend.app.services.ai_analysis_common | IMPORT_OK
+backend.app.services.ai_analysis_context | IMPORT_OK
+backend.app.services.ai_analysis_prompts | IMPORT_OK
+backend.app.services.ai_analysis_runtime | IMPORT_FAIL | ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "<stdin>", line 17, in <module>
+ModuleNotFoundError: No module named 'openai'
+backend.app.services.ai_analysis_normalization | IMPORT_OK
+backend.app.services.ai_analysis_fallback | IMPORT_OK
+backend.app.services.ai_analysis | IMPORT_FAIL | ModuleNotFoundError: No module named 'dotenv'
+Traceback (most recent call last):
+  File "<stdin>", line 17, in <module>
+ModuleNotFoundError: No module named 'dotenv'

@@ -1,0 +1,1219 @@
+﻿=== 65-AI-LIVE-BRIDGE-PREPARED-AUDIT ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+
+==============================================================
+FILE: backend\app\ai\orchestrators\master_orchestrator.py
+EXISTS: True
+SIZE: 6406 bytes
+
+[PATTERN HITS]
+L2 :: master_orchestrator.py
+L10 :: - defines manifest, hierarchy and base contracts
+L13 :: from dataclasses import dataclass, asdict
+L17 :: ORCHESTRATOR_NAME = "master_orchestrator"
+L18 :: ORCHESTRATOR_VERSION = "v1"
+L19 :: ORCHESTRATOR_STATE = "bridge"
+L22 :: @dataclass(frozen=True)
+L23 :: class AgentContract:
+L26 :: mission: str
+L27 :: allowed_tools: Tuple[str, ...]
+L28 :: forbidden_domains: Tuple[str, ...]
+L30 :: phase: str
+L33 :: AGENT_REGISTRY: Dict[str, AgentContract] = {
+L37 :: mission="Classify early-stage user intent and reduce ambiguity.",
+L38 :: allowed_tools=("intent_classifier", "route_mapper"),
+L39 :: forbidden_domains=("deploy", "payments", "code_write"),
+L41 :: phase="now",
+L46 :: mission="Audit URLs, market signals and visible structural friction.",
+L47 :: allowed_tools=("url_reader", "signal_analyzer"),
+L48 :: forbidden_domains=("deploy", "code_write", "payments"),
+L50 :: phase="now",
+L55 :: mission="Convert findings into reliable and structured reports.",
+L56 :: allowed_tools=("report_formatter", "output_schema_validator"),
+L57 :: forbidden_domains=("deploy", "infra_changes", "code_write"),
+L59 :: phase="now",
+L64 :: mission="Define canonical structure, layers and system ownership.",
+L65 :: allowed_tools=("structure_mapper", "decision_registry"),
+L66 :: forbidden_domains=("payments", "marketing_copy"),
+L68 :: phase="next",
+L73 :: mission="Create or modify code within closed architectural scope.",
+L74 :: allowed_tools=("repo_reader", "repo_writer", "code_validator"),
+L75 :: forbidden_domains=("pricing_strategy", "security_policy", "autonomous_deploy"),
+L77 :: phase="next",
+L82 :: mission="Diagnose runtime failures, healthcheck issues and deploy incidents.",
+L83 :: allowed_tools=("log_reader", "runtime_probe", "env_validator"),
+L84 :: forbidden_domains=("ux_redesign", "pricing_strategy"),
+L86 :: phase="now",
+L91 :: mission="Detect security gaps and propose hardening priorities.",
+L92 :: allowed_tools=("policy_validator", "session_audit", "abuse_patterns"),
+L93 :: forbidden_domains=("marketing_copy", "general_ui_build"),
+L95 :: phase="next",
+L100 :: mission="Detect hostile patterns, abuse vectors and security gaps from a defensive adversarial perspective.",
+L101 :: allowed_tools=("policy_validator", "session_audit", "abuse_patterns", "output_sampler", "consistency_checker"),
+L102 :: forbidden_domains=("repo_writer", "autonomous_deploy", "live_attack_execution", "payment_mutation", "production_access"),
+L104 :: phase="next",
+L109 :: mission="Detect growth opportunities in activation, retention and monetization.",
+L110 :: allowed_tools=("funnel_mapper", "growth_hypothesis_engine"),
+L111 :: forbidden_domains=("runtime_patch", "security_policy"),
+L113 :: phase="later",
+L118 :: mission="Reduce conversion friction and improve CTA continuity.",
+L119 :: allowed_tools=("journey_analyzer", "cta_mapper"),
+L120 :: forbidden_domains=("backend_runtime", "auth_security"),
+L122 :: phase="later",
+L127 :: mission="Improve indexable architecture and technical SEO signals.",
+L128 :: allowed_tools=("seo_mapper", "semantic_structure_checker"),
+L129 :: forbidden_domains=("payments", "runtime_patch"),
+L131 :: phase="later",
+L136 :: mission="Validate deploy paths, runtime configuration and release readiness.",
+L137 :: allowed_tools=("deploy_checklist", "env_validator", "health_probe"),
+L138 :: forbidden_domains=("pricing_strategy", "ui_copy"),
+L140 :: phase="next",
+L145 :: mission="Audit consistency, bias and structural quality of AI outputs.",
+L146 :: allowed_tools=("output_sampler", "consistency_checker"),
+L147 :: forbidden_domains=("code_write", "deploy", "payments"),
+L149 :: phase="later",
+L154 :: GUARD_LAYERS: Tuple[str, ...] = (
+L155 :: "policy_guard",
+L156 :: "security_guard",
+L157 :: "abuse_guard",
+L158 :: "output_guard",
+L159 :: "cost_guard",
+L163 :: def get_orchestrator_manifest() -> Dict[str, object]:
+L165 :: "name": ORCHESTRATOR_NAME,
+L166 :: "version": ORCHESTRATOR_VERSION,
+L167 :: "state": ORCHESTRATOR_STATE,
+L168 :: "agents": {key: asdict(value) for key, value in AGENT_REGISTRY.items()},
+L169 :: "guards": list(GUARD_LAYERS),
+
+[HEAD]
+"""
+master_orchestrator.py
+
+Bridge infrastructure for the master intelligence of Sistema Maestro.
+
+State:
+- no live logic
+- not connected to runtime
+- does not route real calls yet
+- defines manifest, hierarchy and base contracts
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, Tuple
+
+
+ORCHESTRATOR_NAME = "master_orchestrator"
+ORCHESTRATOR_VERSION = "v1"
+ORCHESTRATOR_STATE = "bridge"
+
+
+@dataclass(frozen=True)
+class AgentContract:
+    key: str
+    role: str
+    mission: str
+    allowed_tools: Tuple[str, ...]
+    forbidden_domains: Tuple[str, ...]
+    output_type: str
+    phase: str
+
+
+AGENT_REGISTRY: Dict[str, AgentContract] = {
+    "discovery_agent": AgentContract(
+        key="discovery_agent",
+        role="entry_and_discovery",
+        mission="Classify early-stage user intent and reduce ambiguity.",
+        allowed_tools=("intent_classifier", "route_mapper"),
+        forbidden_domains=("deploy", "payments", "code_write"),
+        output_type="discovery_brief",
+        phase="now",
+    ),
+    "audit_agent": AgentContract(
+        key="audit_agent",
+        role="url_market_audit",
+        mission="Audit URLs, market signals and visible structural friction.",
+        allowed_tools=("url_reader", "signal_analyzer"),
+        forbidden_domains=("deploy", "code_write", "payments"),
+        output_type="audit_report",
+        phase="now",
+    ),
+    "report_agent": AgentContract(
+        key="report_agent",
+        role="structured_reporting",
+        mission="Convert findings into reliable and structured reports.",
+        allowed_tools=("report_formatter", "output_schema_validator"),
+        forbidden_domains=("deploy", "infra_changes", "code_write"),
+        output_type="report_document",
+        phase="now",
+    ),
+    "system_architect_agent": AgentContract(
+        key="system_architect_agent",
+        role="architecture",
+        mission="Define canonical structure, layers and system ownership.",
+        allowed_tools=("structure_mapper", "decision_registry"),
+        forbidden_domains=("payments", "marketing_copy"),
+        output_type="architecture_decision",
+        phase="next",
+    ),
+    "builder_agent": AgentContract(
+        key="builder_agent",
+        role="code_construction",
+        mission="Create or modify code within closed architectural scope.",
+        allowed_tools=("repo_reader", "repo_writer", "code_validator"),
+        forbidden_domains=("pricing_strategy", "security_policy", "autonomous_deploy"),
+        output_type="code_change_set",
+        phase="next",
+    ),
+    "rescue_sre_agent": AgentContract(
+        key="rescue_sre_agent",
+        role="runtime_reliability",
+        mission="Diagnose runtime failures, healthcheck issues and deploy incidents.",
+        allowed_tools=("log_reader", "runtime_probe", "env_validator"),
+        forbidden_domains=("ux_redesign", "pricing_strategy"),
+        output_type="incident_diagnosis",
+        phase="now",
+    ),
+    "security_architect_agent": AgentContract(
+        key="security_architect_agent",
+        role="security",
+        mission="Detect security gaps and propose hardening priorities.",
+        allowed_tools=("policy_validator", "session_audit", "abuse_patterns"),
+        forbidden_domains=("marketing_copy", "general_ui_build"),
+        output_type="security_findings",
+        phase="next",
+    ),
+    "red_team_agent": AgentContract(
+        key="red_team_agent",
+        role="adversarial_security",
+        mission="Detect hostile patterns, abuse vectors and security gaps from a defensive adversarial perspective.",
+        allowed_tools=("policy_validator", "session_audit", "abuse_patterns", "output_sampler", "consistency_checker"),
+        forbidden_domains=("repo_writer", "autonomous_deploy", "live_attack_execution", "payment_mutation", "production_access"),
+        output_type="red_team_findings",
+        phase="next",
+    ),
+    "growth_agent": AgentContract(
+        key="growth_agent",
+        role="growth",
+        mission="Detect growth opportunities in activation, retention and monetization.",
+        allowed_tools=("funnel_mapper", "growth_hypothesis_engine"),
+        forbidden_domains=("runtime_patch", "security_policy"),
+        output_type="growth_actions",
+        phase="later",
+    ),
+    "cro_agent": AgentContract(
+        key="cro_agent",
+        role="conversion",
+        mission="Reduce conversion friction and improve CTA continuity.",
+        allowed_tools=("journey_analyzer", "cta_mapper"),
+        forbidden_domains=("backend_runtime", "auth_security"),
+        output_type="cro_recommendations",
+        phase="later",
+    ),
+    "seo_architect_agent": AgentContract(
+        key="seo_architect_agent",
+        role="technical_seo",
+        mission="Improve indexable architecture and technical SEO signals.",
+        allowed_tools=("seo_mapper", "semantic_structure_checker"),
+        forbidden_domains=("payments", "runtime_patch"),
+        output_type="seo_architecture_notes",
+        phase="later",
+    ),
+    "deploy_agent": AgentContract(
+        key="deploy_agent",
+        role="deploy_ops",
+        mission="Validate deploy paths, runtime configuration and release readiness.",
+        allowed_tools=("deploy_checklist", "env_validator", "health_probe"),
+        forbidden_domains=("pricing_strategy", "ui_copy"),
+        output_type="deploy_status",
+        phase="next",
+    ),
+    "algorithmic_auditor_agent": AgentContract(
+        key="algorithmic_auditor_agent",
+        role="quality_audit",
+        mission="Audit consistency, bias and structural quality of AI outputs.",
+        allowed_tools=("output_sampler", "consistency_checker"),
+        forbidden_domains=("code_write", "deploy", "payments"),
+        output_type="algorithmic_audit",
+        phase="later",
+    ),
+}
+
+
+GUARD_LAYERS: Tuple[str, ...] = (
+    "policy_guard",
+    "security_guard",
+    "abuse_guard",
+    "output_guard",
+    "cost_guard",
+)
+
+
+def get_orchestrator_manifest() -> Dict[str, object]:
+    return {
+        "name": ORCHESTRATOR_NAME,
+        "version": ORCHESTRATOR_VERSION,
+        "state": ORCHESTRATOR_STATE,
+        "agents": {key: asdict(value) for key, value in AGENT_REGISTRY.items()},
+        "guards": list(GUARD_LAYERS),
+    }
+
+==============================================================
+FILE: backend\app\ai\memory\project_memory.py
+EXISTS: True
+SIZE: 1336 bytes
+
+[PATTERN HITS]
+L2 :: project_memory.py
+L8 :: from dataclasses import dataclass, asdict, field
+L13 :: @dataclass(frozen=True)
+L14 :: class ProjectMemoryRecord:
+L16 :: memory_version: str
+L25 :: def build_project_memory(
+L33 :: record = ProjectMemoryRecord(
+L35 :: memory_version="v1",
+
+[HEAD]
+"""
+project_memory.py
+
+Memoria puente por proyecto.
+Sin persistencia viva todavía.
+"""
+
+from dataclasses import dataclass, asdict, field
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+
+
+@dataclass(frozen=True)
+class ProjectMemoryRecord:
+    project_id: str
+    memory_version: str
+    context_summary: str = ""
+    active_routes: List[str] = field(default_factory=list)
+    important_decisions: List[str] = field(default_factory=list)
+    constraints: List[str] = field(default_factory=list)
+    meta: Dict[str, Any] = field(default_factory=dict)
+    updated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+def build_project_memory(
+    project_id: str,
+    context_summary: str = "",
+    active_routes: Optional[List[str]] = None,
+    important_decisions: Optional[List[str]] = None,
+    constraints: Optional[List[str]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    record = ProjectMemoryRecord(
+        project_id=project_id,
+        memory_version="v1",
+        context_summary=context_summary,
+        active_routes=active_routes or [],
+        important_decisions=important_decisions or [],
+        constraints=constraints or [],
+        meta=meta or {},
+    )
+    return asdict(record)
+
+==============================================================
+FILE: backend\app\ai\tools\tool_registry.py
+EXISTS: True
+SIZE: 5310 bytes
+
+[PATTERN HITS]
+L2 :: tool_registry.py
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class ToolContract:
+L17 :: phase: str
+L20 :: TOOL_REGISTRY: Dict[str, ToolContract] = {
+L21 :: "intent_classifier": ToolContract(
+L25 :: phase="now",
+L27 :: "route_mapper": ToolContract(
+L31 :: phase="now",
+L33 :: "url_reader": ToolContract(
+L37 :: phase="now",
+L39 :: "signal_analyzer": ToolContract(
+L43 :: phase="now",
+L45 :: "report_formatter": ToolContract(
+L49 :: phase="now",
+L51 :: "output_schema_validator": ToolContract(
+L55 :: phase="now",
+L57 :: "repo_reader": ToolContract(
+L61 :: phase="next",
+L63 :: "repo_writer": ToolContract(
+L67 :: phase="next",
+L69 :: "code_validator": ToolContract(
+L73 :: phase="next",
+L75 :: "log_reader": ToolContract(
+L79 :: phase="now",
+L81 :: "runtime_probe": ToolContract(
+L85 :: phase="now",
+L87 :: "env_validator": ToolContract(
+L91 :: phase="now",
+L93 :: "deploy_checklist": ToolContract(
+L97 :: phase="next",
+L99 :: "policy_validator": ToolContract(
+L103 :: phase="next",
+L105 :: "session_audit": ToolContract(
+L109 :: phase="next",
+L111 :: "abuse_patterns": ToolContract(
+L115 :: phase="next",
+L117 :: "funnel_mapper": ToolContract(
+L121 :: phase="later",
+L123 :: "growth_hypothesis_engine": ToolContract(
+L127 :: phase="later",
+L129 :: "journey_analyzer": ToolContract(
+L133 :: phase="later",
+L135 :: "cta_mapper": ToolContract(
+L139 :: phase="later",
+L141 :: "seo_mapper": ToolContract(
+L145 :: phase="later",
+L147 :: "semantic_structure_checker": ToolContract(
+L151 :: phase="later",
+L153 :: "output_sampler": ToolContract(
+L157 :: phase="later",
+L159 :: "consistency_checker": ToolContract(
+L163 :: phase="later",
+L168 :: def get_tool_manifest():
+L169 :: return {key: asdict(value) for key, value in TOOL_REGISTRY.items()}
+
+[HEAD]
+"""
+tool_registry.py
+
+Registro puente de herramientas disponibles para agentes.
+Sin integración real todavía.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, Tuple
+
+
+@dataclass(frozen=True)
+class ToolContract:
+    key: str
+    domain: str
+    description: str
+    phase: str
+
+
+TOOL_REGISTRY: Dict[str, ToolContract] = {
+    "intent_classifier": ToolContract(
+        key="intent_classifier",
+        domain="routing",
+        description="Clasifica intención inicial del usuario.",
+        phase="now",
+    ),
+    "route_mapper": ToolContract(
+        key="route_mapper",
+        domain="routing",
+        description="Asigna ruta recomendada a partir de intención y contexto.",
+        phase="now",
+    ),
+    "url_reader": ToolContract(
+        key="url_reader",
+        domain="audit",
+        description="Lee señales visibles de una URL o activo digital.",
+        phase="now",
+    ),
+    "signal_analyzer": ToolContract(
+        key="signal_analyzer",
+        domain="audit",
+        description="Analiza fricciones, señales de mercado y estructura visible.",
+        phase="now",
+    ),
+    "report_formatter": ToolContract(
+        key="report_formatter",
+        domain="reporting",
+        description="Formatea salidas de informe en estructura consistente.",
+        phase="now",
+    ),
+    "output_schema_validator": ToolContract(
+        key="output_schema_validator",
+        domain="reporting",
+        description="Valida que el output cumpla un contrato estructural.",
+        phase="now",
+    ),
+    "repo_reader": ToolContract(
+        key="repo_reader",
+        domain="builder",
+        description="Lee estructura y archivos del repositorio.",
+        phase="next",
+    ),
+    "repo_writer": ToolContract(
+        key="repo_writer",
+        domain="builder",
+        description="Escribe cambios controlados en archivos autorizados.",
+        phase="next",
+    ),
+    "code_validator": ToolContract(
+        key="code_validator",
+        domain="builder",
+        description="Valida sintaxis y consistencia básica de cambios técnicos.",
+        phase="next",
+    ),
+    "log_reader": ToolContract(
+        key="log_reader",
+        domain="ops",
+        description="Lee logs de runtime, deploy y errores.",
+        phase="now",
+    ),
+    "runtime_probe": ToolContract(
+        key="runtime_probe",
+        domain="ops",
+        description="Inspecciona estado de arranque y señales de health.",
+        phase="now",
+    ),
+    "env_validator": ToolContract(
+        key="env_validator",
+        domain="ops",
+        description="Valida variables de entorno y consistencia de configuración.",
+        phase="now",
+    ),
+    "deploy_checklist": ToolContract(
+        key="deploy_checklist",
+        domain="deploy",
+        description="Revisa pasos requeridos antes de un release.",
+        phase="next",
+    ),
+    "policy_validator": ToolContract(
+        key="policy_validator",
+        domain="security",
+        description="Valida reglas permitidas y prohibidas por contexto.",
+        phase="next",
+    ),
+    "session_audit": ToolContract(
+        key="session_audit",
+        domain="security",
+        description="Revisa sesiones, cookies y vectores de autenticación.",
+        phase="next",
+    ),
+    "abuse_patterns": ToolContract(
+        key="abuse_patterns",
+        domain="security",
+        description="Detecta patrones de abuso y uso anómalo.",
+        phase="next",
+    ),
+    "funnel_mapper": ToolContract(
+        key="funnel_mapper",
+        domain="growth",
+        description="Mapea activación, continuidad y monetización.",
+        phase="later",
+    ),
+    "growth_hypothesis_engine": ToolContract(
+        key="growth_hypothesis_engine",
+        domain="growth",
+        description="Propone hipótesis de crecimiento estructuradas.",
+        phase="later",
+    ),
+    "journey_analyzer": ToolContract(
+        key="journey_analyzer",
+        domain="cro",
+        description="Analiza fricción del recorrido del usuario.",
+        phase="later",
+    ),
+    "cta_mapper": ToolContract(
+        key="cta_mapper",
+        domain="cro",
+        description="Mapea continuidad de CTA y puntos de decisión.",
+        phase="later",
+    ),
+    "seo_mapper": ToolContract(
+        key="seo_mapper",
+        domain="seo",
+        description="Mapea estructura indexable y señales SEO técnicas.",
+        phase="later",
+    ),
+    "semantic_structure_checker": ToolContract(
+        key="semantic_structure_checker",
+        domain="seo",
+        description="Revisa jerarquía semántica y coherencia de estructura.",
+        phase="later",
+    ),
+    "output_sampler": ToolContract(
+        key="output_sampler",
+        domain="quality",
+        description="Toma muestras de outputs para auditoría algorítmica.",
+        phase="later",
+    ),
+    "consistency_checker": ToolContract(
+        key="consistency_checker",
+        domain="quality",
+        description="Evalúa estabilidad y consistencia de salidas.",
+        phase="later",
+    ),
+}
+
+
+def get_tool_manifest():
+    return {key: asdict(value) for key, value in TOOL_REGISTRY.items()}
+
+==============================================================
+FILE: backend\app\ai\evals\agent_eval_registry.py
+EXISTS: True
+SIZE: 2190 bytes
+
+[PATTERN HITS]
+L2 :: agent_eval_registry.py
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class EvalContract:
+L17 :: phase: str
+L21 :: EVAL_REGISTRY: Dict[str, EvalContract] = {
+L24 :: target_agent="master_orchestrator",
+L26 :: phase="now",
+L33 :: phase="now",
+L40 :: phase="now",
+L47 :: phase="next",
+L54 :: phase="now",
+L61 :: phase="next",
+L67 :: def get_eval_manifest():
+L68 :: return {key: asdict(value) for key, value in EVAL_REGISTRY.items()}
+
+[HEAD]
+"""
+agent_eval_registry.py
+
+Registro puente de evaluación de agentes.
+Sin scoring vivo todavía.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, Tuple
+
+
+@dataclass(frozen=True)
+class EvalContract:
+    key: str
+    target_agent: str
+    objective: str
+    phase: str
+    metrics: Tuple[str, ...]
+
+
+EVAL_REGISTRY: Dict[str, EvalContract] = {
+    "routing_eval": EvalContract(
+        key="routing_eval",
+        target_agent="master_orchestrator",
+        objective="Evaluar si la intención fue enviada al agente correcto.",
+        phase="now",
+        metrics=("route_accuracy", "scope_fit"),
+    ),
+    "report_eval": EvalContract(
+        key="report_eval",
+        target_agent="report_agent",
+        objective="Evaluar consistencia, claridad y estructura del informe.",
+        phase="now",
+        metrics=("structure_consistency", "clarity", "usefulness"),
+    ),
+    "audit_eval": EvalContract(
+        key="audit_eval",
+        target_agent="audit_agent",
+        objective="Evaluar calidad de hallazgos y detección de fricciones visibles.",
+        phase="now",
+        metrics=("signal_quality", "friction_detection"),
+    ),
+    "builder_eval": EvalContract(
+        key="builder_eval",
+        target_agent="builder_agent",
+        objective="Evaluar seguridad, ajuste al alcance y consistencia del cambio técnico.",
+        phase="next",
+        metrics=("scope_compliance", "code_consistency", "change_safety"),
+    ),
+    "rescue_eval": EvalContract(
+        key="rescue_eval",
+        target_agent="rescue_sre_agent",
+        objective="Evaluar calidad del diagnóstico y precisión de causa raíz.",
+        phase="now",
+        metrics=("root_cause_precision", "repair_safety"),
+    ),
+    "security_eval": EvalContract(
+        key="security_eval",
+        target_agent="security_architect_agent",
+        objective="Evaluar severidad, utilidad y prioridad de hallazgos de seguridad.",
+        phase="next",
+        metrics=("severity_quality", "mitigation_quality"),
+    ),
+}
+
+
+def get_eval_manifest():
+    return {key: asdict(value) for key, value in EVAL_REGISTRY.items()}
+
+==============================================================
+FILE: backend\app\ai\schemas\agent_envelope.py
+EXISTS: True
+SIZE: 1139 bytes
+
+[PATTERN HITS]
+L8 :: from dataclasses import dataclass, field, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class AgentInputEnvelope:
+L21 :: allowed_tools: List[str] = field(default_factory=list)
+L22 :: guard_layers: List[str] = field(default_factory=list)
+L25 :: @dataclass(frozen=True)
+L26 :: class AgentOutputEnvelope:
+L33 :: trace_id: Optional[str] = None
+L36 :: def serialize_input(envelope: AgentInputEnvelope) -> Dict[str, Any]:
+L40 :: def serialize_output(envelope: AgentOutputEnvelope) -> Dict[str, Any]:
+
+[HEAD]
+"""
+agent_envelope.py
+
+Contrato puente común para entradas y salidas de agentes.
+Sin lógica viva.
+"""
+
+from dataclasses import dataclass, field, asdict
+from typing import Any, Dict, List, Optional
+
+
+@dataclass(frozen=True)
+class AgentInputEnvelope:
+    agent_key: str
+    request_id: str
+    project_id: Optional[str] = None
+    user_id: Optional[str] = None
+    intent: Optional[str] = None
+    payload: Dict[str, Any] = field(default_factory=dict)
+    context: Dict[str, Any] = field(default_factory=dict)
+    allowed_tools: List[str] = field(default_factory=list)
+    guard_layers: List[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class AgentOutputEnvelope:
+    agent_key: str
+    request_id: str
+    status: str
+    output_type: str
+    data: Dict[str, Any] = field(default_factory=dict)
+    warnings: List[str] = field(default_factory=list)
+    trace_id: Optional[str] = None
+
+
+def serialize_input(envelope: AgentInputEnvelope) -> Dict[str, Any]:
+    return asdict(envelope)
+
+
+def serialize_output(envelope: AgentOutputEnvelope) -> Dict[str, Any]:
+    return asdict(envelope)
+
+==============================================================
+FILE: backend\app\ai\telemetry\agent_trace.py
+EXISTS: True
+SIZE: 1319 bytes
+
+[PATTERN HITS]
+L2 :: agent_trace.py
+L8 :: from dataclasses import dataclass, asdict, field
+L14 :: @dataclass(frozen=True)
+L15 :: class AgentTrace:
+L16 :: trace_id: str
+L18 :: phase: str
+L28 :: def build_trace(
+L30 :: phase: str,
+L38 :: trace = AgentTrace(
+L39 :: trace_id=f"atr_{uuid.uuid4().hex[:12]}",
+L41 :: phase=phase,
+L49 :: return asdict(trace)
+
+[HEAD]
+"""
+agent_trace.py
+
+Telemetría puente para agentes.
+Sin persistencia ni integración viva todavía.
+"""
+
+from dataclasses import dataclass, asdict, field
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+import uuid
+
+
+@dataclass(frozen=True)
+class AgentTrace:
+    trace_id: str
+    agent_key: str
+    phase: str
+    status: str
+    request_id: Optional[str] = None
+    project_id: Optional[str] = None
+    user_id: Optional[str] = None
+    notes: List[str] = field(default_factory=list)
+    meta: Dict[str, Any] = field(default_factory=dict)
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+def build_trace(
+    agent_key: str,
+    phase: str,
+    status: str,
+    request_id: Optional[str] = None,
+    project_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+    notes: Optional[List[str]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    trace = AgentTrace(
+        trace_id=f"atr_{uuid.uuid4().hex[:12]}",
+        agent_key=agent_key,
+        phase=phase,
+        status=status,
+        request_id=request_id,
+        project_id=project_id,
+        user_id=user_id,
+        notes=notes or [],
+        meta=meta or {},
+    )
+    return asdict(trace)
+
+==============================================================
+FILE: backend\app\ai\guards\abuse_guard.py
+EXISTS: True
+SIZE: 1210 bytes
+
+[PATTERN HITS]
+L2 :: abuse_guard.py
+L4 :: Guard puente de abuso.
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class AbuseAssessment:
+L19 :: def assess_abuse(signals: Dict[str, object]) -> Dict[str, object]:
+L28 :: if signals.get("repeated_guard_hits"):
+
+[HEAD]
+"""
+abuse_guard.py
+
+Guard puente de abuso.
+Sin scoring vivo todavía.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict
+
+
+@dataclass(frozen=True)
+class AbuseAssessment:
+    risk_score: int
+    decision: str
+    reason: str
+
+
+def assess_abuse(signals: Dict[str, object]) -> Dict[str, object]:
+    score = 0
+
+    if signals.get("high_frequency_requests"):
+        score += 2
+    if signals.get("prompt_injection_attempt"):
+        score += 3
+    if signals.get("suspicious_checkout_pattern"):
+        score += 3
+    if signals.get("repeated_guard_hits"):
+        score += 2
+
+    if score >= 5:
+        assessment = AbuseAssessment(
+            risk_score=score,
+            decision="block_or_step_up_review",
+            reason="high_risk_pattern",
+        )
+    elif score >= 2:
+        assessment = AbuseAssessment(
+            risk_score=score,
+            decision="allow_with_warning",
+            reason="moderate_risk_pattern",
+        )
+    else:
+        assessment = AbuseAssessment(
+            risk_score=score,
+            decision="allow",
+            reason="no_relevant_abuse_signals",
+        )
+
+    return asdict(assessment)
+
+==============================================================
+FILE: backend\app\ai\guards\cost_guard.py
+EXISTS: True
+SIZE: 1001 bytes
+
+[PATTERN HITS]
+L2 :: cost_guard.py
+L4 :: Guard puente de coste.
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class CostAssessment:
+L19 :: def assess_cost(meta: Dict[str, object]) -> Dict[str, object]:
+L31 :: action="allow_with_trace",
+
+[HEAD]
+"""
+cost_guard.py
+
+Guard puente de coste.
+Sin integración de tokens o créditos todavía.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict
+
+
+@dataclass(frozen=True)
+class CostAssessment:
+    level: str
+    action: str
+    reason: str
+
+
+def assess_cost(meta: Dict[str, object]) -> Dict[str, object]:
+    estimated_units = int(meta.get("estimated_units", 0) or 0)
+
+    if estimated_units >= 10000:
+        assessment = CostAssessment(
+            level="high",
+            action="require_explicit_approval",
+            reason="estimated_cost_too_high",
+        )
+    elif estimated_units >= 2500:
+        assessment = CostAssessment(
+            level="medium",
+            action="allow_with_trace",
+            reason="estimated_cost_moderate",
+        )
+    else:
+        assessment = CostAssessment(
+            level="low",
+            action="allow",
+            reason="estimated_cost_low",
+        )
+
+    return asdict(assessment)
+
+==============================================================
+FILE: backend\app\ai\guards\output_guard.py
+EXISTS: True
+SIZE: 878 bytes
+
+[PATTERN HITS]
+L2 :: output_guard.py
+L4 :: Guard puente de salida.
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class OutputAssessment:
+L19 :: def validate_output_shape(output_type: str, payload: Dict[str, object]) -> Dict[str, object]:
+
+[HEAD]
+"""
+output_guard.py
+
+Guard puente de salida.
+Valida forma mínima del output, no calidad final.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, List
+
+
+@dataclass(frozen=True)
+class OutputAssessment:
+    valid: bool
+    issues: List[str]
+    action: str
+
+
+def validate_output_shape(output_type: str, payload: Dict[str, object]) -> Dict[str, object]:
+    issues: List[str] = []
+
+    if not output_type:
+        issues.append("missing_output_type")
+    if not isinstance(payload, dict):
+        issues.append("payload_not_dict")
+
+    if isinstance(payload, dict) and not payload:
+        issues.append("empty_payload")
+
+    valid = len(issues) == 0
+
+    assessment = OutputAssessment(
+        valid=valid,
+        issues=issues,
+        action="allow" if valid else "reject_or_repair",
+    )
+    return asdict(assessment)
+
+==============================================================
+FILE: backend\app\ai\guards\policy_guard.py
+EXISTS: True
+SIZE: 1259 bytes
+
+[PATTERN HITS]
+L2 :: policy_guard.py
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class PolicyDecision:
+L35 :: def evaluate_policy(agent_key: str, target_domain: str) -> Dict[str, object]:
+
+[HEAD]
+"""
+policy_guard.py
+
+Capa puente de política.
+No bloquea runtime todavía.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, List
+
+
+@dataclass(frozen=True)
+class PolicyDecision:
+    allowed: bool
+    reason: str
+    blocked_domains: List[str]
+
+
+DEFAULT_POLICY = {
+    "discovery_agent": [],
+    "audit_agent": [],
+    "report_agent": [],
+    "system_architect_agent": ["payments"],
+    "builder_agent": ["pricing_strategy", "autonomous_deploy"],
+    "rescue_sre_agent": ["ux_redesign", "pricing_strategy"],
+    "security_architect_agent": ["general_ui_build"],
+    "growth_agent": ["runtime_patch"],
+    "cro_agent": ["backend_runtime", "auth_security"],
+    "seo_architect_agent": ["payments", "runtime_patch"],
+    "deploy_agent": ["pricing_strategy", "ui_copy"],
+    "algorithmic_auditor_agent": ["code_write", "deploy", "payments"],
+}
+
+
+def evaluate_policy(agent_key: str, target_domain: str) -> Dict[str, object]:
+    blocked = DEFAULT_POLICY.get(agent_key, [])
+    allowed = target_domain not in blocked
+    decision = PolicyDecision(
+        allowed=allowed,
+        reason="allowed" if allowed else "blocked_by_policy",
+        blocked_domains=blocked,
+    )
+    return asdict(decision)
+
+==============================================================
+FILE: backend\app\ai\guards\security_guard.py
+EXISTS: True
+SIZE: 1278 bytes
+
+[PATTERN HITS]
+L2 :: security_guard.py
+L4 :: Guard puente de seguridad.
+L8 :: from dataclasses import dataclass, asdict
+L12 :: @dataclass(frozen=True)
+L13 :: class SecurityAssessment:
+L19 :: def assess_security_context(context: Dict[str, object]) -> Dict[str, object]:
+L35 :: action="allow_with_trace",
+
+[HEAD]
+"""
+security_guard.py
+
+Guard puente de seguridad.
+Sin detección viva todavía.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, List
+
+
+@dataclass(frozen=True)
+class SecurityAssessment:
+    risk_level: str
+    flags: List[str]
+    action: str
+
+
+def assess_security_context(context: Dict[str, object]) -> Dict[str, object]:
+    flags: List[str] = []
+
+    if context.get("touches_auth"):
+        flags.append("auth_surface")
+    if context.get("touches_payments"):
+        flags.append("payment_surface")
+    if context.get("touches_tokens"):
+        flags.append("token_surface")
+    if context.get("touches_user_sessions"):
+        flags.append("session_surface")
+
+    if not flags:
+        assessment = SecurityAssessment(
+            risk_level="low",
+            flags=[],
+            action="allow_with_trace",
+        )
+    elif len(flags) == 1:
+        assessment = SecurityAssessment(
+            risk_level="medium",
+            flags=flags,
+            action="require_security_review",
+        )
+    else:
+        assessment = SecurityAssessment(
+            risk_level="high",
+            flags=flags,
+            action="require_explicit_security_gate",
+        )
+
+    return asdict(assessment)
+
+==============================================================
+FILE: backend\app\ai\agents\system_architect_agent.py
+EXISTS: True
+SIZE: 0 bytes
+
+[PATTERN HITS]
+[SIN HITS]
+
+[HEAD]
+[VACIO]
+
+==============================================================
+FILE: backend\app\ai\agents\builder_agent.py
+EXISTS: True
+SIZE: 0 bytes
+
+[PATTERN HITS]
+[SIN HITS]
+
+[HEAD]
+[VACIO]
+
+==============================================================
+FILE: backend\app\ai\agents\audit_agent.py
+EXISTS: True
+SIZE: 0 bytes
+
+[PATTERN HITS]
+[SIN HITS]
+
+[HEAD]
+[VACIO]
+
+==============================================================
+FILE: backend\app\ai\agents\report_agent.py
+EXISTS: True
+SIZE: 0 bytes
+
+[PATTERN HITS]
+[SIN HITS]
+
+[HEAD]
+[VACIO]
+
+==============================================================
+FILE: backend\app\ai\agents\deploy_agent.py
+EXISTS: True
+SIZE: 0 bytes
+
+[PATTERN HITS]
+[SIN HITS]
+
+[HEAD]
+[VACIO]
+
+==============================================================
+FILE: backend\app\ai\agents\red_team_agent.py
+EXISTS: True
+SIZE: 1759 bytes
+
+[PATTERN HITS]
+L10 :: from dataclasses import dataclass, asdict
+L16 :: AGENT_PHASE = "next"
+L19 :: @dataclass(frozen=True)
+L20 :: class RedTeamFinding:
+L28 :: ALLOWED_TOOLS: Tuple[str, ...] = (
+L36 :: FORBIDDEN_DOMAINS: Tuple[str, ...] = (
+L45 :: def get_red_team_manifest() -> Dict[str, object]:
+L49 :: "phase": AGENT_PHASE,
+L50 :: "mission": "Detect hostile patterns, abuse vectors and security gaps from a defensive adversarial perspective.",
+L51 :: "allowed_tools": list(ALLOWED_TOOLS),
+L52 :: "forbidden_domains": list(FORBIDDEN_DOMAINS),
+L57 :: def build_red_team_finding(
+
+[HEAD]
+"""
+red_team_agent.py
+
+Agente puente de seguridad adversarial defensiva.
+No ejecuta ataques.
+No interactua con produccion.
+No tiene logica viva todavia.
+"""
+
+from dataclasses import dataclass, asdict
+from typing import Dict, List, Tuple
+
+
+AGENT_KEY = "red_team_agent"
+AGENT_ROLE = "adversarial_security"
+AGENT_PHASE = "next"
+
+
+@dataclass(frozen=True)
+class RedTeamFinding:
+    vector: str
+    severity: str
+    affected_surface: str
+    recommended_mitigation: str
+    requires_human_review: bool
+
+
+ALLOWED_TOOLS: Tuple[str, ...] = (
+    "policy_validator",
+    "session_audit",
+    "abuse_patterns",
+    "output_sampler",
+    "consistency_checker",
+)
+
+FORBIDDEN_DOMAINS: Tuple[str, ...] = (
+    "repo_writer",
+    "autonomous_deploy",
+    "live_attack_execution",
+    "payment_mutation",
+    "production_access",
+)
+
+
+def get_red_team_manifest() -> Dict[str, object]:
+    return {
+        "key": AGENT_KEY,
+        "role": AGENT_ROLE,
+        "phase": AGENT_PHASE,
+        "mission": "Detect hostile patterns, abuse vectors and security gaps from a defensive adversarial perspective.",
+        "allowed_tools": list(ALLOWED_TOOLS),
+        "forbidden_domains": list(FORBIDDEN_DOMAINS),
+        "output_type": "red_team_findings",
+    }
+
+
+def build_red_team_finding(
+    vector: str,
+    severity: str,
+    affected_surface: str,
+    recommended_mitigation: str,
+    requires_human_review: bool = True,
+) -> Dict[str, object]:
+    finding = RedTeamFinding(
+        vector=vector,
+        severity=severity,
+        affected_surface=affected_surface,
+        recommended_mitigation=recommended_mitigation,
+        requires_human_review=requires_human_review,
+    )
+    return asdict(finding)
+

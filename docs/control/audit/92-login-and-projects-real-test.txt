@@ -1,0 +1,54 @@
+﻿=== LOGIN + PROJECTS REAL TEST ===
+BASE_URL: http://127.0.0.1:8000
+
+[LOGIN_REQUEST]
+{
+    "password":  "TU_PASSWORD",
+    "email":  "TU_EMAIL"
+}
+[LOGIN_RESULT]
+FAIL
+No es posible conectar con el servidor remoto
+
+[RTE01_text_clear_commercial]
+REQUEST_JSON:
+{
+    "input_content":  "Ya vendo un servicio de auditoria web y quiero vender mejor mi oferta para cerrar mas clientes con una propuesta premium.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[RTE02_text_technical_ambiguous]
+REQUEST_JSON:
+{
+    "input_content":  "Plataforma con dashboard, modulos, integraciones, analitica en tiempo real y automatizaciones para equipos de operaciones.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[RTE03_text_sell_build_mix]
+REQUEST_JSON:
+{
+    "input_content":  "Quiero construir esta plataforma para gestion de leads, pero tambien venderla como oferta premium a clientes.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[RTE04_voice_transcript_disordered]
+REQUEST_JSON:
+{
+    "input_mode":  "voice_transcript",
+    "input_content":  "Bueno, a ver, seria como una especie de sistema con IA para empresas, o sea, no se si venderlo, validarlo o construirlo primero.",
+    "input_type":  "text"
+}
+HTTP_RESULT: FAIL
+error_message: No es posible conectar con el servidor remoto
+
+[LOG_VERIFICATION]
+Busca en el log del backend:
+1) semantic_admission_shadow=
+2) project_created=
+3) shadow_status, shadow_input_nature, shadow_user_intent, shadow_confidence, shadow_needs_clarification

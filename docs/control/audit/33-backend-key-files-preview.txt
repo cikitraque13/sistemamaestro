@@ -1,0 +1,4 @@
+﻿=== BACKEND KEY FILES PREVIEW ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro\backend
+
+[NO SE DETECTARON ARCHIVOS CLAVE CON LOS PATRONES DEFINIDOS]

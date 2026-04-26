@@ -1,0 +1,58 @@
+﻿=== 88-SEMANTIC-ADMISSION-PREINTEGRATION-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+
+[PY_COMPILE]
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission_rules.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission_normalization.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission_signals.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission_decision.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission_trace.py
+RESULT: OK
+
+[IMPORT CHECK]
+backend.app.services.semantic_admission_rules | IMPORT_OK
+backend.app.services.semantic_admission_normalization | IMPORT_OK
+backend.app.services.semantic_admission_normalization | normalize_semantic_admission_input=True
+backend.app.services.semantic_admission_signals | IMPORT_OK
+backend.app.services.semantic_admission_signals | build_semantic_admission_signals=True
+backend.app.services.semantic_admission_decision | IMPORT_OK
+backend.app.services.semantic_admission_decision | build_semantic_admission_decision=True
+backend.app.services.semantic_admission | IMPORT_OK
+backend.app.services.semantic_admission | run_semantic_admission=True
+backend.app.services.semantic_admission | run_text_semantic_admission=True
+backend.app.services.semantic_admission | run_pasted_text_semantic_admission=True
+backend.app.services.semantic_admission | run_voice_semantic_admission=True
+backend.app.services.semantic_admission_trace | IMPORT_OK
+backend.app.services.semantic_admission_trace | should_emit_semantic_admission_trace=True
+backend.app.services.semantic_admission_trace | build_semantic_admission_trace_payload=True
+backend.app.services.semantic_admission_trace | emit_semantic_admission_trace=True
+
+[SMOKE TEST]
+[TEXT_CASE]
+status=ready_for_analysis
+input_nature=service_offer
+user_intent=sell_this
+maturity_level=existing_offer
+confidence=high
+needs_clarification=False
+
+[VOICE_CASE]
+status=clarification_required
+input_nature=idea_validation
+user_intent=validate_this
+maturity_level=early_idea
+confidence=medium
+needs_clarification=True
+clarification_question=┐Quieres venderlo, validarlo, construirlo o automatizar algo con esto?

@@ -1,0 +1,15 @@
+﻿[DIR ] .git
+[FILE] .gitconfig (0.06 KB)
+[FILE] .gitignore (2.23 KB)
+[DIR ] backend
+[FILE] DEPLOY_RAILWAY.md (6.24 KB)
+[FILE] Dockerfile (0.66 KB)
+[DIR ] docs
+[DIR ] frontend
+[DIR ] memory
+[DIR ] railway
+[FILE] railway.json (0.5 KB)
+[FILE] README.md (6.42 KB)
+[DIR ] test_reports
+[DIR ] tests
+[FILE] yarn.lock (0.09 KB)

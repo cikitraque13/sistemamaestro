@@ -1,0 +1,12 @@
+﻿===== 00-INDICE-MAESTRO.md =====
+
+===== 01-DECISIONES-CERRADAS.md =====
+
+===== 02-PENDIENTES-PRIORIZADOS.md =====
+
+===== 03-INVENTARIO-TECNICO.md =====
+
+===== 04-RUTAS-CANONICAS.md =====
+
+===== 07-GIT-DEPLOY-HIGIENE.md =====
+

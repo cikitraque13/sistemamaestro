@@ -1,0 +1,49 @@
+﻿=== 90-ROUTER-SHADOW-MODE-CHECK ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+SEMANTIC_ADMISSION_SHADOW_ENABLED: 1
+SEMANTIC_ADMISSION_TRACE_ENABLED: 1
+SEMANTIC_ADMISSION_TRACE_VERBOSE: 0
+
+[PY_COMPILE]
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\routers\projects.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\ai_analysis.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission.py
+RESULT: OK
+
+FILE: C:\Users\lucas\Desktop\sistemamaestro\backend\app\services\semantic_admission_trace.py
+RESULT: OK
+
+[IMPORT CHECK]
+backend.app.routers.projects | IMPORT_OK
+backend.app.routers.projects | router=True
+backend.app.routers.projects | create_project=True
+backend.app.routers.projects | _run_semantic_admission_shadow=True
+backend.app.routers.projects | _semantic_admission_shadow_enabled=True
+backend.app.routers.projects | _resolve_semantic_admission_input_mode=True
+backend.app.services.ai_analysis | IMPORT_OK
+backend.app.services.ai_analysis | analyze_with_ai=True
+backend.app.services.semantic_admission | IMPORT_OK
+backend.app.services.semantic_admission | run_semantic_admission=True
+
+[SHADOW SMOKE TEST]
+[ENV]
+shadow_enabled=True
+
+[RESOLVE_INPUT_MODE]
+text_mode=text
+voice_mode=voice_transcript
+url_fallback_mode=text
+
+[TEXT_SHADOW]
+{'status': 'clarification_required', 'input_mode': 'text', 'input_nature': 'mixed_input', 'user_intent': 'unclear', 'maturity_level': 'concept_in_definition', 'confidence': 'low', 'needs_clarification': True}
+
+[VOICE_SHADOW]
+{'status': 'clarification_required', 'input_mode': 'voice_transcript', 'input_nature': 'idea_validation', 'user_intent': 'validate_this', 'maturity_level': 'early_idea', 'confidence': 'low', 'needs_clarification': True}
+
+[URL_SHADOW]
+{'status': 'shadow_skipped', 'reason': 'unsupported_input_type', 'input_type': 'url'}

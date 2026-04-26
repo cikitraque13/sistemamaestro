@@ -1,0 +1,470 @@
+[
+  {
+    "id": "case_01_sell_existing_offer",
+    "input_type": "text",
+    "input_content": "Ya vendo servicios de auditor?a web y quiero mejorar c?mo presento mi oferta para cerrar m?s clientes.",
+    "expected_route": "sell",
+    "actual_route": "sell",
+    "route_pass": true,
+    "expected_continuity": "blueprint",
+    "actual_continuity": "blueprint",
+    "continuity_pass": true,
+    "summary": "El usuario busca mejorar la presentación de su oferta de servicios de auditoría web para aumentar el cierre de clientes.",
+    "main_finding": "La presentación de la oferta no está alineada con las expectativas del cliente potencial.",
+    "main_weakness": "Falta de un mensaje claro y convincente que destaque el valor diferencial del servicio.",
+    "main_leverage": "Reestructurar la propuesta de valor para que sea más clara y atractiva.",
+    "immediate_action_title": "Revisar y ajustar el mensaje de la propuesta de valor",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "has_clear_utility",
+      "has_existing_offer",
+      "needs_output_definition",
+      "offer_language_present",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 6,
+      "improve": 1,
+      "automate": 0,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 6,
+      "sistema": 0,
+      "premium": 3
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El caso gira en vender mejor una oferta existente y cerrar más. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "case_02_existing_offer_but_diagnostic",
+    "input_type": "text",
+    "input_content": "Ya ofrezco consultor?a, pero quiero una herramienta que detecte fricciones en las webs de mis clientes y priorice mejoras.",
+    "expected_route": "improve",
+    "actual_route": "improve",
+    "route_pass": true,
+    "expected_continuity": "blueprint",
+    "actual_continuity": "blueprint",
+    "continuity_pass": true,
+    "summary": "El usuario busca crear una herramienta para detectar fricciones en las webs de sus clientes y priorizar mejoras.",
+    "main_finding": "Falta de definición en los criterios de fricción.",
+    "main_weakness": "Indefinición de cómo se priorizarán las mejoras.",
+    "main_leverage": "Definir criterios claros de evaluación de fricciones.",
+    "immediate_action_title": "Definir criterios de fricción",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "diagnostic_language_present",
+      "has_clear_utility",
+      "has_existing_offer",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 3,
+      "improve": 5,
+      "automate": 0,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 12,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "case_03_automate_simple",
+    "input_type": "text",
+    "input_content": "Quiero automatizar la clasificaci?n de leads y el env?o de respuestas iniciales para ahorrar tiempo al equipo comercial.",
+    "expected_route": "automate",
+    "actual_route": "automate",
+    "route_pass": true,
+    "expected_continuity": "blueprint",
+    "actual_continuity": "blueprint",
+    "continuity_pass": true,
+    "summary": "Automatización de la clasificación de leads y envío de respuestas iniciales.",
+    "main_finding": "El proceso actual de gestión de leads es manual y consume tiempo valioso.",
+    "main_weakness": "Falta de un sistema automatizado que gestione eficientemente la clasificación y respuesta a leads.",
+    "main_leverage": "Definir y automatizar los criterios de clasificación de leads y las respuestas iniciales.",
+    "immediate_action_title": "Definir criterios de clasificación de leads",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "automation_language_present",
+      "conversion_language_present",
+      "goal_automate_present",
+      "has_clear_utility",
+      "implementation_pressure_present",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 3,
+      "automate": 10,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 12,
+      "sistema": 2,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es automatizar una operativa o trabajo repetitivo. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "case_04_automate_with_integration",
+    "input_type": "text",
+    "input_content": "Quiero automatizar la entrada de leads, el enrutado al equipo correcto y el seguimiento inicial conect?ndolo con varios flujos del sistema.",
+    "expected_route": "automate",
+    "actual_route": "automate",
+    "route_pass": true,
+    "expected_continuity": "sistema",
+    "actual_continuity": "sistema",
+    "continuity_pass": true,
+    "summary": "El usuario busca automatizar la gestión de leads, incluyendo su entrada, enrutamiento y seguimiento inicial.",
+    "main_finding": "La gestión manual de leads es un cuello de botella significativo.",
+    "main_weakness": "Falta de un sistema claro para el enrutamiento y seguimiento de leads.",
+    "main_leverage": "Automatizar el proceso de entrada y enrutamiento de leads.",
+    "immediate_action_title": "Identificar flujos del sistema para integración",
+    "continuity_reason": "El siguiente paso ya exige coordinar varias piezas, capas o flujos del sistema.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "automation_language_present",
+      "conversion_language_present",
+      "goal_automate_present",
+      "has_clear_utility",
+      "implementation_pressure_present",
+      "needs_definition_first",
+      "needs_multilayer_architecture",
+      "needs_output_definition",
+      "output_defined_false",
+      "problem_defined",
+      "system_design_pressure_present"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 3,
+      "automate": 10,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 10,
+      "sistema": 11,
+      "premium": 4
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es automatizar una operativa o trabajo repetitivo. El siguiente paso ya exige coordinar varias piezas, capas o flujos del sistema."
+  },
+  {
+    "id": "case_05_open_idea",
+    "input_type": "text",
+    "input_content": "Estoy pensando en crear algo con IA para ayudar a empresas, pero todav?a no tengo claro exactamente qu?.",
+    "expected_route": "idea",
+    "actual_route": "idea",
+    "route_pass": true,
+    "expected_continuity": "stay",
+    "actual_continuity": "stay",
+    "continuity_pass": true,
+    "summary": "El usuario está considerando crear una solución con IA para empresas, pero carece de una definición clara.",
+    "main_finding": "La idea carece de un enfoque claro y definido.",
+    "main_weakness": "Indefinición del problema empresarial que la IA resolverá.",
+    "main_leverage": "Definir un caso de uso específico para la herramienta de IA.",
+    "immediate_action_title": "Identificar problemas empresariales",
+    "continuity_reason": "Antes de intensificar, hace falta una definición más clara de utilidad, problema u output.",
+    "refine_count": 3,
+    "active_signals": [
+      "ambiguity_high",
+      "audience_defined",
+      "conversion_language_present",
+      "goal_idea_present",
+      "has_clear_utility_false",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 2,
+      "automate": 0,
+      "idea": 11
+    },
+    "continuity_scores": {
+      "stay": 9,
+      "blueprint": 9,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El caso sigue demasiado abierto o ambiguo para salir de idea. Antes de intensificar, hace falta una definición más clara de utilidad, problema u output."
+  },
+  {
+    "id": "case_06_idea_somewhat_concrete",
+    "input_type": "text",
+    "input_content": "Quiero crear algo con IA para ayudar a negocios locales a captar m?s clientes, pero a?n no s? qu? formato tendr?a.",
+    "expected_route": "idea",
+    "actual_route": "idea",
+    "route_pass": true,
+    "expected_continuity": "stay",
+    "actual_continuity": "stay",
+    "continuity_pass": true,
+    "summary": "El usuario quiere crear una solución con IA para ayudar a negocios locales a captar más clientes, pero no tiene claro el formato.",
+    "main_finding": "Falta de definición del formato y funcionalidad específica de la herramienta.",
+    "main_weakness": "Indefinición sobre cómo la IA será aplicada de manera efectiva.",
+    "main_leverage": "Definir un caso de uso específico que la herramienta resolverá inicialmente.",
+    "immediate_action_title": "Identificar problemas de captación",
+    "continuity_reason": "Antes de intensificar, hace falta una definición más clara de utilidad, problema u output.",
+    "refine_count": 3,
+    "active_signals": [
+      "ambiguity_high",
+      "audience_defined",
+      "goal_idea_present",
+      "has_clear_utility_false",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined_false"
+    ],
+    "route_scores": {
+      "sell": 0,
+      "improve": 0,
+      "automate": 0,
+      "idea": 13
+    },
+    "continuity_scores": {
+      "stay": 11,
+      "blueprint": 9,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El caso sigue demasiado abierto o ambiguo para salir de idea. Antes de intensificar, hace falta una definición más clara de utilidad, problema u output."
+  },
+  {
+    "id": "case_07_conversion_diagnostic_tool",
+    "input_type": "text",
+    "input_content": "Quiero una herramienta que ayude a negocios a detectar fricciones de conversi?n y proponer mejoras estructurales con IA.",
+    "expected_route": "improve",
+    "actual_route": "improve",
+    "route_pass": true,
+    "expected_continuity": "blueprint",
+    "actual_continuity": "blueprint",
+    "continuity_pass": true,
+    "summary": "El usuario busca crear una herramienta que identifique fricciones de conversión en negocios y sugiera mejoras estructurales utilizando IA.",
+    "main_finding": "Falta de definición en los tipos de fricciones y el formato de salida.",
+    "main_weakness": "Ambigüedad en el alcance y resultados esperados de la herramienta.",
+    "main_leverage": "Definir claramente las fricciones y el formato de las recomendaciones.",
+    "immediate_action_title": "Definir los tipos de fricciones de conversión",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "conversion_language_present",
+      "diagnostic_language_present",
+      "goal_improve_present",
+      "has_clear_utility",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined_false",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 11,
+      "automate": 0,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 1,
+      "blueprint": 12,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "case_08_diagnostic_system",
+    "input_type": "text",
+    "input_content": "Quiero crear un sistema que analice una web o proceso digital y entregue un diagn?stico claro con prioridades y siguientes pasos.",
+    "expected_route": "improve",
+    "actual_route": "improve",
+    "route_pass": true,
+    "expected_continuity": "blueprint",
+    "actual_continuity": "blueprint",
+    "continuity_pass": true,
+    "summary": "El usuario quiere crear un sistema que analice una web o proceso digital y entregue un diagnóstico claro con prioridades y siguientes pasos.",
+    "main_finding": "Falta de especificidad en los criterios de evaluación del sistema.",
+    "main_weakness": "Indefinición del formato de salida del diagnóstico.",
+    "main_leverage": "Concretar los criterios de evaluación y el formato de salida.",
+    "immediate_action_title": "Definir criterios de evaluación",
+    "continuity_reason": "La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.",
+    "refine_count": 3,
+    "active_signals": [
+      "diagnostic_language_present",
+      "goal_improve_present",
+      "has_clear_utility",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "output_defined",
+      "problem_defined"
+    ],
+    "route_scores": {
+      "sell": 0,
+      "improve": 9,
+      "automate": 0,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 0,
+      "blueprint": 12,
+      "sistema": 0,
+      "premium": 0
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida."
+  },
+  {
+    "id": "case_09_reposition_existing_offer",
+    "input_type": "text",
+    "input_content": "Ya tengo una oferta de servicios y necesito reposicionarla, reestructurar c?mo se presenta y tomar decisiones fuertes para venderla mucho mejor.",
+    "expected_route": "sell",
+    "actual_route": "sell",
+    "route_pass": true,
+    "expected_continuity": "premium",
+    "actual_continuity": "premium",
+    "continuity_pass": true,
+    "summary": "El usuario busca reposicionar y reestructurar su oferta de servicios para mejorar su venta.",
+    "main_finding": "La oferta no está bien posicionada en términos de mensaje y estructura.",
+    "main_weakness": "Desconexión entre la presentación de la oferta y las necesidades del mercado.",
+    "main_leverage": "Reestructurar el mensaje y la presentación para alinearse mejor con el mercado objetivo.",
+    "immediate_action_title": "Identificar diferenciadores clave",
+    "continuity_reason": "El caso exige una capa de intensidad estructural o decisional más alta que un blueprint simple.",
+    "refine_count": 3,
+    "active_signals": [
+      "executive_intensity_high",
+      "has_clear_utility",
+      "needs_definition_first",
+      "needs_output_definition",
+      "needs_scope_definition",
+      "offer_language_present",
+      "output_defined_false",
+      "problem_defined_false"
+    ],
+    "route_scores": {
+      "sell": 3,
+      "improve": 1,
+      "automate": 0,
+      "idea": 2
+    },
+    "continuity_scores": {
+      "stay": 3,
+      "blueprint": 12,
+      "sistema": 0,
+      "premium": 11
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": [
+        "high_intensity_offer_cases_should_compete_for_premium"
+      ]
+    },
+    "decision_reason": "El caso gira en vender mejor una oferta existente y cerrar más. El caso exige una capa de intensidad estructural o decisional más alta que un blueprint simple."
+  },
+  {
+    "id": "case_10_multilayer_system",
+    "input_type": "text",
+    "input_content": "Quiero un sistema completo con motor de an?lisis, builder, dashboard y varios m?dulos conectados para diagnosticar webs y activar mejoras.",
+    "expected_route": "improve",
+    "actual_route": "improve",
+    "route_pass": true,
+    "expected_continuity": "sistema",
+    "actual_continuity": "sistema",
+    "continuity_pass": true,
+    "summary": "El usuario busca desarrollar un sistema integral para diagnosticar sitios web y activar mejoras, compuesto por un motor de análisis, un constructor, un dashboard y varios módulos conectados.",
+    "main_finding": "Falta de definición en los diagnósticos y módulos de mejora.",
+    "main_weakness": "Indefinición de las funciones específicas de cada módulo.",
+    "main_leverage": "Clarificar los diagnósticos y el flujo de activación de mejoras.",
+    "immediate_action_title": "Definir los diagnósticos web específicos",
+    "continuity_reason": "El siguiente paso ya exige coordinar varias piezas, capas o flujos del sistema.",
+    "refine_count": 3,
+    "active_signals": [
+      "audience_defined",
+      "conversion_language_present",
+      "diagnostic_language_present",
+      "goal_improve_present",
+      "has_clear_utility",
+      "implementation_pressure_present",
+      "needs_definition_first",
+      "needs_multilayer_architecture",
+      "needs_output_definition",
+      "output_defined",
+      "problem_defined",
+      "system_design_pressure_present"
+    ],
+    "route_scores": {
+      "sell": 1,
+      "improve": 11,
+      "automate": 1,
+      "idea": 0
+    },
+    "continuity_scores": {
+      "stay": 0,
+      "blueprint": 10,
+      "sistema": 11,
+      "premium": 4
+    },
+    "guardrails_triggered": {
+      "route": [],
+      "continuity": []
+    },
+    "decision_reason": "El núcleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. El siguiente paso ya exige coordinar varias piezas, capas o flujos del sistema."
+  }
+]

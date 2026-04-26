@@ -1,0 +1,96 @@
+﻿=== 87-AI-ANALYSIS-REAL-PROJECT-INPUTS-SUITE ===
+ROOT: C:\Users\lucas\Desktop\sistemamaestro
+PYTHON: C:\Users\lucas\Desktop\sistemamaestro\backend\.venv\Scripts\python.exe
+AI_ANALYSIS_TRACE_ENABLED: 1
+AI_ANALYSIS_TRACE_VERBOSE: 0
+
+=== 87-AI-ANALYSIS-REAL-PROJECT-INPUTS-SUITE ===
+OUTPUT_JSON_FILE: C:\Users\lucas\Desktop\sistemamaestro\docs\control\audit\87-ai-analysis-real-project-inputs-suite.json
+
+[R01]
+route: idea | expected: sell | pass=False
+continuity: blueprint | expected: blueprint | pass=True
+expected_reason: Transformar caracteristicas tecnicas en beneficios emocionales para maximizar la conversion en preventa.
+main_finding: La propuesta no se distingue suficientemente de otros productos similares.
+main_weakness: Falta de un mensaje de valor claro y convincente.
+main_leverage: Enfatizar la carga rßpida y la duraci¾n de la baterÝa en la comunicaci¾n de marketing.
+immediate_action_title: Definir mensajes clave
+active_signals: ['has_clear_utility_false', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined_false']
+route_scores: {'sell': 0, 'improve': 0, 'automate': 0, 'idea': 5}
+continuity_scores: {'stay': 6, 'blueprint': 9, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El caso sigue demasiado abierto o ambiguo para salir de idea. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[R02]
+route: automate | expected: sell | pass=False
+continuity: blueprint | expected: premium | pass=False
+expected_reason: Posicionar una oferta de alto valor mediante escasez, autoridad y resultados garantizados.
+main_finding: Falta de definici¾n en los procesos de automatizaci¾n y mÚtricas de Úxito.
+main_weakness: Riesgo asociado a la garantÝa de resultados sin un plan claro.
+main_leverage: Clarificar y comunicar los procesos especÝficos de automatizaci¾n y las mÚtricas de Úxito.
+immediate_action_title: Especificar mÚtricas de Úxito
+active_signals: ['automation_language_present', 'goal_automate_present', 'has_clear_utility', 'implementation_pressure_present', 'needs_definition_first', 'needs_output_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 0, 'improve': 1, 'automate': 10, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 10, 'sistema': 2, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es automatizar una operativa o trabajo repetitivo. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[R03]
+route: improve | expected: sell | pass=False
+continuity: blueprint | expected: premium | pass=False
+expected_reason: Generar urgencia mediante un diagnostico preventivo que justifica la inversion en seguridad de alto nivel.
+main_finding: Falta de definici¾n en la integraci¾n y uso del Gemelo Digital.
+main_weakness: Incertidumbre sobre la priorizaci¾n de vulnerabilidades detectadas.
+main_leverage: Definir el proceso de simulaci¾n y priorizaci¾n de riesgos.
+immediate_action_title: Especificar los tipos de ataques simulados
+active_signals: ['audience_defined', 'conversion_language_present', 'diagnostic_language_present', 'goal_improve_present', 'has_clear_utility', 'needs_definition_first', 'needs_output_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 1, 'improve': 11, 'automate': 0, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 10, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es diagnosticar, detectar fricciones o mejorar estructura/rendimiento. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[R04]
+route: automate | expected: sell | pass=False
+continuity: blueprint | expected: premium | pass=False
+expected_reason: Escalar la capacidad de respuesta comercial sin aumentar la nomina, garantizando que ningun cliente potencial sea ignorado.
+main_finding: La integraci¾n de plataformas y la precisi¾n en la calificaci¾n de leads son los principales desafÝos.
+main_weakness: La complejidad tÚcnica de integrar CRM, WhatsApp y correo electr¾nico.
+main_leverage: Definir y ajustar los algoritmos de calificaci¾n de leads y respuestas automatizadas.
+immediate_action_title: Definir criterios de calificaci¾n de leads
+active_signals: ['audience_defined', 'conversion_language_present', 'goal_automate_present', 'has_clear_utility', 'needs_definition_first', 'needs_output_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 1, 'improve': 3, 'automate': 5, 'idea': 0}
+continuity_scores: {'stay': 1, 'blueprint': 10, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El n·cleo del caso es automatizar una operativa o trabajo repetitivo. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[R05]
+route: idea | expected: sell | pass=False
+continuity: blueprint | expected: premium | pass=False
+expected_reason: Validar el interes del mercado high-performance en una solucion cientifica que promete extender la juventud.
+main_finding: La integraci¾n de datos en tiempo real es el mayor desafÝo tÚcnico.
+main_weakness: Falta de claridad en la definici¾n de datos y procesos de integraci¾n.
+main_leverage: Clarificar y validar el proceso de integraci¾n de datos y la generaci¾n de recomendaciones.
+immediate_action_title: Definir los tipos de datos genÚticos y de sangre
+active_signals: ['conversion_language_present', 'has_clear_utility_false', 'needs_definition_first', 'needs_output_definition', 'output_defined_false', 'problem_defined']
+route_scores: {'sell': 1, 'improve': 2, 'automate': 0, 'idea': 3}
+continuity_scores: {'stay': 4, 'blueprint': 7, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El caso sigue demasiado abierto o ambiguo para salir de idea. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+[R06]
+route: idea | expected: sell | pass=False
+continuity: blueprint | expected: premium | pass=False
+expected_reason: Convertir una herramienta de productividad en el sistema operativo indispensable para el crecimiento acelerado de una empresa.
+main_finding: La propuesta no se diferencia claramente de otras soluciones de gesti¾n colaborativa.
+main_weakness: Dependencia de plantillas que podrÝan no adaptarse a todas las necesidades especÝficas de las startups.
+main_leverage: Enfatizar y comunicar claramente los beneficios ·nicos de las plantillas y crÚditos gratuitos.
+immediate_action_title: Identificar casos de Úxito especÝficos
+active_signals: ['audience_defined', 'has_clear_utility_false', 'needs_definition_first', 'needs_output_definition', 'needs_scope_definition', 'output_defined_false', 'problem_defined_false']
+route_scores: {'sell': 0, 'improve': 0, 'automate': 0, 'idea': 5}
+continuity_scores: {'stay': 6, 'blueprint': 9, 'sistema': 0, 'premium': 0}
+guardrails_triggered: {'route': [], 'continuity': []}
+decision_reason: El caso sigue demasiado abierto o ambiguo para salir de idea. La utilidad ya se entiende, pero falta definir estructura, criterios, foco o formato de salida.
+
+ROUTE_PASS_TOTAL: 0/6
+CONTINUITY_PASS_TOTAL: 1/6
+FULL_CASES_PASS: 0/6

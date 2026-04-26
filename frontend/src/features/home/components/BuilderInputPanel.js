@@ -20,20 +20,20 @@ const BuilderInputPanel = ({
       placeholder:
         'Quiero crear una herramienta para analizar webs y generar una ruta de mejora con IA.',
       helper:
-        'El sistema interpreta la idea, ordena la ruta y activa el workspace para seguir construyendo.',
+        'El sistema interpreta la idea, ordena la ruta y devuelve una primera lectura clara para ayudarte a decidir el siguiente paso.',
     },
     improve: {
       label: 'Pega la URL que quieres analizar',
       placeholder: 'https://tuweb.com',
       helper:
-        'El sistema toma una web real, detecta fricciones y abre una ruta más clara de mejora.',
+        'El sistema toma una web real, detecta fricciones y devuelve una lectura inicial más clara para orientar la mejora.',
     },
     scale: {
       label: 'Explica qué quieres automatizar o reforzar',
       placeholder:
         'Quiero automatizar el análisis, la captación y el seguimiento de proyectos de clientes.',
       helper:
-        'El sistema organiza procesos, detecta prioridades y abre una ruta más ordenada para escalar.',
+        'El sistema organiza prioridades, detecta palancas y propone una ruta más ordenada para escalar con criterio.',
     },
   };
 
@@ -63,7 +63,7 @@ const BuilderInputPanel = ({
 
           <div className="mt-5">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-              Tipo de construcción
+              Tipo de proyecto
             </p>
 
             <TypeTabs
@@ -75,7 +75,7 @@ const BuilderInputPanel = ({
 
             {activeIntent === 'create' && (
               <p className="mt-3 text-sm leading-6 text-zinc-400">
-                Elige el formato principal. El sistema adapta la ruta según el objetivo del proyecto.
+                Elige el formato principal. El sistema adapta la lectura y la ruta según el objetivo del proyecto.
               </p>
             )}
           </div>
@@ -103,7 +103,7 @@ const BuilderInputPanel = ({
               to="/register"
               className="inline-flex items-center justify-center rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-200 via-white to-amber-100 px-6 py-3 text-sm font-semibold text-black shadow-[0_0_28px_rgba(251,191,36,0.16)] transition hover:opacity-95"
             >
-              Empezar análisis
+              Crear cuenta y continuar
             </Link>
 
             <a
@@ -113,6 +113,10 @@ const BuilderInputPanel = ({
               Ver cómo funciona
             </a>
           </div>
+
+          <p className="mt-4 text-xs leading-6 text-zinc-500">
+            Primero activas una lectura orientativa. El trabajo profundo continúa dentro del sistema.
+          </p>
         </div>
       </div>
     </div>

@@ -1,0 +1,681 @@
+[
+  {
+    "id": "case_01_improve_conversion",
+    "input_type": "text",
+    "input_content": "Quiero una herramienta que ayude a negocios a detectar fricciones de conversi?n y proponer mejoras estructurales con IA.",
+    "route": "improve",
+    "summary": "El usuario busca crear una herramienta que identifique fricciones de conversión en negocios y sugiera mejoras estructurales utilizando IA.",
+    "understanding": "La intención es desarrollar una herramienta digital que analice procesos de conversión en negocios, detecte fricciones y proponga mejoras estructurales mediante el uso de inteligencia artificial.",
+    "main_finding": "Falta de especificidad en las fricciones de conversión a evaluar.",
+    "opportunity": "Concretar los tipos de fricciones y el formato de las recomendaciones.",
+    "main_tension": "Indefinición de las fricciones y del formato de las mejoras.",
+    "main_weakness": "Indefinición del output de la herramienta.",
+    "main_leverage": "Concretar los tipos de fricciones y el formato de las recomendaciones.",
+    "immediate_action": {
+      "title": "Definir tipos de fricciones",
+      "description": "Identificar y listar tres tipos de fricciones de conversión que la herramienta evaluará."
+    },
+    "continuity_recommendation": {
+      "recommended_path": "blueprint",
+      "reason": "Es necesario un blueprint para definir las fricciones y el output de la herramienta.",
+      "cta_label": "Crear blueprint"
+    },
+    "refine_questions": [
+      {
+        "id": "q1",
+        "question": "¿Qué tipos de fricciones de conversión son prioritarios para evaluar?"
+      },
+      {
+        "id": "q2",
+        "question": "¿Cómo se espera que la herramienta presente las mejoras estructurales?"
+      },
+      {
+        "id": "q3",
+        "question": "¿Qué parte del proceso de análisis se espera que realice la IA?"
+      }
+    ],
+    "raw": {
+      "route": "improve",
+      "diagnosis": {
+        "summary": "El usuario busca crear una herramienta que identifique fricciones de conversión en negocios y sugiera mejoras estructurales utilizando IA.",
+        "understanding": "La intención es desarrollar una herramienta digital que analice procesos de conversión en negocios, detecte fricciones y proponga mejoras estructurales mediante el uso de inteligencia artificial.",
+        "main_finding": "Falta de especificidad en las fricciones de conversión a evaluar.",
+        "opportunity": "Concretar los tipos de fricciones y el formato de las recomendaciones.",
+        "strengths": [
+          "Enfoque en un problema relevante de conversión",
+          "Utilidad clara al proponer mejoras estructurales"
+        ],
+        "weaknesses": [
+          "Ambigüedad en la definición de fricciones específicas",
+          "Falta de claridad en el output de la herramienta"
+        ],
+        "quick_wins": [
+          "Identificar tres tipos de fricciones comunes en conversiones",
+          "Decidir si las mejoras se presentarán como informes, listas de verificación o dashboards"
+        ],
+        "executive_summary": {
+          "understanding": "La intención es desarrollar una herramienta digital que analice procesos de conversión en negocios, detecte fricciones y proponga mejoras estructurales mediante el uso de inteligencia artificial.",
+          "main_tension": "Indefinición de las fricciones y del formato de las mejoras.",
+          "commercial_importance": "Clarificar estos aspectos es crucial para que la herramienta sea útil y atractiva para los negocios.",
+          "bottom_line": "Es esencial definir qué fricciones se abordarán y cómo se entregarán las mejoras para avanzar."
+        },
+        "core_diagnosis": {
+          "main_finding": "Falta de especificidad en las fricciones de conversión a evaluar.",
+          "main_weakness": "Indefinición del output de la herramienta.",
+          "main_leverage": "Concretar los tipos de fricciones y el formato de las recomendaciones."
+        },
+        "dimension_review": [
+          {
+            "id": "clarity",
+            "label": "Claridad",
+            "status": "priority",
+            "reading": "La claridad sobre las fricciones y el output es insuficiente.",
+            "priority": "high"
+          },
+          {
+            "id": "proposal",
+            "label": "Propuesta",
+            "status": "improvable",
+            "reading": "La propuesta es interesante pero carece de detalles específicos.",
+            "priority": "medium"
+          },
+          {
+            "id": "conversion",
+            "label": "Conversión",
+            "status": "improvable",
+            "reading": "La herramienta debe definir claramente cómo mejorará las conversiones.",
+            "priority": "high"
+          },
+          {
+            "id": "structure",
+            "label": "Estructura",
+            "status": "improvable",
+            "reading": "La estructura de las recomendaciones necesita definición.",
+            "priority": "medium"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuidad",
+            "status": "improvable",
+            "reading": "La continuidad depende de clarificar el enfoque y el output.",
+            "priority": "medium"
+          }
+        ],
+        "priority_actions": [
+          {
+            "id": "action_1",
+            "title": "Definir fricciones de conversión a evaluar",
+            "why_it_matters": "Esto permitirá enfocar el desarrollo y la utilidad de la herramienta.",
+            "intensity": "high"
+          }
+        ],
+        "immediate_action": {
+          "title": "Definir tipos de fricciones",
+          "description": "Identificar y listar tres tipos de fricciones de conversión que la herramienta evaluará."
+        },
+        "continuity_recommendation": {
+          "recommended_path": "blueprint",
+          "reason": "Es necesario un blueprint para definir las fricciones y el output de la herramienta.",
+          "cta_label": "Crear blueprint"
+        }
+      },
+      "refine_questions": [
+        {
+          "id": "q1",
+          "question": "¿Qué tipos de fricciones de conversión son prioritarios para evaluar?"
+        },
+        {
+          "id": "q2",
+          "question": "¿Cómo se espera que la herramienta presente las mejoras estructurales?"
+        },
+        {
+          "id": "q3",
+          "question": "¿Qué parte del proceso de análisis se espera que realice la IA?"
+        }
+      ]
+    }
+  },
+  {
+    "id": "case_02_automate_ops",
+    "input_type": "text",
+    "input_content": "Quiero automatizar la clasificaci?n de leads y el env?o de respuestas iniciales para ahorrar tiempo al equipo comercial.",
+    "route": "automate",
+    "summary": "Automatización de la clasificación de leads y envío de respuestas iniciales.",
+    "understanding": "El usuario busca implementar un sistema automatizado para clasificar leads y enviar respuestas iniciales, con el objetivo de optimizar el tiempo del equipo comercial.",
+    "main_finding": "Ausencia de un sistema automatizado para la gestión inicial de leads.",
+    "opportunity": "Automatizar la clasificación y respuesta inicial de leads.",
+    "main_tension": "Falta de automatización en la gestión inicial de leads.",
+    "main_weakness": "Falta de definición de criterios de clasificación.",
+    "main_leverage": "Automatizar la clasificación y respuesta inicial de leads.",
+    "immediate_action": {
+      "title": "Definir criterios de clasificación de leads",
+      "description": "Establecer los parámetros que determinarán cómo se clasificarán los leads automáticamente."
+    },
+    "continuity_recommendation": {
+      "recommended_path": "blueprint",
+      "reason": "Necesidad de definir criterios y estructura del sistema antes de implementar.",
+      "cta_label": "Desarrollar un plan de implementación"
+    },
+    "refine_questions": [
+      {
+        "id": "q1",
+        "question": "¿Cuáles son los criterios actuales para clasificar los leads?"
+      },
+      {
+        "id": "q2",
+        "question": "¿Qué tipo de respuestas iniciales se deben enviar automáticamente?"
+      },
+      {
+        "id": "q3",
+        "question": "¿Qué herramientas o plataformas se están considerando para la automatización?"
+      }
+    ],
+    "raw": {
+      "route": "automate",
+      "diagnosis": {
+        "summary": "Automatización de la clasificación de leads y envío de respuestas iniciales.",
+        "understanding": "El usuario busca implementar un sistema automatizado para clasificar leads y enviar respuestas iniciales, con el objetivo de optimizar el tiempo del equipo comercial.",
+        "main_finding": "Ausencia de un sistema automatizado para la gestión inicial de leads.",
+        "opportunity": "Automatizar la clasificación y respuesta inicial de leads.",
+        "strengths": [
+          "Objetivo claro de optimización de tiempo",
+          "Enfoque en un proceso específico del equipo comercial"
+        ],
+        "weaknesses": [
+          "Posible falta de criterios claros para la clasificación de leads",
+          "Dependencia de la calidad de los datos de entrada para la automatización"
+        ],
+        "quick_wins": [
+          "Establecer plantillas de respuestas automáticas"
+        ],
+        "executive_summary": {
+          "understanding": "El usuario busca implementar un sistema automatizado para clasificar leads y enviar respuestas iniciales, con el objetivo de optimizar el tiempo del equipo comercial.",
+          "main_tension": "Falta de automatización en la gestión inicial de leads.",
+          "commercial_importance": "La automatización puede liberar recursos del equipo comercial para tareas de mayor valor.",
+          "bottom_line": "Implementar un sistema automatizado puede mejorar la eficiencia operativa y la respuesta al cliente."
+        },
+        "core_diagnosis": {
+          "main_finding": "Ausencia de un sistema automatizado para la gestión inicial de leads.",
+          "main_weakness": "Falta de definición de criterios de clasificación.",
+          "main_leverage": "Automatizar la clasificación y respuesta inicial de leads."
+        },
+        "dimension_review": [
+          {
+            "id": "clarity",
+            "label": "Claridad",
+            "status": "improvable",
+            "reading": "La claridad sobre los criterios de clasificación de leads es insuficiente.",
+            "priority": "high"
+          },
+          {
+            "id": "proposal",
+            "label": "Propuesta",
+            "status": "strong",
+            "reading": "La propuesta de automatización está bien definida en términos de objetivo.",
+            "priority": "medium"
+          },
+          {
+            "id": "conversion",
+            "label": "Conversión",
+            "status": "improvable",
+            "reading": "La automatización puede mejorar la conversión si se implementa correctamente.",
+            "priority": "high"
+          },
+          {
+            "id": "structure",
+            "label": "Estructura",
+            "status": "improvable",
+            "reading": "La estructura del sistema de automatización necesita definición clara.",
+            "priority": "high"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuidad",
+            "status": "priority",
+            "reading": "La continuidad depende de la correcta implementación y ajuste del sistema.",
+            "priority": "high"
+          }
+        ],
+        "priority_actions": [
+          {
+            "id": "action_1",
+            "title": "Definir criterios de clasificación de leads",
+            "why_it_matters": "Para asegurar que el sistema automatizado funcione correctamente.",
+            "intensity": "high"
+          }
+        ],
+        "immediate_action": {
+          "title": "Definir criterios de clasificación de leads",
+          "description": "Establecer los parámetros que determinarán cómo se clasificarán los leads automáticamente."
+        },
+        "continuity_recommendation": {
+          "recommended_path": "blueprint",
+          "reason": "Necesidad de definir criterios y estructura del sistema antes de implementar.",
+          "cta_label": "Desarrollar un plan de implementación"
+        }
+      },
+      "refine_questions": [
+        {
+          "id": "q1",
+          "question": "¿Cuáles son los criterios actuales para clasificar los leads?"
+        },
+        {
+          "id": "q2",
+          "question": "¿Qué tipo de respuestas iniciales se deben enviar automáticamente?"
+        },
+        {
+          "id": "q3",
+          "question": "¿Qué herramientas o plataformas se están considerando para la automatización?"
+        }
+      ]
+    }
+  },
+  {
+    "id": "case_03_sell_existing_offer",
+    "input_type": "text",
+    "input_content": "Ya vendo servicios de auditor?a web y quiero mejorar c?mo presento mi oferta para cerrar m?s clientes.",
+    "route": "improve",
+    "summary": "El usuario busca mejorar la presentación de su oferta de servicios de auditoría web para aumentar el cierre de clientes.",
+    "understanding": "El usuario quiere optimizar la forma en que comunica y presenta sus servicios de auditoría web para mejorar la tasa de conversión de prospectos a clientes.",
+    "main_finding": "La oferta no comunica efectivamente el valor y los beneficios de los servicios.",
+    "opportunity": "Reestructurar la presentación de la oferta para destacar beneficios y resultados tangibles.",
+    "main_tension": "La oferta actual no está suficientemente clara o atractiva para cerrar más ventas.",
+    "main_weakness": "Falta de una estructura clara y persuasiva en la presentación de la oferta.",
+    "main_leverage": "Reestructurar la presentación de la oferta para destacar beneficios y resultados tangibles.",
+    "immediate_action": {
+      "title": "Redactar un resumen de beneficios",
+      "description": "Crear un documento que resuma claramente los beneficios y resultados de los servicios de auditoría web."
+    },
+    "continuity_recommendation": {
+      "recommended_path": "blueprint",
+      "reason": "Es necesario definir claramente la propuesta de valor y estructura de la oferta.",
+      "cta_label": "Definir propuesta de valor"
+    },
+    "refine_questions": [
+      {
+        "id": "q1",
+        "question": "¿Qué beneficios específicos ofrecen tus auditorías web que podrían destacarse más?"
+      },
+      {
+        "id": "q2",
+        "question": "¿Tienes testimonios o casos de éxito que puedan incluirse en la presentación?"
+      },
+      {
+        "id": "q3",
+        "question": "¿Cómo se diferencia tu servicio de auditoría web de la competencia?"
+      }
+    ],
+    "raw": {
+      "route": "improve",
+      "diagnosis": {
+        "summary": "El usuario busca mejorar la presentación de su oferta de servicios de auditoría web para aumentar el cierre de clientes.",
+        "understanding": "El usuario quiere optimizar la forma en que comunica y presenta sus servicios de auditoría web para mejorar la tasa de conversión de prospectos a clientes.",
+        "main_finding": "La oferta no comunica efectivamente el valor y los beneficios de los servicios.",
+        "opportunity": "Reestructurar la presentación de la oferta para destacar beneficios y resultados tangibles.",
+        "strengths": [
+          "Ya existe una oferta de servicios de auditoría web.",
+          "Experiencia previa en el sector."
+        ],
+        "weaknesses": [
+          "Falta de claridad en la presentación de la oferta.",
+          "Posible desconexión entre la oferta y las necesidades percibidas por los clientes."
+        ],
+        "quick_wins": [
+          "Redactar un resumen claro y conciso de los beneficios de la auditoría web.",
+          "Incluir testimonios o casos de éxito en la presentación de la oferta."
+        ],
+        "executive_summary": {
+          "understanding": "El usuario quiere optimizar la forma en que comunica y presenta sus servicios de auditoría web para mejorar la tasa de conversión de prospectos a clientes.",
+          "main_tension": "La oferta actual no está suficientemente clara o atractiva para cerrar más ventas.",
+          "commercial_importance": "Mejorar la presentación de la oferta puede aumentar significativamente el número de clientes y, por ende, los ingresos.",
+          "bottom_line": "Es crucial redefinir la propuesta de valor para mejorar la captación y conversión de clientes."
+        },
+        "core_diagnosis": {
+          "main_finding": "La oferta no comunica efectivamente el valor y los beneficios de los servicios.",
+          "main_weakness": "Falta de una estructura clara y persuasiva en la presentación de la oferta.",
+          "main_leverage": "Reestructurar la presentación de la oferta para destacar beneficios y resultados tangibles."
+        },
+        "dimension_review": [
+          {
+            "id": "clarity",
+            "label": "Claridad",
+            "status": "priority",
+            "reading": "La oferta necesita una presentación más clara y directa.",
+            "priority": "high"
+          },
+          {
+            "id": "proposal",
+            "label": "Propuesta",
+            "status": "improvable",
+            "reading": "La propuesta debe resaltar mejor los beneficios y el valor diferencial.",
+            "priority": "high"
+          },
+          {
+            "id": "conversion",
+            "label": "Conversión",
+            "status": "improvable",
+            "reading": "La tasa de conversión puede mejorar con una oferta más atractiva.",
+            "priority": "high"
+          },
+          {
+            "id": "structure",
+            "label": "Estructura",
+            "status": "improvable",
+            "reading": "La estructura actual de la oferta no es suficientemente persuasiva.",
+            "priority": "medium"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuidad",
+            "status": "strong",
+            "reading": "El negocio ya está en funcionamiento y tiene una base de clientes.",
+            "priority": "low"
+          }
+        ],
+        "priority_actions": [
+          {
+            "id": "action_1",
+            "title": "Redefinir la propuesta de valor",
+            "why_it_matters": "Para comunicar claramente los beneficios y diferenciarse de la competencia.",
+            "intensity": "high"
+          }
+        ],
+        "immediate_action": {
+          "title": "Redactar un resumen de beneficios",
+          "description": "Crear un documento que resuma claramente los beneficios y resultados de los servicios de auditoría web."
+        },
+        "continuity_recommendation": {
+          "recommended_path": "blueprint",
+          "reason": "Es necesario definir claramente la propuesta de valor y estructura de la oferta.",
+          "cta_label": "Definir propuesta de valor"
+        }
+      },
+      "refine_questions": [
+        {
+          "id": "q1",
+          "question": "¿Qué beneficios específicos ofrecen tus auditorías web que podrían destacarse más?"
+        },
+        {
+          "id": "q2",
+          "question": "¿Tienes testimonios o casos de éxito que puedan incluirse en la presentación?"
+        },
+        {
+          "id": "q3",
+          "question": "¿Cómo se diferencia tu servicio de auditoría web de la competencia?"
+        }
+      ]
+    }
+  },
+  {
+    "id": "case_04_open_idea",
+    "input_type": "text",
+    "input_content": "Estoy pensando en crear algo con IA para ayudar a empresas, pero todav?a no tengo claro exactamente qu?.",
+    "route": "idea",
+    "summary": "El usuario está considerando crear una solución con IA para empresas, pero no tiene claridad sobre el enfoque específico.",
+    "understanding": "El usuario quiere desarrollar una herramienta basada en IA que aporte valor a empresas, pero carece de una dirección clara sobre qué problema resolver o qué funcionalidad ofrecer.",
+    "main_finding": "Indefinición del problema empresarial a abordar con IA.",
+    "opportunity": "Concretar un caso de uso donde la IA tenga un impacto claro.",
+    "main_tension": "La falta de claridad sobre el problema específico a resolver.",
+    "main_weakness": "Ausencia de un enfoque claro y específico.",
+    "main_leverage": "Concretar un caso de uso donde la IA tenga un impacto claro.",
+    "immediate_action": {
+      "title": "Identificar un problema empresarial específico",
+      "description": "Investigar y seleccionar un problema común en empresas donde la IA pueda ofrecer una solución efectiva."
+    },
+    "continuity_recommendation": {
+      "recommended_path": "blueprint",
+      "reason": "Necesita un plan detallado para definir el problema y enfoque de la herramienta.",
+      "cta_label": "Crear un plan de definición"
+    },
+    "refine_questions": [
+      {
+        "id": "q1",
+        "question": "¿Qué tipo de problemas enfrentan las empresas que podrían beneficiarse de una solución de IA?"
+      },
+      {
+        "id": "q2",
+        "question": "¿Qué áreas de negocio te interesan más para aplicar IA (por ejemplo, marketing, operaciones, recursos humanos)?"
+      },
+      {
+        "id": "q3",
+        "question": "¿Tienes algún sector empresarial específico en mente para enfocar la solución de IA?"
+      }
+    ],
+    "raw": {
+      "route": "idea",
+      "diagnosis": {
+        "summary": "El usuario está considerando crear una solución con IA para empresas, pero no tiene claridad sobre el enfoque específico.",
+        "understanding": "El usuario quiere desarrollar una herramienta basada en IA que aporte valor a empresas, pero carece de una dirección clara sobre qué problema resolver o qué funcionalidad ofrecer.",
+        "main_finding": "Indefinición del problema empresarial a abordar con IA.",
+        "opportunity": "Concretar un caso de uso donde la IA tenga un impacto claro.",
+        "strengths": [
+          "Interés en utilizar IA, lo cual es una tecnología en crecimiento.",
+          "Enfoque en el mercado empresarial, que tiene múltiples necesidades potenciales."
+        ],
+        "weaknesses": [
+          "Falta de claridad en el propósito y funcionalidad de la herramienta.",
+          "Ausencia de un problema o necesidad empresarial claramente identificado."
+        ],
+        "quick_wins": [
+          "Identificar tres problemas comunes que enfrentan las empresas donde la IA podría ser útil.",
+          "Decidir si la herramienta se centrará en análisis de datos, automatización de procesos o personalización de servicios."
+        ],
+        "executive_summary": {
+          "understanding": "El usuario quiere desarrollar una herramienta basada en IA que aporte valor a empresas, pero carece de una dirección clara sobre qué problema resolver o qué funcionalidad ofrecer.",
+          "main_tension": "La falta de claridad sobre el problema específico a resolver.",
+          "commercial_importance": "Sin un problema claro, es difícil captar interés o justificar inversión.",
+          "bottom_line": "Definir un caso de uso concreto es esencial para avanzar."
+        },
+        "core_diagnosis": {
+          "main_finding": "Indefinición del problema empresarial a abordar con IA.",
+          "main_weakness": "Ausencia de un enfoque claro y específico.",
+          "main_leverage": "Concretar un caso de uso donde la IA tenga un impacto claro."
+        },
+        "dimension_review": [
+          {
+            "id": "clarity",
+            "label": "Claridad",
+            "status": "priority",
+            "reading": "La falta de definición del problema es el mayor obstáculo.",
+            "priority": "high"
+          },
+          {
+            "id": "proposal",
+            "label": "Propuesta",
+            "status": "improvable",
+            "reading": "La propuesta carece de un enfoque específico.",
+            "priority": "high"
+          },
+          {
+            "id": "conversion",
+            "label": "Conversión",
+            "status": "improvable",
+            "reading": "Sin un problema claro, la conversión es incierta.",
+            "priority": "medium"
+          },
+          {
+            "id": "structure",
+            "label": "Estructura",
+            "status": "improvable",
+            "reading": "La estructura del proyecto depende de definir el caso de uso.",
+            "priority": "medium"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuidad",
+            "status": "improvable",
+            "reading": "La continuidad depende de encontrar un enfoque claro.",
+            "priority": "medium"
+          }
+        ],
+        "priority_actions": [
+          {
+            "id": "action_1",
+            "title": "Definir el problema empresarial a resolver",
+            "why_it_matters": "Es crucial para orientar el desarrollo y captar interés.",
+            "intensity": "high"
+          }
+        ],
+        "immediate_action": {
+          "title": "Identificar un problema empresarial específico",
+          "description": "Investigar y seleccionar un problema común en empresas donde la IA pueda ofrecer una solución efectiva."
+        },
+        "continuity_recommendation": {
+          "recommended_path": "blueprint",
+          "reason": "Necesita un plan detallado para definir el problema y enfoque de la herramienta.",
+          "cta_label": "Crear un plan de definición"
+        }
+      },
+      "refine_questions": [
+        {
+          "id": "q1",
+          "question": "¿Qué tipo de problemas enfrentan las empresas que podrían beneficiarse de una solución de IA?"
+        },
+        {
+          "id": "q2",
+          "question": "¿Qué áreas de negocio te interesan más para aplicar IA (por ejemplo, marketing, operaciones, recursos humanos)?"
+        },
+        {
+          "id": "q3",
+          "question": "¿Tienes algún sector empresarial específico en mente para enfocar la solución de IA?"
+        }
+      ]
+    }
+  },
+  {
+    "id": "case_05_diagnostic_tool",
+    "input_type": "text",
+    "input_content": "Quiero crear un sistema que analice una web o proceso digital y entregue un diagn?stico claro con prioridades y siguientes pasos.",
+    "route": "improve",
+    "summary": "El usuario quiere crear un sistema de diagnóstico para webs o procesos digitales.",
+    "understanding": "El objetivo es desarrollar una herramienta que analice sitios web o procesos digitales para identificar problemas y sugerir mejoras con un enfoque estructurado.",
+    "main_finding": "Falta de especificidad en los criterios de evaluación.",
+    "opportunity": "Concretar los aspectos específicos que el sistema evaluará y cómo presentará los resultados.",
+    "main_tension": "Indefinición de los criterios de evaluación y del formato de salida.",
+    "main_weakness": "Indefinición del output del sistema.",
+    "main_leverage": "Concretar los aspectos específicos que el sistema evaluará y cómo presentará los resultados.",
+    "immediate_action": {
+      "title": "Definir criterios de evaluación",
+      "description": "Especificar qué aspectos del sitio web o proceso digital se evaluarán."
+    },
+    "continuity_recommendation": {
+      "recommended_path": "blueprint",
+      "reason": "Se necesita un plan detallado de los criterios de evaluación y el formato de salida.",
+      "cta_label": "Desarrollar blueprint"
+    },
+    "refine_questions": [
+      {
+        "id": "q1",
+        "question": "¿Qué aspectos específicos del sitio web o proceso digital se evaluarán?"
+      },
+      {
+        "id": "q2",
+        "question": "¿Cuál será el formato del diagnóstico entregado?"
+      },
+      {
+        "id": "q3",
+        "question": "¿Qué parte del proceso se automatizará y cuál requerirá intervención manual?"
+      }
+    ],
+    "raw": {
+      "route": "improve",
+      "diagnosis": {
+        "summary": "El usuario quiere crear un sistema de diagnóstico para webs o procesos digitales.",
+        "understanding": "El objetivo es desarrollar una herramienta que analice sitios web o procesos digitales para identificar problemas y sugerir mejoras con un enfoque estructurado.",
+        "main_finding": "Falta de especificidad en los criterios de evaluación.",
+        "opportunity": "Concretar los aspectos específicos que el sistema evaluará y cómo presentará los resultados.",
+        "strengths": [
+          "Enfoque en diagnóstico claro y accionable",
+          "Potencial para mejorar la eficiencia de procesos digitales"
+        ],
+        "weaknesses": [
+          "Indefinición de los parámetros de análisis",
+          "Falta de claridad sobre el output específico que se entregará"
+        ],
+        "quick_wins": [
+          "Definir tres áreas clave de evaluación para el diagnóstico",
+          "Decidir el formato del informe de diagnóstico (ej. informe, checklist)"
+        ],
+        "executive_summary": {
+          "understanding": "El objetivo es desarrollar una herramienta que analice sitios web o procesos digitales para identificar problemas y sugerir mejoras con un enfoque estructurado.",
+          "main_tension": "Indefinición de los criterios de evaluación y del formato de salida.",
+          "commercial_importance": "Un diagnóstico claro y priorizado puede aumentar la eficiencia y efectividad de las mejoras digitales.",
+          "bottom_line": "Definir claramente los criterios de evaluación y el formato de salida es crucial para avanzar."
+        },
+        "core_diagnosis": {
+          "main_finding": "Falta de especificidad en los criterios de evaluación.",
+          "main_weakness": "Indefinición del output del sistema.",
+          "main_leverage": "Concretar los aspectos específicos que el sistema evaluará y cómo presentará los resultados."
+        },
+        "dimension_review": [
+          {
+            "id": "clarity",
+            "label": "Claridad",
+            "status": "priority",
+            "reading": "La claridad sobre qué se evaluará y cómo se presentará es insuficiente.",
+            "priority": "high"
+          },
+          {
+            "id": "proposal",
+            "label": "Propuesta",
+            "status": "improvable",
+            "reading": "La propuesta necesita una definición más concreta de sus componentes.",
+            "priority": "high"
+          },
+          {
+            "id": "conversion",
+            "label": "Conversión",
+            "status": "improvable",
+            "reading": "Sin un output claro, la conversión de usuarios puede ser baja.",
+            "priority": "medium"
+          },
+          {
+            "id": "structure",
+            "label": "Estructura",
+            "status": "improvable",
+            "reading": "La estructura del sistema necesita una definición más detallada.",
+            "priority": "medium"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuidad",
+            "status": "improvable",
+            "reading": "La continuidad depende de la claridad en la definición de criterios y outputs.",
+            "priority": "medium"
+          }
+        ],
+        "priority_actions": [
+          {
+            "id": "action_1",
+            "title": "Definir criterios de evaluación",
+            "why_it_matters": "Es esencial para estructurar el análisis y el diagnóstico.",
+            "intensity": "high"
+          }
+        ],
+        "immediate_action": {
+          "title": "Definir criterios de evaluación",
+          "description": "Especificar qué aspectos del sitio web o proceso digital se evaluarán."
+        },
+        "continuity_recommendation": {
+          "recommended_path": "blueprint",
+          "reason": "Se necesita un plan detallado de los criterios de evaluación y el formato de salida.",
+          "cta_label": "Desarrollar blueprint"
+        }
+      },
+      "refine_questions": [
+        {
+          "id": "q1",
+          "question": "¿Qué aspectos específicos del sitio web o proceso digital se evaluarán?"
+        },
+        {
+          "id": "q2",
+          "question": "¿Cuál será el formato del diagnóstico entregado?"
+        },
+        {
+          "id": "q3",
+          "question": "¿Qué parte del proceso se automatizará y cuál requerirá intervención manual?"
+        }
+      ]
+    }
+  }
+]

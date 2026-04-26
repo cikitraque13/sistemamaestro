@@ -1,227 +1,461 @@
 # Sistema Maestro
 
-Plataforma guiada de transformación digital que transforma una necesidad, idea o activo existente en una solución digital estructurada, monetizable y lista para ponerse en marcha.
+Sistema Maestro es una plataforma guiada de transformación digital diseñada para convertir una necesidad, una idea o un activo existente en una solución digital estructurada, monetizable y operable.
 
-## Promesa Principal
-
-> "Explica tu necesidad. Sistema Maestro te guía hasta una solución real, estructurada y lista para funcionar."
-
-## Rutas V1
-
-1. **Mejorar algo existente** - Analiza URLs/activos digitales y propone mejoras
-2. **Vender y cobrar** - Estructura propuestas comerciales con modelo de cobro
-3. **Automatizar operación** - Identifica cuellos de botella y propone automatización
-4. **Idea a proyecto** - Convierte ideas en proyectos digitales monetizables
-
-## Tecnología
-
-- **Frontend**: React 18 + Tailwind CSS + Framer Motion
-- **Backend**: FastAPI (Python)
-- **Base de datos**: MongoDB
-- **Pagos**: Stripe
-- **IA**: OpenAI GPT-5.2
-- **Auth**: JWT + Google OAuth
+El sistema no se limita a dar una respuesta superficial. Analiza, ordena, propone una ruta y prepara continuidad para que el proyecto pueda avanzar con más claridad, menos fricción y mejor base de crecimiento.
 
 ---
 
-## ⚠️ CONFIGURACIÓN OBLIGATORIA DE VARIABLES DE ENTORNO
+## Qué representa este repositorio
 
-### Paso 1: Variables del Backend
+Este repositorio contiene la base operativa real de Sistema Maestro.
 
-Añade estas variables en tu panel de hosting (Railway, Render, Vercel, etc.) en la sección **Environment Variables**:
+Su función actual no es servir como escaparate estático, sino como sistema en evolución con:
 
-```env
-# === IA (OBLIGATORIO) ===
-OPENAI_API_KEY=sk-xxx
-# Obtener en: https://platform.openai.com/api-keys
-# Sin esta variable, el análisis de IA NO funcionará
+- capa pública de entrada y captación;
+- flujo de activación;
+- autenticación;
+- dashboard;
+- builder;
+- oportunidades;
+- billing;
+- backend modular;
+- motor de consumo y créditos;
+- y una capa de IA en consolidación estructural.
 
-# === PAGOS (OBLIGATORIO) ===
-STRIPE_SECRET_KEY=sk_live_xxx
-# Obtener en: https://dashboard.stripe.com/apikeys
-# Usa sk_test_xxx para pruebas, sk_live_xxx para producción
-# Sin esta variable, los pagos NO funcionarán
-
-# === BASE DE DATOS ===
-MONGO_URL=mongodb+srv://usuario:password@cluster.mongodb.net/sistemamaestro
-# Para producción: usar MongoDB Atlas (https://mongodb.com/atlas)
-# Para desarrollo local: mongodb://localhost:27017
-
-DB_NAME=sistemamaestro
-
-# === SEGURIDAD ===
-JWT_SECRET=tu_clave_secreta_minimo_32_caracteres_aleatorios
-# Genera uno con: openssl rand -hex 32
-
-# === ADMIN (OPCIONAL) ===
-ADMIN_EMAIL=admin@sistemamaestro.com
-ADMIN_PASSWORD=tu_password_seguro
-```
-
-### Paso 2: Variables del Frontend
-
-```env
-REACT_APP_BACKEND_URL=https://api.sistemamaestro.com
-# O para desarrollo: http://localhost:8001
-```
+Este `README.md` no sustituye la documentación canónica de `docs/control/`, pero sí debe reflejar el estado real del sistema sin arrastres antiguos ni referencias obsoletas.
 
 ---
 
-## Instrucciones Post-Deploy
+## Qué hace Sistema Maestro
 
-### 1. Configurar OpenAI API Key
+Sistema Maestro está pensado para ayudar a usuarios, operadores, agencias y equipos a:
 
-1. Ve a [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-2. Crea una nueva API key (Project API Key)
-3. En tu panel de hosting:
-   - Railway: Dashboard → Variables → Add `OPENAI_API_KEY`
-   - Render: Dashboard → Environment → Add `OPENAI_API_KEY`
-   - Vercel: Project Settings → Environment Variables
-4. Pega tu API key como valor
-5. **Redeploy** la aplicación
+1. **Mejorar algo existente**  
+   Analiza una URL o activo digital y propone una ruta de mejora estructurada.
 
-### 2. Configurar Stripe
+2. **Vender y cobrar**  
+   Ayuda a ordenar una propuesta, una lógica de valor y una estructura de cobro.
 
-1. Ve a [dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
-2. Copia tu **Secret key**:
-   - `sk_test_xxx` para modo pruebas
-   - `sk_live_xxx` para producción (requiere activar cuenta)
-3. Añade `STRIPE_SECRET_KEY` en tu hosting
-4. **Redeploy** la aplicación
+3. **Automatizar operación**  
+   Detecta fricción operativa y ayuda a plantear una secuencia más escalable.
 
-### 3. Configurar MongoDB (producción)
-
-1. Crea cuenta en [MongoDB Atlas](https://mongodb.com/atlas)
-2. Crea un cluster (hay tier gratuito)
-3. Configura Network Access (permitir IP o 0.0.0.0/0 para todos)
-4. Crea usuario de base de datos
-5. Obtén connection string: `mongodb+srv://user:pass@cluster.mongodb.net/sistemamaestro`
-6. Añade `MONGO_URL` en tu hosting
-7. **Redeploy**
+4. **Convertir una idea en proyecto**  
+   Transforma una idea en una estructura digital con continuidad real.
 
 ---
 
-## Estructura del Proyecto
+## Estado real del producto
 
-```
-/app
-├── backend/
-│   ├── server.py          # API FastAPI principal
-│   ├── requirements.txt   # Dependencias Python
-│   └── .env               # Variables de entorno (NO commitear en producción)
-├── frontend/
-│   ├── src/
-│   │   ├── pages/         # Páginas (Home, Login, Dashboard, etc.)
-│   │   ├── components/    # Componentes (Logo, DashboardLayout)
-│   │   └── context/       # AuthContext
-│   ├── public/
-│   │   ├── logo.png       # Logo oficial
-│   │   └── index.html     # HTML con metadatos
-│   └── .env               # URL del backend
-└── README.md
-```
+La lectura correcta del sistema hoy es esta:
+
+- el proyecto ya no es una simple landing;
+- el frontend ya está modularizado por features;
+- el backend ya está modularizado en `backend/app/`;
+- el builder ya existe como pieza real del producto;
+- el sistema ya contiene auth, dashboard, billing, opportunities, projects y flow;
+- existe una capa de créditos y consumo con contratos, catálogos y reglas;
+- existe una capa de IA y orquestación en consolidación;
+- y el proyecto sigue en saneo estructural controlado.
 
 ---
 
-## Endpoints API
+## Arquitectura general del sistema
 
-### Auth
-- `POST /api/auth/register` - Registro
-- `POST /api/auth/login` - Login
-- `POST /api/auth/logout` - Logout
-- `GET /api/auth/me` - Usuario actual
-- `POST /api/auth/google/session` - Google OAuth
+### Raíz real del proyecto
 
-### Proyectos
-- `POST /api/projects` - Crear (analiza texto o URL)
-- `GET /api/projects` - Listar
-- `GET /api/projects/{id}` - Detalle
-- `POST /api/projects/{id}/blueprint` - Generar blueprint
-- `DELETE /api/projects/{id}` - Eliminar
+Las rutas base reales del sistema son:
 
-### Pagos
-- `POST /api/payments/checkout` - Crear sesión Stripe
-- `GET /api/payments/status/{session_id}` - Estado del pago
+- `frontend/`
+- `backend/`
+- `docs/`
+
+La memoria canónica de gobierno técnico vive en:
+
+- `docs/control/`
+
+### Estado del legado retirado
+
+Las siguientes piezas ya no forman parte del repo activo:
+
+- `backend/server.py`
+- `railway/server_railway.py`
+- `railway/requirements.txt`
+- `memory/`
+- `test_reports/`
+
+Su retirada se hizo de forma controlada durante el saneo y, cuando aplicó, quedaron movidas a un área externa de safety.
+
+### Ruta auxiliar vigente
+
+La ruta auxiliar que sigue viva como soporte interno es:
+
+- `tests/`
 
 ---
 
-## Planes
+## Frontend
 
-| Plan | Precio | Características |
-|------|--------|-----------------|
-| Gratis | €0 | Diagnóstico inicial, ruta recomendada |
-| Blueprint | €29/mes | + Estructura completa, prioridades |
-| Sistema | €79/mes | + Continuidad guiada, activación |
-| Premium | €199/mes | + Soporte prioritario, oportunidades ilimitadas |
+### Fuente real
+
+La fuente real del frontend vive en:
+
+- `frontend/src/`
+- `frontend/public/`
+
+La capa principal del producto frontend vive en:
+
+- `frontend/src/features/`
+
+La carpeta `frontend/src/pages/` queda como capa residual temporal y no debe tratarse como la vía principal de crecimiento del producto.
+
+### Features reconocidas
+
+Actualmente el frontend contiene, al menos, estas features reales:
+
+- `activation-flow`
+- `app-shell`
+- `auth`
+- `billing`
+- `builder`
+- `dashboard`
+- `flow`
+- `home`
+- `opportunities`
+- `projects`
+- `reports`
+- `settings`
+
+### Estado del root de frontend
+
+La fuente canónica del producto visible sigue viviendo dentro de `src/` y `public/`.
+
+Los archivos técnicos de raíz de `frontend/` como `package.json`, `package-lock.json`, configs del toolchain y documentación local deben tratarse como soporte de capa, no como producto enrutable.
 
 ---
 
-## Desarrollo Local
+## Home actual
+
+La Home ya no es una portada simple. Está planteada como capa de entrada, activación y demostración del sistema.
+
+### Lectura funcional de Home
+
+La Home actual ya refleja una dirección clara:
+
+- entrada basada en intención del usuario;
+- lógica de tipos de proyecto;
+- previews de flujo, outputs y estructura;
+- bloque visible del constructor;
+- pricing;
+- captación;
+- continuidad comercial;
+- y CTA final.
+
+Además, la Home ya incorpora componentes ligados al constructor, lo que confirma continuidad con Builder y App Shell.
+
+---
+
+## Builder
+
+El Builder ya no debe tratarse como idea futura difusa. Existe como módulo real y debe leerse como pieza central del producto.
+
+### Estructura del Builder
+
+La feature `frontend/src/features/builder/` contiene estructura real de:
+
+- componentes;
+- datos;
+- panels;
+- tabs;
+- utils;
+- workspace.
+
+### Lectura correcta del Builder
+
+Builder no debe tratarse como demo cosmética.
+
+La evidencia actual lo sitúa como:
+
+- entorno de trabajo real;
+- pieza central del sistema;
+- capa donde confluyen estructura, preview, deploy, créditos y continuidad del proyecto.
+
+---
+
+## App Shell
+
+La feature `app-shell` ya actúa como carcasa operativa del producto.
+
+### Función
+
+Sirve como base para:
+
+- navegación;
+- proyectos;
+- créditos;
+- tabs;
+- y módulos internos.
+
+---
+
+## Dashboard y auth
+
+El sistema ya contiene operación interna real más allá de la Home y del acceso.
+
+### Capas reales
+
+- `frontend/src/features/dashboard/`
+- `frontend/src/features/auth/`
+
+### Lectura correcta
+
+No deben tratarse como promesa futura, sino como partes ya integradas del sistema vivo.
+
+---
+
+## Backend
+
+### Estructura real
+
+La capa modular real del backend vive en:
+
+- `backend/app/`
+
+Dentro de ella existen estas subcapas:
+
+- `ai`
+- `core`
+- `db`
+- `domain`
+- `routers`
+- `schemas`
+- `services`
+
+### Entrada canónica del backend
+
+La referencia canónica de runtime del backend es:
 
 ```bash
-# Backend
+uvicorn backend.app.main:app --reload --port 8001
+```
+
+La app canónica de runtime queda fijada como:
+
+- `backend.app.main:app`
+
+### Legacy retirado del repo activo
+
+La pieza plana heredada:
+
+- `backend/server.py`
+
+ya no forma parte del repo activo. Fue retirada a safety para cierre controlado del legado.
+
+### Routers backend detectados
+
+La capa de routers contiene, al menos:
+
+- `auth`
+- `billing`
+- `consumption`
+- `opportunities`
+- `payments`
+- `projects`
+- `public`
+
+### Lectura correcta
+
+El backend ya no debe tratarse como archivo único o API improvisada. La arquitectura real es modular.
+
+---
+
+## Capa de IA
+
+Existe una capa real de IA y orquestación en:
+
+- `backend/app/ai/`
+
+### Lectura correcta
+
+La arquitectura de IA ya está plantada y forma parte del backend real, aunque no toda su lógica esté viva al mismo nivel funcional.
+
+---
+
+## Créditos y consumo
+
+Existe una capa real de créditos en:
+
+- `backend/config/credits/`
+
+### Qué confirma esto
+
+La economía del sistema ya no es solo una idea comercial. Existe una base técnica para:
+
+- acciones con consumo;
+- tiers;
+- reglas de umbral;
+- contratos;
+- y relación con billing y ejecución.
+
+---
+
+## Stack técnico actual
+
+### Frontend
+
+- React 18
+- Tailwind CSS
+- Framer Motion
+- React Router
+- CRACO
+- Radix UI
+- Recharts
+- Sonner
+- Axios
+
+### Backend
+
+- FastAPI
+- Uvicorn
+- Motor / MongoDB
+- Stripe
+- OpenAI
+- JWT
+- bcrypt
+- httpx
+
+El frontend usa scripts activos con:
+
+```bash
+npm install
+npm start
+npm run build
+```
+
+---
+
+## Desarrollo local
+
+### Backend
+
+```bash
 cd backend
 pip install -r requirements.txt
-uvicorn server:app --reload --port 8001
+uvicorn backend.app.main:app --reload --port 8001
+```
 
-# Frontend (en otra terminal)
+### Frontend
+
+```bash
 cd frontend
-yarn install
-yarn start
+npm install
+npm start
 ```
 
 ---
 
-## Credenciales de Test
+## Runtime y despliegue
 
-- **Email**: admin@sistemamaestro.com
-- **Password**: admin123 (cambiar en producción)
-- **Plan**: Premium
+### Runtime canónico actual
+
+- servidor canónico: `backend/app/main.py`
+- app canónica: `backend.app.main:app`
+
+### Deploy canónico actual
+
+- `Dockerfile`
+- `railway.json`
+
+### Healthcheck canónico
+
+- `/health`
+
+### Regla
+
+- mantener una sola verdad de arranque;
+- no reactivar legacy runtime;
+- no ampliar legado;
+- no abrir despliegue final mientras siga el saneo estructural.
 
 ---
 
-## Conectar Dominio (sistemamaestro.com)
+## Variables de entorno mínimas
 
-### DNS Records necesarios
+La configuración exacta puede evolucionar, pero a nivel mínimo el backend requiere una base como esta:
 
+```env
+OPENAI_API_KEY=sk-xxx
+STRIPE_SECRET_KEY=sk_xxx
+MONGO_URL=mongodb+srv://usuario:password@cluster.mongodb.net/sistemamaestro
+DB_NAME=sistemamaestro
+JWT_SECRET=clave_segura_larga
+ALLOWED_ORIGINS=http://localhost:3000,https://tu-dominio.com
 ```
-Tipo    Nombre    Valor
-A       @         [IP de tu servidor]
-A       www       [IP de tu servidor]
-A       api       [IP de tu servidor]  # Si usas subdominio para API
-CNAME   www       sistemamaestro.com   # Alternativa
+
+Y el frontend:
+
+```env
+REACT_APP_BACKEND_URL=http://localhost:8001
 ```
 
-### Pasos específicos por hosting
-
-**Railway:**
-1. Settings → Domains → Add Custom Domain
-2. Añade `sistemamaestro.com`
-3. Railway te dará el registro DNS a configurar
-4. Configura en tu registrador de dominios
-
-**Render:**
-1. Dashboard → Settings → Custom Domains
-2. Añade dominio
-3. Sigue instrucciones de DNS
-
-**Vercel:**
-1. Project Settings → Domains
-2. Add Domain
-3. Vercel gestiona SSL automáticamente
+No deben subirse secretos reales al repositorio.
 
 ---
 
-## Checklist Pre-Producción
+## Estado del saneo
 
-- [ ] `OPENAI_API_KEY` configurada
-- [ ] `STRIPE_SECRET_KEY` configurada  
-- [ ] `MONGO_URL` apuntando a MongoDB Atlas
-- [ ] `JWT_SECRET` con valor seguro (32+ caracteres)
-- [ ] `ADMIN_PASSWORD` cambiado del default
-- [ ] SSL/HTTPS activado
-- [ ] Dominio conectado
+Este proyecto está en fase de saneo estructural controlado.
+
+### Objetivos del saneo
+
+1. separar fuente real de entorno regenerable;
+2. reducir ruido técnico y arrastres heredados;
+3. cerrar referencias canónicas de runtime;
+4. limpiar legado ya retirado;
+5. preparar una base seria para evolución y despliegue futuro.
+
+### Regla crítica
+
+No borrar, mover o reclasificar rutas a ciegas.
 
 ---
 
-© 2026 Sistema Maestro. Todos los derechos reservados.
+## Qué no debe interpretarse mal
+
+- el runtime legacy ya no está en el repo activo;
+- `node_modules`, builds y cachés no forman parte del producto real;
+- `tests/` es soporte técnico, no núcleo canónico;
+- la Home actual ya no es una landing plana;
+- el Builder ya no es una demo cosmética;
+- la capa de IA y créditos ya existe a nivel estructural, aunque no toda esté cerrada al mismo nivel funcional.
+
+---
+
+## Checklist técnico mínimo
+
+- [ ] backend arrancando con `backend.app.main:app`
+- [ ] sin referencias activas de runtime legacy en el repo activo
+- [ ] frontend trabajando desde `frontend/src/features/`
+- [ ] builder tratado como núcleo del producto
+- [ ] app-shell operativo como carcasa interna
+- [ ] créditos y consumo alineados con backend y billing
+- [ ] auth, dashboard y projects conectados con continuidad real
+- [ ] sin secretos reales en repositorio
+- [ ] sin confundir entorno regenerable con producto
+- [ ] documentación canónica mantenida en `docs/control/`
+
+---
+
+## Criterio de trabajo del sistema
+
+Sistema Maestro no debe seguir creciendo por acumulación de parches, rutas heredadas y referencias contradictorias.
+
+La secuencia correcta sigue siendo:
+
+1. control estructural;
+2. clasificación;
+3. canonicidad;
+4. higiene técnica;
+5. reanudación del producto.
+
+Este repositorio debe evolucionar con esa lógica.
