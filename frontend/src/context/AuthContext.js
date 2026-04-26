@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
@@ -21,27 +21,27 @@ export const useAuth = () => {
 
 const ERROR_TRANSLATIONS = {
   'Invalid credentials': 'Credenciales incorrectas',
-  'Email already registered': 'Este email ya está registrado',
-  'Too many failed attempts. Try again later.': 'Demasiados intentos fallidos. Inténtalo más tarde.',
+  'Email already registered': 'Este email ya estÃ¡ registrado',
+  'Too many failed attempts. Try again later.': 'Demasiados intentos fallidos. IntÃ©ntalo mÃ¡s tarde.',
   'Not authenticated': 'No autenticado',
-  'Token expired': 'La sesión ha expirado',
+  'Token expired': 'La sesiÃ³n ha expirado',
   'User not found': 'Usuario no encontrado',
-  'Invalid token': 'Token inválido',
+  'Invalid token': 'Token invÃ¡lido',
   'Project not found': 'Proyecto no encontrado',
   'Opportunity not found': 'Oportunidad no encontrada',
-  'Upgrade to Blueprint plan to unlock this feature': 'Mejora al plan Blueprint para desbloquear esta función',
-  'Upgrade to access more opportunities': 'Mejora tu plan para acceder a más oportunidades',
+  'Upgrade to Blueprint plan to unlock this feature': 'Mejora al plan Blueprint para desbloquear esta funciÃ³n',
+  'Upgrade to access more opportunities': 'Mejora tu plan para acceder a mÃ¡s oportunidades',
   'Payment system not configured. Set STRIPE_SECRET_KEY in environment.': 'Sistema de pagos no configurado',
   'Payment system not configured': 'Sistema de pagos no configurado',
-  'Invalid plan': 'Plan no válido',
-  'Transaction not found': 'Transacción no encontrada',
+  'Invalid plan': 'Plan no vÃ¡lido',
+  'Transaction not found': 'TransacciÃ³n no encontrada',
 };
 
 const SESSION_NOT_PERSISTED_ERROR =
-  'La sesión no ha quedado guardada correctamente. Vuelve a iniciar sesión y comprueba que frontend y backend usan el mismo host.';
+  'La sesiÃ³n no ha quedado guardada correctamente. Vuelve a iniciar sesiÃ³n y comprueba que frontend y backend usan el mismo host.';
 
 const formatApiErrorDetail = (detail) => {
-  if (detail == null) return 'Algo salió mal. Intenta de nuevo.';
+  if (detail == null) return 'Algo saliÃ³ mal. Intenta de nuevo.';
 
   if (typeof detail === 'string') {
     return ERROR_TRANSLATIONS[detail] || detail;
@@ -62,7 +62,7 @@ const formatApiErrorDetail = (detail) => {
 };
 
 const getRequestError = (error) =>
-  formatApiErrorDetail(error?.response?.data?.detail) || error?.message || 'Algo salió mal.';
+  formatApiErrorDetail(error?.response?.data?.detail) || error?.message || 'Algo saliÃ³ mal.';
 
 const api = axios.create({
   baseURL: API_BASE,
