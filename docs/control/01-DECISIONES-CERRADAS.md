@@ -712,3 +712,21 @@ La entrada principal para crear proyectos dentro de la app pasa a ser:
 
 ```text
 /dashboard
+
+---
+
+## DECISIÓN CERRADA — Dashboard como continuidad hacia Builder
+
+Fecha: 2026-04-27
+
+### Decisión
+
+El bloque de proyectos recientes del Dashboard deja de usar el detalle/informe como destino principal.
+
+La continuidad principal del usuario pasa a ser:
+
+```text
+Dashboard / Resumen
+→ Proyectos recientes
+→ Continuar en Builder
+→ /dashboard/builder?project_id=...

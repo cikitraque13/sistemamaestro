@@ -327,10 +327,6 @@ Exportación/deploy no aparecen como propuesta temprana para una landing sencill
 Sí pueden aparecer cuando el recorrido llega a salida técnica.
 
 
-### Añade al final de `02-PENDIENTES-PRIORIZADOS.md`
-
-```md
----
 
 ## ALTA — Saneamiento de app interna posterior a Nuevo Proyecto
 
@@ -366,3 +362,32 @@ Proyectos → continuar en Builder
 Informe/PDF → salida premium
 Facturación → pagos, créditos y planes
 Flow → no visible como creación principal
+
+
+## ALTA — Siguiente saneamiento de app interna: detalle de proyecto
+
+Prioridad: alta
+
+### Estado actual
+
+Dashboard y Proyectos ya priorizan continuar en Builder.
+
+### Pendiente
+
+El detalle de proyecto todavía conserva lógica antigua de informe, blueprint y PDF como centro visual.
+
+### Siguiente pieza
+
+Saneamiento de:
+
+- `frontend/src/features/projects/detail/ProjectDetailPage.js`
+- `frontend/src/features/projects/detail/sections/ProjectHeaderSection.js`
+- `frontend/src/features/projects/detail/sections/PremiumReportSection.js`
+- `frontend/src/features/projects/detail/sections/BlueprintSection.js`
+
+### Criterio de cierre
+
+El detalle debe mostrar arriba:
+
+```text
+Continuar en Builder
