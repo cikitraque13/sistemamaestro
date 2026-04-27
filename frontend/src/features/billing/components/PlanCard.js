@@ -158,7 +158,7 @@ const PlanCard = ({
 
   return (
     <article
-      className={`relative flex h-full min-h-[640px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
+      className={`relative flex h-full min-h-[660px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div
@@ -166,8 +166,8 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 h-[276px]">
-        <div className="mb-7 flex h-[34px] flex-wrap items-start gap-2 overflow-hidden">
+      <div className="relative z-10 h-[330px]">
+        <div className="mb-8 flex h-[34px] flex-wrap items-start gap-2 overflow-hidden">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
           >
@@ -187,33 +187,33 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="h-[215px]">
-          <p className="mb-4 h-[16px] text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
+        <div className="h-[268px]">
+          <p className="mb-5 h-[16px] text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
 
-          <h4 className="mb-5 h-[54px] overflow-hidden text-4xl font-light leading-tight text-white">
+          <h4 className="mb-7 h-[54px] overflow-hidden text-4xl font-light leading-tight text-white">
             {plan.visibleName}
           </h4>
 
-          <p className="mb-5 h-[58px] overflow-hidden text-base leading-7 text-white">
+          <p className="mb-8 h-[58px] overflow-hidden text-base leading-7 text-white">
             {role.headline}
           </p>
 
-          <p className="h-[48px] overflow-hidden text-sm leading-6 text-white/68">
+          <p className="h-[72px] overflow-hidden text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-2 mb-5 flex h-[92px] items-end justify-between gap-4 border-y border-white/12 py-4">
+      <div className="relative z-10 mb-5 flex h-[94px] items-end justify-between gap-4 border-b border-white/16 pb-4">
         <div>
           <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-white/55">
             Nivel de capacidad
           </p>
 
           <div className="flex items-end gap-2">
-            <span className="whitespace-nowrap text-[3.15rem] font-light leading-none text-white">
+            <span className="whitespace-nowrap text-[3.05rem] font-light leading-none text-white">
               {plan.priceLabel}
             </span>
 
