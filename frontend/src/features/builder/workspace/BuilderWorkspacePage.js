@@ -16,13 +16,48 @@ const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000
 
 const API_URL = `${BACKEND_URL}/api`;
 
+const ACTIVE_BUILDER_PROJECT_STORAGE_KEY =
+  'sistema_maestro.active_builder_project_id';
+
 const NAVIGATION_ROUTES = {
   overview: '/dashboard',
   builder: '/dashboard/builder',
   projects: '/dashboard/projects',
   opportunities: '/dashboard/opportunities',
   billing: '/dashboard/billing',
-  settings: '/dashboard/settings'
+  settings: '/dashboard/settings',
+};
+
+const readStoredBuilderProjectId = () => {
+  if (typeof window === 'undefined') return '';
+
+  try {
+    return window.localStorage.getItem(ACTIVE_BUILDER_PROJECT_STORAGE_KEY) || '';
+  } catch {
+    return '';
+  }
+};
+
+const writeStoredBuilderProjectId = (projectId = '') => {
+  if (typeof window === 'undefined') return;
+
+  const value = String(projectId || '').trim();
+
+  try {
+    if (value) {
+      window.localStorage.setItem(ACTIVE_BUILDER_PROJECT_STORAGE_KEY, value);
+    }
+  } catch {
+    // Storage is not critical for Builder runtime.
+  }
+};
+
+const buildBuilderProjectRoute = (projectId = '') => {
+  const value = String(projectId || '').trim();
+
+  if (!value) return NAVIGATION_ROUTES.builder;
+
+  return `${NAVIGATION_ROUTES.builder}?project_id=${encodeURIComponent(value)}`;
 };
 
 const getInitialPrompt = (locationState) => {
@@ -49,6 +84,18 @@ const getStateProjectId = (locationState) => {
     : '';
 };
 
+const buildNavigationState = ({
+  locationState = null,
+  projectId = '',
+  initialPrompt = '',
+  initialMode = 'idea',
+} = {}) => ({
+  ...(locationState && typeof locationState === 'object' ? locationState : {}),
+  projectId: projectId || undefined,
+  initialPrompt: initialPrompt || undefined,
+  initialMode: initialMode || undefined,
+});
+
 const resolveBuilderIntent = (mode) => {
   const intentMap = {
     idea: 'create',
@@ -56,7 +103,7 @@ const resolveBuilderIntent = (mode) => {
     builder: 'create',
     automation: 'scale',
     deploy: 'scale',
-    business: 'improve'
+    business: 'improve',
   };
 
   return intentMap[mode] || 'create';
@@ -69,7 +116,7 @@ const resolveBuilderType = (mode) => {
     builder: 'app',
     automation: 'tool',
     deploy: 'app',
-    business: 'website'
+    business: 'website',
   };
 
   return typeMap[mode] || 'website';
@@ -100,7 +147,7 @@ const getErrorMessage = (error) => {
     return detail.msg || JSON.stringify(detail);
   }
 
-  return error?.message || 'Error de conexión con el backend.';
+  return error?.message || 'Error de conexion con el backend.';
 };
 
 export default function BuilderWorkspacePage() {
@@ -114,10 +161,12 @@ export default function BuilderWorkspacePage() {
   const initialPrompt = getInitialPrompt(location.state);
   const initialMode = getInitialMode(location.state);
   const stateProjectId = getStateProjectId(location.state);
-  const runtimeProjectId = stateProjectId || queryProjectId;
+  const storedProjectId = readStoredBuilderProjectId();
+
+  const runtimeProjectId = stateProjectId || queryProjectId || storedProjectId;
 
   const [activeProjectId, setActiveProjectId] = useState(
-    builderProjects[0]?.id || 'project-alpha'
+    runtimeProjectId || builderProjects[0]?.id || 'project-alpha'
   );
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState(
@@ -128,6 +177,31 @@ export default function BuilderWorkspacePage() {
   const [loadingProject, setLoadingProject] = useState(Boolean(runtimeProjectId));
   const [projectError, setProjectError] = useState('');
   const [generatingBlueprint, setGeneratingBlueprint] = useState(false);
+
+  useEffect(() => {
+    if (!runtimeProjectId) return;
+
+    writeStoredBuilderProjectId(runtimeProjectId);
+
+    if (!queryProjectId || queryProjectId !== runtimeProjectId) {
+      navigate(buildBuilderProjectRoute(runtimeProjectId), {
+        replace: true,
+        state: buildNavigationState({
+          locationState: location.state,
+          projectId: runtimeProjectId,
+          initialPrompt,
+          initialMode,
+        }),
+      });
+    }
+  }, [
+    runtimeProjectId,
+    queryProjectId,
+    navigate,
+    location.state,
+    initialPrompt,
+    initialMode,
+  ]);
 
   useEffect(() => {
     if (!runtimeProjectId) {
@@ -145,13 +219,16 @@ export default function BuilderWorkspacePage() {
 
       try {
         const response = await axios.get(`${API_URL}/projects/${runtimeProjectId}`, {
-          withCredentials: true
+          withCredentials: true,
         });
 
         if (!mounted) return;
 
+        const loadedProjectId = response.data?.project_id || runtimeProjectId;
+
         setProject(response.data);
-        setActiveProjectId(response.data?.project_id || runtimeProjectId);
+        setActiveProjectId(loadedProjectId);
+        writeStoredBuilderProjectId(loadedProjectId);
       } catch (error) {
         if (!mounted) return;
 
@@ -185,24 +262,47 @@ export default function BuilderWorkspacePage() {
   const activeType = resolveBuilderType(initialMode || project?.input_type);
   const projectLabel = buildProjectLabel(project, activeProjectData.label);
 
+  const currentBuilderProjectId =
+    project?.project_id ||
+    runtimeProjectId ||
+    '';
+
   const handleNavChange = (navId) => {
     if (navId === 'deploy' || navId === 'github') {
       setActiveWorkspaceTab(navId);
       return;
     }
 
+    if (navId === 'builder') {
+      navigate(buildBuilderProjectRoute(currentBuilderProjectId), {
+        state: buildNavigationState({
+          locationState: location.state,
+          projectId: currentBuilderProjectId,
+          initialPrompt,
+          initialMode,
+        }),
+      });
+      return;
+    }
+
     const nextRoute = NAVIGATION_ROUTES[navId];
 
     if (nextRoute) {
-      navigate(nextRoute);
+      navigate(nextRoute, {
+        state: currentBuilderProjectId
+          ? {
+              fromBuilderProjectId: currentBuilderProjectId,
+            }
+          : undefined,
+      });
     }
   };
 
   const handleNewProject = () => {
     navigate('/dashboard', {
       state: {
-        focus: 'builder-launcher'
-      }
+        focus: 'builder-launcher',
+      },
     });
   };
 
@@ -218,8 +318,8 @@ export default function BuilderWorkspacePage() {
         {
           withCredentials: true,
           headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          }
+            'Content-Type': 'application/json; charset=utf-8',
+          },
         }
       );
 
@@ -235,10 +335,10 @@ export default function BuilderWorkspacePage() {
   };
 
   const contextBody = project
-    ? `Proyecto real ${project.project_id}. Estado: ${project.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
+    ? `Proyecto real ${project.project_id}. Estado: ${project.status || 'sin estado'}. El Builder ya esta conectado al diagnostico del backend.`
     : initialPrompt
-      ? `Entrada recibida: "${initialPrompt}". El Builder está esperando proyecto real.`
-      : 'Builder operativo para construir, revisar diagnóstico, generar blueprint y preparar continuidad.';
+      ? `Entrada recibida: "${initialPrompt}". El Builder esta esperando proyecto real.`
+      : 'Builder operativo para construir, revisar diagnostico, generar blueprint y preparar continuidad.';
 
   return (
     <AppShellLayout
@@ -253,7 +353,7 @@ export default function BuilderWorkspacePage() {
       onWorkspaceTabChange={setActiveWorkspaceTab}
       credits={user?.credit_balance ?? 0}
       bonus={user?.credit_lifetime_granted ?? 0}
-      usageLabel="Créditos visibles para análisis, builder, blueprint, exportación y deploy."
+      usageLabel="Creditos visibles para analisis, builder, blueprint, exportacion y deploy."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
       contextTitle={project ? `Proyecto ${project.project_id}` : 'Builder activo'}
