@@ -1,0 +1,13 @@
+﻿fastapi
+uvicorn[standard]
+openai
+python-dotenv
+pydantic
+httpx
+motor
+pymongo
+bcrypt
+PyJWT
+email-validator
+stripe
+python-multipart

@@ -1,3 +1,4 @@
+﻿from backend.app.routers import builder_ai
 import logging
 
 from fastapi import FastAPI, HTTPException
@@ -26,7 +27,7 @@ logging.basicConfig(
 
 app = FastAPI(
     title="Sistema Maestro API",
-    description="Plataforma guiada de transformación digital",
+    description="Plataforma guiada de transformaciÃ³n digital",
 )
 
 app.add_middleware(
@@ -95,3 +96,6 @@ async def serve_react(full_path: str):
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+app.include_router(builder_ai.router)
+

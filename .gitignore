@@ -78,4 +78,10 @@ temp/
 # Tooling auxiliar
 .chainlit/
 .ipynb_checkpoints/
-.vercel/
+.vercel/backend/.env
+backup-builder-ai-io-*/
+backend/app/main.py.backup-builder-ai-*
+AUDITORIA-*.txt
+DUMP-*.txt
+diagnostico-*.txt
+mapa-ecosistema-*.txt
