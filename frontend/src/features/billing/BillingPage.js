@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { WarningCircle } from '@phosphor-icons/react';
+import {
+  ArrowLeft,
+  CheckCircle,
+  DiamondsFour,
+  WarningCircle
+} from '@phosphor-icons/react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -50,6 +55,115 @@ const clearCheckoutContext = () => {
   } catch {
     // no-op
   }
+};
+
+const BillingHero = ({ fromProjectId, onReturnToProject }) => (
+  <motion.section
+    initial={{ opacity: 0, y: 18 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="mb-8 overflow-hidden rounded-[28px] border border-amber-200/10 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.14),transparent_28%),radial-gradient(circle_at_top_left,rgba(15,82,87,0.20),transparent_32%),linear-gradient(180deg,#141414_0%,#090909_100%)] p-6 sm:p-8"
+  >
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="max-w-3xl">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-200/15 bg-amber-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-amber-100">
+          <DiamondsFour size={14} weight="fill" />
+          Sistema Maestro Gold
+        </div>
+
+        <h1 className="mb-3 text-3xl font-light leading-tight text-white sm:text-4xl">
+          Centro de capacidad Gold
+        </h1>
+
+        <p className="max-w-2xl text-sm leading-6 text-[#D4D4D4] sm:text-base">
+          Gestiona tu entrada puntual, tu plan, tus créditos y la continuidad de
+          trabajo dentro de Sistema Maestro Builder sin perder el hilo del proyecto.
+        </p>
+      </div>
+
+      {fromProjectId && (
+        <button
+          type="button"
+          onClick={onReturnToProject}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
+        >
+          <ArrowLeft size={16} />
+          Volver al informe
+        </button>
+      )}
+    </div>
+
+    <div className="mt-6 grid gap-3 md:grid-cols-3">
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-amber-100">
+          Informe Gold
+        </p>
+        <p className="text-sm leading-6 text-[#D4D4D4]">
+          Entrada puntual para validar una idea, ordenar el diagnóstico y preparar
+          el primer paso hacia Builder.
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-[#8DE1D0]">
+          Créditos
+        </p>
+        <p className="text-sm leading-6 text-[#D4D4D4]">
+          Capacidad operativa visible para entender el margen de trabajo disponible
+          dentro del sistema.
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-sky-200">
+          Continuidad
+        </p>
+        <p className="text-sm leading-6 text-[#D4D4D4]">
+          Los planes amplían acceso, recorrido y capacidad cuando el proyecto necesita
+          más construcción.
+        </p>
+      </div>
+    </div>
+  </motion.section>
+);
+
+const ProjectContextCard = ({ fromProjectId, onReturnToProject }) => {
+  if (!fromProjectId) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-6 rounded-2xl border border-[#0F5257]/20 bg-[#0F5257]/10 px-5 py-4"
+    >
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-3">
+          <CheckCircle
+            size={20}
+            weight="fill"
+            className="mt-0.5 flex-shrink-0 text-[#8DE1D0]"
+          />
+
+          <div>
+            <p className="mb-1 font-medium text-white">
+              Vienes desde un proyecto activo
+            </p>
+            <p className="text-sm leading-6 text-[#D4D4D4]">
+              Si completas una compra puntual o un plan desde aquí, el sistema conserva
+              el contexto para devolverte al informe o al proyecto correspondiente.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onReturnToProject}
+          className="inline-flex items-center justify-center rounded-xl border border-[#0F5257]/30 bg-black/20 px-4 py-2 text-sm text-[#8DE1D0] transition-all hover:bg-black/30"
+        >
+          Volver al proyecto
+        </button>
+      </div>
+    </motion.div>
+  );
 };
 
 const BillingPage = () => {
@@ -119,6 +233,11 @@ const BillingPage = () => {
     ? billingData.transactions
     : [];
 
+  const handleReturnToProject = () => {
+    if (!fromProjectId) return;
+    navigate(`/dashboard/project/${fromProjectId}/report-preview`);
+  };
+
   const fetchBillingData = async () => {
     try {
       const response = await axios.get(`${API_BASE}/user/billing`, {
@@ -155,7 +274,7 @@ const BillingPage = () => {
         const checkoutContext = readCheckoutContext();
 
         if (item_type === 'one_time_offer' && item_id === 'single_report') {
-          toast.success('Pago completado. Tu informe puntual ha quedado registrado.');
+          toast.success('Pago completado. Tu Informe Gold ha quedado registrado.');
         } else {
           toast.success('Pago completado. Tu plan ha sido actualizado.');
         }
@@ -287,7 +406,7 @@ const BillingPage = () => {
       clearCheckoutContext();
       const message = getErrorMessage(
         error,
-        'No se pudo iniciar el checkout del informe puntual.'
+        'No se pudo iniciar el checkout del Informe Gold.'
       );
       setCheckoutError(message);
       toast.error(message);
@@ -330,15 +449,25 @@ const BillingPage = () => {
 
   return (
     <DashboardLayout title="Facturación">
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         {checkingPayment && (
-          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-            <div className="bg-[#171717] border border-[#262626] rounded-2xl p-8 text-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="rounded-2xl border border-[#262626] bg-[#171717] p-8 text-center">
               <div className="spinner mx-auto mb-4"></div>
               <p className="text-white">Verificando pago...</p>
             </div>
           </div>
         )}
+
+        <BillingHero
+          fromProjectId={fromProjectId}
+          onReturnToProject={handleReturnToProject}
+        />
+
+        <ProjectContextCard
+          fromProjectId={fromProjectId}
+          onReturnToProject={handleReturnToProject}
+        />
 
         {checkoutError && (
           <motion.div
@@ -347,10 +476,12 @@ const BillingPage = () => {
             className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4"
           >
             <div className="flex items-start gap-3">
-              <WarningCircle size={20} className="text-red-400 mt-0.5 flex-shrink-0" />
+              <WarningCircle size={20} className="mt-0.5 flex-shrink-0 text-red-400" />
               <div>
-                <p className="text-red-300 font-medium mb-1">No se pudo abrir el checkout</p>
-                <p className="text-red-200/90 text-sm">{checkoutError}</p>
+                <p className="mb-1 font-medium text-red-300">
+                  No se pudo abrir el checkout
+                </p>
+                <p className="text-sm text-red-200/90">{checkoutError}</p>
               </div>
             </div>
           </motion.div>
@@ -364,8 +495,6 @@ const BillingPage = () => {
           onPlanCheckout={handlePlanCheckout}
         />
 
-        <CreditSummaryCard creditSummary={creditSummary} />
-
         <div ref={entryOfferRef}>
           <EntryOfferCard
             selectedEntryOffer={selectedEntryOffer}
@@ -374,6 +503,8 @@ const BillingPage = () => {
             isFocused={entryOfferFocused}
           />
         </div>
+
+        <CreditSummaryCard creditSummary={creditSummary} />
 
         <CurrentPlanCard
           currentPlanDefinition={currentPlanDefinition}
