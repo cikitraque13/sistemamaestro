@@ -697,3 +697,18 @@ Queda pendiente que cada acción lifecycle aceptada por el usuario modifique de 
 - estructura;
 - estado de madurez;
 - siguientes decisiones.
+
+---
+
+## DECISIÓN CERRADA — Navegación interna de Nuevo Proyecto hacia Dashboard Launcher
+
+Fecha: 2026-04-27
+
+### Decisión
+
+Dentro de la aplicación interna, los CTAs principales de “Nuevo proyecto”, “Crear o abrir proyecto” y accesos rápidos de creación dejan de apuntar a `/flow`.
+
+La entrada principal para crear proyectos dentro de la app pasa a ser:
+
+```text
+/dashboard

@@ -2,6 +2,11 @@ import React from 'react';
 import { ArrowRight, Sparkle } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 
+const BUILDER_LAUNCHER_STATE = {
+  focus: 'builder-launcher',
+  source: 'dashboard-welcome-panel'
+};
+
 const DashboardWelcomePanel = ({ user, recentProjectsCount = 0 }) => {
   const firstName = user?.name?.split(' ')[0] || 'Usuario';
 
@@ -23,30 +28,46 @@ const DashboardWelcomePanel = ({ user, recentProjectsCount = 0 }) => {
       </h2>
 
       <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-        Entra, revisa tu proyecto activo, abre builder, consulta oportunidades o sigue
-        desde el siguiente paso recomendado sin perder continuidad.
+        Crea un proyecto nuevo, continúa una construcción en Builder, consulta oportunidades
+        o revisa el siguiente paso recomendado sin perder continuidad.
       </p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Proyectos activos</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{recentProjectsCount}</p>
+          <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">
+            Proyectos activos
+          </p>
+
+          <p className="mt-2 text-2xl font-semibold text-white">
+            {recentProjectsCount}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Siguiente foco</p>
-          <p className="mt-2 text-base font-medium text-white">Continuar proyecto o abrir builder</p>
+          <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">
+            Siguiente foco
+          </p>
+
+          <p className="mt-2 text-base font-medium text-white">
+            Crear o continuar en Builder
+          </p>
         </div>
 
         <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Estado</p>
-          <p className="mt-2 text-base font-medium text-white">Sistema operativo y listo</p>
+          <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">
+            Estado
+          </p>
+
+          <p className="mt-2 text-base font-medium text-white">
+            Sistema operativo y listo
+          </p>
         </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link
-          to="/flow"
+          to="/dashboard"
+          state={BUILDER_LAUNCHER_STATE}
           className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
         >
           Crear o abrir proyecto

@@ -5,32 +5,87 @@ import { Plus, X } from '@phosphor-icons/react';
 const STORAGE_KEY = 'sm_dashboard_open_tabs_v1';
 const MAX_TABS = 6;
 
+const BUILDER_LAUNCHER_STATE = {
+  focus: 'builder-launcher',
+  source: 'dashboard-project-tabs-new-project'
+};
+
 const TAB_META = [
-  { match: (p) => p === '/dashboard', key: 'overview', label: 'Resumen', to: '/dashboard' },
-  { match: (p) => p === '/dashboard/projects', key: 'projects', label: 'Proyectos', to: '/dashboard/projects' },
-  { match: (p) => p === '/dashboard/opportunities', key: 'opportunities', label: 'Oportunidades', to: '/dashboard/opportunities' },
-  { match: (p) => p === '/dashboard/billing', key: 'billing', label: 'Facturación', to: '/dashboard/billing' },
-  { match: (p) => p.startsWith('/dashboard/project/') && p.includes('/report-preview'), key: 'report-preview', label: 'Informe', to: null },
-  { match: (p) => p.startsWith('/dashboard/project/') && p.includes('/report-print'), key: 'report-print', label: 'Impresión', to: null },
-  { match: (p) => p.startsWith('/dashboard/project/'), key: 'project', label: 'Proyecto activo', to: null },
-  { match: (p) => p.startsWith('/flow'), key: 'flow', label: 'Nuevo proyecto', to: '/flow' }
+  {
+    match: (pathname) => pathname === '/dashboard',
+    key: 'overview',
+    label: 'Resumen',
+    to: '/dashboard'
+  },
+  {
+    match: (pathname) => pathname === '/dashboard/projects',
+    key: 'projects',
+    label: 'Proyectos',
+    to: '/dashboard/projects'
+  },
+  {
+    match: (pathname) => pathname === '/dashboard/opportunities',
+    key: 'opportunities',
+    label: 'Oportunidades',
+    to: '/dashboard/opportunities'
+  },
+  {
+    match: (pathname) => pathname === '/dashboard/billing',
+    key: 'billing',
+    label: 'Facturacion',
+    to: '/dashboard/billing'
+  },
+  {
+    match: (pathname) =>
+      pathname.startsWith('/dashboard/project/') && pathname.includes('/report-preview'),
+    key: 'report-preview',
+    label: 'Informe',
+    to: null
+  },
+  {
+    match: (pathname) =>
+      pathname.startsWith('/dashboard/project/') && pathname.includes('/report-print'),
+    key: 'report-print',
+    label: 'Impresion',
+    to: null
+  },
+  {
+    match: (pathname) => pathname.startsWith('/dashboard/project/'),
+    key: 'project',
+    label: 'Proyecto activo',
+    to: null
+  },
+  {
+    match: (pathname) => pathname.startsWith('/dashboard/builder'),
+    key: 'builder',
+    label: 'Builder',
+    to: null
+  }
 ];
 
-const getTabForPath = (pathname) => {
+const isValidTab = (tab) => {
+  if (!tab || typeof tab !== 'object') return false;
+  if (!tab.to || typeof tab.to !== 'string') return false;
+
+  return !tab.to.startsWith('/flow');
+};
+
+const getTabForPath = (pathname, search = '') => {
   const match = TAB_META.find((item) => item.match(pathname));
+  const resolvedPath = `${pathname}${search || ''}`;
 
   if (!match) {
     return {
-      key: pathname,
+      key: resolvedPath,
       label: 'Workspace',
-      to: pathname
+      to: resolvedPath
     };
   }
 
   return {
-    key: `${match.key}:${pathname}`,
+    key: `${match.key}:${resolvedPath}`,
     label: match.label,
-    to: match.to || pathname
+    to: match.to || resolvedPath
   };
 };
 
@@ -38,7 +93,10 @@ const readTabs = () => {
   try {
     const raw = window.sessionStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter(isValidTab);
   } catch {
     return [];
   }
@@ -46,9 +104,10 @@ const readTabs = () => {
 
 const writeTabs = (tabs) => {
   try {
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(tabs));
+    const cleanTabs = Array.isArray(tabs) ? tabs.filter(isValidTab) : [];
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cleanTabs));
   } catch {
-    // no-op
+    // Session storage is not critical for dashboard navigation.
   }
 };
 
@@ -57,22 +116,28 @@ const DashboardProjectTabs = () => {
   const [tabs, setTabs] = useState([]);
 
   useEffect(() => {
-    const currentTab = getTabForPath(location.pathname);
+    const currentTab = getTabForPath(location.pathname, location.search);
     const existing = readTabs();
 
     const next = [
       currentTab,
       ...existing.filter((item) => item.to !== currentTab.to)
-    ].slice(0, MAX_TABS);
+    ]
+      .filter(isValidTab)
+      .slice(0, MAX_TABS);
 
     setTabs(next);
     writeTabs(next);
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
-  const activeTo = useMemo(() => getTabForPath(location.pathname).to, [location.pathname]);
+  const activeTo = useMemo(
+    () => getTabForPath(location.pathname, location.search).to,
+    [location.pathname, location.search]
+  );
 
   const handleClose = (to) => {
     const next = tabs.filter((item) => item.to !== to);
+
     setTabs(next);
     writeTabs(next);
   };
@@ -110,7 +175,8 @@ const DashboardProjectTabs = () => {
       })}
 
       <Link
-        to="/flow"
+        to="/dashboard"
+        state={BUILDER_LAUNCHER_STATE}
         className="inline-flex items-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-4 py-2 text-sm font-semibold text-black shadow-[0_10px_24px_rgba(245,158,11,0.14)] transition hover:scale-[1.01]"
       >
         <Plus size={14} />

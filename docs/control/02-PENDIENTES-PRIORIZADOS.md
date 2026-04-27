@@ -325,3 +325,44 @@ Preparar exportación, GitHub, deploy y dominio solo cuando:
 Exportación/deploy no aparecen como propuesta temprana para una landing sencilla.
 
 Sí pueden aparecer cuando el recorrido llega a salida técnica.
+
+
+### Añade al final de `02-PENDIENTES-PRIORIZADOS.md`
+
+```md
+---
+
+## ALTA — Saneamiento de app interna posterior a Nuevo Proyecto
+
+Prioridad: alta
+
+### Estado actual
+
+Los CTAs internos principales de “Nuevo proyecto” ya no apuntan a `/flow`.
+
+La creación interna se redirige al Dashboard Launcher moderno.
+
+### Pendiente
+
+Queda pendiente completar el saneamiento de la app interna para que el usuario no vuelva al modelo antiguo de informe/blueprint como centro del producto.
+
+### Siguientes piezas
+
+1. Reordenar Dashboard como centro premium de creación y continuidad.
+2. Saneamiento del detalle de proyecto.
+3. Reposicionar informe/PDF como salida premium, no como centro de navegación.
+4. Reclasificar `/flow` como legacy, diagnóstico puntual o retirarlo por fases.
+5. Alinear Facturación con informe 6,99, créditos, planes y exportación.
+6. Mantener Oportunidades como módulo de plantillas/rutas desbloqueables por plan.
+
+### Criterio de cierre
+
+La app interna debe cumplir:
+
+```text
+Dashboard → crear o inspirar proyecto
+Builder → construir y mejorar
+Proyectos → continuar en Builder
+Informe/PDF → salida premium
+Facturación → pagos, créditos y planes
+Flow → no visible como creación principal

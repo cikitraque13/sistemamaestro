@@ -7,28 +7,38 @@ import {
   Plus
 } from '@phosphor-icons/react';
 
+const BUILDER_LAUNCHER_STATE = {
+  focus: 'builder-launcher',
+  source: 'dashboard-quick-actions'
+};
+
 const actions = [
   {
-    to: '/flow',
+    to: '/dashboard',
+    state: BUILDER_LAUNCHER_STATE,
     label: 'Nuevo proyecto',
+    helper: 'Crear o inspirar desde el launcher',
     icon: Plus,
     tone: 'amber'
   },
   {
     to: '/dashboard/projects',
     label: 'Ver proyectos',
+    helper: 'Continuar construcciones activas',
     icon: FolderOpen,
     tone: 'cyan'
   },
   {
     to: '/dashboard/opportunities',
     label: 'Oportunidades',
+    helper: 'Plantillas y rutas desbloqueables',
     icon: Lightning,
     tone: 'emerald'
   },
   {
     to: '/dashboard/billing',
-    label: 'Billing y créditos',
+    label: 'Facturación y créditos',
+    helper: 'Pagos, planes y capacidad operativa',
     icon: CreditCard,
     tone: 'fuchsia'
   }
@@ -56,15 +66,22 @@ export default function DashboardQuickActions() {
 
           return (
             <Link
-              key={action.to}
+              key={`${action.to}-${action.label}`}
               to={action.to}
+              state={action.state}
               className="rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition hover:border-white/15 hover:bg-white/[0.03]"
             >
               <div className={`inline-flex rounded-2xl border p-3 ${toneClasses[action.tone]}`}>
                 <Icon size={20} />
               </div>
 
-              <p className="mt-4 text-base font-semibold text-white">{action.label}</p>
+              <p className="mt-4 text-base font-semibold text-white">
+                {action.label}
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-zinc-400">
+                {action.helper}
+              </p>
             </Link>
           );
         })}
