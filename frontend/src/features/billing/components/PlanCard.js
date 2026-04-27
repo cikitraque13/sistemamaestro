@@ -18,49 +18,55 @@ const PLAN_ROLE_META = {
     badge: 'Entrada seria',
     suggestedBadge: 'Recomendado',
     level: 'Primera activación operativa',
+    headline: 'Activa una base real de trabajo.',
     description:
       'Para pasar de una idea, informe o diagnóstico inicial a una base real de trabajo dentro de Builder.',
     bestFor:
-      'Base operativa inicial para empezar con estructura, prioridades y primeros créditos.',
+      'Primera activación seria dentro del sistema.',
     surface:
-      'border-[#0F5257]/55 bg-[linear-gradient(180deg,#062D2D_0%,#041616_48%,#050505_100%)]',
-    glow: 'bg-[#0F5257]/22',
+      'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
+    glow: 'bg-[#0F5257]/26',
     badgeClass:
-      'border-[#8DE1D0]/25 bg-[#0F5257]/35 text-[#8DE1D0]',
+      'border-[#8DE1D0]/25 bg-[#0F5257]/34 text-[#8DE1D0]',
     ctaClass:
-      'bg-[#0F5257] text-white hover:bg-[#136970]'
+      'bg-[#0F5257] text-white hover:bg-[#136970]',
+    iconClass: 'text-[#8DE1D0]'
   },
   sistema: {
     stage: 'CONTINUAR',
     badge: 'Núcleo operativo',
     level: 'Continuidad seria',
+    headline: 'Convierte el sistema en continuidad operativa.',
     description:
       'Para proyectos que ya necesitan iteración, seguimiento, más margen operativo y continuidad de construcción.',
     bestFor:
-      'Trabajo con más recorrido, Builder continuo, optimización y mejora del proyecto.',
+      'Continuidad seria y trabajo con más recorrido.',
     surface:
-      'border-sky-300/45 bg-[linear-gradient(180deg,#0B263C_0%,#061722_48%,#050505_100%)]',
-    glow: 'bg-sky-400/16',
+      'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
+    glow: 'bg-sky-400/18',
     badgeClass:
-      'border-sky-200/20 bg-sky-400/18 text-sky-100',
+      'border-sky-200/22 bg-sky-400/18 text-sky-100',
     ctaClass:
-      'bg-[#2A3F55] text-white hover:bg-[#355169]'
+      'bg-[#2A3F55] text-white hover:bg-[#355169]',
+    iconClass: 'text-sky-200'
   },
   premium: {
     stage: 'ESCALAR',
     badge: 'Capa superior',
     level: 'Capa maestra avanzada',
+    headline: 'Activa la capa maestra para casos complejos.',
     description:
       'Para casos complejos que requieren más criterio, más inteligencia, más capacidad y preparación seria de salida.',
     bestFor:
-      'Criterio maestro, Builder avanzado, más capacidad y salida mejor preparada.',
+      'Casos complejos, operador serio y salida preparada.',
     surface:
-      'border-fuchsia-200/45 bg-[linear-gradient(180deg,#2B0D2E_0%,#17081A_48%,#050505_100%)]',
-    glow: 'bg-fuchsia-400/16',
+      'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
+    glow: 'bg-fuchsia-400/18',
     badgeClass:
-      'border-fuchsia-200/20 bg-fuchsia-400/16 text-fuchsia-100',
+      'border-fuchsia-200/22 bg-fuchsia-400/16 text-fuchsia-100',
     ctaClass:
-      'bg-[#3B123E] text-white hover:bg-[#4A1850]'
+      'bg-[#3B123E] text-white hover:bg-[#4A1850]',
+    iconClass: 'text-fuchsia-200'
   }
 };
 
@@ -72,7 +78,7 @@ const OperationalGrid = ({ items }) => (
       return (
         <div
           key={item.label}
-          className={`rounded-2xl border px-3 py-3 ${accent.wrap}`}
+          className={`min-h-[92px] rounded-2xl border px-3 py-3 ${accent.wrap}`}
         >
           <p className={`mb-1 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
             {item.label}
@@ -120,14 +126,14 @@ const PlanCard = ({
 
   return (
     <article
-      className={`relative flex h-full min-h-[680px] flex-col overflow-hidden rounded-[30px] border p-6 shadow-[0_24px_80px_rgba(0,0,0,0.26)] ${role.surface}`}
+      className={`relative flex h-full min-h-[710px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div className={`absolute right-[-110px] top-[-120px] h-72 w-72 rounded-full ${role.glow} blur-3xl`} />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/45 to-white/0" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 flex min-h-[176px] flex-col">
-        <div className="mb-5 flex min-h-[34px] flex-wrap items-start gap-2">
+      <div className="relative z-10 flex min-h-[292px] flex-col">
+        <div className="mb-8 flex min-h-[34px] flex-wrap items-start gap-2">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
           >
@@ -147,24 +153,26 @@ const PlanCard = ({
           )}
         </div>
 
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-white/80">
-          {role.stage}
-        </p>
+        <div className="flex min-h-[232px] flex-col">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
+            {role.stage}
+          </p>
 
-        <h4 className="mb-3 text-4xl font-light leading-tight text-white">
-          {plan.visibleName}
-        </h4>
+          <h4 className="mb-5 min-h-[54px] text-4xl font-light leading-tight text-white">
+            {plan.visibleName}
+          </h4>
 
-        <p className="mb-3 text-base leading-snug text-white">
-          {plan.headline}
-        </p>
+          <p className="mb-5 min-h-[58px] text-base leading-7 text-white">
+            {role.headline || plan.headline}
+          </p>
 
-        <p className="text-sm leading-6 text-white/68">
-          {role.description}
-        </p>
+          <p className="min-h-[78px] text-sm leading-6 text-white/68">
+            {role.description}
+          </p>
+        </div>
       </div>
 
-      <div className="relative z-10 mt-6 rounded-3xl border border-white/14 bg-black/28 p-5">
+      <div className="relative z-10 mt-2 min-h-[248px] rounded-3xl border border-white/16 bg-black/30 p-5">
         <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-white/55">
           Nivel de capacidad
         </p>
@@ -179,32 +187,32 @@ const PlanCard = ({
           </span>
         </div>
 
-        <div className="rounded-2xl border border-white/12 bg-white/[0.045] px-4 py-3">
+        <div className="rounded-2xl border border-white/14 bg-white/[0.045] px-4 py-3">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/48">
             Mejor encaje
           </p>
 
-          <p className="text-sm leading-6 text-white">
+          <p className="min-h-[52px] text-sm leading-6 text-white">
             {plan.bestForShort || plan.bestFor || role.bestFor}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-5 rounded-3xl border border-white/14 bg-black/24 p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="relative z-10 mt-5 rounded-3xl border border-white/16 bg-black/25 p-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/58">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
               Marco operativo
             </p>
-            <p className="mt-1 text-xs text-white/38">
+            <p className="mt-1 text-xs text-white/45">
               Acceso, Builder, salida y créditos.
             </p>
           </div>
 
           <DiamondsFour
-            size={17}
+            size={18}
             weight="fill"
-            className="text-amber-200"
+            className={role.iconClass}
           />
         </div>
 
@@ -212,7 +220,7 @@ const PlanCard = ({
       </div>
 
       {planSignals.length > 0 && (
-        <div className="relative z-10 mt-5">
+        <div className="relative z-10 mt-5 min-h-[72px]">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
@@ -226,8 +234,8 @@ const PlanCard = ({
         </div>
       )}
 
-      <div className="relative z-10 mt-5 flex-1">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/58">
+      <div className="relative z-10 mt-4 flex-1">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
           Incluye
         </p>
 
@@ -235,7 +243,7 @@ const PlanCard = ({
           {highlights.map((feature) => (
             <li
               key={feature}
-              className="flex items-start gap-2 text-sm leading-6 text-white/82"
+              className="flex items-start gap-2 text-sm leading-6 text-white/84"
             >
               <CheckCircle
                 size={16}
