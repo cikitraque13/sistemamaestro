@@ -44,16 +44,16 @@ const PLAN_ROLE_META = {
 };
 
 const OperationalGrid = ({ items }) => (
-  <div className="grid grid-cols-2 gap-3">
+  <div className="grid gap-3 sm:grid-cols-2">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
 
       return (
         <div
           key={item.label}
-          className={`min-h-[90px] rounded-2xl border px-3 py-3 ${accent.wrap}`}
+          className={`rounded-2xl border px-3 py-3 ${accent.wrap}`}
         >
-          <p className={`mb-2 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
+          <p className={`mb-1 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
             {item.label}
           </p>
 
@@ -102,7 +102,7 @@ const PlanCard = ({
 
   return (
     <article
-      className={`group relative flex h-full min-h-[760px] flex-col overflow-hidden rounded-[28px] border p-5 transition-all duration-300 ${
+      className={`group relative flex h-full min-h-[640px] flex-col overflow-hidden rounded-[28px] border p-5 transition-all duration-300 ${
         isSuggestedPlan ? role.shell : `${visual.surfaceClass} ${visual.borderClass}`
       }`}
       data-testid={`plan-card-${plan.id}`}
@@ -111,38 +111,38 @@ const PlanCard = ({
         className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`}
       />
 
-      {isSuggestedPlan && !isCurrentPlan && (
-        <div className="absolute right-4 top-4 rounded-full border border-[#0F5257]/30 bg-[#0F5257]/15 px-3 py-1 text-[11px] font-medium text-[#8DE1D0]">
-          Recomendado
-        </div>
-      )}
+      <div className="mb-4 flex flex-wrap items-start gap-2 pr-0">
+        <span
+          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${visual.badgeClass}`}
+        >
+          {plan.badge || visual.eyebrow}
+        </span>
+
+        {isSuggestedPlan && !isCurrentPlan && (
+          <span className="inline-flex items-center rounded-full border border-[#0F5257]/30 bg-[#0F5257]/15 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
+            Recomendado
+          </span>
+        )}
+
+        {isCurrentPlan && (
+          <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white">
+            Actual
+          </span>
+        )}
+
+        {plan.id === 'blueprint' && !isCurrentPlan && (
+          <span className="inline-flex items-center rounded-full border border-[#0F5257]/20 bg-[#0F5257]/10 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
+            Entrada principal
+          </span>
+        )}
+      </div>
 
       <div className="mb-5">
-        <div className="mb-4 flex flex-wrap items-center gap-2 pr-28">
-          <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${visual.badgeClass}`}
-          >
-            {plan.badge || visual.eyebrow}
-          </span>
-
-          {isCurrentPlan && (
-            <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white">
-              Actual
-            </span>
-          )}
-
-          {plan.id === 'blueprint' && !isCurrentPlan && (
-            <span className="inline-flex items-center rounded-full border border-[#0F5257]/20 bg-[#0F5257]/10 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
-              Entrada principal
-            </span>
-          )}
-        </div>
-
         <p className={`mb-2 text-xs font-semibold uppercase tracking-[0.18em] ${role.accent}`}>
           {role.stage}
         </p>
 
-        <h4 className="mb-2 text-2xl font-medium text-white">
+        <h4 className="mb-2 text-2xl font-medium leading-tight text-white">
           {plan.visibleName}
         </h4>
 
@@ -160,11 +160,11 @@ const PlanCard = ({
           Nivel de capacidad
         </p>
 
-        <div className="mb-4 flex items-end gap-2">
-          <span className="text-4xl font-light text-white lg:text-5xl">
+        <div className="mb-3 flex flex-wrap items-end gap-x-2 gap-y-1">
+          <span className="whitespace-nowrap text-[2.65rem] font-light leading-none text-white lg:text-5xl">
             {plan.priceLabel}
           </span>
-          <span className="pb-1 text-sm text-[#A3A3A3]">
+          <span className="whitespace-nowrap pb-1 text-sm text-[#A3A3A3]">
             {plan.periodLabel}
           </span>
         </div>
@@ -191,7 +191,7 @@ const PlanCard = ({
       </div>
 
       {planSignals.length > 0 && (
-        <div className="mb-5 min-h-[64px]">
+        <div className="mb-5">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
@@ -210,7 +210,7 @@ const PlanCard = ({
           Incluye
         </p>
 
-        <ul className="space-y-3">
+        <ul className="space-y-2.5">
           {highlights.map((feature) => (
             <li
               key={feature}

@@ -19,8 +19,8 @@ const PlansGrid = ({
       transition={{ delay: 0.05 }}
       className="mb-8"
     >
-      <div className="mb-5 overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.18),transparent_30%),linear-gradient(180deg,#121212_0%,#080808_100%)] p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#121212_0%,#080808_100%)] p-6 sm:p-7">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#0F5257]/25 bg-[#0F5257]/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-[#8DE1D0]">
               <Sparkle size={14} weight="fill" />
@@ -48,7 +48,7 @@ const PlansGrid = ({
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 lg:grid-cols-2 2xl:grid-cols-4">
         {pricingPlans.map((plan) => (
           <PlanCard
             key={plan.id}
