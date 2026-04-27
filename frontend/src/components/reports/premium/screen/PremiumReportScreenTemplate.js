@@ -10,6 +10,7 @@ import {
 import {
   DIMENSION_STATUS_META,
   PRIORITY_META,
+  REPORT_BRAND_ASSETS,
   REPORT_COPY,
   REPORT_SECTION_KEYS
 } from '../reportPremium.constants';
@@ -118,12 +119,29 @@ const HeroSection = ({
   page
 }) => (
   <ReportSection page={page} noBorder>
-    <div className="-mx-8 -mt-8 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.16),transparent_35%)] px-8 pb-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9">
-      <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#0F5257]/15 px-3 py-1 text-sm font-medium text-[#8DE1D0]">
-            <Sparkle weight="fill" />
-            {toSafeText(documentTitle)}
+    <div className="-mx-8 -mt-8 border-b border-white/5 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.14),transparent_30%),radial-gradient(circle_at_left_top,rgba(15,82,87,0.22),transparent_34%),linear-gradient(180deg,#111111_0%,#070707_100%)] px-8 pb-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9">
+      <div className="mb-8 flex flex-col gap-7 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-amber-200/15 bg-black/20 p-2 shadow-[0_0_34px_rgba(245,158,11,0.10)]">
+              <img
+                src={REPORT_BRAND_ASSETS.goldLogo}
+                alt={REPORT_BRAND_ASSETS.brandName}
+                className="h-full w-full object-contain"
+                draggable="false"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-amber-200/80">
+                {REPORT_BRAND_ASSETS.brandName}
+              </p>
+
+              <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-200/15 bg-amber-500/10 px-3 py-1 text-sm font-medium text-amber-100">
+                <Sparkle weight="fill" />
+                {toSafeText(documentTitle)}
+              </div>
+            </div>
           </div>
 
           <h1 className="mb-3 text-3xl font-light leading-tight text-white sm:text-[2.3rem]">
@@ -135,7 +153,7 @@ const HeroSection = ({
           </p>
         </div>
 
-        <div className="min-w-[260px] rounded-2xl border border-white/5 bg-[#111111] px-5 py-5">
+        <div className="min-w-[260px] rounded-2xl border border-white/5 bg-[#111111]/90 px-5 py-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <p className="mb-1 text-[11px] uppercase tracking-wide text-[#A3A3A3]">
             {REPORT_COPY.documentLabel}
           </p>
@@ -498,7 +516,7 @@ const ClosingSection = ({
 
 const PremiumReportScreenTemplate = ({
   project,
-  brandName = 'Sistema Maestro',
+  brandName = REPORT_BRAND_ASSETS.brandName,
   documentTitle = 'Informe Puntual',
   showSystemFooter = true
 }) => {

@@ -10,6 +10,7 @@ import {
 import {
   DIMENSION_STATUS_META,
   PRIORITY_META,
+  REPORT_BRAND_ASSETS,
   REPORT_COPY,
   REPORT_SECTION_KEYS
 } from '../reportPremium.constants';
@@ -127,49 +128,67 @@ const PrintHeroSection = ({
   page
 }) => (
   <PrintSection page={page} noBorder>
-    <div className="-mx-10 -mt-9 border-b border-zinc-200 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.10),transparent_34%),linear-gradient(180deg,#ffffff_0%,#f6f7f7_100%)] px-10 pb-9 pt-9">
+    <div className="-mx-10 -mt-9 border-b border-amber-200/20 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.22),transparent_30%),radial-gradient(circle_at_left_top,rgba(20,184,166,0.14),transparent_35%),linear-gradient(180deg,#101010_0%,#050505_100%)] px-10 pb-9 pt-9 text-white">
       <div className="mb-8 flex items-start justify-between gap-8">
         <div className="min-w-0 flex-1">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-100 bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800">
-            <Sparkle weight="fill" />
-            {toSafeText(documentTitle)}
+          <div className="mb-6 flex items-center gap-4">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-amber-200/20 bg-black/30 p-2 shadow-[0_0_40px_rgba(245,158,11,0.16)]">
+              <img
+                src={REPORT_BRAND_ASSETS.goldLogo}
+                alt={REPORT_BRAND_ASSETS.brandName}
+                className="h-full w-full object-contain"
+                draggable="false"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200">
+                {REPORT_BRAND_ASSETS.brandName}
+              </p>
+
+              <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-100">
+                <Sparkle weight="fill" />
+                {toSafeText(documentTitle)}
+              </div>
+            </div>
           </div>
 
-          <h1 className="mb-3 text-[2.3rem] font-semibold leading-tight tracking-tight text-zinc-950">
-            {REPORT_COPY.heroTitle}
+          <h1 className="mb-3 text-[2.35rem] font-semibold leading-tight tracking-tight text-white">
+            Informe Maestro Gold
           </h1>
 
-          <p className="max-w-3xl text-base leading-7 text-zinc-700">
-            {REPORT_COPY.heroDescription}
+          <p className="max-w-3xl text-base leading-7 text-zinc-200">
+            Diagnostico inicial, blueprint de activacion y siguiente prompt recomendado
+            para convertir esta lectura en un proyecto vivo dentro de Sistema Maestro Builder.
           </p>
         </div>
 
-        <div className="w-[260px] shrink-0 rounded-2xl border border-zinc-200 bg-white px-5 py-5">
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+        <div className="w-[270px] shrink-0 rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-5 backdrop-blur">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
             {REPORT_COPY.documentLabel}
           </p>
 
-          <p className="mb-4 font-semibold text-zinc-950">
+          <p className="mb-4 font-semibold text-white">
             {toSafeText(brandName)}
           </p>
 
-          <div className="space-y-2 text-sm text-zinc-700">
+          <div className="space-y-2 text-sm text-zinc-200">
             <p>
-              <span className="font-medium text-zinc-500">
+              <span className="font-medium text-zinc-400">
                 {REPORT_COPY.dateLabel}
               </span>{' '}
               {issueDate || 'Sin fecha'}
             </p>
 
             <p>
-              <span className="font-medium text-zinc-500">
+              <span className="font-medium text-zinc-400">
                 {REPORT_COPY.routeLabel}
               </span>{' '}
               {routeLabel}
             </p>
 
             <p>
-              <span className="font-medium text-zinc-500">
+              <span className="font-medium text-zinc-400">
                 {REPORT_COPY.inputLabel}
               </span>{' '}
               {project.input_type === 'url'
@@ -181,17 +200,17 @@ const PrintHeroSection = ({
       </div>
 
       <div
-        className="mb-6 rounded-2xl border border-zinc-200 bg-white p-5"
+        className="mb-6 rounded-2xl border border-white/10 bg-black/30 p-5"
         style={{
           pageBreakInside: 'avoid',
           breakInside: 'avoid'
         }}
       >
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
           {REPORT_COPY.contextTitle}
         </p>
 
-        <p className="break-words text-sm leading-6 text-zinc-950">
+        <p className="break-words text-sm leading-6 text-white">
           {toSafeText(project.input_content)}
         </p>
       </div>
@@ -208,6 +227,82 @@ const PrintHeroSection = ({
           ))}
         </div>
       )}
+    </div>
+  </PrintSection>
+);
+
+const PrintActivationBlueprintSection = ({ page }) => (
+  <PrintSection
+    page={page}
+    title="Blueprint de activacion"
+    icon={<Sparkle size={17} className="text-amber-600" weight="fill" />}
+  >
+    <div
+      className="rounded-3xl border border-amber-200 bg-[linear-gradient(180deg,#FFF8E8_0%,#FFFFFF_100%)] p-6"
+      style={{
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}
+    >
+      <div className="mb-5">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">
+          Entrada al sistema
+        </p>
+
+        <h3 className="text-2xl font-semibold tracking-tight text-zinc-950">
+          Tu lectura ya esta preparada para construir
+        </h3>
+
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-700">
+          Este informe no esta pensado para quedarse como documento estatico.
+          Su funcion es darte una base clara para entrar en Builder con direccion,
+          criterio y un primer prompt mejor orientado.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-amber-200 bg-white p-5">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            1. Punto de partida
+          </p>
+
+          <p className="text-sm leading-6 text-zinc-900">
+            El informe ordena el caso, detecta friccion principal y separa lo urgente de lo accesorio.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-amber-200 bg-white p-5">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            2. Activacion
+          </p>
+
+          <p className="text-sm leading-6 text-zinc-900">
+            Builder convierte esta lectura en una primera version visible con preview, estructura y codigo.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-amber-200 bg-white p-5">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            3. Maduracion
+          </p>
+
+          <p className="text-sm leading-6 text-zinc-900">
+            El chat propone mejoras sucesivas para llevar el proyecto hasta una salida mas completa.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-zinc-200 bg-zinc-950 p-5 text-white">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-200">
+          Prompt recomendado para empezar
+        </p>
+
+        <p className="text-sm leading-6 text-zinc-100">
+          Quiero construir este proyecto a partir del diagnostico inicial. Usa la lectura del informe
+          como punto de partida, crea una primera version visible, ordena la estructura principal,
+          define el CTA prioritario y proponme la siguiente mejora exacta.
+        </p>
+      </div>
     </div>
   </PrintSection>
 );
@@ -501,35 +596,28 @@ const PrintClosingSection = ({
         )}
       </div>
 
-      {continuityMeta?.label && (
-        <div
-          className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-5"
-          style={{
-            pageBreakInside: 'avoid',
-            breakInside: 'avoid'
-          }}
-        >
-          <p className="text-sm leading-6 text-zinc-950">
-            {reportView.continuityRecommendation ? (
-              <>
-                {REPORT_COPY.closingWithContinuity}{' '}
-                <span className="font-semibold text-teal-800">
-                  {continuityMeta.label}
-                </span>.
-              </>
-            ) : (
-              REPORT_COPY.closingWithoutContinuity
-            )}
-          </p>
-        </div>
-      )}
+      <div
+        className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-950 px-5 py-5 text-white"
+        style={{
+          pageBreakInside: 'avoid',
+          breakInside: 'avoid'
+        }}
+      >
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-200">
+          {REPORT_COPY.builderNextStepTitle}
+        </p>
+
+        <p className="text-sm leading-6 text-zinc-100">
+          {REPORT_COPY.builderNextStepDescription}
+        </p>
+      </div>
     </PrintSection>
   );
 };
 
 const PremiumReportPrintTemplate = ({
   project,
-  brandName = 'Sistema Maestro',
+  brandName = REPORT_BRAND_ASSETS.brandName,
   documentTitle = 'Informe Puntual',
   showSystemFooter = true
 }) => {
@@ -568,6 +656,8 @@ const PremiumReportPrintTemplate = ({
           page={pageMap[REPORT_SECTION_KEYS.hero]}
         />
 
+        <PrintActivationBlueprintSection page="Activacion" />
+
         {visibleSections.includes(REPORT_SECTION_KEYS.summary) && (
           <PrintSummarySection
             reportView={reportView}
@@ -600,13 +690,13 @@ const PremiumReportPrintTemplate = ({
         )}
 
         {showSystemFooter && (
-          <div className="border-t border-zinc-200 bg-zinc-50 px-10 py-5">
+          <div className="border-t border-zinc-200 bg-zinc-950 px-10 py-5 text-white">
             <div className="flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-zinc-700">
+              <p className="text-zinc-200">
                 {toSafeText(brandName)} - {REPORT_COPY.footerLeft}
               </p>
 
-              <p className="text-zinc-500">
+              <p className="text-zinc-400">
                 {REPORT_COPY.footerRight}
               </p>
             </div>

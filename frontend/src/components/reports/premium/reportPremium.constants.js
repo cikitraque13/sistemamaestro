@@ -80,6 +80,11 @@ export const REPORT_SECTION_KEYS = {
   closing: 'closing'
 };
 
+export const REPORT_BRAND_ASSETS = {
+  goldLogo: '/sistema_maestro_gold_logo.png',
+  brandName: 'Sistema Maestro Gold'
+};
+
 export const REPORT_COPY = {
   emptyState: 'No hay datos suficientes para renderizar el informe.',
   documentLabel: 'Documento',
@@ -106,5 +111,14 @@ export const REPORT_COPY = {
   closingWithContinuity:
     'Con esta lectura ya puedes ver el caso con mas claridad. Si quieres activarlo dentro del sistema, el siguiente paso correcto es',
   closingWithoutContinuity:
-    'Con esta lectura ya puedes ver el caso con mas claridad. El siguiente paso correcto es reforzar la parte mas debil del caso antes de ampliar intensidad.'
+    'Con esta lectura ya puedes ver el caso con mas claridad. El siguiente paso correcto es reforzar la parte mas debil del caso antes de ampliar intensidad.',
+  bridgeEyebrow: 'Informe listo',
+  bridgeTitle: 'Convierte esta lectura en un proyecto vivo',
+  bridgeDescription:
+    'El informe ordena el punto de partida. Builder convierte esa lectura en preview, codigo, estructura y siguientes mejoras.',
+  bridgePrimaryCta: 'Construir este proyecto en Builder',
+  bridgeSecondaryCta: 'Volver a proyectos',
+  builderNextStepTitle: 'Siguiente paso recomendado',
+  builderNextStepDescription:
+    'Abre este proyecto en Sistema Maestro Builder para construir la primera version y continuar mejorandolo con estado vivo.'
 };
