@@ -7,10 +7,7 @@ import {
 } from '@phosphor-icons/react';
 
 import { PLAN_SIGNAL_META } from '../billing.constants';
-import {
-  buildOperationalItems,
-  getOperationalAccentClasses
-} from '../billing.utils';
+import { buildOperationalItems } from '../billing.utils';
 
 const PLAN_ROLE_META = {
   blueprint: {
@@ -74,18 +71,18 @@ const normalizeToken = (value) =>
 const getVisibleOperationalLabel = (label) => {
   const normalized = normalizeToken(label);
 
-  if (normalized === 'ACTIVACION') return 'ACTIVACIÓN';
-  if (normalized === 'EXPORTACION') return 'SALIDA';
-  if (normalized === TECH_TOKEN_UPPER) return 'GEMAS';
+  if (normalized === 'ACTIVACION') return 'Activación';
+  if (normalized === 'EXPORTACION') return 'Salida';
+  if (normalized === TECH_TOKEN_UPPER) return 'Gemas';
 
-  return String(label || '').toUpperCase();
+  return String(label || '');
 };
 
 const getVisibleOperationalValue = (item) => {
   const label = getVisibleOperationalLabel(item.label);
   const rawValue = String(item.value || '');
 
-  if (label === 'GEMAS') {
+  if (label === 'Gemas') {
     const amount = rawValue.match(/\d+/)?.[0];
 
     if (amount) return `${amount} incluidas`;
@@ -100,30 +97,36 @@ const getVisibleOperationalValue = (item) => {
   return rawValue;
 };
 
-const OperationalGrid = ({ items }) => (
-  <div className="grid grid-cols-2 gap-2">
-    {items.map((item) => {
-      const accent = getOperationalAccentClasses(item.label);
-      const visibleLabel = getVisibleOperationalLabel(item.label);
-      const visibleValue = getVisibleOperationalValue(item);
+const toVisibleFeature = (feature) =>
+  String(feature || '')
+    .replace(/cr[eé]ditos incluidos/gi, 'gemas incluidas')
+    .replace(/cr[eé]ditos/gi, 'gemas');
 
-      return (
-        <div
-          key={item.label}
-          className={`flex h-[68px] flex-col justify-between rounded-2xl border px-3 py-2.5 ${accent.wrap}`}
-        >
-          <p className={`text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
-            {visibleLabel}
-          </p>
+const buildVisibleIncludes = (plan) => {
+  const operationalItems = buildOperationalItems(plan).map((item) => {
+    const label = getVisibleOperationalLabel(item.label);
+    const value = getVisibleOperationalValue(item);
 
-          <p className={`text-xs font-medium leading-snug ${accent.value}`}>
-            {visibleValue}
-          </p>
-        </div>
-      );
-    })}
-  </div>
-);
+    return `${label}: ${value}`;
+  });
+
+  const baseHighlights =
+    Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
+      ? plan.billingHighlights.slice(0, 4)
+      : (plan.features || []).slice(0, 4);
+
+  const normalizedHighlights = baseHighlights.map(toVisibleFeature);
+
+  return [...operationalItems, ...normalizedHighlights].reduce((items, item) => {
+    const normalized = normalizeToken(item);
+
+    if (items.some((existing) => normalizeToken(existing) === normalized)) {
+      return items;
+    }
+
+    return [...items, item];
+  }, []);
+};
 
 const PlanCard = ({
   plan,
@@ -144,10 +147,7 @@ const PlanCard = ({
     PLAN_SIGNAL_META[plan.id]?.chipClass ||
     'bg-white/5 text-[#D4D4D4] border border-white/10';
 
-  const highlights =
-    Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
-      ? plan.billingHighlights.slice(0, 4)
-      : (plan.features || []).slice(0, 4);
+  const visibleIncludes = buildVisibleIncludes(plan);
 
   const isProcessing = processingKey === `plan:${plan.id}`;
   const isDisabled = isCurrentPlan || isProcessing;
@@ -158,7 +158,7 @@ const PlanCard = ({
 
   return (
     <article
-      className={`relative flex h-full min-h-[660px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
+      className={`relative flex h-full min-h-[620px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div
@@ -166,7 +166,7 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 h-[330px]">
+      <div className="relative z-10 h-[306px]">
         <div className="mb-8 flex h-[34px] flex-wrap items-start gap-2 overflow-hidden">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
@@ -187,7 +187,7 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="h-[268px]">
+        <div className="h-[244px]">
           <p className="mb-5 h-[16px] text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
@@ -206,21 +206,15 @@ const PlanCard = ({
         </div>
       </div>
 
-      <div className="relative z-10 mb-5 flex h-[94px] items-end justify-between gap-4 border-b border-white/16 pb-4">
-        <div>
-          <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-white/55">
-            Nivel de capacidad
-          </p>
+      <div className="relative z-10 mb-4 flex h-[82px] items-end justify-between gap-4 border-b border-white/16 pb-4">
+        <div className="flex items-end gap-2">
+          <span className="whitespace-nowrap text-[3.05rem] font-light leading-none text-white">
+            {plan.priceLabel}
+          </span>
 
-          <div className="flex items-end gap-2">
-            <span className="whitespace-nowrap text-[3.05rem] font-light leading-none text-white">
-              {plan.priceLabel}
-            </span>
-
-            <span className="whitespace-nowrap pb-1 text-sm text-white/62">
-              {plan.periodLabel}
-            </span>
-          </div>
+          <span className="whitespace-nowrap pb-1 text-sm text-white/62">
+            {plan.periodLabel}
+          </span>
         </div>
 
         <DiamondsFour
@@ -230,23 +224,8 @@ const PlanCard = ({
         />
       </div>
 
-      <div className="relative z-10 rounded-3xl border border-white/16 bg-black/25 p-4">
-        <div className="mb-3 flex h-[42px] items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
-              Marco operativo
-            </p>
-            <p className="mt-1 text-xs text-white/45">
-              Activación, Builder, salida y Gema Maestra.
-            </p>
-          </div>
-        </div>
-
-        <OperationalGrid items={buildOperationalItems(plan)} />
-      </div>
-
       {planSignals.length > 0 && (
-        <div className="relative z-10 mt-5 h-[62px] overflow-hidden">
+        <div className="relative z-10 mb-6 h-[62px] overflow-hidden">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
@@ -260,13 +239,13 @@ const PlanCard = ({
         </div>
       )}
 
-      <div className="relative z-10 mt-4 flex-1">
+      <div className="relative z-10 flex-1">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
           Incluye
         </p>
 
         <ul className="space-y-2.5">
-          {highlights.map((feature) => (
+          {visibleIncludes.map((feature) => (
             <li
               key={feature}
               className="flex items-start gap-2 text-sm leading-6 text-white/84"
