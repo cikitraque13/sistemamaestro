@@ -3,6 +3,10 @@ import React, { useMemo } from 'react';
 import BuilderExtractionPanel from '../panels/BuilderExtractionPanel';
 
 import {
+  buildSectorLandingModel,
+} from '../preview/builderSectorProfileResolver';
+
+import {
   BUILDER_CODE_TABS,
   getBuilderCodeLines,
   getVisibleCodeLines,
@@ -12,26 +16,6 @@ import {
   getArray,
 } from '../utils/builderLandingCopy';
 
-const INTERNAL_PREVIEW_TERMS = [
-  'sistema maestro',
-  'builder',
-  'gema maestra',
-  'preview conectada',
-  'estado vivo',
-  'primera versión generada',
-  'cambios reales',
-  'estructura exportable',
-  'código coherente',
-  'proceso visible',
-  'dashboard',
-  'flujo de autenticación',
-  'github',
-  'deploy',
-  'créditos',
-  'salida técnica',
-  'siguientes decisiones',
-];
-
 const truncateText = (value = '', max = 92) => {
   const text = String(value || '').trim();
 
@@ -39,38 +23,6 @@ const truncateText = (value = '', max = 92) => {
   if (text.length <= max) return text;
 
   return `${text.slice(0, max - 1).trim()}…`;
-};
-
-const normalizeText = (value = '') =>
-  String(value || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
-
-const includesAny = (text = '', terms = []) => {
-  const normalized = normalizeText(text);
-
-  return terms.some((term) => normalized.includes(normalizeText(term)));
-};
-
-const isInternalPreviewText = (value = '') => {
-  const normalized = normalizeText(value);
-
-  if (!normalized) return false;
-
-  return INTERNAL_PREVIEW_TERMS.some((term) =>
-    normalized.includes(normalizeText(term))
-  );
-};
-
-const safeLandingText = (value = '', fallback = '') => {
-  const text = String(value || '').trim();
-
-  if (!text) return fallback;
-  if (isInternalPreviewText(text)) return fallback;
-
-  return text;
 };
 
 const getBuilderKernelOutput = (builderIntelligence = {}) =>
@@ -83,7 +35,6 @@ const getBuilderIntelligenceParts = (builderIntelligence = {}) => {
   const lastDelta = builderIntelligence?.lastDelta || {};
   const lastOperation = builderIntelligence?.lastOperation || {};
   const builderKernelOutput = getBuilderKernelOutput(builderIntelligence);
-  const previewSnapshot = builderKernelOutput?.preview || null;
   const codeSnapshot = builderKernelOutput?.code || null;
   const structureSnapshot = builderKernelOutput?.structure || null;
   const buildSummary =
@@ -91,440 +42,40 @@ const getBuilderIntelligenceParts = (builderIntelligence = {}) => {
     builderKernelOutput?.summary ||
     null;
 
-  const visiblePlan =
-    hubSummary?.visiblePlan ||
-    lastOperation?.visiblePlan ||
-    builderIntelligence?.hubState?.visiblePlan ||
-    {};
-
   return {
     hubSummary,
     lastDelta,
     lastOperation,
-    visiblePlan,
     builderKernelOutput,
-    previewSnapshot,
     codeSnapshot,
     structureSnapshot,
     buildSummary,
   };
 };
 
-const getKernelSections = (builderIntelligence = {}) => {
-  const { previewSnapshot } = getBuilderIntelligenceParts(builderIntelligence);
-
-  return getArray(previewSnapshot?.sections);
-};
-
-const getProjectContextText = ({
+const buildLandingModel = ({
   copy,
   project,
   builderIntelligence,
-} = {}) => {
-  const {
-    hubSummary,
-    previewSnapshot,
-  } = getBuilderIntelligenceParts(builderIntelligence);
+} = {}) =>
+  buildSectorLandingModel({
+    copy,
+    project,
+    builderIntelligence,
+  });
 
-  return [
-    project?.input_content,
-    project?.prompt,
-    project?.title,
-    project?.summary,
-    copy?.eyebrow,
-    copy?.headline,
-    copy?.subheadline,
-    copy?.sectionTitle,
-    copy?.sectionText,
-    hubSummary?.projectType,
-    hubSummary?.category,
-    hubSummary?.businessModel,
-    hubSummary?.primaryPlaybook,
-    hubSummary?.operationalFocus,
-    hubSummary?.conversionTarget,
-    hubSummary?.primaryCTA,
-    previewSnapshot?.layout,
-    ...getArray(previewSnapshot?.sections).flatMap((section) => [
-      section?.label,
-      section?.type,
-      section?.props?.title,
-      section?.props?.subtitle,
-    ]),
-  ]
-    .filter(Boolean)
-    .join(' ');
-};
-
-const extractCity = (contextText = '') => {
-  const normalized = normalizeText(contextText);
-
-  const cities = [
-    'Madrid',
-    'Barcelona',
-    'Valencia',
-    'Sevilla',
-    'Málaga',
-    'Zaragoza',
-    'Bilbao',
-    'Alicante',
-    'Murcia',
-    'Valladolid',
-  ];
-
-  return cities.find((city) => normalized.includes(normalizeText(city))) || 'Madrid';
-};
-
-const createDentalProfile = (city = 'Madrid') => ({
-  id: 'dental-premium',
-  tone: 'premium',
-  businessName: `Clínica Dental Aurora ${city}`,
-  eyebrow: `Clínica dental premium en ${city}`,
-  headline: 'Sonríe con confianza desde la primera visita',
-  subheadline:
-    'Odontología avanzada, estética dental y atención cercana para pacientes que buscan seguridad, precisión y una experiencia cómoda.',
-  primaryCTA: 'Reservar cita',
-  secondaryCTA: 'Ver tratamientos',
-  sectionTitle: 'Tratamientos dentales pensados para generar confianza',
-  sectionText:
-    'Una landing preparada para captar pacientes, explicar servicios clave y convertir visitas en reservas reales.',
-  services: [
-    {
-      title: 'Implantes dentales',
-      text: 'Planificación precisa, diagnóstico claro y seguimiento profesional en cada fase.',
-    },
-    {
-      title: 'Estética dental',
-      text: 'Blanqueamiento, carillas y diseño de sonrisa con enfoque natural y elegante.',
-    },
-    {
-      title: 'Ortodoncia invisible',
-      text: 'Tratamientos discretos para alinear tu sonrisa sin alterar tu día a día.',
-    },
-  ],
-  trust: [
-    'Equipo médico especializado',
-    'Primera valoración personalizada',
-    'Tecnología de diagnóstico avanzada',
-    'Explicación clara antes de cada tratamiento',
-  ],
-  technology: [
-    'Escáner intraoral',
-    'Planificación digital',
-    'Recordatorios automáticos',
-    'Seguimiento post-tratamiento',
-  ],
-  testimonials: [
-    {
-      quote:
-        'Me explicaron todo con claridad y salí con un plan de tratamiento que entendía perfectamente.',
-      author: 'Paciente de estética dental',
-    },
-    {
-      quote:
-        'La reserva fue rápida, la atención muy profesional y el resultado superó mis expectativas.',
-      author: 'Paciente de implantología',
-    },
-  ],
-  booking: {
-    title: 'Reserva tu valoración inicial',
-    text:
-      'Completa tus datos y el equipo de la clínica te contactará para confirmar día, hora y tratamiento.',
-    fields: ['Nombre', 'Teléfono', 'Tratamiento', 'Fecha preferida'],
-    buttonLabel: 'Solicitar cita',
-  },
-  automation: {
-    title: 'Sistema de citas preparado para vender',
-    text:
-      'La landing puede conectarse después con email, recordatorios, CRM y seguimiento automático de pacientes.',
-    items: [
-      'Confirmación de cita por email',
-      'Aviso interno al equipo comercial',
-      'Segmentación por tratamiento',
-      'Seguimiento automático si no reserva',
-    ],
-  },
-});
-
-const createBeautyProfile = (city = 'Madrid') => ({
-  id: 'beauty-premium',
-  tone: 'premium',
-  businessName: `Clínica Estética Aura ${city}`,
-  eyebrow: `Clínica estética premium en ${city}`,
-  headline: 'Tratamientos estéticos con criterio médico y resultado natural',
-  subheadline:
-    'Una experiencia premium para pacientes que buscan confianza, asesoramiento experto y resultados visibles sin perder naturalidad.',
-  primaryCTA: 'Reservar valoración',
-  secondaryCTA: 'Ver tratamientos',
-  sectionTitle: 'Servicios de estética preparados para convertir',
-  sectionText:
-    'La landing presenta servicios, autoridad médica y una ruta clara hacia la reserva.',
-  services: [
-    {
-      title: 'Medicina estética facial',
-      text: 'Tratamientos personalizados para mejorar expresión, textura y luminosidad.',
-    },
-    {
-      title: 'Rejuvenecimiento',
-      text: 'Protocolos avanzados para piel, firmeza y prevención del envejecimiento.',
-    },
-    {
-      title: 'Diagnóstico personalizado',
-      text: 'Valoración inicial para recomendar el tratamiento más adecuado.',
-    },
-  ],
-  trust: [
-    'Equipo médico colegiado',
-    'Resultados naturales',
-    'Diagnóstico personalizado',
-    'Seguimiento posterior al tratamiento',
-  ],
-  technology: [
-    'Historia clínica digital',
-    'Recordatorios automáticos',
-    'Segmentación por tratamiento',
-    'Seguimiento de pacientes',
-  ],
-  testimonials: [
-    {
-      quote:
-        'Buscaba un cambio natural y el equipo entendió exactamente lo que necesitaba.',
-      author: 'Paciente de medicina estética',
-    },
-    {
-      quote:
-        'La experiencia fue clara, profesional y muy cuidada desde la primera cita.',
-      author: 'Paciente de rejuvenecimiento',
-    },
-  ],
-  booking: {
-    title: 'Reserva tu diagnóstico estético',
-    text:
-      'El equipo revisará tu caso y te propondrá una valoración inicial adaptada a tus objetivos.',
-    fields: ['Nombre', 'Teléfono', 'Tratamiento', 'Fecha preferida'],
-    buttonLabel: 'Solicitar valoración',
-  },
-  automation: {
-    title: 'Seguimiento comercial preparado',
-    text:
-      'La landing puede alimentar campañas, formularios, email y recordatorios de citas.',
-    items: [
-      'Lead por tratamiento',
-      'Confirmación automática',
-      'Recordatorio de cita',
-      'Reactivación de pacientes',
-    ],
-  },
-});
-
-const createRestaurantProfile = (city = 'Madrid') => ({
-  id: 'restaurant-booking',
-  tone: 'warm',
-  businessName: `Restaurante Brasa Norte ${city}`,
-  eyebrow: `Restaurante con reserva online en ${city}`,
-  headline: 'Reserva una experiencia gastronómica memorable',
-  subheadline:
-    'Una landing diseñada para mostrar propuesta, carta, ambiente y reserva directa en pocos pasos.',
-  primaryCTA: 'Reservar mesa',
-  secondaryCTA: 'Ver carta',
-  sectionTitle: 'Una experiencia clara desde el primer vistazo',
-  sectionText:
-    'El objetivo es reducir fricción, enseñar valor y llevar al usuario a reservar.',
-  services: [
-    {
-      title: 'Carta seleccionada',
-      text: 'Platos principales, menús y especialidades presentadas con jerarquía clara.',
-    },
-    {
-      title: 'Reserva rápida',
-      text: 'Formulario simple para elegir día, hora y número de personas.',
-    },
-    {
-      title: 'Eventos privados',
-      text: 'Captación de grupos, empresas y celebraciones con seguimiento comercial.',
-    },
-  ],
-  trust: [
-    'Reserva en menos de un minuto',
-    'Confirmación automática',
-    'Opciones para grupos',
-    'Ubicación y horarios visibles',
-  ],
-  technology: [
-    'Confirmación por email',
-    'Aviso interno al restaurante',
-    'Segmentación por tipo de reserva',
-    'Lista de espera futura',
-  ],
-  testimonials: [
-    {
-      quote:
-        'Reservar fue muy fácil y la experiencia estuvo a la altura de lo prometido.',
-      author: 'Cliente de cena',
-    },
-    {
-      quote:
-        'La página deja claro el ambiente, la carta y cómo reservar sin complicaciones.',
-      author: 'Cliente de grupo',
-    },
-  ],
-  booking: {
-    title: 'Reserva tu mesa',
-    text:
-      'Indica día, hora y número de personas. El equipo confirmará tu reserva.',
-    fields: ['Nombre', 'Teléfono', 'Fecha', 'Personas'],
-    buttonLabel: 'Confirmar reserva',
-  },
-  automation: {
-    title: 'Reservas y seguimiento',
-    text:
-      'La landing puede conectarse con confirmaciones, recordatorios y campañas para clientes recurrentes.',
-    items: [
-      'Confirmación automática',
-      'Recordatorio de reserva',
-      'Captación de grupos',
-      'Campañas para clientes frecuentes',
-    ],
-  },
-});
-
-const createDefaultServiceProfile = (city = 'Madrid') => ({
-  id: 'local-service',
-  tone: 'direct',
-  businessName: `Servicio Premium ${city}`,
-  eyebrow: `Servicio profesional en ${city}`,
-  headline: 'Convierte visitas en solicitudes reales',
-  subheadline:
-    'Una landing clara, directa y preparada para explicar el servicio, generar confianza y activar contacto.',
-  primaryCTA: 'Solicitar información',
-  secondaryCTA: 'Ver servicios',
-  sectionTitle: 'Una estructura comercial lista para vender',
-  sectionText:
-    'El contenido se organiza para que el usuario entienda la propuesta, confíe y dé el siguiente paso.',
-  services: [
-    {
-      title: 'Servicio principal',
-      text: 'Presentación clara del valor principal y del resultado que obtiene el cliente.',
-    },
-    {
-      title: 'Atención personalizada',
-      text: 'Explicación sencilla del proceso y de cómo se adapta al caso del usuario.',
-    },
-    {
-      title: 'Seguimiento comercial',
-      text: 'Formulario y CTA preparados para responder y convertir oportunidades.',
-    },
-  ],
-  trust: [
-    'Respuesta rápida',
-    'Proceso claro',
-    'Atención profesional',
-    'Seguimiento personalizado',
-  ],
-  technology: [
-    'Formulario conectado',
-    'Confirmación automática',
-    'Segmentación por necesidad',
-    'Seguimiento posterior',
-  ],
-  testimonials: [
-    {
-      quote:
-        'La propuesta se entiende rápido y facilita pedir información sin fricción.',
-      author: 'Cliente interesado',
-    },
-    {
-      quote:
-        'La landing transmite confianza y deja claro el siguiente paso.',
-      author: 'Usuario cualificado',
-    },
-  ],
-  booking: {
-    title: 'Solicita una primera valoración',
-    text:
-      'Déjanos tus datos y el equipo te contactará con una propuesta adaptada.',
-    fields: ['Nombre', 'Email', 'Teléfono', 'Servicio'],
-    buttonLabel: 'Enviar solicitud',
-  },
-  automation: {
-    title: 'Captación y seguimiento automático',
-    text:
-      'La landing queda preparada para conectar formularios, emails, avisos internos y seguimiento comercial.',
-    items: [
-      'Email de confirmación',
-      'Aviso al equipo',
-      'Clasificación del lead',
-      'Seguimiento automático',
-    ],
-  },
-});
-
-const detectBusinessProfile = (contextText = '') => {
-  const city = extractCity(contextText);
-
-  if (
-    includesAny(contextText, [
-      'dental',
-      'dentista',
-      'odontologia',
-      'odontología',
-      'implante',
-      'ortodoncia',
-      'clinica dental',
-      'clínica dental',
-    ])
-  ) {
-    return createDentalProfile(city);
-  }
-
-  if (
-    includesAny(contextText, [
-      'estetica',
-      'estética',
-      'belleza',
-      'medicina estetica',
-      'medicina estética',
-      'botox',
-      'rejuvenecimiento',
-      'facial',
-    ])
-  ) {
-    return createBeautyProfile(city);
-  }
-
-  if (
-    includesAny(contextText, [
-      'restaurante',
-      'reserva mesa',
-      'gastronomia',
-      'gastronomía',
-      'carta',
-      'menú',
-      'menu',
-      'comida',
-      'cena',
-    ])
-  ) {
-    return createRestaurantProfile(city);
-  }
-
-  return createDefaultServiceProfile(city);
-};
-
-const resolvePreviewTone = (builderIntelligence = {}, profileTone = 'contextual') => {
+const resolvePreviewTone = (builderIntelligence = {}, modelTone = 'contextual') => {
   const {
     hubSummary,
     lastDelta,
-    previewSnapshot,
   } = getBuilderIntelligenceParts(builderIntelligence);
 
   const visualTone = lastDelta?.visual?.tone;
-  const category = hubSummary?.category;
   const projectType = hubSummary?.projectType;
   const businessModel = hubSummary?.businessModel;
   const intent = hubSummary?.iterationIntent;
-  const layout = previewSnapshot?.layout;
 
-  if (profileTone) return profileTone;
+  if (modelTone) return modelTone;
   if (visualTone) return visualTone;
 
   if (
@@ -541,31 +92,6 @@ const resolvePreviewTone = (builderIntelligence = {}, profileTone = 'contextual'
   ) {
     return 'direct';
   }
-
-  if (
-    category === 'local_business' ||
-    projectType === 'local_reservation_page' ||
-    layout === 'restaurant_landing'
-  ) {
-    return 'warm';
-  }
-
-  if (
-    category === 'automation' ||
-    projectType === 'automation_workflow'
-  ) {
-    return 'system';
-  }
-
-  if (
-    category === 'saas_ai_tool' ||
-    projectType === 'ai_tool' ||
-    layout === 'app_dashboard'
-  ) {
-    return 'tech';
-  }
-
-  if (intent === 'simplify') return 'simple';
 
   return 'contextual';
 };
@@ -646,147 +172,6 @@ const getPanelClass = (tone = 'contextual') => {
   return classes[tone] || classes.contextual;
 };
 
-const getSafeKernelLandingSections = (builderIntelligence = {}) => {
-  const blockedTypes = [
-    'auth',
-    'dashboard',
-    'credits',
-    'github',
-    'deploy',
-    'builder',
-    'system',
-    'internal',
-  ];
-
-  return getKernelSections(builderIntelligence).filter((section) => {
-    const label = [
-      section?.id,
-      section?.type,
-      section?.label,
-      section?.props?.title,
-      section?.props?.subtitle,
-      section?.props?.buttonLabel,
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-    if (!label) return false;
-    if (blockedTypes.includes(normalizeText(section?.type))) return false;
-    if (isInternalPreviewText(label)) return false;
-
-    return true;
-  });
-};
-
-const buildLandingModel = ({
-  copy,
-  project,
-  builderIntelligence,
-} = {}) => {
-  const contextText = getProjectContextText({
-    copy,
-    project,
-    builderIntelligence,
-  });
-
-  const profile = detectBusinessProfile(contextText);
-  const {
-    hubSummary,
-    lastDelta,
-    lastOperation,
-  } = getBuilderIntelligenceParts(builderIntelligence);
-
-  const safeSections = getSafeKernelLandingSections(builderIntelligence);
-  const safeHeroSection = safeSections.find((section) =>
-    ['hero', 'header', 'landing_hero'].includes(normalizeText(section?.type))
-  );
-
-  const heroProps = safeHeroSection?.props || {};
-
-  const headline = safeLandingText(
-    heroProps.title ||
-      lastDelta?.copy?.headline ||
-      copy?.headline,
-    profile.headline
-  );
-
-  const subheadline = safeLandingText(
-    heroProps.subtitle ||
-      lastDelta?.copy?.subheadline ||
-      copy?.subheadline,
-    profile.subheadline
-  );
-
-  const primaryCTA = safeLandingText(
-    heroProps.buttonLabel ||
-      lastDelta?.cta?.primaryCTA ||
-      lastOperation?.primaryCTA ||
-      hubSummary?.primaryCTA ||
-      copy?.primaryCta,
-    profile.primaryCTA
-  );
-
-  const secondaryCTA = safeLandingText(
-    lastDelta?.cta?.secondaryCTA ||
-      copy?.secondaryCta,
-    profile.secondaryCTA
-  );
-
-  const eyebrow = safeLandingText(
-    heroProps.badge ||
-      heroProps.eyebrow ||
-      copy?.eyebrow,
-    profile.eyebrow
-  );
-
-  const kernelServices = safeSections
-    .filter((section) =>
-      ['services', 'service', 'features', 'benefits'].includes(normalizeText(section?.type))
-    )
-    .flatMap((section) => {
-      const props = section?.props || {};
-      const items = getArray(props.items || props.points || props.services);
-
-      if (!items.length && props.title) {
-        return [
-          {
-            title: props.title,
-            text: props.subtitle || 'Servicio preparado para presentar valor de forma clara.',
-          },
-        ];
-      }
-
-      return items.map((item) =>
-        typeof item === 'string'
-          ? {
-              title: item,
-              text: 'Servicio destacado para reforzar la propuesta comercial.',
-            }
-          : {
-              title: item?.title || item?.label || 'Servicio',
-              text: item?.text || item?.description || item?.subtitle || '',
-            }
-      );
-    })
-    .filter((item) => !isInternalPreviewText(`${item.title} ${item.text}`));
-
-  const services = kernelServices.length >= 3
-    ? kernelServices.slice(0, 3)
-    : profile.services;
-
-  return {
-    ...profile,
-    eyebrow,
-    headline,
-    subheadline,
-    primaryCTA,
-    secondaryCTA,
-    sectionTitle: safeLandingText(copy?.sectionTitle, profile.sectionTitle),
-    sectionText: safeLandingText(copy?.sectionText, profile.sectionText),
-    services,
-  };
-};
-
 const LandingHero = ({
   model,
   tone,
@@ -850,7 +235,7 @@ const LandingHero = ({
         }`}
       >
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-          Reserva rápida
+          {model.offerLabel || 'Acción principal'}
         </p>
 
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
@@ -893,7 +278,7 @@ const LandingServices = ({
   >
     <div className="max-w-3xl">
       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
-        Tratamientos y servicios
+        {model.offerLabel || 'Servicios'}
       </p>
 
       <h2 className="mt-3 text-3xl font-semibold tracking-[-0.055em] text-white">
@@ -930,7 +315,7 @@ const LandingServices = ({
   </section>
 );
 
-const LandingTrustTechnology = ({
+const LandingTrustProcess = ({
   model,
   tone,
   progress,
@@ -943,11 +328,11 @@ const LandingTrustTechnology = ({
     <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <article className={`rounded-[28px] border p-6 ${getPanelClass(tone)}`}>
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-          Confianza médica
+          {model.trustLabel || 'Confianza'}
         </p>
 
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
-          Seguridad antes de reservar
+          {model.trustTitle}
         </h2>
 
         <div className="mt-6 grid gap-3">
@@ -964,23 +349,24 @@ const LandingTrustTechnology = ({
 
       <article className={`rounded-[28px] border p-6 ${getPanelClass(tone)}`}>
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
-          Tecnología y seguimiento
+          Proceso
         </p>
 
         <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
-          Un sistema preparado para captar y atender mejor
+          {model.processTitle}
         </h2>
 
         <p className="mt-4 text-sm leading-7 text-zinc-400">
-          La landing presenta valor al paciente y deja preparada una evolución comercial hacia reservas, emails, automatizaciones y seguimiento.
+          Una experiencia clara para que el usuario entienda qué hacer, qué esperar y cuál es el siguiente paso.
         </p>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {model.technology.map((item) => (
+        <div className="mt-6 grid gap-3">
+          {model.processSteps.map((item, index) => (
             <div
               key={item}
               className="rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3 text-sm text-zinc-300"
             >
+              <span className="mr-2 text-cyan-200">{index + 1}.</span>
               {item}
             </div>
           ))}
@@ -1003,16 +389,16 @@ const LandingTestimonials = ({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
-          Prueba social
+          {model.testimonialLabel || 'Prueba social'}
         </p>
 
         <h2 className="mt-3 text-3xl font-semibold tracking-[-0.055em] text-white">
-          Pacientes que entienden el valor antes de llamar
+          {model.testimonialTitle}
         </h2>
       </div>
 
       <span className={`rounded-full border px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] ${getAccentClass(tone)}`}>
-        Testimonios preparados
+        Opiniones preparadas
       </span>
     </div>
 
@@ -1035,7 +421,7 @@ const LandingTestimonials = ({
   </section>
 );
 
-const LandingAutomationCTA = ({
+const LandingFollowUpCTA = ({
   model,
   tone,
   progress,
@@ -1049,7 +435,7 @@ const LandingAutomationCTA = ({
       <div className="grid gap-7 lg:grid-cols-[1fr_0.9fr] lg:items-center">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            Captación automatizable
+            {model.automationLabel || 'Seguimiento'}
           </p>
 
           <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white">
@@ -1062,11 +448,11 @@ const LandingAutomationCTA = ({
 
           <div className="mt-7 flex flex-wrap gap-3">
             <button className={`rounded-2xl px-6 py-3.5 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
-              {model.primaryCTA}
+              {model.finalCTA || model.primaryCTA}
             </button>
 
             <button className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-white">
-              Solicitar demo del sistema
+              {model.secondaryCTA || 'Solicitar información'}
             </button>
           </div>
         </div>
@@ -1122,7 +508,7 @@ const ClientLandingPreview = ({
         progress={progress}
       />
 
-      <LandingTrustTechnology
+      <LandingTrustProcess
         model={model}
         tone={tone}
         progress={progress}
@@ -1134,7 +520,7 @@ const ClientLandingPreview = ({
         progress={progress}
       />
 
-      <LandingAutomationCTA
+      <LandingFollowUpCTA
         model={model}
         tone={tone}
         progress={progress}
