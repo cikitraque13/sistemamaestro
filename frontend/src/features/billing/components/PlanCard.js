@@ -19,7 +19,7 @@ const PLAN_ROLE_META = {
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
     description:
-      'Idea, diagnóstico o informe convertidos en base operativa lista para Builder.',
+      'Idea, diagnóstico o informe convertidos en una base operativa lista para Builder.',
     bestFor: 'Primera activación seria.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
@@ -161,7 +161,7 @@ const PlanCard = ({
 
   return (
     <article
-      className={`relative flex h-full min-h-[680px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
+      className={`relative flex h-full min-h-[710px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div
@@ -169,7 +169,7 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 h-[252px]">
+      <div className="relative z-10 h-[306px]">
         <div className="mb-7 flex h-[34px] flex-wrap items-start gap-2 overflow-hidden">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
@@ -190,20 +190,20 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="h-[188px]">
+        <div className="h-[242px]">
           <p className="mb-4 h-[16px] text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
 
-          <h4 className="mb-5 h-[54px] overflow-hidden text-4xl font-light leading-tight text-white">
+          <h4 className="mb-5 h-[54px] text-4xl font-light leading-tight text-white">
             {plan.visibleName}
           </h4>
 
-          <p className="mb-5 h-[58px] overflow-hidden text-base leading-7 text-white">
+          <p className="mb-5 h-[58px] text-base leading-7 text-white">
             {role.headline}
           </p>
 
-          <p className="h-[48px] overflow-hidden text-sm leading-6 text-white/68">
+          <p className="h-[72px] text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
@@ -229,7 +229,7 @@ const PlanCard = ({
             Mejor encaje
           </p>
 
-          <p className="h-[36px] overflow-hidden text-sm leading-6 text-white">
+          <p className="h-[36px] text-sm leading-6 text-white">
             {role.bestFor}
           </p>
         </div>
