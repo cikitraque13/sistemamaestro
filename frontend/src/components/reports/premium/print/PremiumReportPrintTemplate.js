@@ -1,234 +1,54 @@
 import React, { useMemo } from 'react';
 import {
   CheckCircle,
+  DiamondsFour,
+  Flag,
   Lightning,
   Sparkle
 } from '@phosphor-icons/react';
 
-const ROUTE_NAMES = {
-  improve: 'Mejorar algo existente',
-  sell: 'Vender y cobrar',
-  automate: 'Automatizar operación',
-  idea: 'Idea a proyecto',
-  improve_existing: 'Mejorar algo existente',
-  sell_and_charge: 'Vender y cobrar',
-  automate_operation: 'Automatizar operación',
-  idea_to_project: 'Idea a proyecto'
-};
+import {
+  DIMENSION_STATUS_META,
+  PRIORITY_META,
+  REPORT_COPY,
+  REPORT_SECTION_KEYS
+} from '../reportPremium.constants';
 
-const PLACEHOLDER_PATTERNS = [
-  /^sin .*disponible/i,
-  /^sin .*datos/i,
-  /^sin recomendaci[oó]n/i,
-  /^sin acci[oó]n/i,
-  /^no se ha/i,
-  /^no hay/i,
-  /^lectura pendiente/i,
-  /^pendiente/i
-];
+import {
+  buildReportPremiumModel
+} from '../reportPremiumViewModel';
 
-const ensureArray = (value) => (Array.isArray(value) ? value : []);
+import {
+  getGridClass,
+  isMeaningfulText,
+  toSafeText
+} from '../reportPremium.utils';
 
-const formatDate = (value) => {
-  if (!value) return '';
-  try {
-    return new Date(value).toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  } catch {
-    return '';
-  }
-};
-
-const isMeaningfulText = (value) => {
-  if (typeof value !== 'string') return false;
-  const trimmed = value.trim();
-  if (!trimmed) return false;
-  if (trimmed.length < 10) return false;
-  return !PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(trimmed));
-};
-
-const dedupeTexts = (items, maxItems = null) => {
-  const result = [];
-
-  for (const item of items) {
-    if (!isMeaningfulText(item)) continue;
-    if (result.includes(item)) continue;
-    result.push(item);
-    if (maxItems && result.length >= maxItems) break;
-  }
-
-  return result;
-};
-
-const normalizeReportView = (project) => {
-  const diagnosis = project?.diagnosis;
-  if (!diagnosis) return null;
-
-  const strengths = dedupeTexts(ensureArray(diagnosis.strengths), 3);
-  const weaknesses = dedupeTexts(ensureArray(diagnosis.weaknesses), 4);
-  const quickWins = dedupeTexts(ensureArray(diagnosis.quick_wins), 4);
-
-  const executiveSummaryRaw =
-    diagnosis.executive_summary && typeof diagnosis.executive_summary === 'object'
-      ? diagnosis.executive_summary
-      : {};
-
-  const coreDiagnosisRaw =
-    diagnosis.core_diagnosis && typeof diagnosis.core_diagnosis === 'object'
-      ? diagnosis.core_diagnosis
-      : {};
-
-  const rawPriorityActions = ensureArray(diagnosis.priority_actions);
-
-  const immediateActionRaw =
-    diagnosis.immediate_action && typeof diagnosis.immediate_action === 'object'
-      ? diagnosis.immediate_action
-      : null;
-
-  const continuityRecommendationRaw =
-    diagnosis.continuity_recommendation && typeof diagnosis.continuity_recommendation === 'object'
-      ? diagnosis.continuity_recommendation
-      : null;
-
-  const understanding =
-    diagnosis.understanding ||
-    diagnosis.summary ||
-    executiveSummaryRaw.understanding ||
-    '';
-
-  const mainFinding =
-    diagnosis.main_finding ||
-    coreDiagnosisRaw.main_finding ||
-    weaknesses[0] ||
-    strengths[0] ||
-    diagnosis.summary ||
-    '';
-
-  const mainWeakness =
-    coreDiagnosisRaw.main_weakness ||
-    weaknesses[0] ||
-    '';
-
-  const mainLeverage =
-    diagnosis.opportunity ||
-    coreDiagnosisRaw.main_leverage ||
-    quickWins[0] ||
-    '';
-
-  const executiveSummary = {
-    understanding:
-      executiveSummaryRaw.understanding || understanding,
-    mainTension:
-      executiveSummaryRaw.main_tension || weaknesses[0] || '',
-    commercialImportance:
-      executiveSummaryRaw.commercial_importance || '',
-    bottomLine:
-      executiveSummaryRaw.bottom_line || quickWins[0] || ''
-  };
-
-  const coreDiagnosis = {
-    mainFinding,
-    mainWeakness,
-    mainLeverage
-  };
-
-  const priorityActions = rawPriorityActions
-    .filter((action) => action && typeof action === 'object')
-    .filter((action) => isMeaningfulText(action.title) || isMeaningfulText(action.why_it_matters))
-    .slice(0, 3);
-
-  let immediateAction = null;
-
-  if (
-    immediateActionRaw &&
-    (isMeaningfulText(immediateActionRaw.title) || isMeaningfulText(immediateActionRaw.description))
-  ) {
-    immediateAction = {
-      title: isMeaningfulText(immediateActionRaw.title)
-        ? immediateActionRaw.title
-        : 'Siguiente acción inmediata',
-      description: isMeaningfulText(immediateActionRaw.description)
-        ? immediateActionRaw.description
-        : ''
-    };
-  } else if (priorityActions.length > 0) {
-    immediateAction = {
-      title: priorityActions[0].title || 'Aplicar acción prioritaria',
-      description: priorityActions[0].why_it_matters || ''
-    };
-  } else if (quickWins.length > 0) {
-    immediateAction = {
-      title: 'Aplicar quick win prioritario',
-      description: quickWins[0]
-    };
-  }
-
-  const continuityRecommendation =
-    continuityRecommendationRaw &&
-    (isMeaningfulText(continuityRecommendationRaw.reason) ||
-      isMeaningfulText(continuityRecommendationRaw.cta_label))
-      ? continuityRecommendationRaw
-      : null;
-
-  return {
-    strengths,
-    weaknesses,
-    quickWins,
-    executiveSummary,
-    coreDiagnosis,
-    priorityActions,
-    immediateAction,
-    continuityRecommendation
-  };
-};
-
-const buildAdvancePrompt = ({ project, routeLabel, reportView }) => {
-  const context = project?.input_content || 'Sin contexto';
-  const entryType = project?.input_type === 'url' ? 'URL' : 'idea o descripción';
-  const immediateTitle =
-    reportView?.immediateAction?.title ||
-    reportView?.coreDiagnosis?.mainLeverage ||
-    'Definir el siguiente paso prioritario';
-
-  return [
-    'Actúa como estratega digital senior y transforma este caso en un siguiente paso ejecutable.',
-    '',
-    `Contexto analizado: ${context}`,
-    `Tipo de entrada: ${entryType}`,
-    `Ruta detectada: ${routeLabel}`,
-    `Hallazgo principal: ${reportView?.coreDiagnosis?.mainFinding || 'No disponible'}`,
-    `Palanca principal: ${reportView?.coreDiagnosis?.mainLeverage || 'No disponible'}`,
-    `Primer foco de mejora: ${immediateTitle}`,
-    '',
-    'Devuélveme:',
-    '1. El objetivo inmediato correcto para este caso.',
-    '2. La estructura o enfoque recomendado para moverlo sin dispersión.',
-    '3. Las 3 acciones prioritarias más concretas.',
-    '4. Qué copy, elementos o bloques debería implementar primero.',
-    '5. Qué errores o desvíos debería evitar en este caso.',
-    '',
-    'Condiciones:',
-    '- No generalices.',
-    '- No improvises soluciones vagas.',
-    '- Prioriza claridad, conversión y continuidad.',
-    '- Responde con enfoque profesional y accionable.'
-  ].join('\n');
-};
-
-const PdfSection = ({ title, icon, children, noBorder = false }) => (
+const PrintSection = ({ page, title, icon, children, noBorder = false }) => (
   <section
-    className={`pdf-section px-8 py-8 sm:px-10 sm:py-9 ${noBorder ? '' : 'border-t border-slate-200'}`}
-    style={{ pageBreakInside: 'avoid' }}
+    className={`px-10 py-9 ${noBorder ? '' : 'border-b border-zinc-200'}`}
+    style={{
+      pageBreakInside: 'avoid',
+      breakInside: 'avoid'
+    }}
   >
-    {title && (
-      <div className="flex items-center gap-2 mb-5">
-        {icon}
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-          {title}
-        </h2>
+    {(page || title) && (
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          {icon}
+
+          {title && (
+            <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+              {title}
+            </h2>
+          )}
+        </div>
+
+        {page && (
+          <div className="rounded-full border border-zinc-200 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500">
+            {page}
+          </div>
+        )}
       </div>
     )}
 
@@ -236,65 +56,474 @@ const PdfSection = ({ title, icon, children, noBorder = false }) => (
   </section>
 );
 
-const MetricCard = ({ eyebrow, value, accent = 'default' }) => {
+const PrintSnapshotCard = ({ eyebrow, value, accent = 'default' }) => {
   const accentMap = {
     teal: 'border-teal-200 bg-teal-50',
     amber: 'border-amber-200 bg-amber-50',
     violet: 'border-fuchsia-200 bg-fuchsia-50',
-    default: 'border-slate-200 bg-slate-50'
+    default: 'border-zinc-200 bg-white'
   };
+
+  const accentClass = accentMap[accent] || accentMap.default;
 
   return (
     <div
-      className={`pdf-card rounded-2xl border p-5 ${accentMap[accent] || accentMap.default}`}
-      style={{ pageBreakInside: 'avoid' }}
+      className={`rounded-2xl border p-5 ${accentClass}`}
+      style={{
+        pageBreakInside: 'avoid',
+        breakInside: 'avoid'
+      }}
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-        {eyebrow}
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+        {toSafeText(eyebrow)}
       </p>
-      <p className="text-slate-900 font-medium leading-relaxed">
-        {value}
+
+      <p className="text-sm font-medium leading-6 text-zinc-950">
+        {toSafeText(value)}
       </p>
     </div>
   );
 };
 
-const SoftCard = ({ eyebrow, value }) => (
+const PrintSignalList = ({ title, items }) => (
   <div
-    className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5"
-    style={{ pageBreakInside: 'avoid' }}
+    className="rounded-2xl border border-zinc-200 bg-white p-5"
+    style={{
+      pageBreakInside: 'avoid',
+      breakInside: 'avoid'
+    }}
   >
-    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-      {eyebrow}
+    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+      {toSafeText(title)}
     </p>
-    <p className="text-slate-800 leading-relaxed">{value}</p>
+
+    <ul className="space-y-2">
+      {items.map((item, index) => (
+        <li
+          key={`${title}-${index}-${String(item).substring(0, 24)}`}
+          className="flex items-start gap-2 text-sm leading-6 text-zinc-900"
+        >
+          <CheckCircle
+            size={14}
+            className="mt-1 flex-shrink-0 text-teal-700"
+          />
+
+          <span>
+            {toSafeText(item)}
+          </span>
+        </li>
+      ))}
+    </ul>
   </div>
 );
 
-const BulletList = ({ title, items }) => {
-  if (!items || items.length === 0) return null;
+const PrintHeroSection = ({
+  project,
+  brandName,
+  documentTitle,
+  routeLabel,
+  issueDate,
+  heroCards,
+  page
+}) => (
+  <PrintSection page={page} noBorder>
+    <div className="-mx-10 -mt-9 border-b border-zinc-200 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.10),transparent_34%),linear-gradient(180deg,#ffffff_0%,#f6f7f7_100%)] px-10 pb-9 pt-9">
+      <div className="mb-8 flex items-start justify-between gap-8">
+        <div className="min-w-0 flex-1">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-100 bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800">
+            <Sparkle weight="fill" />
+            {toSafeText(documentTitle)}
+          </div>
+
+          <h1 className="mb-3 text-[2.3rem] font-semibold leading-tight tracking-tight text-zinc-950">
+            {REPORT_COPY.heroTitle}
+          </h1>
+
+          <p className="max-w-3xl text-base leading-7 text-zinc-700">
+            {REPORT_COPY.heroDescription}
+          </p>
+        </div>
+
+        <div className="w-[260px] shrink-0 rounded-2xl border border-zinc-200 bg-white px-5 py-5">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            {REPORT_COPY.documentLabel}
+          </p>
+
+          <p className="mb-4 font-semibold text-zinc-950">
+            {toSafeText(brandName)}
+          </p>
+
+          <div className="space-y-2 text-sm text-zinc-700">
+            <p>
+              <span className="font-medium text-zinc-500">
+                {REPORT_COPY.dateLabel}
+              </span>{' '}
+              {issueDate || 'Sin fecha'}
+            </p>
+
+            <p>
+              <span className="font-medium text-zinc-500">
+                {REPORT_COPY.routeLabel}
+              </span>{' '}
+              {routeLabel}
+            </p>
+
+            <p>
+              <span className="font-medium text-zinc-500">
+                {REPORT_COPY.inputLabel}
+              </span>{' '}
+              {project.input_type === 'url'
+                ? REPORT_COPY.inputUrlLabel
+                : REPORT_COPY.inputDescriptionLabel}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="mb-6 rounded-2xl border border-zinc-200 bg-white p-5"
+        style={{
+          pageBreakInside: 'avoid',
+          breakInside: 'avoid'
+        }}
+      >
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          {REPORT_COPY.contextTitle}
+        </p>
+
+        <p className="break-words text-sm leading-6 text-zinc-950">
+          {toSafeText(project.input_content)}
+        </p>
+      </div>
+
+      {heroCards.length > 0 && (
+        <div className={`grid gap-4 ${getGridClass(heroCards.length)}`}>
+          {heroCards.map((card) => (
+            <PrintSnapshotCard
+              key={`${card.eyebrow}-${String(card.value).substring(0, 24)}`}
+              eyebrow={card.eyebrow}
+              value={card.value}
+              accent={card.accent}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </PrintSection>
+);
+
+const PrintSummarySection = ({ reportView, page }) => (
+  <PrintSection
+    page={page}
+    title={REPORT_COPY.summaryTitle}
+    icon={<DiamondsFour size={17} className="text-amber-600" weight="fill" />}
+  >
+    {reportView.executiveCards.length > 0 && (
+      <div className="grid gap-4 md:grid-cols-2">
+        {reportView.executiveCards.map((item) => (
+          <div
+            key={item.key}
+            className="rounded-2xl border border-zinc-200 bg-white p-5"
+            style={{
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}
+          >
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              {item.label}
+            </p>
+
+            <p className="text-sm leading-6 text-zinc-950">
+              {item.value}
+            </p>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {reportView.coreDiagnosisCards.length > 0 && (
+      <div className={reportView.executiveCards.length > 0 ? 'mt-6' : ''}>
+        <div className="mb-4 flex items-center gap-2">
+          <Lightning size={17} className="text-teal-700" weight="fill" />
+
+          <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            {REPORT_COPY.coreDiagnosisTitle}
+          </h3>
+        </div>
+
+        <div className={`grid gap-4 ${getGridClass(reportView.coreDiagnosisCards.length)}`}>
+          {reportView.coreDiagnosisCards.map((item) => {
+            const accentClass =
+              item.accent === 'teal'
+                ? 'border-teal-200 bg-teal-50'
+                : item.accent === 'amber'
+                  ? 'border-amber-200 bg-amber-50'
+                  : 'border-zinc-200 bg-white';
+
+            return (
+              <div
+                key={item.key}
+                className={`rounded-2xl border p-5 ${accentClass}`}
+                style={{
+                  pageBreakInside: 'avoid',
+                  breakInside: 'avoid'
+                }}
+              >
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  {item.label}
+                </p>
+
+                <p className="text-sm font-medium leading-6 text-zinc-950">
+                  {item.value}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </PrintSection>
+);
+
+const PrintDimensionsSection = ({ reportView, dimensionCounters, page }) => (
+  <PrintSection
+    page={page}
+    title={REPORT_COPY.dimensionsTitle}
+    icon={<Flag size={17} className="text-teal-700" weight="fill" />}
+  >
+    <div className="mb-5 flex flex-wrap gap-2">
+      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+        {dimensionCounters.strong} fuertes
+      </span>
+
+      <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700">
+        {dimensionCounters.improvable} mejorables
+      </span>
+
+      <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+        {dimensionCounters.priority} prioritarias
+      </span>
+    </div>
+
+    <div className="grid gap-4 md:grid-cols-2">
+      {reportView.dimensionReview.map((dimension, index) => {
+        const statusMeta =
+          DIMENSION_STATUS_META[dimension.status] || DIMENSION_STATUS_META.improvable;
+        const priorityMeta =
+          PRIORITY_META[dimension.priority] || PRIORITY_META.medium;
+
+        return (
+          <div
+            key={`${dimension.id}-${index}`}
+            className="rounded-2xl border border-zinc-200 bg-white p-5"
+            style={{
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}
+          >
+            <div className="mb-3 flex items-start justify-between gap-3">
+              <p className="font-semibold text-zinc-950">
+                {dimension.label}
+              </p>
+
+              <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-1 text-[10px] font-medium text-zinc-600">
+                {statusMeta.label}
+              </span>
+            </div>
+
+            <p className="mb-4 text-sm leading-6 text-zinc-700">
+              {dimension.reading}
+            </p>
+
+            <span className="inline-flex rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[10px] font-medium text-zinc-600">
+              Prioridad {priorityMeta.label.toLowerCase()}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  </PrintSection>
+);
+
+const PrintActionsSection = ({ reportView, page }) => (
+  <PrintSection
+    page={page}
+    title={REPORT_COPY.actionsTitle}
+    icon={<CheckCircle size={17} className="text-teal-700" weight="fill" />}
+  >
+    {reportView.priorityActions.length > 0 && (
+      <div className="mb-6 grid gap-4 md:grid-cols-2">
+        {reportView.priorityActions.map((action, index) => {
+          const intensityMeta =
+            PRIORITY_META[action.intensity] || PRIORITY_META.medium;
+
+          return (
+            <div
+              key={action.id || `${action.title}-${index}`}
+              className="rounded-2xl border border-zinc-200 bg-white p-5"
+              style={{
+                pageBreakInside: 'avoid',
+                breakInside: 'avoid'
+              }}
+            >
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-50 text-sm font-semibold text-teal-800">
+                  {index + 1}
+                </div>
+
+                <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[10px] font-medium text-zinc-600">
+                  {intensityMeta.label}
+                </span>
+              </div>
+
+              <p className="mb-2 font-semibold text-zinc-950">
+                {action.title}
+              </p>
+
+              {isMeaningfulText(action.why_it_matters) && (
+                <p className="text-sm leading-6 text-zinc-700">
+                  {action.why_it_matters}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    )}
+
+    {reportView.immediateAction && (
+      <div
+        className="rounded-2xl border border-zinc-200 bg-white p-5"
+        style={{
+          pageBreakInside: 'avoid',
+          breakInside: 'avoid'
+        }}
+      >
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+          {REPORT_COPY.immediateActionTitle}
+        </p>
+
+        <p className="mb-2 font-semibold text-zinc-950">
+          {reportView.immediateAction.title}
+        </p>
+
+        {isMeaningfulText(reportView.immediateAction.description) && (
+          <p className="text-sm leading-6 text-zinc-700">
+            {reportView.immediateAction.description}
+          </p>
+        )}
+      </div>
+    )}
+  </PrintSection>
+);
+
+const PrintClosingSection = ({
+  reportView,
+  signalGroups,
+  continuityMeta,
+  page
+}) => {
+  const sectionTitle =
+    reportView.continuityRecommendation && signalGroups.length > 0
+      ? REPORT_COPY.continuityAndSignalsTitle
+      : reportView.continuityRecommendation
+        ? REPORT_COPY.continuityTitle
+        : REPORT_COPY.signalsTitle;
 
   return (
-    <div
-      className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5"
-      style={{ pageBreakInside: 'avoid' }}
+    <PrintSection
+      page={page}
+      title={sectionTitle}
+      icon={<Sparkle size={17} className="text-teal-700" weight="fill" />}
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
-        {title}
-      </p>
-
-      <ul className="space-y-2">
-        {items.map((item, index) => (
-          <li
-            key={`${title}-${index}-${String(item).substring(0, 24)}`}
-            className="text-slate-800 text-sm flex items-start gap-2"
+      <div className={`grid gap-4 ${
+        reportView.continuityRecommendation && signalGroups.length > 0
+          ? 'lg:grid-cols-[1.05fr_0.95fr]'
+          : 'grid-cols-1'
+      }`}
+      >
+        {reportView.continuityRecommendation && continuityMeta && (
+          <div
+            className="rounded-2xl border border-teal-200 bg-teal-50 p-5"
+            style={{
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}
           >
-            <CheckCircle size={14} className="text-teal-600 mt-1 flex-shrink-0" weight="fill" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <div className="mb-3 flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-teal-200 bg-white px-3 py-1 text-sm font-medium text-teal-800">
+                {continuityMeta.label}
+              </span>
+            </div>
+
+            {isMeaningfulText(reportView.continuityRecommendation.reason) && (
+              <p className="mb-4 text-sm leading-6 text-zinc-950">
+                {reportView.continuityRecommendation.reason}
+              </p>
+            )}
+
+            {isMeaningfulText(reportView.continuityRecommendation.cta_label) && (
+              <div className="rounded-2xl border border-zinc-200 bg-white px-4 py-4">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  {REPORT_COPY.continuityCtaTitle}
+                </p>
+
+                <p className="font-medium text-zinc-950">
+                  {reportView.continuityRecommendation.cta_label}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {signalGroups.length > 0 && (
+          <div
+            className="rounded-2xl border border-zinc-200 bg-white p-5"
+            style={{
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid'
+            }}
+          >
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+              {REPORT_COPY.signalsTitle}
+            </p>
+
+            <div className="grid gap-4">
+              {signalGroups.map((group) => (
+                <PrintSignalList
+                  key={group.title}
+                  title={group.title}
+                  items={group.items}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {continuityMeta?.label && (
+        <div
+          className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-5"
+          style={{
+            pageBreakInside: 'avoid',
+            breakInside: 'avoid'
+          }}
+        >
+          <p className="text-sm leading-6 text-zinc-950">
+            {reportView.continuityRecommendation ? (
+              <>
+                {REPORT_COPY.closingWithContinuity}{' '}
+                <span className="font-semibold text-teal-800">
+                  {continuityMeta.label}
+                </span>.
+              </>
+            ) : (
+              REPORT_COPY.closingWithoutContinuity
+            )}
+          </p>
+        </div>
+      )}
+    </PrintSection>
   );
 };
 
@@ -304,298 +533,81 @@ const PremiumReportPrintTemplate = ({
   documentTitle = 'Informe Puntual',
   showSystemFooter = true
 }) => {
-  const reportView = useMemo(() => normalizeReportView(project), [project]);
+  const model = useMemo(() => buildReportPremiumModel(project), [project]);
 
-  const routeLabel = ROUTE_NAMES[project?.route] || project?.route || 'Sin clasificar';
-  const issueDate = formatDate(project?.created_at);
-
-  const advancePrompt = useMemo(() => {
-    if (!project || !reportView) return '';
-    return buildAdvancePrompt({ project, routeLabel, reportView });
-  }, [project, reportView, routeLabel]);
+  const {
+    reportView,
+    routeLabel,
+    issueDate,
+    dimensionCounters,
+    continuityMeta,
+    heroCards,
+    signalGroups,
+    visibleSections,
+    pageMap
+  } = model;
 
   if (!project || !reportView) {
     return (
-      <div className="max-w-[920px] mx-auto rounded-2xl border border-slate-200 bg-white p-8 text-slate-800">
-        No hay datos suficientes para renderizar el informe.
+      <div className="mx-auto max-w-[920px] rounded-2xl border border-zinc-200 bg-white p-8 text-zinc-950">
+        {REPORT_COPY.emptyState}
       </div>
     );
   }
 
-  const validationLead =
-    reportView.executiveSummary.bottomLine ||
-    reportView.executiveSummary.commercialImportance ||
-    reportView.executiveSummary.understanding ||
-    reportView.coreDiagnosis.mainFinding;
-
-  const firstFocus =
-    reportView.immediateAction?.title ||
-    reportView.coreDiagnosis.mainLeverage ||
-    'Definir el siguiente foco de mejora';
-
   return (
-    <div className="max-w-[920px] mx-auto">
-      <style>{`
-        @media print {
-          html, body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
+    <div className="mx-auto max-w-[920px] bg-white text-zinc-950">
+      <div className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none">
+        <PrintHeroSection
+          project={project}
+          brandName={brandName}
+          documentTitle={documentTitle}
+          routeLabel={routeLabel}
+          issueDate={issueDate}
+          heroCards={heroCards}
+          page={pageMap[REPORT_SECTION_KEYS.hero]}
+        />
 
-          .pdf-document-shell {
-            background: #ffffff !important;
-            color: #0f172a !important;
-            border: none !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            max-width: none !important;
-            margin: 0 !important;
-            overflow: visible !important;
-          }
+        {visibleSections.includes(REPORT_SECTION_KEYS.summary) && (
+          <PrintSummarySection
+            reportView={reportView}
+            page={pageMap[REPORT_SECTION_KEYS.summary]}
+          />
+        )}
 
-          .pdf-hero-band,
-          .pdf-card,
-          .pdf-soft-card,
-          .pdf-context-card,
-          .pdf-meta-card,
-          .pdf-prompt-box {
-            box-shadow: none !important;
-          }
+        {visibleSections.includes(REPORT_SECTION_KEYS.dimensions) && (
+          <PrintDimensionsSection
+            reportView={reportView}
+            dimensionCounters={dimensionCounters}
+            page={pageMap[REPORT_SECTION_KEYS.dimensions]}
+          />
+        )}
 
-          .pdf-section,
-          .pdf-card,
-          .pdf-soft-card,
-          .pdf-prompt-box {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-        }
-      `}</style>
+        {visibleSections.includes(REPORT_SECTION_KEYS.actions) && (
+          <PrintActionsSection
+            reportView={reportView}
+            page={pageMap[REPORT_SECTION_KEYS.actions]}
+          />
+        )}
 
-      <div className="pdf-document-shell bg-white text-slate-900 rounded-[28px] overflow-hidden border border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.08)]">
-        <PdfSection noBorder>
-          <div className="pdf-hero-band pb-8 border-b border-slate-200 -mx-8 -mt-8 px-8 pt-8 sm:-mx-10 sm:-mt-9 sm:px-10 sm:pt-9 bg-[linear-gradient(180deg,#F8FAFC_0%,#FFFFFF_100%)]">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-8">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 text-sm font-medium mb-4">
-                  <Sparkle size={14} weight="fill" />
-                  {documentTitle}
-                </div>
-
-                <h1 className="text-3xl sm:text-[2.3rem] font-semibold text-slate-900 mb-3 leading-tight">
-                  Informe puntual de validación
-                </h1>
-
-                <p className="text-slate-600 max-w-3xl leading-relaxed">
-                  Validación puntual, lectura útil, primer foco de mejora y prompt de avance para mover el caso con más criterio.
-                </p>
-              </div>
-
-              <div className="pdf-meta-card rounded-2xl border border-slate-200 bg-white px-5 py-5 min-w-[260px]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-1">
-                  Documento
-                </p>
-                <p className="text-slate-900 font-medium mb-3">{brandName}</p>
-
-                <div className="space-y-2 text-sm">
-                  <p className="text-slate-700">
-                    <span className="text-slate-500">Fecha:</span> {issueDate || 'Sin fecha'}
-                  </p>
-                  <p className="text-slate-700">
-                    <span className="text-slate-500">Ruta:</span> {routeLabel}
-                  </p>
-                  <p className="text-slate-700">
-                    <span className="text-slate-500">Entrada:</span>{' '}
-                    {project.input_type === 'url' ? 'URL' : 'Idea / descripción'}
-                  </p>
-                  {project.project_id && (
-                    <p className="text-slate-700 break-all">
-                      <span className="text-slate-500">Proyecto:</span> {project.project_id}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div
-              className="pdf-context-card rounded-2xl border border-slate-200 bg-white p-5 mb-6"
-              style={{ pageBreakInside: 'avoid' }}
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-                Contexto analizado
-              </p>
-              <p className="text-slate-800 leading-relaxed break-words">{project.input_content}</p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <MetricCard
-                eyebrow="Hallazgo principal"
-                value={reportView.coreDiagnosis.mainFinding}
-                accent="teal"
-              />
-              <MetricCard
-                eyebrow="Palanca principal"
-                value={reportView.coreDiagnosis.mainLeverage}
-                accent="amber"
-              />
-              <MetricCard
-                eyebrow="Primer foco de mejora"
-                value={firstFocus}
-                accent="violet"
-              />
-            </div>
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          title="Validación puntual"
-          icon={<CheckCircle size={18} className="text-teal-600" weight="fill" />}
-        >
-          <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-4 mb-4">
-            <div
-              className="pdf-soft-card rounded-2xl border border-slate-200 bg-slate-50 p-5"
-              style={{ pageBreakInside: 'avoid' }}
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
-                Lectura de validación
-              </p>
-              <p className="text-slate-800 leading-relaxed">
-                {validationLead}
-              </p>
-            </div>
-
-            <div className="grid gap-4">
-              <MetricCard
-                eyebrow="Fricción central"
-                value={reportView.coreDiagnosis.mainWeakness || reportView.executiveSummary.mainTension || 'Sin fricción central disponible.'}
-                accent="default"
-              />
-            </div>
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          title="Lectura útil del caso"
-          icon={<Lightning size={18} className="text-amber-600" weight="fill" />}
-        >
-          <div className="grid md:grid-cols-2 gap-4">
-            {isMeaningfulText(reportView.executiveSummary.understanding) && (
-              <SoftCard
-                eyebrow="Comprensión"
-                value={reportView.executiveSummary.understanding}
-              />
-            )}
-
-            {isMeaningfulText(reportView.executiveSummary.mainTension) && (
-              <SoftCard
-                eyebrow="Tensión principal"
-                value={reportView.executiveSummary.mainTension}
-              />
-            )}
-
-            {isMeaningfulText(reportView.executiveSummary.commercialImportance) && (
-              <SoftCard
-                eyebrow="Importancia comercial"
-                value={reportView.executiveSummary.commercialImportance}
-              />
-            )}
-
-            {isMeaningfulText(reportView.executiveSummary.bottomLine) && (
-              <SoftCard
-                eyebrow="Conclusión ejecutiva"
-                value={reportView.executiveSummary.bottomLine}
-              />
-            )}
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          title="Primer foco de mejora"
-          icon={<Sparkle size={18} className="text-teal-600" weight="fill" />}
-        >
-          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-4 mb-4">
-            <div className="grid gap-4">
-              {reportView.immediateAction && (
-                <div
-                  className="pdf-soft-card rounded-2xl border border-teal-200 bg-teal-50 p-5"
-                  style={{ pageBreakInside: 'avoid' }}
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-700 mb-3">
-                    Acción inmediata
-                  </p>
-
-                  <p className="text-slate-900 font-medium mb-2">
-                    {reportView.immediateAction.title}
-                  </p>
-
-                  {isMeaningfulText(reportView.immediateAction.description) && (
-                    <p className="text-slate-700 leading-relaxed">
-                      {reportView.immediateAction.description}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <BulletList
-                title="Acciones prioritarias"
-                items={reportView.priorityActions.map((action) => action.title).filter(Boolean)}
-              />
-            </div>
-
-            <div className="grid gap-4">
-              <BulletList
-                title="Fortalezas detectadas"
-                items={reportView.strengths}
-              />
-
-              <BulletList
-                title="Quick wins"
-                items={reportView.quickWins}
-              />
-            </div>
-          </div>
-        </PdfSection>
-
-        <PdfSection
-          title="Prompt de avance"
-          icon={<Lightning size={18} className="text-amber-600" weight="fill" />}
-        >
-          <div
-            className="pdf-prompt-box rounded-2xl border border-slate-200 bg-slate-50 p-5"
-            style={{ pageBreakInside: 'avoid' }}
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-3">
-              Prompt listo para copiar
-            </p>
-
-            <pre className="whitespace-pre-wrap break-words text-[13px] leading-6 text-slate-800 font-mono">
-              {advancePrompt}
-            </pre>
-          </div>
-
-          {reportView.continuityRecommendation && isMeaningfulText(reportView.continuityRecommendation.reason) && (
-            <div
-              className="pdf-soft-card rounded-2xl border border-slate-200 bg-white p-5 mt-4"
-              style={{ pageBreakInside: 'avoid' }}
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
-                Nota de continuidad
-              </p>
-              <p className="text-slate-800 leading-relaxed">
-                {reportView.continuityRecommendation.reason}
-              </p>
-            </div>
-          )}
-        </PdfSection>
+        {visibleSections.includes(REPORT_SECTION_KEYS.closing) && (
+          <PrintClosingSection
+            reportView={reportView}
+            signalGroups={signalGroups}
+            continuityMeta={continuityMeta}
+            page={pageMap[REPORT_SECTION_KEYS.closing]}
+          />
+        )}
 
         {showSystemFooter && (
-          <div className="px-8 py-5 sm:px-10 border-t border-slate-200 bg-slate-50">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
-              <p className="text-slate-700">
-                {brandName} · Informe puntual de validación
+          <div className="border-t border-zinc-200 bg-zinc-50 px-10 py-5">
+            <div className="flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-zinc-700">
+                {toSafeText(brandName)} - {REPORT_COPY.footerLeft}
               </p>
-              <p className="text-slate-500">
-                Documento final orientado a lectura útil y acción inmediata
+
+              <p className="text-zinc-500">
+                {REPORT_COPY.footerRight}
               </p>
             </div>
           </div>
