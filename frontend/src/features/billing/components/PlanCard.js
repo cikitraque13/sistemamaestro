@@ -19,7 +19,7 @@ const PLAN_ROLE_META = {
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
     description:
-      'Convierte una idea, informe o diagnóstico inicial en una base operativa dentro de Builder.',
+      'Convierte una idea o diagnóstico inicial en una base operativa lista para Builder.',
     bestFor: 'Primera activación seria dentro del sistema.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
@@ -35,7 +35,7 @@ const PLAN_ROLE_META = {
     badge: 'Núcleo operativo',
     headline: 'Convierte el sistema en continuidad operativa.',
     description:
-      'Mantén proyectos vivos con iteración, seguimiento, más margen operativo y construcción continua.',
+      'Mantén proyectos vivos con iteración, seguimiento y construcción continua.',
     bestFor: 'Continuidad seria y trabajo con más recorrido.',
     surface:
       'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
@@ -51,7 +51,7 @@ const PLAN_ROLE_META = {
     badge: 'Capa superior',
     headline: 'Activa la capa maestra para casos complejos.',
     description:
-      'Trabaja con más criterio, más inteligencia, más capacidad y preparación seria de salida.',
+      'Trabaja con más criterio, inteligencia, capacidad y preparación seria de salida.',
     bestFor: 'Casos complejos, operador serio y salida preparada.',
     surface:
       'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
@@ -72,7 +72,7 @@ const GEM_LABELS = {
 const getVisibleOperationalLabel = (label) => GEM_LABELS[label] || label;
 
 const OperationalGrid = ({ items }) => (
-  <div className="grid gap-3 sm:grid-cols-2">
+  <div className="grid gap-2">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
       const visibleLabel = getVisibleOperationalLabel(item.label);
@@ -80,13 +80,13 @@ const OperationalGrid = ({ items }) => (
       return (
         <div
           key={item.label}
-          className={`min-h-[92px] rounded-2xl border px-3 py-3 ${accent.wrap}`}
+          className={`flex min-h-[54px] items-center justify-between gap-3 rounded-2xl border px-3 py-2.5 ${accent.wrap}`}
         >
-          <p className={`mb-1 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
+          <p className={`text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
             {visibleLabel}
           </p>
 
-          <p className={`text-xs leading-relaxed ${accent.value}`}>
+          <p className={`max-w-[58%] text-right text-xs font-medium leading-snug ${accent.value}`}>
             {item.value}
           </p>
         </div>
@@ -128,7 +128,7 @@ const PlanCard = ({
 
   return (
     <article
-      className={`relative flex h-full min-h-[710px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
+      className={`relative flex h-full min-h-[690px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div
@@ -136,8 +136,8 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 flex min-h-[286px] flex-col">
-        <div className="mb-8 flex min-h-[34px] flex-wrap items-start gap-2">
+      <div className="relative z-10 flex min-h-[270px] flex-col">
+        <div className="mb-7 flex min-h-[34px] flex-wrap items-start gap-2">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
           >
@@ -157,7 +157,7 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="flex min-h-[224px] flex-col">
+        <div className="flex min-h-[210px] flex-col">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
@@ -170,13 +170,13 @@ const PlanCard = ({
             {role.headline}
           </p>
 
-          <p className="min-h-[72px] text-sm leading-6 text-white/68">
+          <p className="min-h-[54px] text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-2 min-h-[236px] rounded-3xl border border-white/16 bg-black/30 p-5">
+      <div className="relative z-10 mt-2 min-h-[222px] rounded-3xl border border-white/16 bg-black/30 p-5">
         <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-white/55">
           Nivel de capacidad
         </p>
@@ -196,20 +196,20 @@ const PlanCard = ({
             Mejor encaje
           </p>
 
-          <p className="min-h-[52px] text-sm leading-6 text-white">
+          <p className="min-h-[44px] text-sm leading-6 text-white">
             {plan.bestForShort || plan.bestFor || role.bestFor}
           </p>
         </div>
       </div>
 
       <div className="relative z-10 mt-5 rounded-3xl border border-white/16 bg-black/25 p-4">
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
               Marco operativo
             </p>
             <p className="mt-1 text-xs text-white/45">
-              Acceso, Builder, salida y Gema Maestra.
+              Activación, Builder, salida y Gema Maestra.
             </p>
           </div>
 
@@ -224,7 +224,7 @@ const PlanCard = ({
       </div>
 
       {planSignals.length > 0 && (
-        <div className="relative z-10 mt-5 min-h-[72px]">
+        <div className="relative z-10 mt-5 min-h-[62px]">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
