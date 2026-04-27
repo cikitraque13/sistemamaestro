@@ -1,5 +1,4 @@
 import {
-  CONTINUITY_META,
   REPORT_SECTION_KEYS,
   ROUTE_NAMES
 } from './reportPremium.constants';
@@ -13,6 +12,18 @@ import {
   isMeaningfulText,
   toSafeText
 } from './reportPremium.utils';
+
+const BUILDER_CONTINUITY_META = {
+  label: 'Construir en Builder',
+  badgeClass: 'bg-[#0F5257]/20 text-[#8DE1D0]'
+};
+
+const BUILDER_CONTINUITY_RECOMMENDATION = {
+  recommended_path: 'builder',
+  reason:
+    'El informe ya ordeno el punto de partida. El siguiente paso correcto es convertir esta lectura en una primera version visible dentro de Sistema Maestro Builder.',
+  cta_label: 'Construir este proyecto en Builder'
+};
 
 const getPlainObject = (value) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
@@ -88,23 +99,7 @@ const buildImmediateAction = ({
   return null;
 };
 
-const buildContinuityRecommendation = (continuityRecommendationRaw) => {
-  const recommendedPath = toSafeText(continuityRecommendationRaw?.recommended_path);
-  const reason = toSafeText(continuityRecommendationRaw?.reason);
-  const ctaLabel = toSafeText(continuityRecommendationRaw?.cta_label);
-
-  const hasPath = recommendedPath && recommendedPath !== 'stay';
-  const hasReason = isMeaningfulText(reason);
-
-  if (!hasPath && !hasReason) return null;
-
-  return {
-    ...continuityRecommendationRaw,
-    recommended_path: recommendedPath,
-    reason,
-    cta_label: ctaLabel
-  };
-};
+const buildContinuityRecommendation = () => BUILDER_CONTINUITY_RECOMMENDATION;
 
 export const normalizeReportView = (project) => {
   const diagnosis = getPlainObject(project?.diagnosis);
@@ -199,9 +194,7 @@ export const normalizeReportView = (project) => {
     quickWins
   });
 
-  const continuityRecommendation = buildContinuityRecommendation(
-    getPlainObject(diagnosis.continuity_recommendation)
-  );
+  const continuityRecommendation = buildContinuityRecommendation();
 
   const avoidSignals = [
     ...executiveCards.map((item) => item.value),
@@ -239,15 +232,7 @@ export const buildDimensionCounters = (reportView) => {
   return counters;
 };
 
-export const resolveContinuityMeta = (reportView) => {
-  const continuityPath = toSafeText(
-    reportView?.continuityRecommendation?.recommended_path
-  );
-
-  if (!continuityPath) return null;
-
-  return CONTINUITY_META[continuityPath] || CONTINUITY_META.stay;
-};
+export const resolveContinuityMeta = () => BUILDER_CONTINUITY_META;
 
 export const buildHeroCards = (reportView, continuityMeta) => {
   const cards = [];
