@@ -19,6 +19,14 @@ import {
   runBuilderBuildKernel,
 } from '../../state/builderBuildKernel';
 
+import {
+  buildWithBuilderAI,
+} from '../../api/builderAiClient';
+
+import {
+  adaptBuilderAIOutputToKernelResult,
+} from '../../api/builderAiAdapter';
+
 const DEFAULT_PROGRESS_STEP = 2;
 const DEFAULT_PROGRESS_INTERVAL = 950;
 
@@ -143,35 +151,35 @@ const buildSistemaMaestroDecisionOptions = () => [
     id: 'sm-hero',
     label: 'Crear hero de Sistema Maestro',
     prompt:
-      'Construye un hero específico para Sistema Maestro con titular potente, promesa clara, subtítulo breve y CTAs “Entrar en Sistema Maestro” y “Ver cómo funciona”.',
+      'Construye un hero especÃƒÂ­fico para Sistema Maestro con titular potente, promesa clara, subtÃƒÂ­tulo breve y CTAs Ã¢â‚¬Å“Entrar en Sistema MaestroÃ¢â‚¬Â y Ã¢â‚¬Å“Ver cÃƒÂ³mo funcionaÃ¢â‚¬Â.',
     creditTier: 'medium',
   }),
   createDecisionOption({
     id: 'sm-google-access',
-    label: 'Añadir acceso con Google',
+    label: 'AÃƒÂ±adir acceso con Google',
     prompt:
-      'Añade un recuadro premium de acceso con “Entrar con Google” y “Suscribirme”, conectado al mensaje de activación del usuario.',
+      'AÃƒÂ±ade un recuadro premium de acceso con Ã¢â‚¬Å“Entrar con GoogleÃ¢â‚¬Â y Ã¢â‚¬Å“SuscribirmeÃ¢â‚¬Â, conectado al mensaje de activaciÃƒÂ³n del usuario.',
     creditTier: 'medium',
   }),
   createDecisionOption({
     id: 'sm-live-builder',
     label: 'Explicar Builder en vivo',
     prompt:
-      'Crea una sección que explique que Sistema Maestro construye en vivo con código, preview, agente y mejoras iterativas.',
+      'Crea una secciÃƒÂ³n que explique que Sistema Maestro construye en vivo con cÃƒÂ³digo, preview, agente y mejoras iterativas.',
     creditTier: 'medium',
   }),
   createDecisionOption({
     id: 'sm-gema',
-    label: 'Mostrar Gema Maestra y créditos',
+    label: 'Mostrar Gema Maestra y crÃƒÂ©ditos',
     prompt:
-      'Añade una sección clara de Gema Maestra, créditos, iteraciones, exportación y deploy sin parecer una tabla de precios agresiva.',
+      'AÃƒÂ±ade una secciÃƒÂ³n clara de Gema Maestra, crÃƒÂ©ditos, iteraciones, exportaciÃƒÂ³n y deploy sin parecer una tabla de precios agresiva.',
     creditTier: 'medium',
   }),
   createDecisionOption({
     id: 'sm-how-it-works',
-    label: 'Crear sección Cómo funciona',
+    label: 'Crear secciÃƒÂ³n CÃƒÂ³mo funciona',
     prompt:
-      'Añade una sección “Cómo funciona” con tres pasos: describe tu idea, el Builder construye, iteras/exportas/despliegas.',
+      'AÃƒÂ±ade una secciÃƒÂ³n Ã¢â‚¬Å“CÃƒÂ³mo funcionaÃ¢â‚¬Â con tres pasos: describe tu idea, el Builder construye, iteras/exportas/despliegas.',
     creditTier: 'medium',
   }),
 ];
@@ -181,19 +189,19 @@ const buildRestaurantDecisionOptions = () => [
     id: 'restaurant-reservations',
     label: 'Activar reservas directas',
     prompt:
-      'Optimiza la landing para reservas directas con CTA claro, WhatsApp, horario, ubicación y reducción de fricción.',
+      'Optimiza la landing para reservas directas con CTA claro, WhatsApp, horario, ubicaciÃƒÂ³n y reducciÃƒÂ³n de fricciÃƒÂ³n.',
   }),
   createDecisionOption({
     id: 'restaurant-menu',
     label: 'Destacar carta y platos',
     prompt:
-      'Añade una sección de carta, platos recomendados, fotos y motivos para reservar.',
+      'AÃƒÂ±ade una secciÃƒÂ³n de carta, platos recomendados, fotos y motivos para reservar.',
   }),
   createDecisionOption({
     id: 'restaurant-trust',
-    label: 'Añadir reseñas locales',
+    label: 'AÃƒÂ±adir reseÃƒÂ±as locales',
     prompt:
-      'Añade reseñas, confianza local, ubicación y prueba social para aumentar reservas.',
+      'AÃƒÂ±ade reseÃƒÂ±as, confianza local, ubicaciÃƒÂ³n y prueba social para aumentar reservas.',
   }),
 ];
 
@@ -202,20 +210,20 @@ const buildAutomationDecisionOptions = () => [
     id: 'automation-map',
     label: 'Mapear proceso',
     prompt:
-      'Mapea el proceso actual con pasos, responsables, herramientas, entradas, salidas y puntos de fricción.',
+      'Mapea el proceso actual con pasos, responsables, herramientas, entradas, salidas y puntos de fricciÃƒÂ³n.',
   }),
   createDecisionOption({
     id: 'automation-flow',
-    label: 'Diseñar flujo automatizado',
+    label: 'DiseÃƒÂ±ar flujo automatizado',
     prompt:
-      'Diseña un flujo automatizado con triggers, condiciones, herramientas, responsables y seguimiento.',
+      'DiseÃƒÂ±a un flujo automatizado con triggers, condiciones, herramientas, responsables y seguimiento.',
     creditTier: 'high',
   }),
   createDecisionOption({
     id: 'automation-dashboard',
     label: 'Crear dashboard de control',
     prompt:
-      'Añade una vista de dashboard para controlar estado, tareas, errores, métricas y resultados del proceso.',
+      'AÃƒÂ±ade una vista de dashboard para controlar estado, tareas, errores, mÃƒÂ©tricas y resultados del proceso.',
     creditTier: 'high',
   }),
 ];
@@ -225,19 +233,19 @@ const buildSaasDecisionOptions = () => [
     id: 'saas-use-case',
     label: 'Explicar caso de uso',
     prompt:
-      'Explica el caso de uso principal con problema, solución, resultado y CTA de activación.',
+      'Explica el caso de uso principal con problema, soluciÃƒÂ³n, resultado y CTA de activaciÃƒÂ³n.',
   }),
   createDecisionOption({
     id: 'saas-onboarding',
     label: 'Mejorar onboarding',
     prompt:
-      'Añade una primera experiencia de onboarding para que el usuario entienda qué hacer en menos de un minuto.',
+      'AÃƒÂ±ade una primera experiencia de onboarding para que el usuario entienda quÃƒÂ© hacer en menos de un minuto.',
   }),
   createDecisionOption({
     id: 'saas-features',
     label: 'Ordenar funciones por valor',
     prompt:
-      'Ordena las funciones por valor real para el usuario, no como lista técnica genérica.',
+      'Ordena las funciones por valor real para el usuario, no como lista tÃƒÂ©cnica genÃƒÂ©rica.',
   }),
 ];
 
@@ -254,14 +262,14 @@ const buildGenericDecisionOptions = ({
     id: 'generic-cta',
     label: primaryCTA ? `Ajustar CTA: ${primaryCTA}` : 'Ajustar CTA principal',
     prompt: primaryCTA
-      ? `Ajusta el CTA principal hacia “${primaryCTA}” y mejora su continuidad en hero, bloques y cierre.`
-      : 'Ajusta el CTA principal para que sea más claro, accionable y coherente con el objetivo real del proyecto.',
+      ? `Ajusta el CTA principal hacia Ã¢â‚¬Å“${primaryCTA}Ã¢â‚¬Â y mejora su continuidad en hero, bloques y cierre.`
+      : 'Ajusta el CTA principal para que sea mÃƒÂ¡s claro, accionable y coherente con el objetivo real del proyecto.',
   }),
   createDecisionOption({
     id: 'generic-trust',
-    label: 'Añadir confianza',
+    label: 'AÃƒÂ±adir confianza',
     prompt:
-      'Añade señales de confianza, autoridad, prueba social y objeciones resueltas sin recargar la interfaz.',
+      'AÃƒÂ±ade seÃƒÂ±ales de confianza, autoridad, prueba social y objeciones resueltas sin recargar la interfaz.',
   }),
   createDecisionOption({
     id: 'generic-structure',
@@ -370,7 +378,7 @@ const buildRuntimeDecisionMessage = ({
     projectId: project?.project_id || project?.id || '',
     text:
       hubSummary?.firstQuestion ||
-      'Elige una mejora para seguir construyendo esta versión.',
+      'Elige una mejora para seguir construyendo esta versiÃƒÂ³n.',
     options,
     onDecision,
   });
@@ -391,8 +399,8 @@ const createInitialMessages = ({
 
   const fallbackText =
     copy.mode === 'transform'
-      ? 'Entendido. Voy a tratar esta entrada como una oportunidad de mejora: claridad, confianza, CTA y conversión.'
-      : 'Entendido. Voy a convertir esta entrada en una primera versión estructurada con preview, código y criterio de conversión.';
+      ? 'Entendido. Voy a tratar esta entrada como una oportunidad de mejora: claridad, confianza, CTA y conversiÃƒÂ³n.'
+      : 'Entendido. Voy a convertir esta entrada en una primera versiÃƒÂ³n estructurada con preview, cÃƒÂ³digo y criterio de conversiÃƒÂ³n.';
 
   return [
     createUserMessage(input),
@@ -539,7 +547,7 @@ export default function useBuilderWorkspaceRuntime({
   }, []);
 
   const submitMessage = useCallback(
-    (text) => {
+    async (text) => {
       const value = String(text || '').trim();
 
       if (!value) return;
@@ -572,15 +580,51 @@ export default function useBuilderWorkspaceRuntime({
         },
       });
 
-      const kernelResult = runBuilderBuildKernel({
-        input: value,
-        message: value,
-        project: projectSnapshot || project,
-        initialPrompt,
-        currentState: builderBuildState,
-        currentSelection: response.hub?.selection || currentSelection || null,
-        source: 'user',
-      });
+      let builderAiResult = null;
+      let builderAiError = null;
+      let kernelResult = null;
+
+      try {
+        builderAiResult = await buildWithBuilderAI({
+          userInput: value,
+          currentBuildState: {
+            builderBuildState,
+            builderKernelOutput,
+            builderBuildSummary,
+            hubSummary,
+            lastDelta,
+            lastOperation,
+          },
+          projectId:
+            projectSnapshot?.project_id ||
+            projectSnapshot?.id ||
+            project?.project_id ||
+            project?.id ||
+            null,
+          userId: null,
+          mode: builderBuildState ? 'iterate' : 'build',
+        });
+
+        kernelResult = adaptBuilderAIOutputToKernelResult({
+          builderAIOutput: builderAiResult,
+          currentBuildState: builderBuildState,
+          previousKernelOutput: builderKernelOutput,
+          project: projectSnapshot || project,
+          userInput: value,
+        });
+      } catch (error) {
+        builderAiError = error;
+
+        kernelResult = runBuilderBuildKernel({
+          input: value,
+          message: value,
+          project: projectSnapshot || project,
+          initialPrompt,
+          currentState: builderBuildState,
+          currentSelection: response.hub?.selection || currentSelection || null,
+          source: 'user_fallback',
+        });
+      }
 
       setDirection(nextDirection);
 
@@ -596,11 +640,11 @@ export default function useBuilderWorkspaceRuntime({
         const nextMessages = [
           ...current,
           createUserMessage(value),
-          createAgentMessage(response.text, {
+          createAgentMessage(builderAiResult?.assistantMessage || response.text, {
             confidence: response.confidence,
             shouldAsk: response.shouldAsk,
             summary: response.summary,
-            source: response.source,
+            source: builderAiResult ? 'builder_ai_openai' : response.source,
             hubSummary: response.hubSummary || null,
             delta: response.delta || null,
             operation: response.operation || null,
@@ -608,6 +652,19 @@ export default function useBuilderWorkspaceRuntime({
               ok: kernelResult?.ok,
               mutationTypes: kernelResult?.mutationTypes || [],
               summary: kernelResult?.summary || null,
+              builderAI: builderAiResult
+                ? {
+                    ok: true,
+                    projectKind: builderAiResult.projectKind,
+                    sector: builderAiResult.sector,
+                    objective: builderAiResult.objective,
+                    tone: builderAiResult.tone,
+                  }
+                : {
+                    ok: false,
+                    fallback: true,
+                    error: builderAiError?.message || '',
+                  },
             },
           }),
         ];

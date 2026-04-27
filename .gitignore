@@ -85,3 +85,6 @@ AUDITORIA-*.txt
 DUMP-*.txt
 diagnostico-*.txt
 mapa-ecosistema-*.txt
+runtime-hook-*.txt
+*.backup-builder-ai-runtime-*
+*.backup-openai-connect-*
