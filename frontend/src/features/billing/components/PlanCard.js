@@ -13,33 +13,38 @@ import {
 } from '../billing.utils';
 
 const PLAN_ROLE_META = {
-  free: {
-    stage: 'Explorar',
-    title: 'Entrada sin friccion',
-    description: 'Para orientarte, probar el sistema y entender si la oportunidad merece avanzar.',
-    accent: 'text-zinc-300',
-    shell: 'border-white/8 bg-[linear-gradient(180deg,#151515_0%,#0B0B0B_100%)]'
-  },
   blueprint: {
     stage: 'Activar',
-    title: 'Primera capacidad real',
-    description: 'Para pasar del analisis a una base estructural con Builder, ruta y creditos iniciales.',
+    level: 'Primera activación operativa',
+    description:
+      'Para pasar de una idea, informe o diagnóstico inicial a una base real de trabajo dentro de Builder.',
+    emphasis: 'Entrada seria al sistema',
     accent: 'text-[#8DE1D0]',
-    shell: 'border-[#0F5257]/45 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.18),transparent_32%),linear-gradient(180deg,#121B1C_0%,#090909_100%)]'
+    border: 'border-[#0F5257]/45',
+    surface:
+      'bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.20),transparent_32%),linear-gradient(180deg,#121B1C_0%,#090909_100%)]'
   },
   sistema: {
     stage: 'Continuar',
-    title: 'Operacion con recorrido',
-    description: 'Para proyectos que ya necesitan iteracion, continuidad y mas margen operativo.',
+    level: 'Continuidad y mejora',
+    description:
+      'Para proyectos que ya necesitan iteración, seguimiento, más margen operativo y continuidad de construcción.',
+    emphasis: 'Núcleo operativo',
     accent: 'text-sky-200',
-    shell: 'border-sky-500/20 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.10),transparent_30%),linear-gradient(180deg,#111722_0%,#090909_100%)]'
+    border: 'border-sky-500/24',
+    surface:
+      'bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.13),transparent_32%),linear-gradient(180deg,#111722_0%,#090909_100%)]'
   },
   premium: {
     stage: 'Escalar',
-    title: 'Criterio avanzado',
-    description: 'Para trabajar con mas capacidad, estructura superior y enfoque maestro.',
+    level: 'Capa maestra avanzada',
+    description:
+      'Para casos complejos que requieren más criterio, más inteligencia, más capacidad y preparación seria de salida.',
+    emphasis: 'Máxima capacidad',
     accent: 'text-fuchsia-200',
-    shell: 'border-fuchsia-400/20 bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.10),transparent_30%),linear-gradient(180deg,#17111F_0%,#090909_100%)]'
+    border: 'border-fuchsia-400/24',
+    surface:
+      'bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.12),transparent_32%),linear-gradient(180deg,#17111F_0%,#090909_100%)]'
   }
 };
 
@@ -78,8 +83,8 @@ const PlanCard = ({
     ? suggestedPlanId === plan.id
     : plan.id === 'blueprint';
 
-  const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
-  const role = PLAN_ROLE_META[plan.id] || PLAN_ROLE_META.free;
+  const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.blueprint;
+  const role = PLAN_ROLE_META[plan.id] || PLAN_ROLE_META.blueprint;
 
   const planSignals = PLAN_SIGNAL_META[plan.id]?.chips || [];
   const planSignalClass =
@@ -92,30 +97,28 @@ const PlanCard = ({
       : (plan.features || []).slice(0, 4);
 
   const isProcessing = processingKey === `plan:${plan.id}`;
-  const isDisabled = plan.id === 'free' || isCurrentPlan || isProcessing;
+  const isDisabled = isCurrentPlan || isProcessing;
 
   const ctaLabel = isCurrentPlan
     ? 'Plan actual'
-    : plan.id === 'free'
-      ? 'Plan base'
-      : plan.cta?.label || 'Activar plan';
+    : plan.cta?.label || `Activar ${plan.visibleName}`;
 
   return (
     <article
-      className={`group relative flex h-full min-h-[640px] flex-col overflow-hidden rounded-[28px] border p-5 transition-all duration-300 ${
-        isSuggestedPlan ? role.shell : `${visual.surfaceClass} ${visual.borderClass}`
-      }`}
+      className={`group relative flex h-full min-h-[650px] flex-col overflow-hidden rounded-[30px] border p-5 transition-all duration-300 ${role.border} ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div
         className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`}
       />
 
-      <div className="mb-4 flex flex-wrap items-start gap-2 pr-0">
+      <div className="absolute right-[-80px] top-[-90px] h-56 w-56 rounded-full bg-white/[0.035] blur-3xl" />
+
+      <div className="relative z-10 mb-4 flex flex-wrap items-start gap-2">
         <span
           className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${visual.badgeClass}`}
         >
-          {plan.badge || visual.eyebrow}
+          {plan.badge || role.emphasis}
         </span>
 
         {isSuggestedPlan && !isCurrentPlan && (
@@ -137,51 +140,63 @@ const PlanCard = ({
         )}
       </div>
 
-      <div className="mb-5">
-        <p className={`mb-2 text-xs font-semibold uppercase tracking-[0.18em] ${role.accent}`}>
+      <div className="relative z-10 mb-5">
+        <p className={`mb-2 text-xs font-semibold uppercase tracking-[0.22em] ${role.accent}`}>
           {role.stage}
         </p>
 
-        <h4 className="mb-2 text-2xl font-medium leading-tight text-white">
+        <h4 className="mb-2 text-3xl font-light leading-tight text-white">
           {plan.visibleName}
         </h4>
 
-        <p className="mb-3 text-[15px] leading-snug text-[#F0F0F0]">
+        <p className="mb-3 text-base leading-snug text-[#F0F0F0]">
           {plan.headline}
         </p>
 
-        <p className="text-sm leading-relaxed text-[#A3A3A3]">
-          {role.description || plan.description}
+        <p className="text-sm leading-6 text-[#A3A3A3]">
+          {role.description}
         </p>
       </div>
 
-      <div className="mb-5 rounded-3xl border border-white/10 bg-black/25 p-5">
-        <p className="mb-2 text-[11px] uppercase tracking-[0.14em] text-[#A3A3A3]">
+      <div className="relative z-10 mb-5 rounded-3xl border border-white/10 bg-black/28 p-5">
+        <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#A3A3A3]">
           Nivel de capacidad
         </p>
 
-        <div className="mb-3 flex flex-wrap items-end gap-x-2 gap-y-1">
-          <span className="whitespace-nowrap text-[2.65rem] font-light leading-none text-white lg:text-5xl">
+        <div className="mb-4 flex items-end gap-2">
+          <span className="whitespace-nowrap text-[3.1rem] font-light leading-none text-white">
             {plan.priceLabel}
           </span>
+
           <span className="whitespace-nowrap pb-1 text-sm text-[#A3A3A3]">
             {plan.periodLabel}
           </span>
         </div>
 
-        <p className="text-sm leading-6 text-[#D4D4D4]">
-          {plan.bestForShort || plan.bestFor || role.title}
-        </p>
-      </div>
-
-      <div className="mb-5 rounded-3xl border border-white/10 bg-black/20 p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A3A3A3]">
-            Marco operativo
+        <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#A3A3A3]">
+            Mejor encaje
           </p>
 
+          <p className="text-sm leading-6 text-white">
+            {plan.bestForShort || plan.bestFor || role.level}
+          </p>
+        </div>
+      </div>
+
+      <div className="relative z-10 mb-5 rounded-3xl border border-white/10 bg-black/22 p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A3A3A3]">
+              Marco operativo
+            </p>
+            <p className="mt-1 text-xs text-[#777]">
+              Acceso, Builder, salida y créditos.
+            </p>
+          </div>
+
           <DiamondsFour
-            size={16}
+            size={17}
             weight="fill"
             className={plan.id === 'blueprint' ? 'text-[#8DE1D0]' : 'text-amber-200'}
           />
@@ -191,7 +206,7 @@ const PlanCard = ({
       </div>
 
       {planSignals.length > 0 && (
-        <div className="mb-5">
+        <div className="relative z-10 mb-5">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
@@ -205,8 +220,8 @@ const PlanCard = ({
         </div>
       )}
 
-      <div className="mb-6 flex-1">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A3A3A3]">
+      <div className="relative z-10 mb-6 flex-1">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A3A3A3]">
           Incluye
         </p>
 
@@ -228,7 +243,7 @@ const PlanCard = ({
         </ul>
       </div>
 
-      <div className="mt-auto">
+      <div className="relative z-10 mt-auto">
         <button
           type="button"
           onClick={() => onPlanCheckout(plan.id)}
@@ -236,9 +251,7 @@ const PlanCard = ({
           className={`flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 font-medium transition-all ${
             isCurrentPlan
               ? 'cursor-default bg-white/8 text-[#A3A3A3]'
-              : plan.id === 'free'
-                ? 'cursor-default bg-white/8 text-[#A3A3A3]'
-                : `${visual.ctaClass} hover:translate-y-[-1px]`
+              : `${visual.ctaClass} hover:translate-y-[-1px]`
           } disabled:opacity-55`}
           data-testid={`upgrade-btn-${plan.id}`}
         >
@@ -247,7 +260,7 @@ const PlanCard = ({
           ) : (
             <>
               {ctaLabel}
-              {!isCurrentPlan && plan.id !== 'free' && <ArrowRight size={16} />}
+              {!isCurrentPlan && <ArrowRight size={16} />}
             </>
           )}
         </button>
@@ -255,9 +268,7 @@ const PlanCard = ({
         <div className="mt-3 flex items-center justify-center gap-2 text-xs text-[#8D8D8D]">
           <Sparkle size={13} />
           <span>
-            {plan.id === 'free'
-              ? 'Exploracion inicial del sistema'
-              : 'Activacion mediante checkout seguro'}
+            Activación mediante checkout seguro
           </span>
         </div>
       </div>

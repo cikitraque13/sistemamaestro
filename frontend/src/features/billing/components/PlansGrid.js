@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { DiamondsFour, Sparkle } from '@phosphor-icons/react';
 
@@ -12,6 +12,11 @@ const PlansGrid = ({
   processingKey,
   onPlanCheckout
 }) => {
+  const paidPlans = useMemo(
+    () => pricingPlans.filter((plan) => plan.id !== 'free'),
+    []
+  );
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 18 }}
@@ -28,28 +33,29 @@ const PlansGrid = ({
             </div>
 
             <h3 className="text-2xl font-light leading-tight text-white sm:text-3xl">
-              Niveles de capacidad operativa
+              Niveles de continuidad operativa
             </h3>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#A3A3A3]">
-              Elige el nivel según el recorrido que necesita tu proyecto: explorar,
-              activar, continuar o escalar con más criterio y capacidad dentro de Builder.
+              Gratis ya es tu estado base dentro del sistema. Aquí eliges la capacidad
+              de continuidad que necesita tu proyecto: activar, crecer o trabajar con
+              criterio maestro.
             </p>
           </div>
 
           <div className="rounded-2xl border border-amber-200/15 bg-amber-500/10 px-4 py-3">
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-amber-100">
-              Progresión recomendada
+              Progresión interna
             </p>
             <p className="mt-1 text-sm text-[#F2E7D1]">
-              Informe Gold → Pro → Growth → AI Master
+              10 créditos iniciales → Pro → Growth → AI Master
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2 2xl:grid-cols-4">
-        {pricingPlans.map((plan) => (
+      <div className="grid gap-6 lg:grid-cols-3">
+        {paidPlans.map((plan) => (
           <PlanCard
             key={plan.id}
             plan={plan}
@@ -69,10 +75,12 @@ const PlansGrid = ({
 
           <div>
             <p className="mb-1 text-sm font-medium text-white">
-              Créditos como capacidad operativa
+              Gratis queda como capacidad inicial
             </p>
             <p className="text-sm leading-6 text-[#D5D5D5]">
-              {OPERATIONAL_NOTE}
+              El usuario registrado parte con créditos iniciales para probar valor real.
+              Los planes amplían recorrido, Builder, continuidad y capacidad operativa.
+              {` ${OPERATIONAL_NOTE}`}
             </p>
           </div>
         </div>
