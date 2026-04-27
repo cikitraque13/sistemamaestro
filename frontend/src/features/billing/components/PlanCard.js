@@ -6,7 +6,7 @@ import {
   Sparkle
 } from '@phosphor-icons/react';
 
-import { PLAN_SIGNAL_META, PLAN_VISUAL_META } from '../billing.constants';
+import { PLAN_SIGNAL_META } from '../billing.constants';
 import {
   buildOperationalItems,
   getOperationalAccentClasses
@@ -14,37 +14,53 @@ import {
 
 const PLAN_ROLE_META = {
   blueprint: {
-    stage: 'Activar',
+    stage: 'ACTIVAR',
+    badge: 'Entrada seria',
+    suggestedBadge: 'Recomendado',
     level: 'Primera activación operativa',
     description:
       'Para pasar de una idea, informe o diagnóstico inicial a una base real de trabajo dentro de Builder.',
-    emphasis: 'Entrada seria al sistema',
-    accent: 'text-[#8DE1D0]',
-    border: 'border-[#0F5257]/45',
+    bestFor:
+      'Base operativa inicial para empezar con estructura, prioridades y primeros créditos.',
     surface:
-      'bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.20),transparent_32%),linear-gradient(180deg,#121B1C_0%,#090909_100%)]'
+      'border-[#0F5257]/55 bg-[linear-gradient(180deg,#062D2D_0%,#041616_48%,#050505_100%)]',
+    glow: 'bg-[#0F5257]/22',
+    badgeClass:
+      'border-[#8DE1D0]/25 bg-[#0F5257]/35 text-[#8DE1D0]',
+    ctaClass:
+      'bg-[#0F5257] text-white hover:bg-[#136970]'
   },
   sistema: {
-    stage: 'Continuar',
-    level: 'Continuidad y mejora',
+    stage: 'CONTINUAR',
+    badge: 'Núcleo operativo',
+    level: 'Continuidad seria',
     description:
       'Para proyectos que ya necesitan iteración, seguimiento, más margen operativo y continuidad de construcción.',
-    emphasis: 'Núcleo operativo',
-    accent: 'text-sky-200',
-    border: 'border-sky-500/24',
+    bestFor:
+      'Trabajo con más recorrido, Builder continuo, optimización y mejora del proyecto.',
     surface:
-      'bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.13),transparent_32%),linear-gradient(180deg,#111722_0%,#090909_100%)]'
+      'border-sky-300/45 bg-[linear-gradient(180deg,#0B263C_0%,#061722_48%,#050505_100%)]',
+    glow: 'bg-sky-400/16',
+    badgeClass:
+      'border-sky-200/20 bg-sky-400/18 text-sky-100',
+    ctaClass:
+      'bg-[#2A3F55] text-white hover:bg-[#355169]'
   },
   premium: {
-    stage: 'Escalar',
+    stage: 'ESCALAR',
+    badge: 'Capa superior',
     level: 'Capa maestra avanzada',
     description:
       'Para casos complejos que requieren más criterio, más inteligencia, más capacidad y preparación seria de salida.',
-    emphasis: 'Máxima capacidad',
-    accent: 'text-fuchsia-200',
-    border: 'border-fuchsia-400/24',
+    bestFor:
+      'Criterio maestro, Builder avanzado, más capacidad y salida mejor preparada.',
     surface:
-      'bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.12),transparent_32%),linear-gradient(180deg,#17111F_0%,#090909_100%)]'
+      'border-fuchsia-200/45 bg-[linear-gradient(180deg,#2B0D2E_0%,#17081A_48%,#050505_100%)]',
+    glow: 'bg-fuchsia-400/16',
+    badgeClass:
+      'border-fuchsia-200/20 bg-fuchsia-400/16 text-fuchsia-100',
+    ctaClass:
+      'bg-[#3B123E] text-white hover:bg-[#4A1850]'
   }
 };
 
@@ -83,7 +99,6 @@ const PlanCard = ({
     ? suggestedPlanId === plan.id
     : plan.id === 'blueprint';
 
-  const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.blueprint;
   const role = PLAN_ROLE_META[plan.id] || PLAN_ROLE_META.blueprint;
 
   const planSignals = PLAN_SIGNAL_META[plan.id]?.chips || [];
@@ -101,96 +116,87 @@ const PlanCard = ({
 
   const ctaLabel = isCurrentPlan
     ? 'Plan actual'
-    : plan.cta?.label || `Activar ${plan.visibleName}`;
+    : plan.cta?.label || `Entrar en ${plan.visibleName}`;
 
   return (
     <article
-      className={`group relative flex h-full min-h-[650px] flex-col overflow-hidden rounded-[30px] border p-5 transition-all duration-300 ${role.border} ${role.surface}`}
+      className={`relative flex h-full min-h-[680px] flex-col overflow-hidden rounded-[30px] border p-6 shadow-[0_24px_80px_rgba(0,0,0,0.26)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
-      <div
-        className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`}
-      />
+      <div className={`absolute right-[-110px] top-[-120px] h-72 w-72 rounded-full ${role.glow} blur-3xl`} />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/45 to-white/0" />
 
-      <div className="absolute right-[-80px] top-[-90px] h-56 w-56 rounded-full bg-white/[0.035] blur-3xl" />
-
-      <div className="relative z-10 mb-4 flex flex-wrap items-start gap-2">
-        <span
-          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${visual.badgeClass}`}
-        >
-          {plan.badge || role.emphasis}
-        </span>
-
-        {isSuggestedPlan && !isCurrentPlan && (
-          <span className="inline-flex items-center rounded-full border border-[#0F5257]/30 bg-[#0F5257]/15 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
-            Recomendado
+      <div className="relative z-10 flex min-h-[176px] flex-col">
+        <div className="mb-5 flex min-h-[34px] flex-wrap items-start gap-2">
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
+          >
+            {role.badge}
           </span>
-        )}
 
-        {isCurrentPlan && (
-          <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white">
-            Actual
-          </span>
-        )}
+          {isSuggestedPlan && !isCurrentPlan && role.suggestedBadge && (
+            <span className="inline-flex items-center rounded-full border border-[#8DE1D0]/25 bg-[#0F5257]/18 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
+              {role.suggestedBadge}
+            </span>
+          )}
 
-        {plan.id === 'blueprint' && !isCurrentPlan && (
-          <span className="inline-flex items-center rounded-full border border-[#0F5257]/20 bg-[#0F5257]/10 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
-            Entrada principal
-          </span>
-        )}
-      </div>
+          {isCurrentPlan && (
+            <span className="inline-flex items-center rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
+              Actual
+            </span>
+          )}
+        </div>
 
-      <div className="relative z-10 mb-5">
-        <p className={`mb-2 text-xs font-semibold uppercase tracking-[0.22em] ${role.accent}`}>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-white/80">
           {role.stage}
         </p>
 
-        <h4 className="mb-2 text-3xl font-light leading-tight text-white">
+        <h4 className="mb-3 text-4xl font-light leading-tight text-white">
           {plan.visibleName}
         </h4>
 
-        <p className="mb-3 text-base leading-snug text-[#F0F0F0]">
+        <p className="mb-3 text-base leading-snug text-white">
           {plan.headline}
         </p>
 
-        <p className="text-sm leading-6 text-[#A3A3A3]">
+        <p className="text-sm leading-6 text-white/68">
           {role.description}
         </p>
       </div>
 
-      <div className="relative z-10 mb-5 rounded-3xl border border-white/10 bg-black/28 p-5">
-        <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#A3A3A3]">
+      <div className="relative z-10 mt-6 rounded-3xl border border-white/14 bg-black/28 p-5">
+        <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-white/55">
           Nivel de capacidad
         </p>
 
-        <div className="mb-4 flex items-end gap-2">
-          <span className="whitespace-nowrap text-[3.1rem] font-light leading-none text-white">
+        <div className="mb-5 flex items-end gap-2">
+          <span className="whitespace-nowrap text-[3.25rem] font-light leading-none text-white">
             {plan.priceLabel}
           </span>
 
-          <span className="whitespace-nowrap pb-1 text-sm text-[#A3A3A3]">
+          <span className="whitespace-nowrap pb-1 text-sm text-white/62">
             {plan.periodLabel}
           </span>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#A3A3A3]">
+        <div className="rounded-2xl border border-white/12 bg-white/[0.045] px-4 py-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/48">
             Mejor encaje
           </p>
 
           <p className="text-sm leading-6 text-white">
-            {plan.bestForShort || plan.bestFor || role.level}
+            {plan.bestForShort || plan.bestFor || role.bestFor}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mb-5 rounded-3xl border border-white/10 bg-black/22 p-4">
+      <div className="relative z-10 mt-5 rounded-3xl border border-white/14 bg-black/24 p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A3A3A3]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/58">
               Marco operativo
             </p>
-            <p className="mt-1 text-xs text-[#777]">
+            <p className="mt-1 text-xs text-white/38">
               Acceso, Builder, salida y créditos.
             </p>
           </div>
@@ -198,7 +204,7 @@ const PlanCard = ({
           <DiamondsFour
             size={17}
             weight="fill"
-            className={plan.id === 'blueprint' ? 'text-[#8DE1D0]' : 'text-amber-200'}
+            className="text-amber-200"
           />
         </div>
 
@@ -206,7 +212,7 @@ const PlanCard = ({
       </div>
 
       {planSignals.length > 0 && (
-        <div className="relative z-10 mb-5">
+        <div className="relative z-10 mt-5">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
@@ -220,8 +226,8 @@ const PlanCard = ({
         </div>
       )}
 
-      <div className="relative z-10 mb-6 flex-1">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A3A3A3]">
+      <div className="relative z-10 mt-5 flex-1">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/58">
           Incluye
         </p>
 
@@ -229,7 +235,7 @@ const PlanCard = ({
           {highlights.map((feature) => (
             <li
               key={feature}
-              className="flex items-start gap-2 text-sm leading-6 text-[#D4D4D4]"
+              className="flex items-start gap-2 text-sm leading-6 text-white/82"
             >
               <CheckCircle
                 size={16}
@@ -243,15 +249,15 @@ const PlanCard = ({
         </ul>
       </div>
 
-      <div className="relative z-10 mt-auto">
+      <div className="relative z-10 mt-6">
         <button
           type="button"
           onClick={() => onPlanCheckout(plan.id)}
           disabled={isDisabled}
-          className={`flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 font-medium transition-all ${
+          className={`flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-4 font-medium transition-all ${
             isCurrentPlan
-              ? 'cursor-default bg-white/8 text-[#A3A3A3]'
-              : `${visual.ctaClass} hover:translate-y-[-1px]`
+              ? 'cursor-default bg-white/10 text-white/45'
+              : `${role.ctaClass} hover:translate-y-[-1px]`
           } disabled:opacity-55`}
           data-testid={`upgrade-btn-${plan.id}`}
         >
@@ -265,11 +271,9 @@ const PlanCard = ({
           )}
         </button>
 
-        <div className="mt-3 flex items-center justify-center gap-2 text-xs text-[#8D8D8D]">
+        <div className="mt-3 flex items-center justify-center gap-2 text-xs text-white/45">
           <Sparkle size={13} />
-          <span>
-            Activación mediante checkout seguro
-          </span>
+          <span>Activación mediante checkout seguro</span>
         </div>
       </div>
     </article>
