@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import axios from 'axios';
 import { ArrowLeft, CheckCircle, Printer } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+
 import PremiumReportPrintTemplate from '../../components/reports/premium/print/PremiumReportPrintTemplate';
+import { REPORT_BRAND_ASSETS } from '../../components/reports/premium/reportPremium.constants';
 import { useAuth } from '../../context/AuthContext';
 
 const API_BASE = '/api';
@@ -119,7 +121,7 @@ const ReportPrintPage = () => {
       try {
         window.close();
       } catch (error) {
-        console.warn('No se pudo cerrar automáticamente la ventana de impresión', error);
+        console.warn('No se pudo cerrar automaticamente la ventana de impresion', error);
       }
 
       window.setTimeout(() => {
@@ -143,17 +145,17 @@ const ReportPrintPage = () => {
       window.print();
     };
 
-    document.title = `informe-puntual-${safeProjectId}`;
+    document.title = `informe-maestro-gold-${safeProjectId}`;
     window.addEventListener('afterprint', finishPrintFlow);
 
     if (typeof window.requestAnimationFrame === 'function') {
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
-          window.setTimeout(triggerPrint, 120);
+          window.setTimeout(triggerPrint, 180);
         });
       });
     } else {
-      window.setTimeout(triggerPrint, 260);
+      window.setTimeout(triggerPrint, 320);
     }
 
     return () => {
@@ -164,10 +166,10 @@ const ReportPrintPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#EEF2F7] text-slate-900 flex items-center justify-center">
-        <div className="text-center px-6">
-          <p className="text-lg font-medium mb-2">Preparando documento</p>
-          <p className="text-sm text-slate-500">Generando vista de impresión…</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-white">
+        <div className="px-6 text-center">
+          <p className="mb-2 text-lg font-medium">Preparando Informe Maestro Gold</p>
+          <p className="text-sm text-zinc-400">Generando vista de impresion premium...</p>
         </div>
       </div>
     );
@@ -175,15 +177,16 @@ const ReportPrintPage = () => {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-[#EEF2F7] text-slate-900 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-white">
         <div className="max-w-xl px-6 text-center">
-          <p className="text-lg font-semibold mb-2">No se pudo cargar el documento</p>
-          <p className="text-sm text-slate-500 mb-4">
-            El proyecto no estaba disponible o la sesión no pudo validarse.
+          <p className="mb-2 text-lg font-semibold">No se pudo cargar el documento</p>
+          <p className="mb-4 text-sm text-zinc-400">
+            El proyecto no estaba disponible o la sesion no pudo validarse.
           </p>
+
           <Link
             to="/dashboard/projects"
-            className="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 transition-all"
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/10"
           >
             Volver a proyectos
           </Link>
@@ -194,15 +197,16 @@ const ReportPrintPage = () => {
 
   if (!isAdmin && billingChecked && !canExportPdf) {
     return (
-      <div className="min-h-screen bg-[#EEF2F7] text-slate-900 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-white">
         <div className="max-w-xl px-6 text-center">
-          <p className="text-lg font-semibold mb-2">La exportación PDF no está disponible</p>
-          <p className="text-sm text-slate-500 mb-4">
-            Este documento requiere la activación puntual o acceso administrador para imprimirse.
+          <p className="mb-2 text-lg font-semibold">La exportacion PDF no esta disponible</p>
+          <p className="mb-4 text-sm text-zinc-400">
+            Este documento requiere la activacion puntual o acceso administrador para imprimirse.
           </p>
+
           <Link
             to={`/dashboard/project/${id}/report-preview`}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 transition-all"
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/10"
           >
             Volver a la vista previa
           </Link>
@@ -214,8 +218,16 @@ const ReportPrintPage = () => {
   return (
     <>
       <style>{`
-        html, body, #root {
-          background: #ffffff !important;
+        html,
+        body,
+        #root {
+          min-height: 100%;
+          background: #0B0F14 !important;
+        }
+
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
 
         @media screen {
@@ -227,8 +239,9 @@ const ReportPrintPage = () => {
             min-height: 100vh;
             padding: 88px 24px 40px;
             background:
-              radial-gradient(circle at top right, rgba(15, 82, 87, 0.10), transparent 24%),
-              linear-gradient(180deg, #0B0F14 0%, #111827 100%);
+              radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 26%),
+              radial-gradient(circle at top left, rgba(15, 82, 87, 0.18), transparent 28%),
+              linear-gradient(180deg, #0B0F14 0%, #050505 100%);
           }
 
           .report-print-screen-toolbar {
@@ -238,19 +251,25 @@ const ReportPrintPage = () => {
             right: 0;
             z-index: 50;
             backdrop-filter: blur(16px);
-            background: rgba(10, 10, 10, 0.82);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(10, 10, 10, 0.86);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.14);
           }
         }
 
         @media print {
           @page {
             size: A4;
-            margin: 12mm;
+            margin: 10mm;
           }
 
-          html, body, #root {
+          html,
+          body,
+          #root {
             background: #ffffff !important;
+          }
+
+          body {
+            margin: 0 !important;
           }
 
           .report-print-page-shell {
@@ -258,41 +277,44 @@ const ReportPrintPage = () => {
             background: #ffffff !important;
           }
 
-          .report-print-screen-toolbar {
+          .report-print-screen-toolbar,
+          .report-print-flow-message {
             display: none !important;
           }
         }
       `}</style>
 
       <div className="report-print-screen-toolbar">
-        <div className="max-w-6xl mx-auto px-5 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center flex-shrink-0">
-              <Printer size={18} className="text-[#8DE1D0]" />
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-amber-200/20 bg-amber-500/10">
+              <Printer size={18} className="text-amber-200" />
             </div>
 
             <div>
-              <p className="text-white text-sm font-medium">
-                Ventana de impresión dedicada
+              <p className="text-sm font-medium text-white">
+                Ventana de impresion dedicada
               </p>
-              <p className="text-[#A3A3A3] text-xs sm:text-sm">
-                Al guardar o cancelar, esta ventana intentará cerrarse sola y volver al flujo anterior.
+              <p className="text-xs text-[#A3A3A3] sm:text-sm">
+                Al guardar o cancelar, esta ventana intentara cerrarse sola y volver al flujo anterior.
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
             <button
+              type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#0F5257] text-white hover:bg-[#136970] transition-all"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0F5257] px-4 py-2 text-white transition-all hover:bg-[#136970]"
             >
               <Printer size={16} />
               Imprimir de nuevo
             </button>
 
             <button
+              type="button"
               onClick={finishPrintFlow}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-[#171717] text-white hover:bg-[#1E1E1E] transition-all"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#171717] px-4 py-2 text-white transition-all hover:bg-[#1E1E1E]"
             >
               <ArrowLeft size={16} />
               Cerrar y volver
@@ -303,18 +325,18 @@ const ReportPrintPage = () => {
 
       <div className="report-print-page-shell">
         {printFinished && (
-          <div className="max-w-6xl mx-auto mb-4 px-2">
-            <div className="rounded-2xl border border-emerald-500/18 bg-emerald-500/8 px-4 py-3 text-sm text-emerald-100 flex items-center gap-2">
+          <div className="report-print-flow-message mx-auto mb-4 max-w-6xl px-2">
+            <div className="flex items-center gap-2 rounded-2xl border border-emerald-500/18 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
               <CheckCircle size={16} weight="fill" className="text-emerald-300" />
-              Cerrando flujo de impresión y devolviendo el control a la vista previa…
+              Cerrando flujo de impresion y devolviendo el control a la vista previa...
             </div>
           </div>
         )}
 
         <PremiumReportPrintTemplate
           project={project}
-          brandName="Sistema Maestro"
-          documentTitle="Informe Puntual"
+          brandName={REPORT_BRAND_ASSETS.brandName}
+          documentTitle="Informe Maestro Gold"
           showSystemFooter={true}
         />
       </div>
