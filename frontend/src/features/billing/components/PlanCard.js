@@ -1,5 +1,10 @@
 import React from 'react';
-import { ArrowRight, CheckCircle } from '@phosphor-icons/react';
+import {
+  ArrowRight,
+  CheckCircle,
+  DiamondsFour,
+  Sparkle
+} from '@phosphor-icons/react';
 
 import { PLAN_SIGNAL_META, PLAN_VISUAL_META } from '../billing.constants';
 import {
@@ -7,22 +12,54 @@ import {
   getOperationalAccentClasses
 } from '../billing.utils';
 
+const PLAN_ROLE_META = {
+  free: {
+    stage: 'Explorar',
+    title: 'Entrada sin friccion',
+    description: 'Para orientarte, probar el sistema y entender si la oportunidad merece avanzar.',
+    accent: 'text-zinc-300',
+    shell: 'border-white/8 bg-[linear-gradient(180deg,#151515_0%,#0B0B0B_100%)]'
+  },
+  blueprint: {
+    stage: 'Activar',
+    title: 'Primera capacidad real',
+    description: 'Para pasar del analisis a una base estructural con Builder, ruta y creditos iniciales.',
+    accent: 'text-[#8DE1D0]',
+    shell: 'border-[#0F5257]/45 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.18),transparent_32%),linear-gradient(180deg,#121B1C_0%,#090909_100%)]'
+  },
+  sistema: {
+    stage: 'Continuar',
+    title: 'Operacion con recorrido',
+    description: 'Para proyectos que ya necesitan iteracion, continuidad y mas margen operativo.',
+    accent: 'text-sky-200',
+    shell: 'border-sky-500/20 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.10),transparent_30%),linear-gradient(180deg,#111722_0%,#090909_100%)]'
+  },
+  premium: {
+    stage: 'Escalar',
+    title: 'Criterio avanzado',
+    description: 'Para trabajar con mas capacidad, estructura superior y enfoque maestro.',
+    accent: 'text-fuchsia-200',
+    shell: 'border-fuchsia-400/20 bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.10),transparent_30%),linear-gradient(180deg,#17111F_0%,#090909_100%)]'
+  }
+};
+
 const OperationalGrid = ({ items }) => (
-  <div className="grid grid-cols-2 gap-3 auto-rows-fr">
+  <div className="grid grid-cols-2 gap-3">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
 
       return (
         <div
           key={item.label}
-          className={`rounded-xl border px-3 py-3 min-h-[96px] h-full flex flex-col justify-between ${accent.wrap}`}
+          className={`min-h-[90px] rounded-2xl border px-3 py-3 ${accent.wrap}`}
         >
-          <p className={`text-[10px] uppercase tracking-wide min-h-[18px] ${accent.label}`}>
+          <p className={`mb-2 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
             {item.label}
           </p>
-          <div className="flex-1 flex items-end">
-            <p className={`text-xs leading-relaxed ${accent.value}`}>{item.value}</p>
-          </div>
+
+          <p className={`text-xs leading-relaxed ${accent.value}`}>
+            {item.value}
+          </p>
         </div>
       );
     })}
@@ -42,6 +79,8 @@ const PlanCard = ({
     : plan.id === 'blueprint';
 
   const visual = PLAN_VISUAL_META[plan.id] || PLAN_VISUAL_META.free;
+  const role = PLAN_ROLE_META[plan.id] || PLAN_ROLE_META.free;
+
   const planSignals = PLAN_SIGNAL_META[plan.id]?.chips || [];
   const planSignalClass =
     PLAN_SIGNAL_META[plan.id]?.chipClass ||
@@ -49,13 +88,22 @@ const PlanCard = ({
 
   const highlights =
     Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
-      ? plan.billingHighlights.slice(0, 3)
-      : (plan.features || []).slice(0, 3);
+      ? plan.billingHighlights.slice(0, 4)
+      : (plan.features || []).slice(0, 4);
+
+  const isProcessing = processingKey === `plan:${plan.id}`;
+  const isDisabled = plan.id === 'free' || isCurrentPlan || isProcessing;
+
+  const ctaLabel = isCurrentPlan
+    ? 'Plan actual'
+    : plan.id === 'free'
+      ? 'Plan base'
+      : plan.cta?.label || 'Activar plan';
 
   return (
-    <div
-      className={`relative overflow-hidden border rounded-2xl p-6 h-full min-h-[920px] ${visual.surfaceClass} ${
-        isSuggestedPlan ? 'border-[#0F5257]' : visual.borderClass
+    <article
+      className={`group relative flex h-full min-h-[760px] flex-col overflow-hidden rounded-[28px] border p-5 transition-all duration-300 ${
+        isSuggestedPlan ? role.shell : `${visual.surfaceClass} ${visual.borderClass}`
       }`}
       data-testid={`plan-card-${plan.id}`}
     >
@@ -63,125 +111,157 @@ const PlanCard = ({
         className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${visual.accentLineClass}`}
       />
 
-      <div className="grid h-full grid-rows-[92px_176px_88px_122px_244px_1fr_auto] gap-y-4">
-        <div className="flex items-start">
-          <div className="flex flex-wrap gap-2">
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${visual.badgeClass}`}
-            >
-              {plan.badge || visual.eyebrow}
+      {isSuggestedPlan && !isCurrentPlan && (
+        <div className="absolute right-4 top-4 rounded-full border border-[#0F5257]/30 bg-[#0F5257]/15 px-3 py-1 text-[11px] font-medium text-[#8DE1D0]">
+          Recomendado
+        </div>
+      )}
+
+      <div className="mb-5">
+        <div className="mb-4 flex flex-wrap items-center gap-2 pr-28">
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${visual.badgeClass}`}
+          >
+            {plan.badge || visual.eyebrow}
+          </span>
+
+          {isCurrentPlan && (
+            <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white">
+              Actual
             </span>
+          )}
 
-            {isSuggestedPlan && !isCurrentPlan && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/15 text-[#8DE1D0] text-xs font-medium">
-                Recomendado
-              </span>
-            )}
-
-            {isCurrentPlan && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#262626] text-white text-xs font-medium">
-                Actual
-              </span>
-            )}
-
-            {plan.id === 'blueprint' && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#0F5257]/10 text-[#8DE1D0] text-xs font-medium">
-                Entrada principal
-              </span>
-            )}
-          </div>
+          {plan.id === 'blueprint' && !isCurrentPlan && (
+            <span className="inline-flex items-center rounded-full border border-[#0F5257]/20 bg-[#0F5257]/10 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
+              Entrada principal
+            </span>
+          )}
         </div>
 
-        <div>
-          <h4 className="text-2xl font-medium text-white mb-2">{plan.visibleName}</h4>
-          <p className="text-[#F0F0F0] text-[15px] leading-snug mb-3">{plan.headline}</p>
-          <p className="text-[#A3A3A3] text-sm leading-relaxed">{plan.description}</p>
+        <p className={`mb-2 text-xs font-semibold uppercase tracking-[0.18em] ${role.accent}`}>
+          {role.stage}
+        </p>
+
+        <h4 className="mb-2 text-2xl font-medium text-white">
+          {plan.visibleName}
+        </h4>
+
+        <p className="mb-3 text-[15px] leading-snug text-[#F0F0F0]">
+          {plan.headline}
+        </p>
+
+        <p className="text-sm leading-relaxed text-[#A3A3A3]">
+          {role.description || plan.description}
+        </p>
+      </div>
+
+      <div className="mb-5 rounded-3xl border border-white/10 bg-black/25 p-5">
+        <p className="mb-2 text-[11px] uppercase tracking-[0.14em] text-[#A3A3A3]">
+          Nivel de capacidad
+        </p>
+
+        <div className="mb-4 flex items-end gap-2">
+          <span className="text-4xl font-light text-white lg:text-5xl">
+            {plan.priceLabel}
+          </span>
+          <span className="pb-1 text-sm text-[#A3A3A3]">
+            {plan.periodLabel}
+          </span>
         </div>
 
-        <div className="flex items-end gap-2">
-          <span className="text-4xl lg:text-5xl font-light text-white">{plan.priceLabel}</span>
-          <span className="text-[#A3A3A3] mb-1">{plan.periodLabel}</span>
-        </div>
+        <p className="text-sm leading-6 text-[#D4D4D4]">
+          {plan.bestForShort || plan.bestFor || role.title}
+        </p>
+      </div>
 
-        <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4">
-          <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-2">
-            Mejor encaje
-          </p>
-          <p className="text-sm text-white leading-relaxed">
-            {plan.bestForShort || plan.bestFor}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-[#262626] bg-[#0A0A0A] px-4 py-4">
-          <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-3">
+      <div className="mb-5 rounded-3xl border border-white/10 bg-black/20 p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A3A3A3]">
             Marco operativo
           </p>
 
-          <OperationalGrid items={buildOperationalItems(plan)} />
+          <DiamondsFour
+            size={16}
+            weight="fill"
+            className={plan.id === 'blueprint' ? 'text-[#8DE1D0]' : 'text-amber-200'}
+          />
         </div>
 
-        <div className="flex flex-col gap-4">
-          <div className="min-h-[60px]">
-            <div className="flex flex-wrap gap-2">
-              {planSignals.map((signal) => (
-                <span
-                  key={`${plan.id}-${signal}`}
-                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium ${planSignalClass}`}
-                >
-                  {signal}
-                </span>
-              ))}
-            </div>
-          </div>
+        <OperationalGrid items={buildOperationalItems(plan)} />
+      </div>
 
-          <ul className="space-y-3">
-            {highlights.map((feature) => (
-              <li
-                key={feature}
-                className="flex items-start gap-2 text-sm text-[#D4D4D4]"
+      {planSignals.length > 0 && (
+        <div className="mb-5 min-h-[64px]">
+          <div className="flex flex-wrap gap-2">
+            {planSignals.map((signal) => (
+              <span
+                key={`${plan.id}-${signal}`}
+                className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${planSignalClass}`}
               >
-                <CheckCircle
-                  size={16}
-                  weight="fill"
-                  className="text-[#0F5257] mt-0.5 flex-shrink-0"
-                />
-                <span>{feature}</span>
-              </li>
+                {signal}
+              </span>
             ))}
-          </ul>
+          </div>
         </div>
+      )}
 
+      <div className="mb-6 flex-1">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A3A3A3]">
+          Incluye
+        </p>
+
+        <ul className="space-y-3">
+          {highlights.map((feature) => (
+            <li
+              key={feature}
+              className="flex items-start gap-2 text-sm leading-6 text-[#D4D4D4]"
+            >
+              <CheckCircle
+                size={16}
+                weight="fill"
+                className="mt-1 flex-shrink-0 text-[#0F5257]"
+              />
+
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-auto">
         <button
+          type="button"
           onClick={() => onPlanCheckout(plan.id)}
-          disabled={
-            plan.id === 'free' ||
-            isCurrentPlan ||
-            processingKey === `plan:${plan.id}`
-          }
-          className={`w-full py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+          disabled={isDisabled}
+          className={`flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 font-medium transition-all ${
             isCurrentPlan
-              ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
+              ? 'cursor-default bg-white/8 text-[#A3A3A3]'
               : plan.id === 'free'
-                ? 'bg-[#262626] text-[#A3A3A3] cursor-default'
-                : visual.ctaClass
-          } disabled:opacity-50`}
+                ? 'cursor-default bg-white/8 text-[#A3A3A3]'
+                : `${visual.ctaClass} hover:translate-y-[-1px]`
+          } disabled:opacity-55`}
           data-testid={`upgrade-btn-${plan.id}`}
         >
-          {processingKey === `plan:${plan.id}` ? (
-            <div className="spinner w-4 h-4"></div>
-          ) : isCurrentPlan ? (
-            'Plan actual'
-          ) : plan.id === 'free' ? (
-            'Plan base'
+          {isProcessing ? (
+            <div className="spinner h-4 w-4"></div>
           ) : (
             <>
-              {plan.cta.label}
-              <ArrowRight size={16} />
+              {ctaLabel}
+              {!isCurrentPlan && plan.id !== 'free' && <ArrowRight size={16} />}
             </>
           )}
         </button>
+
+        <div className="mt-3 flex items-center justify-center gap-2 text-xs text-[#8D8D8D]">
+          <Sparkle size={13} />
+          <span>
+            {plan.id === 'free'
+              ? 'Exploracion inicial del sistema'
+              : 'Activacion mediante checkout seguro'}
+          </span>
+        </div>
       </div>
-    </div>
+    </article>
   );
 };
 
