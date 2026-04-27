@@ -18,9 +18,8 @@ const PLAN_ROLE_META = {
     badge: 'Entrada seria',
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
-    description:
-      'Convierte una idea o diagnóstico inicial en una base operativa lista para Builder.',
-    bestFor: 'Primera activación seria dentro del sistema.',
+    description: 'Idea, diagnóstico o informe convertidos en base operativa para Builder.',
+    bestFor: 'Primera activación seria.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
     glow: 'bg-[#0F5257]/26',
@@ -34,9 +33,8 @@ const PLAN_ROLE_META = {
     stage: 'CONTINUAR',
     badge: 'Núcleo operativo',
     headline: 'Convierte el sistema en continuidad operativa.',
-    description:
-      'Mantén proyectos vivos con iteración, seguimiento y construcción continua.',
-    bestFor: 'Continuidad seria y trabajo con más recorrido.',
+    description: 'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
+    bestFor: 'Continuidad y recorrido.',
     surface:
       'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
     glow: 'bg-sky-400/18',
@@ -50,9 +48,8 @@ const PLAN_ROLE_META = {
     stage: 'ESCALAR',
     badge: 'Capa superior',
     headline: 'Activa la capa maestra para casos complejos.',
-    description:
-      'Trabaja con más criterio, inteligencia, capacidad y preparación seria de salida.',
-    bestFor: 'Casos complejos, operador serio y salida preparada.',
+    description: 'Más criterio, inteligencia y capacidad para preparar una salida seria.',
+    bestFor: 'Casos complejos y salida.',
     surface:
       'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
     glow: 'bg-fuchsia-400/18',
@@ -64,30 +61,51 @@ const PLAN_ROLE_META = {
   }
 };
 
-const GEM_LABELS = {
-  CRÉDITOS: 'GEMA MAESTRA',
-  CREDITOS: 'GEMA MAESTRA'
+const OPERATIONAL_LABELS = {
+  ACTIVACIÓN: 'ACTIVACIÓN',
+  ACTIVACION: 'ACTIVACIÓN',
+  BUILDER: 'BUILDER',
+  EXPORTACIÓN: 'SALIDA',
+  EXPORTACION: 'SALIDA',
+  CRÉDITOS: 'GEMA',
+  CREDITOS: 'GEMA'
 };
 
-const getVisibleOperationalLabel = (label) => GEM_LABELS[label] || label;
+const getVisibleOperationalLabel = (label) =>
+  OPERATIONAL_LABELS[label] || label;
+
+const getVisibleOperationalValue = (item) => {
+  const label = getVisibleOperationalLabel(item.label);
+
+  if (label === 'GEMA') {
+    return String(item.value)
+      .replace(/créditos/gi, '')
+      .replace(/creditos/gi, '')
+      .replace(/incluidos/gi, '')
+      .trim();
+  }
+
+  return item.value;
+};
 
 const OperationalGrid = ({ items }) => (
-  <div className="grid gap-2">
+  <div className="grid grid-cols-2 gap-2">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
       const visibleLabel = getVisibleOperationalLabel(item.label);
+      const visibleValue = getVisibleOperationalValue(item);
 
       return (
         <div
           key={item.label}
-          className={`flex min-h-[54px] items-center justify-between gap-3 rounded-2xl border px-3 py-2.5 ${accent.wrap}`}
+          className={`min-h-[64px] rounded-2xl border px-3 py-2.5 ${accent.wrap}`}
         >
-          <p className={`text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
+          <p className={`mb-1 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
             {visibleLabel}
           </p>
 
-          <p className={`max-w-[58%] text-right text-xs font-medium leading-snug ${accent.value}`}>
-            {item.value}
+          <p className={`text-xs font-medium leading-snug ${accent.value}`}>
+            {visibleValue}
           </p>
         </div>
       );
@@ -128,7 +146,7 @@ const PlanCard = ({
 
   return (
     <article
-      className={`relative flex h-full min-h-[690px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
+      className={`relative flex h-full min-h-[680px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
       <div
@@ -136,7 +154,7 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 flex min-h-[270px] flex-col">
+      <div className="relative z-10 flex min-h-[252px] flex-col">
         <div className="mb-7 flex min-h-[34px] flex-wrap items-start gap-2">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
@@ -157,7 +175,7 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="flex min-h-[210px] flex-col">
+        <div className="flex min-h-[188px] flex-col">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
@@ -170,13 +188,13 @@ const PlanCard = ({
             {role.headline}
           </p>
 
-          <p className="min-h-[54px] text-sm leading-6 text-white/68">
+          <p className="min-h-[48px] text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-2 min-h-[222px] rounded-3xl border border-white/16 bg-black/30 p-5">
+      <div className="relative z-10 mt-2 min-h-[210px] rounded-3xl border border-white/16 bg-black/30 p-5">
         <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-white/55">
           Nivel de capacidad
         </p>
@@ -196,8 +214,8 @@ const PlanCard = ({
             Mejor encaje
           </p>
 
-          <p className="min-h-[44px] text-sm leading-6 text-white">
-            {plan.bestForShort || plan.bestFor || role.bestFor}
+          <p className="min-h-[36px] text-sm leading-6 text-white">
+            {role.bestFor}
           </p>
         </div>
       </div>
