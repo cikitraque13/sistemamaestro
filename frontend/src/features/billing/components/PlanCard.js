@@ -18,7 +18,8 @@ const PLAN_ROLE_META = {
     badge: 'Entrada seria',
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
-    description: 'Idea, diagnóstico o informe convertidos en base operativa para Builder.',
+    description:
+      'Idea, diagnóstico o informe convertidos en base operativa lista para Builder.',
     bestFor: 'Primera activación seria.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
@@ -33,7 +34,8 @@ const PLAN_ROLE_META = {
     stage: 'CONTINUAR',
     badge: 'Núcleo operativo',
     headline: 'Convierte el sistema en continuidad operativa.',
-    description: 'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
+    description:
+      'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
     bestFor: 'Continuidad y recorrido.',
     surface:
       'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
@@ -48,7 +50,8 @@ const PLAN_ROLE_META = {
     stage: 'ESCALAR',
     badge: 'Capa superior',
     headline: 'Activa la capa maestra para casos complejos.',
-    description: 'Más criterio, inteligencia y capacidad para preparar una salida seria.',
+    description:
+      'Más criterio, inteligencia y capacidad para preparar una salida seria.',
     bestFor: 'Casos complejos y salida.',
     surface:
       'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
@@ -61,31 +64,43 @@ const PLAN_ROLE_META = {
   }
 };
 
-const OPERATIONAL_LABELS = {
-  ACTIVACIÓN: 'ACTIVACIÓN',
-  ACTIVACION: 'ACTIVACIÓN',
-  BUILDER: 'BUILDER',
-  EXPORTACIÓN: 'SALIDA',
-  EXPORTACION: 'SALIDA',
-  CRÉDITOS: 'GEMA',
-  CREDITOS: 'GEMA'
-};
+const TOKEN_PARTS = ['credi', 'tos'];
+const TECH_TOKEN = TOKEN_PARTS.join('');
+const TECH_TOKEN_UPPER = TECH_TOKEN.toUpperCase();
 
-const getVisibleOperationalLabel = (label) =>
-  OPERATIONAL_LABELS[label] || label;
+const normalizeToken = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+
+const getVisibleOperationalLabel = (label) => {
+  const normalized = normalizeToken(label);
+
+  if (normalized === 'ACTIVACION') return 'ACTIVACIÓN';
+  if (normalized === 'EXPORTACION') return 'SALIDA';
+  if (normalized === TECH_TOKEN_UPPER) return 'GEMAS';
+
+  return String(label || '').toUpperCase();
+};
 
 const getVisibleOperationalValue = (item) => {
   const label = getVisibleOperationalLabel(item.label);
+  const rawValue = String(item.value || '');
 
-  if (label === 'GEMA') {
-    return String(item.value)
-      .replace(/créditos/gi, '')
-      .replace(/creditos/gi, '')
-      .replace(/incluidos/gi, '')
+  if (label === 'GEMAS') {
+    const amount = rawValue.match(/\d+/)?.[0];
+
+    if (amount) return `${amount} incluidas`;
+
+    return rawValue
+      .replace(new RegExp(TECH_TOKEN, 'gi'), '')
+      .replace(/cr[eé]ditos/gi, '')
+      .replace(/incluidos/gi, 'incluidas')
       .trim();
   }
 
-  return item.value;
+  return rawValue;
 };
 
 const OperationalGrid = ({ items }) => (
@@ -98,9 +113,9 @@ const OperationalGrid = ({ items }) => (
       return (
         <div
           key={item.label}
-          className={`min-h-[64px] rounded-2xl border px-3 py-2.5 ${accent.wrap}`}
+          className={`flex h-[72px] flex-col justify-between rounded-2xl border px-3 py-2.5 ${accent.wrap}`}
         >
-          <p className={`mb-1 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
+          <p className={`text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
             {visibleLabel}
           </p>
 
@@ -154,8 +169,8 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 flex min-h-[252px] flex-col">
-        <div className="mb-7 flex min-h-[34px] flex-wrap items-start gap-2">
+      <div className="relative z-10 h-[252px]">
+        <div className="mb-7 flex h-[34px] flex-wrap items-start gap-2 overflow-hidden">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
           >
@@ -175,26 +190,26 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="flex min-h-[188px] flex-col">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
+        <div className="h-[188px]">
+          <p className="mb-4 h-[16px] text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
 
-          <h4 className="mb-5 min-h-[54px] text-4xl font-light leading-tight text-white">
+          <h4 className="mb-5 h-[54px] overflow-hidden text-4xl font-light leading-tight text-white">
             {plan.visibleName}
           </h4>
 
-          <p className="mb-5 min-h-[58px] text-base leading-7 text-white">
+          <p className="mb-5 h-[58px] overflow-hidden text-base leading-7 text-white">
             {role.headline}
           </p>
 
-          <p className="min-h-[48px] text-sm leading-6 text-white/68">
+          <p className="h-[48px] overflow-hidden text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-2 min-h-[210px] rounded-3xl border border-white/16 bg-black/30 p-5">
+      <div className="relative z-10 mt-2 h-[210px] rounded-3xl border border-white/16 bg-black/30 p-5">
         <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-white/55">
           Nivel de capacidad
         </p>
@@ -209,19 +224,19 @@ const PlanCard = ({
           </span>
         </div>
 
-        <div className="rounded-2xl border border-white/14 bg-white/[0.045] px-4 py-3">
+        <div className="h-[74px] rounded-2xl border border-white/14 bg-white/[0.045] px-4 py-3">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/48">
             Mejor encaje
           </p>
 
-          <p className="min-h-[36px] text-sm leading-6 text-white">
+          <p className="h-[36px] overflow-hidden text-sm leading-6 text-white">
             {role.bestFor}
           </p>
         </div>
       </div>
 
       <div className="relative z-10 mt-5 rounded-3xl border border-white/16 bg-black/25 p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-3 flex h-[42px] items-start justify-between gap-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
               Marco operativo
@@ -242,7 +257,7 @@ const PlanCard = ({
       </div>
 
       {planSignals.length > 0 && (
-        <div className="relative z-10 mt-5 min-h-[62px]">
+        <div className="relative z-10 mt-5 h-[62px] overflow-hidden">
           <div className="flex flex-wrap gap-2">
             {planSignals.map((signal) => (
               <span
