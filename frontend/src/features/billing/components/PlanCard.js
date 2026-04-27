@@ -16,7 +16,7 @@ const PLAN_ROLE_META = {
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
     description:
-      'Idea, diagnóstico o informe convertidos en base operativa lista para Builder.',
+      'Idea, diagnostico o informe convertidos en base operativa lista para Builder.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
     glow: 'bg-[#0F5257]/26',
@@ -28,10 +28,10 @@ const PLAN_ROLE_META = {
   },
   sistema: {
     stage: 'CONTINUAR',
-    badge: 'Núcleo operativo',
+    badge: 'Nucleo operativo',
     headline: 'Convierte el sistema en continuidad operativa.',
     description:
-      'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
+      'Iteracion, seguimiento y construccion continua para mantener proyectos vivos.',
     surface:
       'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
     glow: 'bg-sky-400/18',
@@ -46,7 +46,7 @@ const PLAN_ROLE_META = {
     badge: 'Capa superior',
     headline: 'Activa la capa maestra para casos complejos.',
     description:
-      'Más criterio, inteligencia y capacidad para preparar una salida seria.',
+      'Mas criterio, inteligencia y capacidad para preparar una salida seria.',
     surface:
       'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
     glow: 'bg-fuchsia-400/18',
@@ -60,20 +60,26 @@ const PLAN_ROLE_META = {
 
 const TOKEN_PARTS = ['credi', 'tos'];
 const TECH_TOKEN = TOKEN_PARTS.join('');
-const TECH_TOKEN_UPPER = TECH_TOKEN.toUpperCase();
 
-const normalizeToken = (value) =>
+const normalizeText = (value) =>
   String(value || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .toUpperCase();
+    .toLowerCase()
+    .trim();
+
+const cleanVisibleText = (value) =>
+  String(value || '')
+    .replace(/cr[eé]ditos incluidos/gi, 'gemas incluidas')
+    .replace(/cr[eé]ditos/gi, 'gemas')
+    .replace(new RegExp(TECH_TOKEN, 'gi'), 'gemas');
 
 const getVisibleOperationalLabel = (label) => {
-  const normalized = normalizeToken(label);
+  const normalized = normalizeText(label);
 
-  if (normalized === 'ACTIVACION') return 'Activación';
-  if (normalized === 'EXPORTACION') return 'Salida';
-  if (normalized === TECH_TOKEN_UPPER) return 'Gemas';
+  if (normalized === 'activacion') return 'Activacion';
+  if (normalized === 'exportacion') return 'Salida';
+  if (normalized === TECH_TOKEN) return 'Gemas';
 
   return String(label || '');
 };
@@ -84,23 +90,11 @@ const getVisibleOperationalValue = (item) => {
 
   if (label === 'Gemas') {
     const amount = rawValue.match(/\d+/)?.[0];
-
-    if (amount) return `${amount} incluidas`;
-
-    return rawValue
-      .replace(new RegExp(TECH_TOKEN, 'gi'), '')
-      .replace(/cr[eé]ditos/gi, '')
-      .replace(/incluidos/gi, 'incluidas')
-      .trim();
+    return amount ? `${amount} incluidas` : cleanVisibleText(rawValue);
   }
 
-  return rawValue;
+  return cleanVisibleText(rawValue);
 };
-
-const toVisibleFeature = (feature) =>
-  String(feature || '')
-    .replace(/cr[eé]ditos incluidos/gi, 'gemas incluidas')
-    .replace(/cr[eé]ditos/gi, 'gemas');
 
 const buildVisibleIncludes = (plan) => {
   const operationalItems = buildOperationalItems(plan).map((item) => {
@@ -112,15 +106,27 @@ const buildVisibleIncludes = (plan) => {
 
   const baseHighlights =
     Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
-      ? plan.billingHighlights.slice(0, 4)
-      : (plan.features || []).slice(0, 4);
+      ? plan.billingHighlights
+      : plan.features || [];
 
-  const normalizedHighlights = baseHighlights.map(toVisibleFeature);
+  const filteredHighlights = baseHighlights
+    .map(cleanVisibleText)
+    .filter((feature) => {
+      const normalized = normalizeText(feature);
 
-  return [...operationalItems, ...normalizedHighlights].reduce((items, item) => {
-    const normalized = normalizeToken(item);
+      if (!normalized) return false;
+      if (normalized.includes('gema')) return false;
+      if (normalized.includes('credito')) return false;
+      if (normalized.includes('builder')) return false;
 
-    if (items.some((existing) => normalizeToken(existing) === normalized)) {
+      return true;
+    })
+    .slice(0, 3);
+
+  return [...operationalItems, ...filteredHighlights].reduce((items, item) => {
+    const normalized = normalizeText(item);
+
+    if (items.some((existing) => normalizeText(existing) === normalized)) {
       return items;
     }
 
@@ -166,8 +172,8 @@ const PlanCard = ({
       />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 h-[306px]">
-        <div className="mb-8 flex h-[34px] flex-wrap items-start gap-2 overflow-hidden">
+      <div className="relative z-10">
+        <div className="mb-12 flex min-h-[34px] flex-wrap items-start gap-2">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
           >
@@ -187,57 +193,57 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="h-[244px]">
-          <p className="mb-5 h-[16px] text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
+        <div className="mb-10">
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
 
-          <h4 className="mb-7 h-[54px] overflow-hidden text-4xl font-light leading-tight text-white">
+          <h4 className="mb-10 text-4xl font-light leading-tight text-white">
             {plan.visibleName}
           </h4>
 
-          <p className="mb-8 h-[58px] overflow-hidden text-base leading-7 text-white">
+          <p className="mb-8 min-h-[56px] text-base leading-7 text-white">
             {role.headline}
           </p>
 
-          <p className="h-[72px] overflow-hidden text-sm leading-6 text-white/68">
+          <p className="min-h-[72px] text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
-      </div>
 
-      <div className="relative z-10 mb-4 flex h-[82px] items-end justify-between gap-4 border-b border-white/16 pb-4">
-        <div className="flex items-end gap-2">
-          <span className="whitespace-nowrap text-[3.05rem] font-light leading-none text-white">
-            {plan.priceLabel}
-          </span>
+        <div className="mb-5 flex items-end justify-between gap-4 border-b border-white/16 pb-5">
+          <div className="flex items-end gap-2">
+            <span className="whitespace-nowrap text-[3.15rem] font-light leading-none text-white">
+              {plan.priceLabel}
+            </span>
 
-          <span className="whitespace-nowrap pb-1 text-sm text-white/62">
-            {plan.periodLabel}
-          </span>
-        </div>
-
-        <DiamondsFour
-          size={18}
-          weight="fill"
-          className={role.iconClass}
-        />
-      </div>
-
-      {planSignals.length > 0 && (
-        <div className="relative z-10 mb-6 h-[62px] overflow-hidden">
-          <div className="flex flex-wrap gap-2">
-            {planSignals.map((signal) => (
-              <span
-                key={`${plan.id}-${signal}`}
-                className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${planSignalClass}`}
-              >
-                {signal}
-              </span>
-            ))}
+            <span className="whitespace-nowrap pb-1 text-sm text-white/62">
+              {plan.periodLabel}
+            </span>
           </div>
+
+          <DiamondsFour
+            size={18}
+            weight="fill"
+            className={role.iconClass}
+          />
         </div>
-      )}
+
+        {planSignals.length > 0 && (
+          <div className="mb-8 min-h-[62px]">
+            <div className="flex flex-wrap gap-2">
+              {planSignals.map((signal) => (
+                <span
+                  key={`${plan.id}-${signal}`}
+                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${planSignalClass}`}
+                >
+                  {signal}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="relative z-10 flex-1">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/65">
@@ -286,7 +292,7 @@ const PlanCard = ({
 
         <div className="mt-3 flex items-center justify-center gap-2 text-xs text-white/45">
           <Sparkle size={13} />
-          <span>Activación mediante checkout seguro</span>
+          <span>Activacion mediante checkout seguro</span>
         </div>
       </div>
     </article>
