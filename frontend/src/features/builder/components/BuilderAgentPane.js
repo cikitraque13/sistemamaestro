@@ -6,23 +6,21 @@ import {
   getVisibleCodeLines,
 } from '../utils/builderCodeTemplates';
 
-const getArray = (value) => (Array.isArray(value) ? value.filter(Boolean) : []);
-
 const getBuilderIntelligenceParts = (builderIntelligence = {}) => {
   const hubSummary = builderIntelligence?.hubSummary || {};
   const lastDelta = builderIntelligence?.lastDelta || {};
   const lastOperation = builderIntelligence?.lastOperation || {};
-  const visiblePlan =
-    hubSummary?.visiblePlan ||
-    lastOperation?.visiblePlan ||
-    builderIntelligence?.hubState?.visiblePlan ||
+  const lifecycle =
+    builderIntelligence?.lifecycle ||
+    hubSummary?.lifecycle ||
+    lastOperation?.lifecycle ||
     {};
 
   return {
     hubSummary,
     lastDelta,
     lastOperation,
-    visiblePlan,
+    lifecycle,
   };
 };
 
@@ -31,26 +29,68 @@ const normalizeActionLabel = (value = '') =>
     .replace(/^\s*[A-D][).:-]\s*/i, '')
     .trim();
 
-const normalizeDecisionOption = (option, index) => {
+const isLifecycleDecisionMessage = (message = {}) =>
+  message?.role === 'decision' &&
+  Array.isArray(message.options) &&
+  (
+    message?.meta?.source === 'builder_lifecycle' ||
+    message.options.some((option) =>
+      option?.source === 'builder_lifecycle' ||
+      option?.lifecycleActionId
+    )
+  );
+
+const normalizeDecisionOption = (option, index, decisionMessage = {}) => {
+  if (!option) return null;
+
   if (typeof option === 'string') {
     const value = normalizeActionLabel(option);
 
     return {
-      id: `decision-${index}`,
+      id: `lifecycle-decision-${index}`,
       label: value,
       prompt: value,
-      source: 'decision',
+      source: 'builder_lifecycle',
+      lifecycleActionId: '',
+      lifecycleStageId: decisionMessage?.meta?.targetStageId || '',
+      creditTier: 'none',
+      expectedPreviewDelta: [],
+      expectedCodeDelta: [],
+      expectedStructureDelta: [],
+      onDecision: decisionMessage?.onDecision,
     };
   }
 
-  const label = normalizeActionLabel(option?.label || option?.title || option?.prompt);
-  const prompt = normalizeActionLabel(option?.prompt || option?.label || option?.title);
+  const label = normalizeActionLabel(
+    option.label ||
+      option.title ||
+      option.prompt
+  );
+
+  const prompt = normalizeActionLabel(
+    option.prompt ||
+      option.label ||
+      option.title
+  );
+
+  if (!label && !prompt) return null;
 
   return {
-    id: option?.id || `decision-${index}`,
-    label,
-    prompt,
-    source: 'decision',
+    id: option.id || option.lifecycleActionId || `lifecycle-decision-${index}`,
+    label: label || prompt,
+    prompt: prompt || label,
+    source: option.source || 'builder_lifecycle',
+    lifecycleActionId: option.lifecycleActionId || option.id || '',
+    lifecycleStageId:
+      option.lifecycleStageId ||
+      decisionMessage?.meta?.targetStageId ||
+      '',
+    creditTier: option.creditTier || 'none',
+    scoreGain: option.scoreGain || 0,
+    expectedPreviewDelta: option.expectedPreviewDelta || [],
+    expectedCodeDelta: option.expectedCodeDelta || [],
+    expectedStructureDelta: option.expectedStructureDelta || [],
+    onDecision: option.onDecision || decisionMessage?.onDecision,
   };
 };
 
@@ -87,132 +127,91 @@ const getStatusTone = (status = '') => {
 
 const buildSuggestedActions = ({
   messages = [],
-  visiblePlan = {},
-  lastDelta = {},
 } = {}) => {
   const decisionMessage = [...messages]
     .reverse()
-    .find((message) => message?.role === 'decision' && Array.isArray(message.options));
+    .find(isLifecycleDecisionMessage);
 
-  if (decisionMessage?.options?.length) {
-    return decisionMessage.options
-      .slice(0, 5)
-      .map((option, index) => ({
-        ...normalizeDecisionOption(option, index),
-        onDecision: decisionMessage.onDecision,
-      }))
-      .filter((item) => item.label || item.prompt);
+  if (!decisionMessage?.options?.length) {
+    return [];
   }
 
-  const immediateChanges = getArray(visiblePlan?.immediateChanges);
-  const visibleTargets = getArray(visiblePlan?.visibleTargets);
-  const appliedChangeSummary = getArray(visiblePlan?.appliedChangeSummary);
+  return decisionMessage.options
+    .slice(0, 3)
+    .map((option, index) =>
+      normalizeDecisionOption(option, index, decisionMessage)
+    )
+    .filter(Boolean)
+    .filter((item) =>
+      item.source === 'builder_lifecycle' ||
+      item.lifecycleActionId
+    );
+};
 
-  const fromPlan = [
-    ...immediateChanges.map((item) => ({
-      label: item?.label || item?.action || item?.expectedChange,
-      prompt: item?.action || item?.expectedChange || item?.label,
-    })),
-    ...visibleTargets.map((item) => ({
-      label: item?.label || item?.expectedChange,
-      prompt: item?.expectedChange || item?.label,
-    })),
-    ...appliedChangeSummary.map((item) => ({
-      label: item,
-      prompt: item,
-    })),
-  ].filter((item) => item.label || item.prompt);
+const formatCreditTier = (creditTier = 'none') => {
+  const normalized = String(creditTier || 'none').toLowerCase();
 
-  if (fromPlan.length) {
-    return fromPlan.slice(0, 5).map((item, index) => ({
-      id: `plan-${index}`,
-      label: normalizeActionLabel(item.label || item.prompt),
-      prompt: normalizeActionLabel(item.prompt || item.label),
-      source: 'plan',
-    }));
-  }
+  const labels = {
+    none: 'sin coste',
+    low: 'bajo',
+    medium: 'medio',
+    high: 'alto',
+    premium: 'premium',
+  };
 
-  const primaryCTA = lastDelta?.cta?.primaryCTA;
-
-  return [
-    {
-      id: 'promise',
-      label: 'Reforzar promesa principal',
-      prompt: 'Refuerza la promesa principal con resultado concreto, especificidad y motivo claro para actuar ahora.',
-    },
-    {
-      id: 'cta',
-      label: primaryCTA ? `Ajustar CTA: ${primaryCTA}` : 'Ajustar CTA principal',
-      prompt: primaryCTA
-        ? `Ajusta el CTA principal hacia "${primaryCTA}" y mejora su continuidad en el hero, tarjetas y cierre.`
-        : 'Ajusta el CTA principal para que sea más claro, accionable y coherente con el objetivo del proyecto.',
-    },
-    {
-      id: 'trust',
-      label: 'Añadir confianza y prueba social',
-      prompt: 'Añade señales de confianza, autoridad, prueba social y objeciones resueltas sin recargar la interfaz.',
-    },
-    {
-      id: 'visual',
-      label: 'Elevar jerarquía visual',
-      prompt: 'Mejora jerarquía visual, contraste, ritmo, espaciado y sensación premium sin cambiar la intención del proyecto.',
-    },
-    {
-      id: 'structure',
-      label: 'Ordenar siguiente sección',
-      prompt: 'Ordena la siguiente sección para que conecte mejor con el hero, el CTA y el cierre de conversión.',
-    },
-  ];
+  return labels[normalized] || normalized;
 };
 
 const AGENT_ACTIONS = [
   {
     id: 'cro',
     label: 'CRO',
-    title: 'Optimizar conversión',
-    prompt: 'Activa el agente CRO y optimiza esta versión para conversión, claridad de CTA y reducción de fricción.',
+    title: 'Optimizar conversion',
+    prompt:
+      'Mejora la conversion visible del proyecto manteniendo el recorrido actual del Builder.',
     dotClassName: 'bg-emerald-300 shadow-[0_0_14px_rgba(52,211,153,0.65)]',
-    ringClassName: 'border-emerald-300/25 hover:border-emerald-300/50 hover:bg-emerald-300/[0.08]',
+    ringClassName:
+      'border-emerald-300/25 hover:border-emerald-300/50 hover:bg-emerald-300/[0.08]',
   },
   {
     id: 'copy',
     label: 'COPY',
     title: 'Mejorar copy',
-    prompt: 'Activa el agente de copy y mejora promesa, claridad, tono y textos accionables.',
+    prompt:
+      'Mejora promesa, claridad, tono y textos accionables dentro del recorrido actual del Builder.',
     dotClassName: 'bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.65)]',
-    ringClassName: 'border-cyan-300/25 hover:border-cyan-300/50 hover:bg-cyan-300/[0.08]',
+    ringClassName:
+      'border-cyan-300/25 hover:border-cyan-300/50 hover:bg-cyan-300/[0.08]',
   },
   {
     id: 'visual',
     label: 'VISUAL',
-    title: 'Elevar diseño',
-    prompt: 'Activa el agente visual y eleva la interfaz con más jerarquía, contraste, aire y sensación premium.',
+    title: 'Elevar diseno',
+    prompt:
+      'Eleva la interfaz con mas jerarquia, contraste, aire y sensacion premium sin romper el recorrido actual.',
     dotClassName: 'bg-fuchsia-300 shadow-[0_0_14px_rgba(240,171,252,0.65)]',
-    ringClassName: 'border-fuchsia-300/25 hover:border-fuchsia-300/50 hover:bg-fuchsia-300/[0.08]',
-  },
-  {
-    id: 'auto',
-    label: 'AUTO',
-    title: 'Diseñar flujo',
-    prompt: 'Activa el agente de automatización y convierte esta idea en un flujo operativo claro con pasos, entradas y salidas.',
-    dotClassName: 'bg-amber-300 shadow-[0_0_14px_rgba(252,211,77,0.65)]',
-    ringClassName: 'border-amber-300/25 hover:border-amber-300/50 hover:bg-amber-300/[0.08]',
+    ringClassName:
+      'border-fuchsia-300/25 hover:border-fuchsia-300/50 hover:bg-fuchsia-300/[0.08]',
   },
   {
     id: 'trust',
     label: 'TRUST',
-    title: 'Añadir confianza',
-    prompt: 'Activa el agente de confianza y añade autoridad, prueba social, garantías y objeciones resueltas.',
+    title: 'Reforzar confianza',
+    prompt:
+      'Refuerza confianza, autoridad, prueba social y objeciones resueltas dentro del recorrido actual.',
     dotClassName: 'bg-orange-300 shadow-[0_0_14px_rgba(253,186,116,0.65)]',
-    ringClassName: 'border-orange-300/25 hover:border-orange-300/50 hover:bg-orange-300/[0.08]',
+    ringClassName:
+      'border-orange-300/25 hover:border-orange-300/50 hover:bg-orange-300/[0.08]',
   },
   {
     id: 'seo',
     label: 'SEO',
     title: 'Mejorar SEO',
-    prompt: 'Activa el agente SEO y mejora estructura, títulos, semántica y texto para búsqueda orgánica.',
+    prompt:
+      'Mejora estructura, titulos, semantica y texto para busqueda organica sin salir del recorrido actual.',
     dotClassName: 'bg-sky-300 shadow-[0_0_14px_rgba(125,211,252,0.65)]',
-    ringClassName: 'border-sky-300/25 hover:border-sky-300/50 hover:bg-sky-300/[0.08]',
+    ringClassName:
+      'border-sky-300/25 hover:border-sky-300/50 hover:bg-sky-300/[0.08]',
   },
 ];
 
@@ -224,8 +223,8 @@ const AgentRail = ({ onSelectPrompt }) => (
         type="button"
         onClick={() => onSelectPrompt?.(agent.prompt)}
         className={`group grid h-7 w-7 place-items-center rounded-full border bg-black/60 backdrop-blur transition ${agent.ringClassName}`}
-        title={`${agent.label} · ${agent.title}`}
-        aria-label={`${agent.label} · ${agent.title}`}
+        title={`${agent.label} - ${agent.title}`}
+        aria-label={`${agent.label} - ${agent.title}`}
       >
         <span className={`h-2.5 w-2.5 rounded-full ${agent.dotClassName}`} />
       </button>
@@ -293,7 +292,7 @@ const InlineSuggestionRows = ({
         </span>
       </div>
 
-      {actions.slice(0, 5).map((action, index) => (
+      {actions.slice(0, 3).map((action, index) => (
         <button
           key={action.id || `${action.label}-${index}`}
           type="button"
@@ -304,8 +303,17 @@ const InlineSuggestionRows = ({
             {index + 1}.
           </span>
 
-          <span className="truncate text-[13px] leading-7 text-cyan-100 transition group-hover:text-white">
-            {action.label}
+          <span className="min-w-0">
+            <span className="block truncate text-[13px] leading-7 text-cyan-100 transition group-hover:text-white">
+              {action.label}
+            </span>
+
+            {action.creditTier && action.creditTier !== 'none' && (
+              <span className="block truncate text-[10px] uppercase tracking-[0.14em] text-zinc-600">
+                Coste {formatCreditTier(action.creditTier)}
+                {action.scoreGain ? ` · +${action.scoreGain} madurez` : ''}
+              </span>
+            )}
           </span>
         </button>
       ))}
@@ -319,7 +327,7 @@ const CodeTopBar = ({
 }) => (
   <div className="flex h-[46px] shrink-0 items-center justify-between gap-3 border-b border-white/[0.08] bg-[#020405] px-4">
     <p className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-      Código en construcción
+      Codigo en construccion
     </p>
 
     <div className="flex flex-wrap justify-end gap-1.5">
@@ -470,7 +478,7 @@ const ControlDock = ({
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Escribe un cambio: CTA, color, sección, fotos, tono, versión..."
+          placeholder="Escribe un cambio: CTA, color, seccion, fotos, tono, version..."
           className="min-h-[52px] flex-1 resize-none rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-sm leading-5 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
         />
 
@@ -490,7 +498,7 @@ const ControlDock = ({
 
       <div className="mt-2 flex items-center justify-between gap-3 border-t border-white/[0.08] pt-2">
         <p className="min-w-0 truncate text-[11px] text-zinc-500">
-          Iteración estimada <span className="font-semibold text-zinc-300">8–18 créditos</span>
+          Iteracion estimada <span className="font-semibold text-zinc-300">8-18 creditos</span>
         </p>
 
         <button
@@ -527,20 +535,15 @@ export default function BuilderAgentPane({
   const {
     hubSummary,
     lastDelta,
-    visiblePlan,
   } = getBuilderIntelligenceParts(builderIntelligence);
 
   const suggestedActions = useMemo(
     () =>
       buildSuggestedActions({
         messages,
-        visiblePlan,
-        lastDelta,
       }),
     [
       messages,
-      visiblePlan,
-      lastDelta,
     ]
   );
 

@@ -497,23 +497,30 @@ No entra nada no validado.
 
 ---
 
-## 30. BuilderBuildKernel como piedra angular del Builder visible
+## 30. BuilderBuildKernel como capa de ejecución y consolidación del Builder visible
 
 ### Decisión cerrada 27
 
-`BuilderBuildKernel` queda aprobado como piedra angular operativa del Builder visible.
+`BuilderBuildKernel` queda aprobado como capa operativa de ejecución, normalización y consolidación del Builder visible.
 
 ### Regla aprobada
 
 El Builder no debe gobernarse por copy suelto, mensajes del agente, `hubSummary`, `lastDelta`, `lastOperation`, fases de progreso ni plantillas aisladas.
 
-El Builder debe gobernarse por una fuente viva de construcción:
+Tampoco debe permitir que OpenAI gobierne directamente la experiencia visible sin pasar por la arquitectura de producto.
+
+La arquitectura aprobada es:
 
 ```text
-input usuario
-→ interpretación IA
+Builder AI / OpenAI
+→ interpretación de intención
+→ generación estructurada
+→ Builder Project Lifecycle
+→ selección de siguiente mejora
+→ BuilderBuildKernel
 → mutación normalizada
 → BuilderBuildState
+→ BuilderOutputMap
 → preview
 → código
 → estructura
@@ -521,6 +528,12 @@ input usuario
 ```
 
 ### Efecto operativo
+
+Builder AI/OpenAI interpreta, razona y genera intención, copy, estructura o propuesta.
+
+Builder Project Lifecycle ordena el recorrido de maduración del proyecto, bloquea acciones fuera de fase y decide qué mejora corresponde.
+
+BuilderBuildKernel no sustituye a OpenAI. Su función es aplicar, normalizar, acumular y estabilizar los cambios para que la IA no produzca solo texto sin construcción real.
 
 Toda acción del usuario o del agente debe producir al menos uno de estos efectos:
 
@@ -530,24 +543,157 @@ Toda acción del usuario o del agente debe producir al menos uno de estos efecto
 - cambio de CTA;
 - bloque nuevo;
 - archivo nuevo;
+- cambio de estado acumulado;
 - siguiente decisión contextual distinta.
 
-Si una acción solo produce texto del agente y no modifica preview, código o estructura, no se considera construcción válida.
+Si una acción solo produce texto del agente y no modifica preview, código, estructura o estado acumulado, no se considera construcción válida.
 
 ### Prohibición
 
 Queda prohibido crear un megaarchivo con todo el conocimiento del Builder.
 
-El kernel debe ser pequeño, modular y coordinador. El conocimiento debe vivir en registros, playbooks, presets, mapas de output, mutaciones, estructura y flujos de preguntas.
+El kernel debe ser pequeño, modular y coordinador. El conocimiento debe vivir en lifecycle, registros, playbooks, presets, mapas de output, mutaciones, estructura y flujos de decisión.
 
 ### Criterio de cierre
 
-Esta decisión queda cerrada cuando la implementación posterior cree una subcapa canónica interna del Builder capaz de convertir cada intención del usuario en una mutación verificable sobre:
+Esta decisión queda cerrada a nivel arquitectónico.
+
+Queda pendiente la implementación completa de mutaciones acumulativas para que cada acción lifecycle aceptada modifique:
 
 - estado vivo;
 - preview;
 - código;
 - estructura;
+- readinessScore;
 - siguientes decisiones.
 
-Hasta entonces, no se aprueba seguir corrigiendo el Builder como si fuera solo un problema visual.
+Hasta entonces, no se aprueba tratar el Builder como cerrado comercialmente.
+
+---
+
+## 31. Builder Runtime conectado a Builder AI/OpenAI
+
+### Decisión cerrada 28
+
+Fecha: 2026-04-27
+
+### Decisión
+
+Builder Runtime queda conectado a Builder AI/OpenAI como capa de interpretación y generación estructurada.
+
+La conexión no convierte a OpenAI en autoridad directa sobre la interfaz visible. OpenAI debe alimentar la arquitectura interna del Builder.
+
+### Regla canónica
+
+La relación aprobada es:
+
+```text
+input usuario
+→ Builder AI / OpenAI
+→ salida estructurada
+→ adapter
+→ lifecycle
+→ kernel
+→ estado acumulado
+→ preview / código / estructura
+```
+
+### Efecto operativo
+
+- OpenAI puede interpretar intención, sector, objetivo, tono, propuesta y siguiente acción.
+- OpenAI no debe inyectar mejoras visibles sin pasar por lifecycle.
+- OpenAI no debe saltarse guards, fases ni estado acumulado.
+- El adapter debe convertir la salida IA en resultado compatible con el kernel.
+- La preview no debe mostrar contenido interno del sistema.
+- El chat guía, pregunta y propone.
+- La preview construye.
+- El código refleja.
+- La estructura ordena.
+
+### Límite de esta decisión
+
+La conexión con Builder AI/OpenAI no cierra todavía la ejecución completa de mejoras acumulativas.
+
+Queda pendiente que cada mejora aceptada genere mutación real en BuilderBuildState, preview, código y estructura.
+
+---
+
+## 32. Builder Project Lifecycle V1 conectado al chat
+
+### Decisión cerrada 29
+
+Fecha: 2026-04-27
+
+### Decisión
+
+Queda aprobado `Builder Project Lifecycle V1` como capa canónica de maduración de proyectos dentro del Builder.
+
+El Builder no debe proponer mejoras sueltas ni repetir acciones genéricas. Debe guiar cada proyecto por un recorrido secuencial:
+
+```text
+entrada del usuario
+→ clasificación del proyecto
+→ primera versión visible
+→ conversión
+→ confianza
+→ oferta
+→ marca
+→ salida técnica
+```
+
+### Archivos nuevos canónicos
+
+Se crea la subcapa:
+
+```text
+frontend/src/features/builder/lifecycle/
+```
+
+Con estos archivos:
+
+- `frontend/src/features/builder/lifecycle/builderProjectLifecycle.js`
+- `frontend/src/features/builder/lifecycle/builderLifecycleActions.js`
+- `frontend/src/features/builder/lifecycle/builderLifecycleGuards.js`
+- `frontend/src/features/builder/lifecycle/builderLifecycleState.js`
+- `frontend/src/features/builder/lifecycle/builderLifecycleResolver.js`
+
+### Archivos conectados al lifecycle
+
+Quedan alineados con esta capa:
+
+- `frontend/src/features/builder/intelligence/builderAgentResponseComposer.js`
+- `frontend/src/features/builder/components/BuilderAgentPane.js`
+- `frontend/src/features/builder/api/builderAiAdapter.js`
+
+### Reglas aprobadas
+
+- Las siguientes mejoras visibles deben venir de `builder_lifecycle`.
+- El chat del Builder debe proponer mejoras por fase del proyecto.
+- Se muestran como máximo 3 mejoras visibles.
+- No se debe proponer Google, backend, auth, dashboard, GitHub, deploy o dominio antes de la salida técnica, salvo intención explícita o proyecto técnico.
+- `readinessScore` representa madurez del proyecto, no créditos consumidos.
+- Los créditos quedan separados del score de madurez y se aplican como coste de acciones intensivas.
+- OpenAI no debe inyectar un `decisionMessage` visible saltándose el lifecycle.
+- El panel del agente no debe inventar fallback técnico si no hay decisión lifecycle válida.
+- Se elimina mojibake de los conectores principales del chat.
+
+### Criterio de cierre cumplido
+
+- Los 5 archivos lifecycle existen.
+- Los 5 archivos lifecycle quedan saneados y sin mojibake.
+- `builderAgentResponseComposer.js` queda conectado a lifecycle.
+- `BuilderAgentPane.js` pinta solo decisiones lifecycle.
+- `builderAiAdapter.js` adapta la salida IA sin crear decisiones sueltas desde `nextAction`.
+- El build frontend pasa correctamente.
+
+### Límite de esta decisión
+
+Esta decisión no cierra todavía la ejecución completa de mutaciones.
+
+Queda pendiente que cada acción lifecycle aceptada por el usuario modifique de forma acumulativa:
+
+- preview;
+- código;
+- estructura;
+- estado de madurez;
+- siguientes decisiones.
