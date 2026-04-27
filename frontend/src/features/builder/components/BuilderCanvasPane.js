@@ -12,6 +12,26 @@ import {
   getArray,
 } from '../utils/builderLandingCopy';
 
+const INTERNAL_PREVIEW_TERMS = [
+  'sistema maestro',
+  'builder',
+  'gema maestra',
+  'preview conectada',
+  'estado vivo',
+  'primera versión generada',
+  'cambios reales',
+  'estructura exportable',
+  'código coherente',
+  'proceso visible',
+  'dashboard',
+  'flujo de autenticación',
+  'github',
+  'deploy',
+  'créditos',
+  'salida técnica',
+  'siguientes decisiones',
+];
+
 const truncateText = (value = '', max = 92) => {
   const text = String(value || '').trim();
 
@@ -19,6 +39,38 @@ const truncateText = (value = '', max = 92) => {
   if (text.length <= max) return text;
 
   return `${text.slice(0, max - 1).trim()}…`;
+};
+
+const normalizeText = (value = '') =>
+  String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+
+const includesAny = (text = '', terms = []) => {
+  const normalized = normalizeText(text);
+
+  return terms.some((term) => normalized.includes(normalizeText(term)));
+};
+
+const isInternalPreviewText = (value = '') => {
+  const normalized = normalizeText(value);
+
+  if (!normalized) return false;
+
+  return INTERNAL_PREVIEW_TERMS.some((term) =>
+    normalized.includes(normalizeText(term))
+  );
+};
+
+const safeLandingText = (value = '', fallback = '') => {
+  const text = String(value || '').trim();
+
+  if (!text) return fallback;
+  if (isInternalPreviewText(text)) return fallback;
+
+  return text;
 };
 
 const getBuilderKernelOutput = (builderIntelligence = {}) =>
@@ -64,19 +116,401 @@ const getKernelSections = (builderIntelligence = {}) => {
   return getArray(previewSnapshot?.sections);
 };
 
-const getActiveKernelSection = (builderIntelligence = {}) => {
-  const { previewSnapshot } = getBuilderIntelligenceParts(builderIntelligence);
-  const sections = getArray(previewSnapshot?.sections);
+const getProjectContextText = ({
+  copy,
+  project,
+  builderIntelligence,
+} = {}) => {
+  const {
+    hubSummary,
+    previewSnapshot,
+  } = getBuilderIntelligenceParts(builderIntelligence);
 
-  if (!sections.length) return null;
-
-  return (
-    sections.find((section) => section.id === previewSnapshot?.activeSectionId) ||
-    sections[sections.length - 1]
-  );
+  return [
+    project?.input_content,
+    project?.prompt,
+    project?.title,
+    project?.summary,
+    copy?.eyebrow,
+    copy?.headline,
+    copy?.subheadline,
+    copy?.sectionTitle,
+    copy?.sectionText,
+    hubSummary?.projectType,
+    hubSummary?.category,
+    hubSummary?.businessModel,
+    hubSummary?.primaryPlaybook,
+    hubSummary?.operationalFocus,
+    hubSummary?.conversionTarget,
+    hubSummary?.primaryCTA,
+    previewSnapshot?.layout,
+    ...getArray(previewSnapshot?.sections).flatMap((section) => [
+      section?.label,
+      section?.type,
+      section?.props?.title,
+      section?.props?.subtitle,
+    ]),
+  ]
+    .filter(Boolean)
+    .join(' ');
 };
 
-const resolvePreviewTone = (builderIntelligence = {}) => {
+const extractCity = (contextText = '') => {
+  const normalized = normalizeText(contextText);
+
+  const cities = [
+    'Madrid',
+    'Barcelona',
+    'Valencia',
+    'Sevilla',
+    'Málaga',
+    'Zaragoza',
+    'Bilbao',
+    'Alicante',
+    'Murcia',
+    'Valladolid',
+  ];
+
+  return cities.find((city) => normalized.includes(normalizeText(city))) || 'Madrid';
+};
+
+const createDentalProfile = (city = 'Madrid') => ({
+  id: 'dental-premium',
+  tone: 'premium',
+  businessName: `Clínica Dental Aurora ${city}`,
+  eyebrow: `Clínica dental premium en ${city}`,
+  headline: 'Sonríe con confianza desde la primera visita',
+  subheadline:
+    'Odontología avanzada, estética dental y atención cercana para pacientes que buscan seguridad, precisión y una experiencia cómoda.',
+  primaryCTA: 'Reservar cita',
+  secondaryCTA: 'Ver tratamientos',
+  sectionTitle: 'Tratamientos dentales pensados para generar confianza',
+  sectionText:
+    'Una landing preparada para captar pacientes, explicar servicios clave y convertir visitas en reservas reales.',
+  services: [
+    {
+      title: 'Implantes dentales',
+      text: 'Planificación precisa, diagnóstico claro y seguimiento profesional en cada fase.',
+    },
+    {
+      title: 'Estética dental',
+      text: 'Blanqueamiento, carillas y diseño de sonrisa con enfoque natural y elegante.',
+    },
+    {
+      title: 'Ortodoncia invisible',
+      text: 'Tratamientos discretos para alinear tu sonrisa sin alterar tu día a día.',
+    },
+  ],
+  trust: [
+    'Equipo médico especializado',
+    'Primera valoración personalizada',
+    'Tecnología de diagnóstico avanzada',
+    'Explicación clara antes de cada tratamiento',
+  ],
+  technology: [
+    'Escáner intraoral',
+    'Planificación digital',
+    'Recordatorios automáticos',
+    'Seguimiento post-tratamiento',
+  ],
+  testimonials: [
+    {
+      quote:
+        'Me explicaron todo con claridad y salí con un plan de tratamiento que entendía perfectamente.',
+      author: 'Paciente de estética dental',
+    },
+    {
+      quote:
+        'La reserva fue rápida, la atención muy profesional y el resultado superó mis expectativas.',
+      author: 'Paciente de implantología',
+    },
+  ],
+  booking: {
+    title: 'Reserva tu valoración inicial',
+    text:
+      'Completa tus datos y el equipo de la clínica te contactará para confirmar día, hora y tratamiento.',
+    fields: ['Nombre', 'Teléfono', 'Tratamiento', 'Fecha preferida'],
+    buttonLabel: 'Solicitar cita',
+  },
+  automation: {
+    title: 'Sistema de citas preparado para vender',
+    text:
+      'La landing puede conectarse después con email, recordatorios, CRM y seguimiento automático de pacientes.',
+    items: [
+      'Confirmación de cita por email',
+      'Aviso interno al equipo comercial',
+      'Segmentación por tratamiento',
+      'Seguimiento automático si no reserva',
+    ],
+  },
+});
+
+const createBeautyProfile = (city = 'Madrid') => ({
+  id: 'beauty-premium',
+  tone: 'premium',
+  businessName: `Clínica Estética Aura ${city}`,
+  eyebrow: `Clínica estética premium en ${city}`,
+  headline: 'Tratamientos estéticos con criterio médico y resultado natural',
+  subheadline:
+    'Una experiencia premium para pacientes que buscan confianza, asesoramiento experto y resultados visibles sin perder naturalidad.',
+  primaryCTA: 'Reservar valoración',
+  secondaryCTA: 'Ver tratamientos',
+  sectionTitle: 'Servicios de estética preparados para convertir',
+  sectionText:
+    'La landing presenta servicios, autoridad médica y una ruta clara hacia la reserva.',
+  services: [
+    {
+      title: 'Medicina estética facial',
+      text: 'Tratamientos personalizados para mejorar expresión, textura y luminosidad.',
+    },
+    {
+      title: 'Rejuvenecimiento',
+      text: 'Protocolos avanzados para piel, firmeza y prevención del envejecimiento.',
+    },
+    {
+      title: 'Diagnóstico personalizado',
+      text: 'Valoración inicial para recomendar el tratamiento más adecuado.',
+    },
+  ],
+  trust: [
+    'Equipo médico colegiado',
+    'Resultados naturales',
+    'Diagnóstico personalizado',
+    'Seguimiento posterior al tratamiento',
+  ],
+  technology: [
+    'Historia clínica digital',
+    'Recordatorios automáticos',
+    'Segmentación por tratamiento',
+    'Seguimiento de pacientes',
+  ],
+  testimonials: [
+    {
+      quote:
+        'Buscaba un cambio natural y el equipo entendió exactamente lo que necesitaba.',
+      author: 'Paciente de medicina estética',
+    },
+    {
+      quote:
+        'La experiencia fue clara, profesional y muy cuidada desde la primera cita.',
+      author: 'Paciente de rejuvenecimiento',
+    },
+  ],
+  booking: {
+    title: 'Reserva tu diagnóstico estético',
+    text:
+      'El equipo revisará tu caso y te propondrá una valoración inicial adaptada a tus objetivos.',
+    fields: ['Nombre', 'Teléfono', 'Tratamiento', 'Fecha preferida'],
+    buttonLabel: 'Solicitar valoración',
+  },
+  automation: {
+    title: 'Seguimiento comercial preparado',
+    text:
+      'La landing puede alimentar campañas, formularios, email y recordatorios de citas.',
+    items: [
+      'Lead por tratamiento',
+      'Confirmación automática',
+      'Recordatorio de cita',
+      'Reactivación de pacientes',
+    ],
+  },
+});
+
+const createRestaurantProfile = (city = 'Madrid') => ({
+  id: 'restaurant-booking',
+  tone: 'warm',
+  businessName: `Restaurante Brasa Norte ${city}`,
+  eyebrow: `Restaurante con reserva online en ${city}`,
+  headline: 'Reserva una experiencia gastronómica memorable',
+  subheadline:
+    'Una landing diseñada para mostrar propuesta, carta, ambiente y reserva directa en pocos pasos.',
+  primaryCTA: 'Reservar mesa',
+  secondaryCTA: 'Ver carta',
+  sectionTitle: 'Una experiencia clara desde el primer vistazo',
+  sectionText:
+    'El objetivo es reducir fricción, enseñar valor y llevar al usuario a reservar.',
+  services: [
+    {
+      title: 'Carta seleccionada',
+      text: 'Platos principales, menús y especialidades presentadas con jerarquía clara.',
+    },
+    {
+      title: 'Reserva rápida',
+      text: 'Formulario simple para elegir día, hora y número de personas.',
+    },
+    {
+      title: 'Eventos privados',
+      text: 'Captación de grupos, empresas y celebraciones con seguimiento comercial.',
+    },
+  ],
+  trust: [
+    'Reserva en menos de un minuto',
+    'Confirmación automática',
+    'Opciones para grupos',
+    'Ubicación y horarios visibles',
+  ],
+  technology: [
+    'Confirmación por email',
+    'Aviso interno al restaurante',
+    'Segmentación por tipo de reserva',
+    'Lista de espera futura',
+  ],
+  testimonials: [
+    {
+      quote:
+        'Reservar fue muy fácil y la experiencia estuvo a la altura de lo prometido.',
+      author: 'Cliente de cena',
+    },
+    {
+      quote:
+        'La página deja claro el ambiente, la carta y cómo reservar sin complicaciones.',
+      author: 'Cliente de grupo',
+    },
+  ],
+  booking: {
+    title: 'Reserva tu mesa',
+    text:
+      'Indica día, hora y número de personas. El equipo confirmará tu reserva.',
+    fields: ['Nombre', 'Teléfono', 'Fecha', 'Personas'],
+    buttonLabel: 'Confirmar reserva',
+  },
+  automation: {
+    title: 'Reservas y seguimiento',
+    text:
+      'La landing puede conectarse con confirmaciones, recordatorios y campañas para clientes recurrentes.',
+    items: [
+      'Confirmación automática',
+      'Recordatorio de reserva',
+      'Captación de grupos',
+      'Campañas para clientes frecuentes',
+    ],
+  },
+});
+
+const createDefaultServiceProfile = (city = 'Madrid') => ({
+  id: 'local-service',
+  tone: 'direct',
+  businessName: `Servicio Premium ${city}`,
+  eyebrow: `Servicio profesional en ${city}`,
+  headline: 'Convierte visitas en solicitudes reales',
+  subheadline:
+    'Una landing clara, directa y preparada para explicar el servicio, generar confianza y activar contacto.',
+  primaryCTA: 'Solicitar información',
+  secondaryCTA: 'Ver servicios',
+  sectionTitle: 'Una estructura comercial lista para vender',
+  sectionText:
+    'El contenido se organiza para que el usuario entienda la propuesta, confíe y dé el siguiente paso.',
+  services: [
+    {
+      title: 'Servicio principal',
+      text: 'Presentación clara del valor principal y del resultado que obtiene el cliente.',
+    },
+    {
+      title: 'Atención personalizada',
+      text: 'Explicación sencilla del proceso y de cómo se adapta al caso del usuario.',
+    },
+    {
+      title: 'Seguimiento comercial',
+      text: 'Formulario y CTA preparados para responder y convertir oportunidades.',
+    },
+  ],
+  trust: [
+    'Respuesta rápida',
+    'Proceso claro',
+    'Atención profesional',
+    'Seguimiento personalizado',
+  ],
+  technology: [
+    'Formulario conectado',
+    'Confirmación automática',
+    'Segmentación por necesidad',
+    'Seguimiento posterior',
+  ],
+  testimonials: [
+    {
+      quote:
+        'La propuesta se entiende rápido y facilita pedir información sin fricción.',
+      author: 'Cliente interesado',
+    },
+    {
+      quote:
+        'La landing transmite confianza y deja claro el siguiente paso.',
+      author: 'Usuario cualificado',
+    },
+  ],
+  booking: {
+    title: 'Solicita una primera valoración',
+    text:
+      'Déjanos tus datos y el equipo te contactará con una propuesta adaptada.',
+    fields: ['Nombre', 'Email', 'Teléfono', 'Servicio'],
+    buttonLabel: 'Enviar solicitud',
+  },
+  automation: {
+    title: 'Captación y seguimiento automático',
+    text:
+      'La landing queda preparada para conectar formularios, emails, avisos internos y seguimiento comercial.',
+    items: [
+      'Email de confirmación',
+      'Aviso al equipo',
+      'Clasificación del lead',
+      'Seguimiento automático',
+    ],
+  },
+});
+
+const detectBusinessProfile = (contextText = '') => {
+  const city = extractCity(contextText);
+
+  if (
+    includesAny(contextText, [
+      'dental',
+      'dentista',
+      'odontologia',
+      'odontología',
+      'implante',
+      'ortodoncia',
+      'clinica dental',
+      'clínica dental',
+    ])
+  ) {
+    return createDentalProfile(city);
+  }
+
+  if (
+    includesAny(contextText, [
+      'estetica',
+      'estética',
+      'belleza',
+      'medicina estetica',
+      'medicina estética',
+      'botox',
+      'rejuvenecimiento',
+      'facial',
+    ])
+  ) {
+    return createBeautyProfile(city);
+  }
+
+  if (
+    includesAny(contextText, [
+      'restaurante',
+      'reserva mesa',
+      'gastronomia',
+      'gastronomía',
+      'carta',
+      'menú',
+      'menu',
+      'comida',
+      'cena',
+    ])
+  ) {
+    return createRestaurantProfile(city);
+  }
+
+  return createDefaultServiceProfile(city);
+};
+
+const resolvePreviewTone = (builderIntelligence = {}, profileTone = 'contextual') => {
   const {
     hubSummary,
     lastDelta,
@@ -90,6 +524,7 @@ const resolvePreviewTone = (builderIntelligence = {}) => {
   const intent = hubSummary?.iterationIntent;
   const layout = previewSnapshot?.layout;
 
+  if (profileTone) return profileTone;
   if (visualTone) return visualTone;
 
   if (
@@ -133,21 +568,6 @@ const resolvePreviewTone = (builderIntelligence = {}) => {
   if (intent === 'simplify') return 'simple';
 
   return 'contextual';
-};
-
-const getToneLabel = (tone = 'contextual') => {
-  const labels = {
-    premium: 'Premium',
-    direct: 'Conversión',
-    warm: 'Local',
-    system: 'Sistema',
-    tech: 'Tecnológico',
-    simple: 'Claro',
-    serious: 'Sobrio',
-    contextual: 'Contextual',
-  };
-
-  return labels[tone] || labels.contextual;
 };
 
 const getPreviewSurfaceClass = (tone = 'contextual') => {
@@ -226,365 +646,223 @@ const getPanelClass = (tone = 'contextual') => {
   return classes[tone] || classes.contextual;
 };
 
-const resolveDynamicPrimaryCTA = ({
-  copy,
-  hubSummary,
-  lastDelta,
-  lastOperation,
-  activeKernelSection,
-} = {}) =>
-  activeKernelSection?.props?.buttonLabel ||
-  lastDelta?.cta?.primaryCTA ||
-  lastOperation?.primaryCTA ||
-  hubSummary?.primaryCTA ||
-  copy?.primaryCta ||
-  'Continuar';
+const getSafeKernelLandingSections = (builderIntelligence = {}) => {
+  const blockedTypes = [
+    'auth',
+    'dashboard',
+    'credits',
+    'github',
+    'deploy',
+    'builder',
+    'system',
+    'internal',
+  ];
 
-const resolveDynamicSecondaryCTA = ({
-  copy,
-  lastDelta,
-} = {}) =>
-  lastDelta?.cta?.secondaryCTA ||
-  copy?.secondaryCta ||
-  'Ver estructura';
+  return getKernelSections(builderIntelligence).filter((section) => {
+    const label = [
+      section?.id,
+      section?.type,
+      section?.label,
+      section?.props?.title,
+      section?.props?.subtitle,
+      section?.props?.buttonLabel,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
-const resolveDynamicHeadline = ({
-  copy,
-  hubSummary,
-  lastDelta,
-  activeKernelSection,
-} = {}) => {
-  const intent = hubSummary?.iterationIntent;
-  const conversionTarget = hubSummary?.conversionTarget;
-  const primaryPlaybook = hubSummary?.primaryPlaybook;
+    if (!label) return false;
+    if (blockedTypes.includes(normalizeText(section?.type))) return false;
+    if (isInternalPreviewText(label)) return false;
 
-  if (activeKernelSection?.props?.title && activeKernelSection?.type !== 'section') {
-    return activeKernelSection.props.title;
-  }
-
-  if (intent === 'premiumize') {
-    return `Versión premium orientada a ${conversionTarget || 'conversión cualificada'}.`;
-  }
-
-  if (intent === 'increase_conversion') {
-    return `Estructura optimizada para convertir hacia ${conversionTarget || 'la acción principal'}.`;
-  }
-
-  if (intent === 'change_cta') {
-    return 'CTA y recorrido ajustados para una acción más clara.';
-  }
-
-  if (intent === 'automation_detail') {
-    return 'Flujo operativo preparado para automatizar con control.';
-  }
-
-  if (intent === 'change_sector_context' && primaryPlaybook) {
-    return `Versión adaptada al contexto ${primaryPlaybook}.`;
-  }
-
-  if (lastDelta?.copy?.headlineStrategy && primaryPlaybook) {
-    return `${primaryPlaybook}: primera versión ajustada al objetivo real.`;
-  }
-
-  return copy?.headline || 'Primera versión preparada para construir.';
+    return true;
+  });
 };
 
-const resolveDynamicSubheadline = ({
+const buildLandingModel = ({
   copy,
-  hubSummary,
-  lastDelta,
-  activeKernelSection,
-} = {}) => {
-  const focus = hubSummary?.operationalFocus;
-  const agentMessage = hubSummary?.agentMessage;
-
-  if (activeKernelSection?.props?.subtitle) {
-    return activeKernelSection.props.subtitle;
-  }
-
-  if (lastDelta?.copy?.subheadlineStrategy && focus) {
-    return `El Hub está aplicando una mejora sobre ${focus}. ${lastDelta.copy.subheadlineStrategy}`;
-  }
-
-  if (agentMessage && hubSummary?.iterationIntent) {
-    return agentMessage;
-  }
-
-  if (focus) {
-    return `Sistema Maestro ha clasificado el proyecto y aplica una estructura orientada a ${focus}.`;
-  }
-
-  return copy?.subheadline ||
-    'El sistema transforma la entrada inicial en una estructura visual lista para iterar.';
-};
-
-const buildCardsFromVisiblePlan = ({
-  visiblePlan,
-  hubSummary,
-  copy,
-  kernelSections = [],
-} = {}) => {
-  if (kernelSections.length) {
-    return kernelSections.slice(-3).map((section, index) => ({
-      title: section.label || section.props?.title || `Bloque ${index + 1}`,
-      text:
-        section.props?.subtitle ||
-        section.props?.title ||
-        section.props?.buttonLabel ||
-        `Bloque ${section.type || 'visual'} aplicado al Builder.`,
-    }));
-  }
-
-  const applied = getArray(visiblePlan?.appliedChangeSummary);
-  const immediate = getArray(visiblePlan?.immediateChanges);
-  const targets = getArray(visiblePlan?.visibleTargets);
-
-  if (applied.length) {
-    return applied.slice(0, 3).map((item, index) => ({
-      title: index === 0 ? 'Cambio aplicado' : `Ajuste ${index + 1}`,
-      text: item,
-    }));
-  }
-
-  if (immediate.length) {
-    return immediate.slice(0, 3).map((item) => ({
-      title: item.label || 'Cambio previsto',
-      text: item.action || item.expectedChange || 'Ajuste preparado por el Hub.',
-    }));
-  }
-
-  if (targets.length) {
-    return targets.slice(0, 3).map((item) => ({
-      title: item.label || 'Objetivo visible',
-      text: item.expectedChange || 'Cambio visual preparado.',
-    }));
-  }
-
-  if (hubSummary?.primaryPlaybook) {
-    return [
-      {
-        title: hubSummary.primaryPlaybook,
-        text: `Playbook principal activo para ${hubSummary.conversionTarget || 'conversión cualificada'}.`,
-      },
-      {
-        title: 'CTA recomendado',
-        text: hubSummary.primaryCTA || 'Acción principal pendiente de confirmar.',
-      },
-      {
-        title: 'Siguiente decisión',
-        text: hubSummary.firstQuestion || 'Ajustar diseño, copy, CTA o estructura.',
-      },
-    ];
-  }
-
-  return getArray(copy?.cards).length
-    ? copy.cards
-    : [
-        {
-          title: 'Promesa',
-          text: 'Mensaje principal definido para orientar el primer impacto.',
-        },
-        {
-          title: 'Conversión',
-          text: 'CTA y recorrido preparados para reducir fricción.',
-        },
-        {
-          title: 'Salida',
-          text: 'Base lista para iterar, generar archivos y preparar deploy.',
-        },
-      ];
-};
-
-const buildEffectivePreviewCopy = ({
-  copy,
+  project,
   builderIntelligence,
 } = {}) => {
+  const contextText = getProjectContextText({
+    copy,
+    project,
+    builderIntelligence,
+  });
+
+  const profile = detectBusinessProfile(contextText);
   const {
     hubSummary,
     lastDelta,
     lastOperation,
-    visiblePlan,
-    previewSnapshot,
   } = getBuilderIntelligenceParts(builderIntelligence);
 
-  const kernelSections = getArray(previewSnapshot?.sections);
-  const activeKernelSection = getActiveKernelSection(builderIntelligence);
+  const safeSections = getSafeKernelLandingSections(builderIntelligence);
+  const safeHeroSection = safeSections.find((section) =>
+    ['hero', 'header', 'landing_hero'].includes(normalizeText(section?.type))
+  );
+
+  const heroProps = safeHeroSection?.props || {};
+
+  const headline = safeLandingText(
+    heroProps.title ||
+      lastDelta?.copy?.headline ||
+      copy?.headline,
+    profile.headline
+  );
+
+  const subheadline = safeLandingText(
+    heroProps.subtitle ||
+      lastDelta?.copy?.subheadline ||
+      copy?.subheadline,
+    profile.subheadline
+  );
+
+  const primaryCTA = safeLandingText(
+    heroProps.buttonLabel ||
+      lastDelta?.cta?.primaryCTA ||
+      lastOperation?.primaryCTA ||
+      hubSummary?.primaryCTA ||
+      copy?.primaryCta,
+    profile.primaryCTA
+  );
+
+  const secondaryCTA = safeLandingText(
+    lastDelta?.cta?.secondaryCTA ||
+      copy?.secondaryCta,
+    profile.secondaryCTA
+  );
+
+  const eyebrow = safeLandingText(
+    heroProps.badge ||
+      heroProps.eyebrow ||
+      copy?.eyebrow,
+    profile.eyebrow
+  );
+
+  const kernelServices = safeSections
+    .filter((section) =>
+      ['services', 'service', 'features', 'benefits'].includes(normalizeText(section?.type))
+    )
+    .flatMap((section) => {
+      const props = section?.props || {};
+      const items = getArray(props.items || props.points || props.services);
+
+      if (!items.length && props.title) {
+        return [
+          {
+            title: props.title,
+            text: props.subtitle || 'Servicio preparado para presentar valor de forma clara.',
+          },
+        ];
+      }
+
+      return items.map((item) =>
+        typeof item === 'string'
+          ? {
+              title: item,
+              text: 'Servicio destacado para reforzar la propuesta comercial.',
+            }
+          : {
+              title: item?.title || item?.label || 'Servicio',
+              text: item?.text || item?.description || item?.subtitle || '',
+            }
+      );
+    })
+    .filter((item) => !isInternalPreviewText(`${item.title} ${item.text}`));
+
+  const services = kernelServices.length >= 3
+    ? kernelServices.slice(0, 3)
+    : profile.services;
 
   return {
-    ...copy,
-    eyebrow:
-      activeKernelSection?.label ||
-      hubSummary?.primaryPlaybook ||
-      copy?.eyebrow ||
-      'Builder',
-    headline: resolveDynamicHeadline({
-      copy,
-      hubSummary,
-      lastDelta,
-      activeKernelSection,
-    }),
-    subheadline: resolveDynamicSubheadline({
-      copy,
-      hubSummary,
-      lastDelta,
-      activeKernelSection,
-    }),
-    primaryCta: resolveDynamicPrimaryCTA({
-      copy,
-      hubSummary,
-      lastDelta,
-      lastOperation,
-      activeKernelSection,
-    }),
-    secondaryCta: resolveDynamicSecondaryCTA({
-      copy,
-      lastDelta,
-    }),
-    sectionTitle:
-      hubSummary?.operationalFocus ||
-      copy?.sectionTitle ||
-      'Base estructural preparada',
-    sectionText:
-      lastDelta?.structure?.strategy ||
-      lastDelta?.visual?.direction ||
-      copy?.sectionText ||
-      'Builder organiza promesa, bloques, CTA y continuidad antes de pasar a salida técnica.',
-    cards: buildCardsFromVisiblePlan({
-      visiblePlan,
-      hubSummary,
-      copy,
-      kernelSections,
-    }),
+    ...profile,
+    eyebrow,
+    headline,
+    subheadline,
+    primaryCTA,
+    secondaryCTA,
+    sectionTitle: safeLandingText(copy?.sectionTitle, profile.sectionTitle),
+    sectionText: safeLandingText(copy?.sectionText, profile.sectionText),
+    services,
   };
 };
 
-const HubSignalStrip = ({ builderIntelligence }) => {
-  const {
-    hubSummary,
-    lastDelta,
-    buildSummary,
-  } = getBuilderIntelligenceParts(builderIntelligence);
-
-  if (!hubSummary?.primaryPlaybook && !lastDelta && !buildSummary) return null;
-
-  const tone = resolvePreviewTone(builderIntelligence);
-  const affectedLayers = getArray(hubSummary?.affectedLayers);
-
-  return (
-    <div className="border-b border-white/[0.08] bg-black/20 px-6 py-3 md:px-9">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${getAccentClass(tone)}`}>
-          Builder vivo
-        </span>
-
-        {hubSummary?.primaryPlaybook && (
-          <span className="rounded-full border border-white/[0.08] bg-white/[0.035] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-300">
-            {hubSummary.primaryPlaybook}
-          </span>
-        )}
-
-        {hubSummary?.primaryCTA && (
-          <span className="rounded-full border border-white/[0.08] bg-white/[0.035] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
-            CTA: {hubSummary.primaryCTA}
-          </span>
-        )}
-
-        {buildSummary && (
-          <span className="rounded-full border border-emerald-300/15 bg-emerald-300/[0.04] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-100/80">
-            {buildSummary.blocksCount || 0} bloques · {buildSummary.filesCount || 0} archivos
-          </span>
-        )}
-
-        <span className="rounded-full border border-white/[0.08] bg-white/[0.035] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-          Tono: {getToneLabel(tone)}
-        </span>
-
-        {affectedLayers.slice(0, 3).map((layer) => (
-          <span
-            key={layer}
-            className="rounded-full border border-cyan-300/10 bg-cyan-300/[0.035] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-100/80"
-          >
-            {layer}
-          </span>
-        ))}
-      </div>
+const LandingHero = ({
+  model,
+  tone,
+  progress,
+}) => (
+  <section className="px-6 py-9 md:px-10 md:py-12">
+    <div
+      className={`inline-flex rounded-full border px-4 py-2 transition-all duration-700 ${getAccentClass(tone)} ${
+        progress >= 18 ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-20'
+      }`}
+    >
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em]">
+        {model.eyebrow}
+      </p>
     </div>
-  );
-};
 
-const KernelSectionCard = ({ section, tone }) => {
-  const props = section?.props || {};
-  const points = getArray(props.points);
-  const steps = getArray(props.steps);
-  const fields = getArray(props.fields);
-  const items = getArray(props.items);
-  const list = points.length ? points : steps.length ? steps : fields.length ? fields : items;
+    <div className="mt-7 grid gap-8 xl:grid-cols-[1.15fr_0.85fr] xl:items-end">
+      <div>
+        <p
+          className={`text-sm font-semibold uppercase tracking-[0.18em] text-zinc-400 transition-all duration-700 ${
+            progress >= 24 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
+          }`}
+        >
+          {model.businessName}
+        </p>
 
-  return (
-    <article className={`rounded-[24px] border p-5 ${getPanelClass(tone)}`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100/80">
-            {section.label || section.type || 'Bloque'}
-          </p>
+        <h1
+          className={`mt-4 max-w-5xl text-4xl font-semibold tracking-[-0.075em] text-white transition-all duration-700 md:text-6xl ${
+            progress >= 34 ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-20'
+          }`}
+        >
+          {model.headline}
+        </h1>
 
-          <h3 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white">
-            {props.title || section.label || 'Bloque generado'}
-          </h3>
+        <p
+          className={`mt-6 max-w-3xl text-base leading-8 text-zinc-300 transition-all duration-700 md:text-lg ${
+            progress >= 48 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
+          }`}
+        >
+          {model.subheadline}
+        </p>
+
+        <div
+          className={`mt-8 flex flex-wrap gap-3 transition-all duration-700 ${
+            progress >= 62 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
+          }`}
+        >
+          <button className={`rounded-2xl px-6 py-3.5 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
+            {model.primaryCTA}
+          </button>
+
+          <button className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-white">
+            {model.secondaryCTA}
+          </button>
         </div>
-
-        {props.badge && (
-          <span className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${getAccentClass(tone)}`}>
-            {props.badge}
-          </span>
-        )}
       </div>
 
-      {props.subtitle && (
-        <p className="mt-4 text-sm leading-7 text-zinc-300">
-          {props.subtitle}
+      <div
+        className={`rounded-[28px] border p-5 transition-all duration-700 ${getPanelClass(tone)} ${
+          progress >= 56 ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-20'
+        }`}
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
+          Reserva rápida
         </p>
-      )}
 
-      {list.length > 0 && (
-        <div className="mt-5 grid gap-2 sm:grid-cols-2">
-          {list.slice(0, 6).map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3 text-sm text-zinc-300"
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-      )}
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
+          {model.booking.title}
+        </h2>
 
-      {(section.type === 'lead_capture' || section.type === 'lead_form') && (
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <input
-            readOnly
-            value=""
-            placeholder={props.placeholder || 'tu@email.com'}
-            className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-zinc-400 outline-none"
-          />
+        <p className="mt-3 text-sm leading-7 text-zinc-400">
+          {model.booking.text}
+        </p>
 
-          <button className={`rounded-2xl px-5 py-3 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
-            {props.buttonLabel || 'Enviar'}
-          </button>
-        </div>
-      )}
-
-      {section.type === 'auth' && (
-        <div className="mt-5">
-          <button className={`rounded-2xl px-5 py-3 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
-            {props.buttonLabel || 'Entrar con Google'}
-          </button>
-        </div>
-      )}
-
-      {section.type === 'booking' && (
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {(fields.length ? fields : ['nombre', 'fecha']).slice(0, 4).map((field) => (
+          {model.booking.fields.slice(0, 4).map((field) => (
             <input
               key={field}
               readOnly
@@ -595,57 +873,273 @@ const KernelSectionCard = ({ section, tone }) => {
           ))}
 
           <button className={`rounded-2xl px-5 py-3 text-sm font-semibold sm:col-span-2 ${getPrimaryButtonClass(tone)}`}>
-            {props.buttonLabel || 'Confirmar'}
+            {model.booking.buttonLabel}
           </button>
         </div>
-      )}
+      </div>
+    </div>
+  </section>
+);
 
-      {props.buttonLabel && !['auth', 'booking', 'lead_capture', 'lead_form'].includes(section.type) && (
-        <button className={`mt-5 rounded-2xl px-5 py-3 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
-          {props.buttonLabel}
-        </button>
-      )}
-    </article>
-  );
-};
+const LandingServices = ({
+  model,
+  tone,
+  progress,
+}) => (
+  <section
+    className={`border-t border-white/[0.08] px-6 py-8 transition-all duration-700 md:px-10 ${
+      progress >= 68 ? 'opacity-100' : 'opacity-20'
+    }`}
+  >
+    <div className="max-w-3xl">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
+        Tratamientos y servicios
+      </p>
 
-const BuilderKernelSections = ({ builderIntelligence, progress, tone }) => {
-  const sections = getKernelSections(builderIntelligence);
+      <h2 className="mt-3 text-3xl font-semibold tracking-[-0.055em] text-white">
+        {model.sectionTitle}
+      </h2>
 
-  if (!sections.length) return null;
+      <p className="mt-4 text-sm leading-7 text-zinc-400">
+        {model.sectionText}
+      </p>
+    </div>
 
-  return (
-    <section
-      className={`border-t border-white/[0.08] px-6 py-7 transition-all duration-700 md:px-9 ${
-        progress >= 70 ? 'opacity-100' : 'opacity-20'
-      }`}
-    >
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            Cambios reales del Builder
+    <div className="mt-7 grid gap-4 lg:grid-cols-3">
+      {model.services.map((service, index) => (
+        <article
+          key={`${service.title}-${index}`}
+          className={`rounded-[26px] border p-5 transition-all duration-700 ${getPanelClass(tone)} ${
+            progress >= 72 + index * 4 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
+          }`}
+        >
+          <div className={`mb-5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border text-sm font-semibold ${getAccentClass(tone)}`}>
+            {index + 1}
+          </div>
+
+          <h3 className="text-xl font-semibold tracking-[-0.04em] text-white">
+            {truncateText(service.title, 56)}
+          </h3>
+
+          <p className="mt-4 text-sm leading-7 text-zinc-400">
+            {service.text}
+          </p>
+        </article>
+      ))}
+    </div>
+  </section>
+);
+
+const LandingTrustTechnology = ({
+  model,
+  tone,
+  progress,
+}) => (
+  <section
+    className={`border-t border-white/[0.08] px-6 py-8 transition-all duration-700 md:px-10 ${
+      progress >= 78 ? 'opacity-100' : 'opacity-20'
+    }`}
+  >
+    <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+      <article className={`rounded-[28px] border p-6 ${getPanelClass(tone)}`}>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
+          Confianza médica
+        </p>
+
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
+          Seguridad antes de reservar
+        </h2>
+
+        <div className="mt-6 grid gap-3">
+          {model.trust.map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3 text-sm text-zinc-300"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article className={`rounded-[28px] border p-6 ${getPanelClass(tone)}`}>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
+          Tecnología y seguimiento
+        </p>
+
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
+          Un sistema preparado para captar y atender mejor
+        </h2>
+
+        <p className="mt-4 text-sm leading-7 text-zinc-400">
+          La landing presenta valor al paciente y deja preparada una evolución comercial hacia reservas, emails, automatizaciones y seguimiento.
+        </p>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {model.technology.map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-3 text-sm text-zinc-300"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      </article>
+    </div>
+  </section>
+);
+
+const LandingTestimonials = ({
+  model,
+  tone,
+  progress,
+}) => (
+  <section
+    className={`border-t border-white/[0.08] px-6 py-8 transition-all duration-700 md:px-10 ${
+      progress >= 86 ? 'opacity-100' : 'opacity-20'
+    }`}
+  >
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200">
+          Prueba social
+        </p>
+
+        <h2 className="mt-3 text-3xl font-semibold tracking-[-0.055em] text-white">
+          Pacientes que entienden el valor antes de llamar
+        </h2>
+      </div>
+
+      <span className={`rounded-full border px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] ${getAccentClass(tone)}`}>
+        Testimonios preparados
+      </span>
+    </div>
+
+    <div className="mt-7 grid gap-4 lg:grid-cols-2">
+      {model.testimonials.map((testimonial, index) => (
+        <article
+          key={`${testimonial.author}-${index}`}
+          className={`rounded-[26px] border p-6 ${getPanelClass(tone)}`}
+        >
+          <p className="text-lg leading-8 text-white">
+            “{testimonial.quote}”
           </p>
 
-          <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white md:text-3xl">
-            Preview conectada al estado vivo
+          <p className="mt-5 text-sm font-semibold text-zinc-400">
+            {testimonial.author}
+          </p>
+        </article>
+      ))}
+    </div>
+  </section>
+);
+
+const LandingAutomationCTA = ({
+  model,
+  tone,
+  progress,
+}) => (
+  <section
+    className={`border-t border-white/[0.08] px-6 py-8 transition-all duration-700 md:px-10 ${
+      progress >= 92 ? 'opacity-100' : 'opacity-20'
+    }`}
+  >
+    <div className={`rounded-[30px] border p-6 md:p-8 ${getPanelClass(tone)}`}>
+      <div className="grid gap-7 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
+            Captación automatizable
+          </p>
+
+          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white">
+            {model.automation.title}
           </h2>
+
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-300">
+            {model.automation.text}
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <button className={`rounded-2xl px-6 py-3.5 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
+              {model.primaryCTA}
+            </button>
+
+            <button className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-white">
+              Solicitar demo del sistema
+            </button>
+          </div>
         </div>
 
-        <span className="rounded-full border border-emerald-300/15 bg-emerald-300/[0.04] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-100">
-          {sections.length} bloque{sections.length === 1 ? '' : 's'}
-        </span>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {model.automation.items.map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/[0.08] bg-black/25 px-4 py-4 text-sm text-zinc-300"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
       </div>
+    </div>
+  </section>
+);
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        {sections.slice(-4).map((section) => (
-          <KernelSectionCard
-            key={section.id}
-            section={section}
-            tone={tone}
-          />
-        ))}
-      </div>
-    </section>
+const ClientLandingPreview = ({
+  copy,
+  project,
+  progress,
+  builderIntelligence,
+}) => {
+  const model = useMemo(
+    () =>
+      buildLandingModel({
+        copy,
+        project,
+        builderIntelligence,
+      }),
+    [
+      copy,
+      project,
+      builderIntelligence,
+    ]
+  );
+
+  const tone = resolvePreviewTone(builderIntelligence, model.tone);
+
+  return (
+    <div className={`h-full overflow-y-auto ${getPreviewSurfaceClass(tone)}`}>
+      <LandingHero
+        model={model}
+        tone={tone}
+        progress={progress}
+      />
+
+      <LandingServices
+        model={model}
+        tone={tone}
+        progress={progress}
+      />
+
+      <LandingTrustTechnology
+        model={model}
+        tone={tone}
+        progress={progress}
+      />
+
+      <LandingTestimonials
+        model={model}
+        tone={tone}
+        progress={progress}
+      />
+
+      <LandingAutomationCTA
+        model={model}
+        tone={tone}
+        progress={progress}
+      />
+    </div>
   );
 };
 
@@ -759,261 +1253,11 @@ const CodeCanvas = ({
             </span>
 
             <span className="text-cyan-300">
-              <span className="inline-block h-4 w-[7px] translate-y-[2px] bg-cyan-300 animate-pulse" />
+              <span className="inline-block h-4 w-[7px] translate-y-[2px] animate-pulse bg-cyan-300" />
             </span>
           </div>
         )}
       </div>
-    </div>
-  );
-};
-
-const CreationPreview = ({ copy, progress, builderIntelligence }) => {
-  const ready = progress >= 92;
-  const tone = resolvePreviewTone(builderIntelligence);
-  const effectiveCopy = buildEffectivePreviewCopy({
-    copy,
-    builderIntelligence,
-  });
-
-  return (
-    <div className={`h-full overflow-y-auto ${getPreviewSurfaceClass(tone)}`}>
-      <HubSignalStrip builderIntelligence={builderIntelligence} />
-
-      <section className="px-6 py-8 md:px-9 md:py-10">
-        <div
-          className={`inline-flex rounded-full border px-4 py-2 transition-all duration-700 ${getAccentClass(tone)} ${
-            progress >= 18 ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-20'
-          }`}
-        >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em]">
-            {effectiveCopy.eyebrow}
-          </p>
-        </div>
-
-        <h1
-          className={`mt-6 max-w-4xl text-3xl font-semibold tracking-[-0.07em] text-white transition-all duration-700 md:text-5xl ${
-            progress >= 34 ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-20'
-          }`}
-        >
-          {effectiveCopy.headline}
-        </h1>
-
-        <p
-          className={`mt-5 max-w-3xl text-sm leading-7 text-zinc-300 transition-all duration-700 md:text-base ${
-            progress >= 48 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
-          }`}
-        >
-          {effectiveCopy.subheadline}
-        </p>
-
-        <div
-          className={`mt-7 flex flex-wrap gap-3 transition-all duration-700 ${
-            progress >= 62 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
-          }`}
-        >
-          <button className={`rounded-2xl px-5 py-3 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
-            {effectiveCopy.primaryCta}
-          </button>
-
-          <button className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white">
-            {effectiveCopy.secondaryCta}
-          </button>
-        </div>
-      </section>
-
-      <BuilderKernelSections
-        builderIntelligence={builderIntelligence}
-        progress={progress}
-        tone={tone}
-      />
-
-      <section
-        className={`border-t border-white/[0.08] px-6 py-7 transition-all duration-700 md:px-9 ${
-          progress >= 68 ? 'opacity-100' : 'opacity-20'
-        }`}
-      >
-        <div className="max-w-3xl">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
-            Sistema operativo
-          </p>
-
-          <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white md:text-3xl">
-            {effectiveCopy.sectionTitle}
-          </h2>
-
-          <p className="mt-4 text-sm leading-7 text-zinc-400">
-            {effectiveCopy.sectionText}
-          </p>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {effectiveCopy.cards.map((card, index) => (
-            <div
-              key={`${card.title}-${index}`}
-              className={`rounded-[22px] border p-5 transition-all duration-700 ${getPanelClass(tone)} ${
-                progress >= 74 + index * 6 ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-20'
-              }`}
-            >
-              <p className="text-base font-semibold text-white">
-                {truncateText(card.title, 48)}
-              </p>
-
-              <p className="mt-3 text-sm leading-6 text-zinc-400">
-                {card.text}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section
-        className={`border-t border-white/[0.08] px-6 py-7 transition-all duration-700 md:px-9 ${
-          ready ? 'opacity-100' : 'opacity-20'
-        }`}
-      >
-        <div className={`rounded-[24px] border p-5 ${getPanelClass(tone)}`}>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            Primera versión generada
-          </p>
-
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-200">
-            La base visual ya responde al estado vivo del Builder: bloques, CTA, archivos y estructura quedan preparados para preview, código y salida técnica.
-          </p>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-const TransformPreview = ({ copy, progress, builderIntelligence }) => {
-  const showAfter = progress >= 42;
-  const ready = progress >= 90;
-  const tone = resolvePreviewTone(builderIntelligence);
-  const effectiveCopy = buildEffectivePreviewCopy({
-    copy,
-    builderIntelligence,
-  });
-
-  return (
-    <div className={`h-full overflow-y-auto p-4 ${getPreviewSurfaceClass(tone)}`}>
-      <HubSignalStrip builderIntelligence={builderIntelligence} />
-
-      <div className="mb-4 rounded-[22px] border border-white/[0.08] bg-black/25 p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-          URL recibida
-        </p>
-
-        <p className="mt-2 text-sm text-zinc-300">
-          {effectiveCopy.originalLabel}
-        </p>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <section className="rounded-[24px] border border-red-300/10 bg-red-300/[0.035] p-4 opacity-80">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-red-200/80">
-            Versión actual detectada
-          </p>
-
-          <div className="mt-5 rounded-[20px] border border-white/[0.08] bg-black/35 p-4">
-            <div className="h-7 w-40 rounded-full bg-white/[0.08]" />
-            <div className="mt-5 h-14 rounded-2xl bg-white/[0.06]" />
-            <div className="mt-4 h-4 w-3/4 rounded-full bg-white/[0.07]" />
-            <div className="mt-3 h-4 w-1/2 rounded-full bg-white/[0.07]" />
-            <div className="mt-6 h-10 w-32 rounded-2xl border border-white/[0.08] bg-white/[0.04]" />
-          </div>
-
-          <div className="mt-4 space-y-3">
-            {[
-              'Promesa poco priorizada',
-              'CTA sin suficiente peso visual',
-              'Jerarquía comercial mejorable',
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-2xl border border-white/[0.06] bg-black/20 p-3"
-              >
-                <p className="text-sm text-zinc-400">{item}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section
-          className={`rounded-[24px] border p-4 transition-all duration-700 ${getPanelClass(tone)} ${
-            showAfter ? 'opacity-100' : 'opacity-20'
-          }`}
-        >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            Nueva versión propuesta
-          </p>
-
-          <div className="mt-5 rounded-[20px] border border-white/[0.08] bg-[#07090C] p-4">
-            <div className={`inline-flex rounded-full border px-3 py-1.5 ${getAccentClass(tone)}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em]">
-                {effectiveCopy.eyebrow || 'Web optimizada'}
-              </p>
-            </div>
-
-            <h1 className="mt-5 text-2xl font-semibold tracking-[-0.06em] text-white">
-              {effectiveCopy.headline}
-            </h1>
-
-            <p className="mt-4 text-sm leading-7 text-zinc-300">
-              {effectiveCopy.subheadline}
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button className={`rounded-2xl px-4 py-2.5 text-sm font-semibold ${getPrimaryButtonClass(tone)}`}>
-                {effectiveCopy.primaryCta}
-              </button>
-
-              <button className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-white">
-                {effectiveCopy.secondaryCta}
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3">
-            {effectiveCopy.cards.map((card, index) => (
-              <div
-                key={`${card.title}-${index}`}
-                className={`rounded-2xl border border-white/[0.08] bg-black/25 p-4 transition-all duration-700 ${
-                  progress >= 60 + index * 9 ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-20'
-                }`}
-              >
-                <p className="font-semibold text-white">
-                  {truncateText(card.title, 48)}
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
-                  {card.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <BuilderKernelSections
-        builderIntelligence={builderIntelligence}
-        progress={progress}
-        tone={tone}
-      />
-
-      <section
-        className={`mt-4 rounded-[24px] border p-5 transition-opacity duration-700 ${getPanelClass(tone)} ${
-          ready ? 'opacity-100' : 'opacity-20'
-        }`}
-      >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-200">
-          Rediseño preparado
-        </p>
-
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-200">
-          La nueva versión queda conectada al estado vivo del Builder: CTA, bloques, código y estructura pueden reflejarse antes de pasar a GitHub o deploy.
-        </p>
-      </section>
     </div>
   );
 };
@@ -1130,7 +1374,7 @@ const BuilderStructureCompact = ({ project, builderIntelligence }) => {
           </h2>
 
           <p className="mt-4 max-w-4xl text-sm leading-7 text-zinc-400">
-            Esta estructura sale de `BuilderBuildState`, no de un blueprint estático. Cada mutación añade o actualiza piezas exportables.
+            Esta estructura sale del estado de construcción y permite preparar una salida técnica coherente.
           </p>
         </div>
 
@@ -1201,7 +1445,7 @@ const DeployPanel = ({ project, kind = 'deploy' }) => (
           <p className="text-sm font-semibold text-white">{item}</p>
 
           <p className="mt-3 text-sm leading-6 text-zinc-500">
-            Pendiente de la Ola 2B.2.
+            Pendiente de salida técnica validada.
           </p>
         </div>
       ))}
@@ -1218,14 +1462,16 @@ export default function BuilderCanvasPane({
   onCodeTabChange,
   builderIntelligence = null,
 }) {
-  const effectiveCopy = useMemo(
+  const landingCopy = useMemo(
     () =>
-      buildEffectivePreviewCopy({
+      buildLandingModel({
         copy,
+        project,
         builderIntelligence,
       }),
     [
       copy,
+      project,
       builderIntelligence,
     ]
   );
@@ -1239,7 +1485,7 @@ export default function BuilderCanvasPane({
   if (activeWorkspaceTab === 'code') {
     return (
       <CodeCanvas
-        copy={effectiveCopy}
+        copy={landingCopy}
         project={project}
         progress={progress}
         activeCodeTab={activeCodeTab}
@@ -1254,7 +1500,7 @@ export default function BuilderCanvasPane({
   if (activeWorkspaceTab === 'extract') {
     return (
       <BuilderExtractionPanel
-        copy={effectiveCopy}
+        copy={landingCopy}
         project={project}
         progress={progress}
         builderIntelligence={builderIntelligence}
@@ -1279,19 +1525,12 @@ export default function BuilderCanvasPane({
     return <DeployPanel project={project} kind="github" />;
   }
 
-  return effectiveCopy.mode === 'transform'
-    ? (
-        <TransformPreview
-          copy={effectiveCopy}
-          progress={progress}
-          builderIntelligence={builderIntelligence}
-        />
-      )
-    : (
-        <CreationPreview
-          copy={effectiveCopy}
-          progress={progress}
-          builderIntelligence={builderIntelligence}
-        />
-      );
+  return (
+    <ClientLandingPreview
+      copy={copy}
+      project={project}
+      progress={progress}
+      builderIntelligence={builderIntelligence}
+    />
+  );
 }
