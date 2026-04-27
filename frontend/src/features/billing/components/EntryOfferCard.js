@@ -1,6 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, FileText } from '@phosphor-icons/react';
+import {
+  ArrowRight,
+  CheckCircle,
+  FileText,
+  Sparkle
+} from '@phosphor-icons/react';
+
+const GOLD_FEATURES = [
+  'Diagnóstico premium del caso',
+  'Blueprint de activación',
+  'Prompt recomendado para empezar',
+  'Continuidad natural hacia Builder'
+];
 
 const EntryOfferCard = ({
   selectedEntryOffer,
@@ -10,108 +22,124 @@ const EntryOfferCard = ({
 }) => {
   if (!selectedEntryOffer) return null;
 
+  const priceLabel = selectedEntryOffer.priceLabel || '6,99 €';
+  const periodLabel = selectedEntryOffer.periodLabel || 'PAGO ÚNICO';
+  const isProcessing = processingKey === `offer:${selectedEntryOffer.id}`;
+
   return (
-    <motion.div
+    <motion.section
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.08 }}
-      className={`mb-10 ${isFocused ? 'ring-2 ring-amber-400/30 rounded-2xl' : ''}`}
+      transition={{ delay: 0.03 }}
+      className={`mb-8 ${isFocused ? 'rounded-[28px] ring-2 ring-amber-300/30' : ''}`}
       data-testid="entry-offer-card"
     >
-      <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_28%),linear-gradient(180deg,#141311_0%,#0F0F0F_100%)] p-6">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-amber-500/0 via-amber-500/40 to-amber-500/0" />
+      <div className="relative overflow-hidden rounded-[28px] border border-amber-200/15 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(15,82,87,0.16),transparent_34%),linear-gradient(180deg,#15120D_0%,#090909_100%)] p-6 sm:p-8">
+        <div className="absolute right-[-120px] top-[-140px] h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
+        <div className="absolute bottom-[-140px] left-[-110px] h-72 w-72 rounded-full bg-[#0F5257]/14 blur-3xl" />
 
-        <div className="grid lg:grid-cols-[1.18fr_0.82fr] gap-6 items-stretch">
-          <div className="flex flex-col">
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-amber-500/10 text-amber-200 text-xs font-medium border border-amber-500/20">
-                {selectedEntryOffer.badge}
+        <div className="relative z-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
+          <div>
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-100">
+                <Sparkle size={14} weight="fill" />
+                Informe Gold
               </span>
-              <span className="text-xs uppercase tracking-wider text-[#C8B898]">
-                {selectedEntryOffer.priceLabel} · {selectedEntryOffer.periodLabel}
+
+              <span className="text-sm font-medium text-amber-100/85">
+                {priceLabel} · {periodLabel.toLowerCase()}
               </span>
             </div>
 
-            <h3 className="text-[2rem] leading-tight font-medium text-white mb-3">
-              {selectedEntryOffer.headline}
-            </h3>
+            <h2 className="mb-4 max-w-3xl text-3xl font-light leading-tight text-white sm:text-4xl">
+              Informe Maestro Gold
+            </h2>
 
-            <p className="text-[#ECE7DD] text-lg leading-relaxed mb-4 max-w-2xl">
-              {selectedEntryOffer.description}
+            <p className="mb-5 max-w-2xl text-base leading-7 text-[#D4D4D4]">
+              Compra puntual para convertir una idea, una URL o una oportunidad
+              en una lectura premium con diagnóstico, dirección y siguiente paso
+              accionable dentro de Sistema Maestro.
             </p>
 
-            <p className="text-sm text-[#D9C8A2] mb-4 max-w-2xl">
-              Reduce dudas, ordena el caso y prepara el siguiente paso.
-            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {GOLD_FEATURES.map((feature) => (
+                <div
+                  key={feature}
+                  className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-3"
+                >
+                  <CheckCircle
+                    size={17}
+                    weight="fill"
+                    className="mt-0.5 flex-shrink-0 text-[#8DE1D0]"
+                  />
 
-            <p className="text-sm text-[#B9B1A3] mb-6 max-w-2xl">
-              {selectedEntryOffer.valuePromise}
-            </p>
-
-            <div className="flex flex-wrap gap-2 mt-auto">
-              {(selectedEntryOffer.billingHighlights || selectedEntryOffer.features)
-                .slice(0, 4)
-                .map((feature) => (
-                  <span
-                    key={feature}
-                    className="px-3 py-2 rounded-full text-xs bg-[#0A0A0A] border border-amber-500/14 text-[#F0E2C5]"
-                  >
+                  <span className="text-sm leading-6 text-white">
                     {feature}
                   </span>
-                ))}
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="bg-[#090909] border border-amber-500/15 rounded-2xl p-5 flex flex-col shadow-[0_0_0_1px_rgba(245,158,11,0.04)]">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-100 text-xs font-medium border border-amber-500/20 mb-4 self-start">
-              <FileText size={14} weight="fill" />
-              Compra puntual
+          <div className="flex h-full flex-col justify-between rounded-3xl border border-white/10 bg-black/30 p-5 sm:p-6">
+            <div>
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200/20 bg-amber-500/10">
+                <FileText size={24} className="text-amber-200" />
+              </div>
+
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100">
+                Activación puntual
+              </p>
+
+              <div className="mb-5 flex items-end gap-2">
+                <span className="text-5xl font-light text-white">
+                  {priceLabel}
+                </span>
+                <span className="pb-2 text-sm text-[#A3A3A3]">
+                  pago único
+                </span>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#8DE1D0]">
+                  Qué estás activando
+                </p>
+
+                <p className="text-sm leading-6 text-[#D4D4D4]">
+                  Una lectura premium más útil que un resumen: ordena el caso,
+                  detecta la fricción principal y te entrega un prompt preparado
+                  para empezar en Builder.
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-baseline gap-2 mb-5">
-              <span className="text-5xl font-light text-white">
-                {selectedEntryOffer.priceLabel}
-              </span>
-              <span className="text-amber-100/75">{selectedEntryOffer.periodLabel}</span>
-            </div>
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={onEntryOfferCheckout}
+                disabled={isProcessing}
+                data-testid="entry-offer-cta"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#F8D98B_0%,#F2A1B7_100%)] px-5 py-4 text-base font-semibold text-black shadow-[0_18px_50px_rgba(245,158,11,0.18)] transition-all hover:translate-y-[-1px] hover:shadow-[0_22px_60px_rgba(245,158,11,0.24)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              >
+                {isProcessing ? (
+                  'Abriendo checkout...'
+                ) : (
+                  <>
+                    Comprar Informe Gold
+                    <ArrowRight size={18} />
+                  </>
+                )}
+              </button>
 
-            <div className="rounded-xl border border-white/5 bg-[#111111] px-4 py-4 mb-4">
-              <p className="text-[11px] uppercase tracking-wide text-[#A3A3A3] mb-1">
-                Rol dentro del sistema
-              </p>
-              <p className="text-sm text-white">
-                Puente transaccional antes de entrar en continuidad.
+              <p className="mt-3 text-center text-xs leading-5 text-[#A3A3A3]">
+                Después de la compra, volverás al informe o al proyecto activo
+                para continuar hacia Builder.
               </p>
             </div>
-
-            <div className="rounded-xl border border-amber-500/20 bg-[linear-gradient(180deg,#181308_0%,#120F07_100%)] px-4 py-4 mb-5">
-              <p className="text-[11px] uppercase tracking-wide text-amber-200/75 mb-1">
-                Qué activa
-              </p>
-              <p className="text-sm text-[#F2E7D1]">
-                Informe premium inicial, lectura más útil y primer paso accionable.
-              </p>
-            </div>
-
-            <button
-              onClick={onEntryOfferCheckout}
-              disabled={processingKey === `offer:${selectedEntryOffer.id}`}
-              className="w-full py-3 rounded-lg font-medium bg-[linear-gradient(180deg,#3F3728_0%,#30291F_100%)] text-white hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto border border-amber-500/15"
-              data-testid="entry-offer-cta"
-            >
-              {processingKey === `offer:${selectedEntryOffer.id}` ? (
-                <div className="spinner w-4 h-4"></div>
-              ) : (
-                <>
-                  {selectedEntryOffer.cta.label}
-                  <ArrowRight size={16} />
-                </>
-              )}
-            </button>
           </div>
         </div>
       </div>
-    </motion.div>
+    </motion.section>
   );
 };
 
