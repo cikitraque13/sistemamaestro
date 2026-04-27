@@ -17,12 +17,10 @@ const PLAN_ROLE_META = {
     stage: 'ACTIVAR',
     badge: 'Entrada seria',
     suggestedBadge: 'Recomendado',
-    level: 'Primera activación operativa',
     headline: 'Activa una base real de trabajo.',
     description:
-      'Para pasar de una idea, informe o diagnóstico inicial a una base real de trabajo dentro de Builder.',
-    bestFor:
-      'Primera activación seria dentro del sistema.',
+      'Convierte una idea, informe o diagnóstico inicial en una base operativa dentro de Builder.',
+    bestFor: 'Primera activación seria dentro del sistema.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
     glow: 'bg-[#0F5257]/26',
@@ -35,12 +33,10 @@ const PLAN_ROLE_META = {
   sistema: {
     stage: 'CONTINUAR',
     badge: 'Núcleo operativo',
-    level: 'Continuidad seria',
     headline: 'Convierte el sistema en continuidad operativa.',
     description:
-      'Para proyectos que ya necesitan iteración, seguimiento, más margen operativo y continuidad de construcción.',
-    bestFor:
-      'Continuidad seria y trabajo con más recorrido.',
+      'Mantén proyectos vivos con iteración, seguimiento, más margen operativo y construcción continua.',
+    bestFor: 'Continuidad seria y trabajo con más recorrido.',
     surface:
       'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
     glow: 'bg-sky-400/18',
@@ -53,12 +49,10 @@ const PLAN_ROLE_META = {
   premium: {
     stage: 'ESCALAR',
     badge: 'Capa superior',
-    level: 'Capa maestra avanzada',
     headline: 'Activa la capa maestra para casos complejos.',
     description:
-      'Para casos complejos que requieren más criterio, más inteligencia, más capacidad y preparación seria de salida.',
-    bestFor:
-      'Casos complejos, operador serio y salida preparada.',
+      'Trabaja con más criterio, más inteligencia, más capacidad y preparación seria de salida.',
+    bestFor: 'Casos complejos, operador serio y salida preparada.',
     surface:
       'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
     glow: 'bg-fuchsia-400/18',
@@ -70,10 +64,18 @@ const PLAN_ROLE_META = {
   }
 };
 
+const GEM_LABELS = {
+  CRÉDITOS: 'GEMA MAESTRA',
+  CREDITOS: 'GEMA MAESTRA'
+};
+
+const getVisibleOperationalLabel = (label) => GEM_LABELS[label] || label;
+
 const OperationalGrid = ({ items }) => (
   <div className="grid gap-3 sm:grid-cols-2">
     {items.map((item) => {
       const accent = getOperationalAccentClasses(item.label);
+      const visibleLabel = getVisibleOperationalLabel(item.label);
 
       return (
         <div
@@ -81,7 +83,7 @@ const OperationalGrid = ({ items }) => (
           className={`min-h-[92px] rounded-2xl border px-3 py-3 ${accent.wrap}`}
         >
           <p className={`mb-1 text-[10px] uppercase tracking-[0.14em] ${accent.label}`}>
-            {item.label}
+            {visibleLabel}
           </p>
 
           <p className={`text-xs leading-relaxed ${accent.value}`}>
@@ -129,10 +131,12 @@ const PlanCard = ({
       className={`relative flex h-full min-h-[710px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
     >
-      <div className={`absolute right-[-110px] top-[-120px] h-72 w-72 rounded-full ${role.glow} blur-3xl`} />
+      <div
+        className={`absolute right-[-110px] top-[-120px] h-72 w-72 rounded-full ${role.glow} blur-3xl`}
+      />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-white/0 via-white/55 to-white/0" />
 
-      <div className="relative z-10 flex min-h-[292px] flex-col">
+      <div className="relative z-10 flex min-h-[286px] flex-col">
         <div className="mb-8 flex min-h-[34px] flex-wrap items-start gap-2">
           <span
             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
@@ -153,7 +157,7 @@ const PlanCard = ({
           )}
         </div>
 
-        <div className="flex min-h-[232px] flex-col">
+        <div className="flex min-h-[224px] flex-col">
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-white/82">
             {role.stage}
           </p>
@@ -163,16 +167,16 @@ const PlanCard = ({
           </h4>
 
           <p className="mb-5 min-h-[58px] text-base leading-7 text-white">
-            {role.headline || plan.headline}
+            {role.headline}
           </p>
 
-          <p className="min-h-[78px] text-sm leading-6 text-white/68">
+          <p className="min-h-[72px] text-sm leading-6 text-white/68">
             {role.description}
           </p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-2 min-h-[248px] rounded-3xl border border-white/16 bg-black/30 p-5">
+      <div className="relative z-10 mt-2 min-h-[236px] rounded-3xl border border-white/16 bg-black/30 p-5">
         <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-white/55">
           Nivel de capacidad
         </p>
@@ -205,7 +209,7 @@ const PlanCard = ({
               Marco operativo
             </p>
             <p className="mt-1 text-xs text-white/45">
-              Acceso, Builder, salida y créditos.
+              Acceso, Builder, salida y Gema Maestra.
             </p>
           </div>
 
