@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { DiamondsFour, Sparkle } from '@phosphor-icons/react';
 
 import { pricingPlans } from '../../../content/pricingContent';
-import { OPERATIONAL_NOTE } from '../billing.constants';
 import PlanCard from './PlanCard';
 
 const PlansGrid = ({
@@ -24,7 +23,7 @@ const PlansGrid = ({
       transition={{ delay: 0.05 }}
       className="mb-8"
     >
-      <div className="mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(15,82,87,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#121212_0%,#080808_100%)] p-6 sm:p-7">
+      <div className="mb-6 overflow-hidden rounded-[28px] border border-cyan-300/10 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.08),transparent_34%),linear-gradient(180deg,#121212_0%,#080808_100%)] p-6 sm:p-7">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#0F5257]/25 bg-[#0F5257]/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-[#8DE1D0]">
@@ -43,12 +42,13 @@ const PlansGrid = ({
             </p>
           </div>
 
-          <div className="rounded-2xl border border-amber-200/15 bg-amber-500/10 px-4 py-3">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-amber-100">
+          <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/10 px-4 py-3">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-cyan-100">
               Progresión interna
             </p>
-            <p className="mt-1 text-sm text-[#F2E7D1]">
-              10 créditos iniciales → Pro → Growth → AI Master
+
+            <p className="mt-1 text-sm text-[#DDFBFF]">
+              10 gemas iniciales - Pro - Growth - AI Master
             </p>
           </div>
         </div>
@@ -67,20 +67,22 @@ const PlansGrid = ({
         ))}
       </div>
 
-      <div className="mt-5 rounded-2xl border border-amber-500/10 bg-[linear-gradient(180deg,#14110A_0%,#0A0A0A_100%)] px-5 py-4">
+      <div className="mt-5 rounded-2xl border border-cyan-300/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.08),transparent_28%),linear-gradient(180deg,#101314_0%,#080808_100%)] px-5 py-4">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl border border-amber-200/15 bg-amber-500/10">
-            <DiamondsFour size={17} className="text-amber-300" weight="fill" />
+          <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl border border-cyan-300/15 bg-cyan-400/10">
+            <DiamondsFour size={17} className="text-cyan-300" weight="fill" />
           </div>
 
           <div>
             <p className="mb-1 text-sm font-medium text-white">
-              Gratis queda como capacidad inicial
+              Capacidad inicial incluida
             </p>
+
             <p className="text-sm leading-6 text-[#D5D5D5]">
-              El usuario registrado parte con créditos iniciales para probar valor real.
+              El usuario registrado parte con gemas iniciales para probar valor real.
               Los planes amplían recorrido, Builder, continuidad y capacidad operativa.
-              {` ${OPERATIONAL_NOTE}`}
+              Gema Maestra representa la capacidad operativa del sistema. Consumo,
+              recargas y salida con coste se activarán en la siguiente microfase.
             </p>
           </div>
         </div>
