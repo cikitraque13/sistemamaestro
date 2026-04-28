@@ -11,7 +11,7 @@ const GOLD_FEATURES = [
   'Diagnóstico premium del caso',
   'Blueprint de activación',
   'Prompt recomendado para empezar',
-  'Continuidad natural hacia Builder'
+  '10 gemas iniciales para Builder'
 ];
 
 const EntryOfferCard = ({
@@ -34,9 +34,9 @@ const EntryOfferCard = ({
       className={`mb-8 ${isFocused ? 'rounded-[28px] ring-2 ring-amber-300/30' : ''}`}
       data-testid="entry-offer-card"
     >
-      <div className="relative overflow-hidden rounded-[28px] border border-amber-200/15 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(15,82,87,0.16),transparent_34%),linear-gradient(180deg,#15120D_0%,#090909_100%)] p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-[28px] border border-amber-200/15 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.18),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#15120D_0%,#090909_100%)] p-6 sm:p-8">
         <div className="absolute right-[-120px] top-[-140px] h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
-        <div className="absolute bottom-[-140px] left-[-110px] h-72 w-72 rounded-full bg-[#0F5257]/14 blur-3xl" />
+        <div className="absolute bottom-[-140px] left-[-110px] h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
 
         <div className="relative z-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <div>
@@ -44,6 +44,11 @@ const EntryOfferCard = ({
               <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-100">
                 <Sparkle size={14} weight="fill" />
                 Informe Gold
+              </span>
+
+              <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                <Sparkle size={14} weight="fill" />
+                10 gemas iniciales
               </span>
 
               <span className="text-sm font-medium text-amber-100/85">
@@ -57,8 +62,8 @@ const EntryOfferCard = ({
 
             <p className="mb-5 max-w-2xl text-base leading-7 text-[#D4D4D4]">
               Compra puntual para convertir una idea, una URL o una oportunidad
-              en una lectura premium con diagnóstico, dirección y siguiente paso
-              accionable dentro de Sistema Maestro.
+              en una lectura premium con diagnóstico, dirección, prompt recomendado
+              y 10 gemas iniciales para empezar en Builder.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -91,13 +96,17 @@ const EntryOfferCard = ({
                 Activación puntual
               </p>
 
-              <div className="mb-5 flex items-end gap-2">
+              <div className="mb-3 flex items-end gap-2">
                 <span className="text-5xl font-light text-white">
                   {priceLabel}
                 </span>
                 <span className="pb-2 text-sm text-[#A3A3A3]">
                   pago único
                 </span>
+              </div>
+
+              <div className="mb-5 inline-flex rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] text-cyan-100">
+                Incluye 10 gemas iniciales
               </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
@@ -107,8 +116,8 @@ const EntryOfferCard = ({
 
                 <p className="text-sm leading-6 text-[#D4D4D4]">
                   Una lectura premium más útil que un resumen: ordena el caso,
-                  detecta la fricción principal y te entrega un prompt preparado
-                  para empezar en Builder.
+                  detecta la fricción principal, entrega un prompt preparado y
+                  activa 10 gemas iniciales para empezar en Builder.
                 </p>
               </div>
             </div>
@@ -133,7 +142,7 @@ const EntryOfferCard = ({
 
               <p className="mt-3 text-center text-xs leading-5 text-[#A3A3A3]">
                 Después de la compra, volverás al informe o al proyecto activo
-                para continuar hacia Builder.
+                con el prompt y las gemas iniciales para continuar hacia Builder.
               </p>
             </div>
           </div>

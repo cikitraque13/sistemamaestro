@@ -61,7 +61,7 @@ const BillingHero = ({ fromProjectId, onReturnToProject }) => (
   <motion.section
     initial={{ opacity: 0, y: 18 }}
     animate={{ opacity: 1, y: 0 }}
-    className="mb-8 overflow-hidden rounded-[28px] border border-amber-200/10 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.14),transparent_28%),radial-gradient(circle_at_top_left,rgba(15,82,87,0.20),transparent_32%),linear-gradient(180deg,#141414_0%,#090909_100%)] p-6 sm:p-8"
+    className="mb-8 overflow-hidden rounded-[28px] border border-cyan-300/10 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_28%),radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(180deg,#141414_0%,#090909_100%)] p-6 sm:p-8"
   >
     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
       <div className="max-w-3xl">
@@ -75,8 +75,8 @@ const BillingHero = ({ fromProjectId, onReturnToProject }) => (
         </h1>
 
         <p className="max-w-2xl text-sm leading-6 text-[#D4D4D4] sm:text-base">
-          Gestiona tu entrada puntual, tu plan, tus créditos y la continuidad de
-          trabajo dentro de Sistema Maestro Builder sin perder el hilo del proyecto.
+          Gestiona tu entrada puntual, tu plan, tus Gemas Maestras y la continuidad
+          de trabajo dentro de Sistema Maestro Builder sin perder el hilo del proyecto.
         </p>
       </div>
 
@@ -98,18 +98,18 @@ const BillingHero = ({ fromProjectId, onReturnToProject }) => (
           Informe Gold
         </p>
         <p className="text-sm leading-6 text-[#D4D4D4]">
-          Entrada puntual para validar una idea, ordenar el diagnóstico y preparar
-          el primer paso hacia Builder.
+          Entrada puntual para validar una idea, ordenar el diagnóstico, recibir
+          un prompt preparado y activar 10 gemas iniciales hacia Builder.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-[#8DE1D0]">
-          Créditos
+      <div className="rounded-2xl border border-cyan-300/12 bg-cyan-400/[0.06] p-4">
+        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-cyan-100">
+          Gema Maestra
         </p>
         <p className="text-sm leading-6 text-[#D4D4D4]">
-          Capacidad operativa visible para entender el margen de trabajo disponible
-          dentro del sistema.
+          Capacidad operativa visible para construir, iterar y avanzar dentro
+          del sistema sin perder continuidad.
         </p>
       </div>
 
