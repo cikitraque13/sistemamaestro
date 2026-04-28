@@ -104,9 +104,3 @@ export const EXPORT_ACCESS_LABELS = {
   separate_quote: 'Valoración aparte',
   quoted_and_prioritized: 'Valoración priorizada'
 };
-
-export const OPERATIONAL_NOTE =
-  'Créditos = capacidad operativa del sistema. Consumo, recargas y exportación con coste se activarán en la siguiente microfase.';
-
-export const CREDIT_NOTE =
-  'Saldo e incluidos por plan ya visibles. Esta capa prepara builder con coste, consumo y recargas sin abrir todavía esa lógica.';

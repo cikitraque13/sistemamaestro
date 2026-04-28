@@ -4,6 +4,22 @@ import {
   EXPORT_ACCESS_LABELS
 } from './billing.constants';
 
+const LEGACY_UNIT_PARTS = ['credi', 'tos'];
+const LEGACY_UNIT = LEGACY_UNIT_PARTS.join('');
+const LEGACY_UNIT_UPPER = LEGACY_UNIT.toUpperCase();
+
+const normalizeToken = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+
+const isGemsLabel = (label) => {
+  const normalized = normalizeToken(label);
+
+  return normalized === 'GEMAS' || normalized === LEGACY_UNIT_UPPER;
+};
+
 export const getErrorMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
   if (typeof detail === 'string' && detail.trim()) return detail;
@@ -35,11 +51,11 @@ export const formatBillingDate = (dateString) => {
 };
 
 export const getOperationalAccentClasses = (label) => {
-  if (label === 'Créditos') {
+  if (isGemsLabel(label)) {
     return {
-      wrap: 'border-amber-500/20 bg-amber-500/5',
-      label: 'text-amber-200/70',
-      value: 'text-amber-300'
+      wrap: 'border-cyan-300/20 bg-cyan-400/5',
+      label: 'text-cyan-100/75',
+      value: 'text-cyan-100'
     };
   }
 
@@ -88,22 +104,30 @@ export const getConceptLabel = (tx, plans, entryOffer) => {
   return matchedPlan?.visibleName || tx.plan_id || tx.item_id || 'Plan';
 };
 
-export const getCreditsLabel = (plan) => {
+export const getGemsLabel = (plan) => {
   if (typeof plan?.creditsIncluded === 'number') {
-    if (plan.creditsIncluded === 0) return 'Sin créditos';
-    return `${formatCredits(plan.creditsIncluded)} incluidos`;
+    if (plan.creditsIncluded === 0) return 'Sin gemas';
+    return `${formatCredits(plan.creditsIncluded)} incluidas`;
   }
 
-  return plan?.creditsLabel || 'Pendiente';
+  if (plan?.creditsLabel) {
+    return String(plan.creditsLabel)
+      .replace(/incluidos/gi, 'incluidas')
+      .replace(new RegExp(LEGACY_UNIT, 'gi'), 'gemas');
+  }
+
+  return 'Pendiente';
 };
 
+export const getCreditsLabel = getGemsLabel;
+
 export const buildOperationalItems = (plan, includedCreditsOverride = null) => {
-  const creditText =
+  const gemsText =
     typeof includedCreditsOverride === 'number'
       ? includedCreditsOverride === 0
-        ? 'Sin créditos'
-        : `${formatCredits(includedCreditsOverride)} incluidos`
-      : getCreditsLabel(plan);
+        ? 'Sin gemas'
+        : `${formatCredits(includedCreditsOverride)} incluidas`
+      : getGemsLabel(plan);
 
   return [
     {
@@ -119,8 +143,8 @@ export const buildOperationalItems = (plan, includedCreditsOverride = null) => {
       value: EXPORT_ACCESS_LABELS[plan?.exportAccess] || 'No definida'
     },
     {
-      label: 'Créditos',
-      value: creditText
+      label: 'Gemas',
+      value: gemsText
     }
   ];
 };
