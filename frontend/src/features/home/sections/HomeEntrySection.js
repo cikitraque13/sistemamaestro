@@ -92,6 +92,12 @@ const outputs = [
   },
 ];
 
+const peachPrimaryButton =
+  'inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-3.5 text-sm font-semibold text-black shadow-[0_14px_32px_rgba(245,158,11,0.20)] transition hover:scale-[1.01] hover:shadow-[0_16px_38px_rgba(244,114,182,0.24)]';
+
+const peachSecondaryButton =
+  'inline-flex items-center justify-center rounded-2xl border border-amber-200/24 bg-[linear-gradient(135deg,rgba(255,242,204,0.11),rgba(242,180,90,0.08),rgba(244,114,182,0.08))] px-5 py-3.5 text-sm font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:border-amber-200/40 hover:bg-amber-200/[0.10]';
+
 const HomeEntrySection = () => {
   const [activeMode, setActiveMode] = useState('idea');
   const [activeType, setActiveType] = useState('automation');
@@ -125,7 +131,7 @@ const HomeEntrySection = () => {
             </h2>
           </div>
 
-          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(255,228,163,0.07),rgba(244,114,182,0.065),rgba(6,182,212,0.045))] p-5 shadow-[0_0_45px_rgba(245,158,11,0.06)]">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d5b16e]">
               Qué prepara el sistema
             </p>
@@ -135,7 +141,7 @@ const HomeEntrySection = () => {
             </p>
 
             <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-emerald-300/12 bg-emerald-300/[0.05] p-4">
+              <div className="rounded-2xl border border-emerald-300/14 bg-emerald-300/[0.055] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100/70">
                   Registro gratis
                 </p>
@@ -144,8 +150,8 @@ const HomeEntrySection = () => {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-amber-300/14 bg-amber-300/[0.06] p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/75">
+              <div className="rounded-2xl border border-amber-300/18 bg-amber-300/[0.075] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/80">
                   Informe 6,99 €
                 </p>
                 <p className="mt-2 text-sm font-semibold text-white">
@@ -153,7 +159,7 @@ const HomeEntrySection = () => {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-fuchsia-300/14 bg-fuchsia-300/[0.06] p-4">
+              <div className="rounded-2xl border border-fuchsia-300/16 bg-fuchsia-300/[0.065] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fuchsia-100/75">
                   Arranque
                 </p>
@@ -164,19 +170,20 @@ const HomeEntrySection = () => {
             </div>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="#pricing"
+                className={peachPrimaryButton}
+              >
+                Ver informe de entrada
+                <ArrowRight className="h-4 w-4" />
+              </a>
+
               <Link
                 to="/register"
-                className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.06]"
+                className={peachSecondaryButton}
               >
                 Registrarme gratis
               </Link>
-
-              <a
-                href="#pricing"
-                className="inline-flex items-center justify-center rounded-2xl border border-amber-200/25 bg-amber-200/[0.07] px-4 py-3 text-sm font-semibold text-amber-100 transition hover:border-amber-200/40 hover:bg-amber-200/[0.10]"
-              >
-                Ver informe de entrada
-              </a>
             </div>
           </div>
         </div>
@@ -247,37 +254,39 @@ const HomeEntrySection = () => {
                 </div>
               )}
 
-              <div className="relative mt-5 rounded-[24px] border border-white/10 bg-[#070808] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                    Entrada del usuario
-                  </p>
+              <div className="relative mt-5 rounded-[30px] border border-amber-200/22 bg-[linear-gradient(135deg,rgba(255,228,163,0.22),rgba(255,210,161,0.16),rgba(242,139,165,0.14))] p-1 shadow-[0_18px_48px_rgba(0,0,0,0.22)]">
+                <div className="rounded-[26px] border border-white/8 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.10),transparent_30%),linear-gradient(180deg,#080909_0%,#050606_100%)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100/70">
+                      Entrada del usuario
+                    </p>
 
-                  <span className="rounded-full border border-cyan-300/14 bg-cyan-300/[0.06] px-3 py-1 text-[11px] font-semibold text-cyan-100">
-                    Interpretación inicial
-                  </span>
-                </div>
+                    <span className="rounded-full border border-cyan-300/18 bg-cyan-300/[0.07] px-3 py-1 text-[11px] font-semibold text-cyan-100">
+                      Interpretación inicial
+                    </span>
+                  </div>
 
-                {isWebMode ? (
-                  <input
-                    type="text"
-                    placeholder={current.placeholder}
-                    className="w-full rounded-[18px] border border-white/8 bg-black/35 px-5 py-4 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-cyan-400/25"
-                  />
-                ) : (
-                  <>
-                    <textarea
-                      rows={3}
+                  {isWebMode ? (
+                    <input
+                      type="text"
                       placeholder={current.placeholder}
-                      className="w-full resize-none rounded-[18px] border border-white/8 bg-black/35 px-5 py-4 pr-12 text-sm leading-7 text-white placeholder:text-zinc-500 outline-none transition focus:border-cyan-400/25"
+                      className="w-full rounded-[20px] border border-white/10 bg-black/50 px-5 py-4 text-sm text-white placeholder:text-zinc-500 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition focus:border-amber-200/28"
                     />
-                    <Pencil className="pointer-events-none absolute bottom-8 right-7 h-4 w-4 text-zinc-500" />
-                  </>
-                )}
+                  ) : (
+                    <div className="relative">
+                      <textarea
+                        rows={3}
+                        placeholder={current.placeholder}
+                        className="w-full resize-none rounded-[20px] border border-white/10 bg-black/50 px-5 py-4 pr-12 text-sm leading-7 text-white placeholder:text-zinc-500 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition focus:border-amber-200/28"
+                      />
+                      <Pencil className="pointer-events-none absolute bottom-4 right-4 h-4 w-4 text-amber-100/45" />
+                    </div>
+                  )}
 
-                <p className="mt-3 px-1 text-xs leading-5 text-zinc-500">
-                  Escribe lo esencial. La primera lectura ordenará foco, prioridad y vía de entrada.
-                </p>
+                  <p className="mt-3 text-xs leading-5 text-zinc-500">
+                    Escribe lo esencial. La primera lectura ordenará foco, prioridad y vía de entrada.
+                  </p>
+                </div>
               </div>
 
               <div className="mt-4 flex items-start gap-2 text-sm leading-6 text-zinc-300">
@@ -286,20 +295,20 @@ const HomeEntrySection = () => {
               </div>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3.5 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
-                >
-                  Empezar gratis con 10 gemas
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-
                 <a
                   href="#pricing"
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-3.5 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.04]"
+                  className={peachPrimaryButton}
                 >
                   Informe 6,99 € + 10 gemas
+                  <ArrowRight className="h-4 w-4" />
                 </a>
+
+                <Link
+                  to="/register"
+                  className={peachSecondaryButton}
+                >
+                  Empezar gratis con 10 gemas
+                </Link>
               </div>
             </div>
           </div>
