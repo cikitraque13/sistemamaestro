@@ -20,7 +20,7 @@ const API_BASE = '/api';
 const TOTAL_OPPORTUNITIES = 10;
 
 const BILLING_STATE = {
-  suggestedPlan: 'premium',
+  suggestedPlan: 'blueprint',
   focusSection: 'opportunities',
   source: 'opportunities-page'
 };
