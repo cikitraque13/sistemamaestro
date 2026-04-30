@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -23,18 +23,64 @@ const BUILDER_LAUNCHER_STATE = {
   source: 'projects-page-new-project'
 };
 
-const ROUTE_NAMES = {
-  improve_existing: 'Mejorar existente',
-  sell_and_charge: 'Vender y cobrar',
-  automate_operation: 'Automatizar',
-  idea_to_project: 'Idea a proyecto'
-};
+const ROUTE_FILTERS = [
+  {
+    value: 'all',
+    label: 'Todas las rutas',
+    aliases: []
+  },
+  {
+    value: 'improve_existing',
+    label: 'Mejorar existente',
+    aliases: ['improve_existing', 'improve', 'redesign', 'audit', 'analyze_url']
+  },
+  {
+    value: 'sell_and_charge',
+    label: 'Vender y cobrar',
+    aliases: ['sell_and_charge', 'sell', 'sales', 'charge']
+  },
+  {
+    value: 'automate_operation',
+    label: 'Automatizar',
+    aliases: ['automate_operation', 'automation', 'automate', 'auto']
+  },
+  {
+    value: 'idea_to_project',
+    label: 'Idea a proyecto',
+    aliases: ['idea_to_project', 'idea', 'blueprint', 'project_idea']
+  }
+];
 
 const STATUS_BADGES = {
   pending: { label: 'Pendiente', color: 'bg-yellow-500/20 text-yellow-400' },
   analyzed: { label: 'Analizado', color: 'bg-blue-500/20 text-blue-400' },
   refined: { label: 'Afinado', color: 'bg-purple-500/20 text-purple-400' },
   blueprint_generated: { label: 'Blueprint', color: 'bg-[#0F5257]/30 text-[#6ee7d8]' }
+};
+
+const normalizeRoute = (route) => String(route || '').trim();
+
+const getRouteLabel = (route) => {
+  const normalizedRoute = normalizeRoute(route);
+
+  if (!normalizedRoute) return 'Sin clasificar';
+
+  const matchedFilter = ROUTE_FILTERS.find((filter) =>
+    filter.aliases.includes(normalizedRoute)
+  );
+
+  return matchedFilter?.label || normalizedRoute;
+};
+
+const matchesRouteFilter = (route, filterRoute) => {
+  if (filterRoute === 'all') return true;
+
+  const normalizedRoute = normalizeRoute(route);
+  const selectedFilter = ROUTE_FILTERS.find((filter) => filter.value === filterRoute);
+
+  if (!selectedFilter) return true;
+
+  return selectedFilter.aliases.includes(normalizedRoute);
 };
 
 const getProjectTitle = (project) => {
@@ -68,6 +114,7 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterRoute, setFilterRoute] = useState('all');
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     fetchProjects();
@@ -110,19 +157,43 @@ const ProjectsPage = () => {
     }
   };
 
+  const handleSearchAction = () => {
+    setSearch((currentSearch) => currentSearch.trim());
+    searchInputRef.current?.focus();
+  };
+
+  const clearFilters = () => {
+    setSearch('');
+    setFilterRoute('all');
+    searchInputRef.current?.focus();
+  };
+
   const filteredProjects = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
     return projects.filter((project) => {
-      const inputContent = String(project.input_content || '').toLowerCase();
-      const route = project.route || '';
+      const routeLabel = getRouteLabel(project.route);
+      const searchableContent = [
+        project.input_content,
+        project.input_url,
+        project.status,
+        project.route,
+        routeLabel
+      ]
+        .map((value) => String(value || '').toLowerCase())
+        .join(' ');
 
-      const matchesSearch = inputContent.includes(normalizedSearch);
-      const matchesRoute = filterRoute === 'all' || route === filterRoute;
+      const matchesSearch =
+        !normalizedSearch || searchableContent.includes(normalizedSearch);
+
+      const matchesRoute = matchesRouteFilter(project.route, filterRoute);
 
       return matchesSearch && matchesRoute;
     });
   }, [projects, search, filterRoute]);
+
+  const hasProjects = projects.length > 0;
+  const hasActiveFilters = search.trim().length > 0 || filterRoute !== 'all';
 
   return (
     <DashboardLayout title="Proyectos">
@@ -160,11 +231,17 @@ const ProjectsPage = () => {
         <div className="mb-6 rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative flex-1">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-300/15 bg-cyan-400/10 text-cyan-100">
+              <button
+                type="button"
+                onClick={handleSearchAction}
+                className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-2xl border border-cyan-300/15 bg-cyan-400/10 text-cyan-100 transition hover:border-cyan-300/30 hover:bg-cyan-400/15 focus:outline-none focus:ring-2 focus:ring-cyan-300/20"
+                aria-label="Buscar proyectos"
+              >
                 <MagnifyingGlass size={18} />
-              </span>
+              </button>
 
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Buscar por idea, URL o contenido del proyecto..."
                 value={search}
@@ -180,7 +257,8 @@ const ProjectsPage = () => {
                   Resultados
                 </p>
                 <p className="mt-0.5 text-sm font-semibold text-white">
-                  {loading ? '—' : filteredProjects.length} proyectos
+                  {loading ? '—' : filteredProjects.length}{' '}
+                  {filteredProjects.length === 1 ? 'proyecto' : 'proyectos'}
                 </p>
               </div>
 
@@ -190,11 +268,11 @@ const ProjectsPage = () => {
                 className="h-14 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm font-semibold text-white outline-none transition hover:border-white/16 focus:border-cyan-300/35 focus:ring-2 focus:ring-cyan-300/10 sm:min-w-[230px]"
                 data-testid="filter-route"
               >
-                <option value="all">Todas las rutas</option>
-                <option value="improve_existing">Mejorar existente</option>
-                <option value="sell_and_charge">Vender y cobrar</option>
-                <option value="automate_operation">Automatizar</option>
-                <option value="idea_to_project">Idea a proyecto</option>
+                {ROUTE_FILTERS.map((filter) => (
+                  <option key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -212,8 +290,7 @@ const ProjectsPage = () => {
                 STATUS_BADGES[project.status] ||
                 { label: project.status || 'Sin estado', color: 'bg-white/10 text-zinc-300' };
 
-              const routeLabel =
-                ROUTE_NAMES[project.route] || project.route || 'Sin clasificar';
+              const routeLabel = getRouteLabel(project.route);
 
               return (
                 <motion.article
@@ -286,6 +363,29 @@ const ProjectsPage = () => {
                 </motion.article>
               );
             })}
+          </div>
+        ) : hasProjects && hasActiveFilters ? (
+          <div className="rounded-[28px] border border-white/8 bg-white/[0.02] px-6 py-20 text-center">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-300/15 bg-cyan-400/10">
+              <MagnifyingGlass size={28} className="text-cyan-100" />
+            </div>
+
+            <h3 className="text-2xl font-semibold text-white">
+              No hay resultados con estos filtros
+            </h3>
+
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
+              Hay proyectos guardados, pero ninguno coincide con la búsqueda o la ruta seleccionada.
+              Limpia los filtros para volver a ver toda tu continuidad.
+            </p>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="mt-6 inline-flex items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/35 hover:bg-cyan-400/15"
+            >
+              Limpiar filtros
+            </button>
           </div>
         ) : (
           <div className="rounded-[28px] border border-white/8 bg-white/[0.02] px-6 py-20 text-center">
