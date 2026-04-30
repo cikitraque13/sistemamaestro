@@ -7,6 +7,7 @@ import {
 const LEGACY_UNIT_PARTS = ['credi', 'tos'];
 const LEGACY_UNIT = LEGACY_UNIT_PARTS.join('');
 const LEGACY_UNIT_UPPER = LEGACY_UNIT.toUpperCase();
+const LEGACY_ACCENTED_UNIT = new RegExp(`cr[eé]di${'tos'}`, 'gi');
 
 const normalizeToken = (value) =>
   String(value || '')
@@ -19,6 +20,19 @@ const isGemsLabel = (label) => {
 
   return normalized === 'GEMAS' || normalized === LEGACY_UNIT_UPPER;
 };
+
+const isInitialGemsPlan = (plan) => {
+  const planId = String(plan?.id || '').toLowerCase();
+  const creditsLabel = String(plan?.creditsLabel || '').toLowerCase();
+
+  return planId === 'free' || creditsLabel.includes('inicial');
+};
+
+const cleanGemsText = (value) =>
+  String(value || '')
+    .replace(/incluidos/gi, 'incluidas')
+    .replace(LEGACY_ACCENTED_UNIT, 'gemas')
+    .replace(new RegExp(LEGACY_UNIT, 'gi'), 'gemas');
 
 export const getErrorMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
@@ -51,6 +65,8 @@ export const formatBillingDate = (dateString) => {
 };
 
 export const getOperationalAccentClasses = (label) => {
+  const normalized = normalizeToken(label);
+
   if (isGemsLabel(label)) {
     return {
       wrap: 'border-cyan-300/20 bg-cyan-400/5',
@@ -59,7 +75,7 @@ export const getOperationalAccentClasses = (label) => {
     };
   }
 
-  if (label === 'Activación') {
+  if (normalized === 'ACTIVACION') {
     return {
       wrap: 'border-[#0F5257]/20 bg-[#0F5257]/5',
       label: 'text-[#8DE1D0]/75',
@@ -67,7 +83,7 @@ export const getOperationalAccentClasses = (label) => {
     };
   }
 
-  if (label === 'Builder') {
+  if (normalized === 'BUILDER') {
     return {
       wrap: 'border-sky-500/15 bg-sky-500/5',
       label: 'text-sky-200/70',
@@ -75,7 +91,7 @@ export const getOperationalAccentClasses = (label) => {
     };
   }
 
-  if (label === 'Exportación') {
+  if (normalized === 'EXPORTACION') {
     return {
       wrap: 'border-white/5 bg-[#101010]',
       label: 'text-[#8D8D8D]',
@@ -105,15 +121,18 @@ export const getConceptLabel = (tx, plans, entryOffer) => {
 };
 
 export const getGemsLabel = (plan) => {
-  if (typeof plan?.creditsIncluded === 'number') {
-    if (plan.creditsIncluded === 0) return 'Sin gemas';
-    return `${formatCredits(plan.creditsIncluded)} incluidas`;
+  if (plan?.creditsLabel) {
+    return cleanGemsText(plan.creditsLabel);
   }
 
-  if (plan?.creditsLabel) {
-    return String(plan.creditsLabel)
-      .replace(/incluidos/gi, 'incluidas')
-      .replace(new RegExp(LEGACY_UNIT, 'gi'), 'gemas');
+  if (typeof plan?.creditsIncluded === 'number') {
+    if (plan.creditsIncluded === 0) return 'Sin gemas';
+
+    if (isInitialGemsPlan(plan)) {
+      return `${formatCredits(plan.creditsIncluded)} iniciales`;
+    }
+
+    return `${formatCredits(plan.creditsIncluded)} incluidas`;
   }
 
   return 'Pendiente';
@@ -122,12 +141,15 @@ export const getGemsLabel = (plan) => {
 export const getCreditsLabel = getGemsLabel;
 
 export const buildOperationalItems = (plan, includedCreditsOverride = null) => {
-  const gemsText =
-    typeof includedCreditsOverride === 'number'
-      ? includedCreditsOverride === 0
-        ? 'Sin gemas'
+  const hasIncludedCreditsOverride = typeof includedCreditsOverride === 'number';
+
+  const gemsText = hasIncludedCreditsOverride
+    ? includedCreditsOverride === 0
+      ? 'Sin gemas'
+      : isInitialGemsPlan(plan)
+        ? `${formatCredits(includedCreditsOverride)} iniciales`
         : `${formatCredits(includedCreditsOverride)} incluidas`
-      : getGemsLabel(plan);
+    : getGemsLabel(plan);
 
   return [
     {

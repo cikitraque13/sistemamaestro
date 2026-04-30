@@ -27,7 +27,7 @@ FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
 CREDIT_LEDGER_COLLECTION = os.environ.get("CREDIT_LEDGER_COLLECTION", "credit_ledger")
 
 PLAN_INCLUDED_CREDITS = {
-    "free": int(os.environ.get("CREDITS_FREE", "0")),
+    "free": int(os.environ.get("CREDITS_FREE", "10")),
     "blueprint": int(os.environ.get("CREDITS_BLUEPRINT", "60")),
     "sistema": int(os.environ.get("CREDITS_SISTEMA", "220")),
     "premium": int(os.environ.get("CREDITS_PREMIUM", "600")),

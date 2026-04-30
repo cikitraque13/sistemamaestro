@@ -5,6 +5,9 @@ from typing import Any, Dict, Optional
 from backend.app.core.config import CREDIT_LEDGER_COLLECTION, PLAN_INCLUDED_CREDITS
 from backend.app.db.mongodb import db
 
+INITIAL_FREE_GRANT_REASON = "initial_free_grant"
+INITIAL_FREE_GRANT_SOURCE_REF = "registration_free_grant_v1"
+
 
 def get_plan_included_credits(plan_id: str) -> int:
     raw_value = PLAN_INCLUDED_CREDITS.get(plan_id, 0)
@@ -19,9 +22,11 @@ async def ensure_user_credit_profile(user_id: str) -> Dict[str, int]:
         {"user_id": user_id},
         {
             "_id": 0,
+            "plan": 1,
             "credit_balance": 1,
             "credit_lifetime_used": 1,
-            "credit_lifetime_granted": 1
+            "credit_lifetime_granted": 1,
+            "credit_initial_free_grant_at": 1
         }
     )
 
@@ -48,6 +53,63 @@ async def ensure_user_credit_profile(user_id: str) -> Dict[str, int]:
             {"user_id": user_id},
             {"$set": update_fields}
         )
+
+    initial_free_credits = get_plan_included_credits("free")
+    has_initial_grant = bool(user.get("credit_initial_free_grant_at"))
+    has_credit_history = (
+        credit_balance > 0 or
+        credit_lifetime_used > 0 or
+        credit_lifetime_granted > 0
+    )
+
+    if initial_free_credits > 0 and not has_initial_grant and not has_credit_history:
+        existing_initial_grant = await db[CREDIT_LEDGER_COLLECTION].find_one(
+            {
+                "user_id": user_id,
+                "reason_code": INITIAL_FREE_GRANT_REASON
+            },
+            {"_id": 0}
+        )
+
+        if not existing_initial_grant:
+            now_iso = datetime.now(timezone.utc).isoformat()
+            new_balance = credit_balance + initial_free_credits
+
+            update_result = await db.users.update_one(
+                {
+                    "user_id": user_id,
+                    "$or": [
+                        {"credit_initial_free_grant_at": {"$exists": False}},
+                        {"credit_initial_free_grant_at": None}
+                    ]
+                },
+                {
+                    "$set": {
+                        "credit_balance": new_balance,
+                        "credit_last_grant_at": now_iso,
+                        "credit_initial_free_grant_at": now_iso
+                    },
+                    "$inc": {
+                        "credit_lifetime_granted": initial_free_credits
+                    }
+                }
+            )
+
+            if update_result.modified_count > 0:
+                await create_credit_ledger_entry(
+                    user_id=user_id,
+                    credits_delta=initial_free_credits,
+                    credits_balance_after=new_balance,
+                    reason_code=INITIAL_FREE_GRANT_REASON,
+                    meta={
+                        "plan_id": "free",
+                        "source_ref": INITIAL_FREE_GRANT_SOURCE_REF,
+                        "source_type": "registration_initial_capacity"
+                    }
+                )
+
+                credit_balance = new_balance
+                credit_lifetime_granted += initial_free_credits
 
     return {
         "credit_balance": credit_balance,

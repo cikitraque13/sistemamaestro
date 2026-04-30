@@ -48,7 +48,7 @@ export const PLAN_VISUAL_META = {
 
 export const PLAN_SIGNAL_META = {
   free: {
-    chips: ['Entrada', 'Claridad'],
+    chips: ['Entrada', 'Builder limitado', '10 gemas'],
     chipClass:
       'bg-[rgba(255,255,255,0.035)] text-[#DCE7E4] border border-[#0F5257]/14'
   },
@@ -90,6 +90,7 @@ export const ACTIVATION_LABELS = {
 
 export const BUILDER_ACCESS_LABELS = {
   none: 'Sin builder',
+  limited: 'Builder limitado',
   base: 'Builder base',
   operational: 'Builder continuo',
   advanced: 'Builder avanzado'

@@ -5,7 +5,7 @@ const pricingContent = {
     description:
       'La estructura de precios no debe vender por ruido. Debe acompañar una progresión real: explorar, validar, activar, continuar y, cuando convenga, preparar salida.',
     microNote:
-      'La suscripción da acceso al sistema. La capacidad operativa se apoya en créditos. La exportación se valora aparte.'
+      'La suscripción da acceso al sistema. La capacidad operativa se expresa en Gemas Maestras. La exportación se valora aparte.'
   },
 
   architecture: {
@@ -33,7 +33,7 @@ const pricingContent = {
     periodLabel: 'PAGO ÚNICO',
     headline: 'Valida una oportunidad antes de entrar al sistema.',
     description:
-      'Compra puntual para convertir una idea, una URL o una oportunidad en una lectura útil y una primera dirección seria.',
+      'Compra puntual para convertir una idea, una URL o una oportunidad en una lectura útil, una primera dirección seria y 10 gemas iniciales para empezar en Builder.',
     bestFor:
       'Usuario que aún no necesita continuidad, pero sí una validación mejor enfocada.',
     valuePromise:
@@ -42,13 +42,13 @@ const pricingContent = {
       'Informe breve con criterio',
       'Lectura más concreta',
       'Enfoque inicial de mejora',
-      '1 prompt accionable'
+      '10 gemas iniciales para Builder'
     ],
     billingHighlights: [
       'Validación puntual',
       'Lectura más útil',
       'Primer foco de mejora',
-      '1 prompt de avance'
+      '10 gemas iniciales'
     ],
     promptLayer: {
       label: 'Prompt de avance',
@@ -82,7 +82,7 @@ const pricingContent = {
       activeStep: 'Validar',
       stepDetails: {
         Explorar: 'Gratis',
-        Validar: '6,99 € ahora',
+        Validar: '6,99 € + 10 gemas',
         Activar: '29 € Pro',
         Continuar: '79 € Growth',
         Escalar: '199 € AI Master'
@@ -92,8 +92,8 @@ const pricingContent = {
     },
     strategicRole: {
       activationLevel: 'puntual',
-      builderAccess: 'none',
-      creditsIncluded: 0,
+      builderAccess: 'limited',
+      creditsIncluded: 10,
       exportAccess: 'not_included'
     }
   },
@@ -109,33 +109,33 @@ const pricingContent = {
       badge: 'Entrada',
       category: 'exploration',
       activationLevel: 'exploration',
-      builderAccess: 'none',
+      builderAccess: 'limited',
       exportAccess: 'not_included',
-      creditsIncluded: 0,
-      creditsLabel: 'Sin créditos',
+      creditsIncluded: 10,
+      creditsLabel: '10 iniciales',
       price: 0,
       priceLabel: 'Gratis',
       periodLabel: '',
-      headline: 'Explora el caso y decide si merece avanzar.',
+      headline: 'Prueba Sistema Maestro con capacidad inicial real.',
       description:
-        'Entrada sin fricción para clasificar necesidad, URL u oportunidad y obtener una primera lectura útil.',
+        'Entrada sin fricción para clasificar una necesidad, activar Builder limitado y usar 10 gemas iniciales para construir una primera base.',
       bestFor:
-        'Usuario que solo necesita claridad inicial.',
+        'Usuario que quiere probar Builder antes de pagar y entender si su idea, URL u oportunidad merece avanzar.',
       bestForShort:
-        'Exploración inicial sin continuidad.',
+        'Prueba real con Builder limitado.',
       valuePromise:
-        'Abre claridad y rompe la inercia inicial.',
+        'Permite comprobar valor real con una primera capacidad operativa sin compromiso.',
       features: [
         'Diagnóstico inicial',
         'Ruta recomendada',
-        'Resultado resumido',
-        'Primer marco de decisión'
+        'Builder limitado',
+        '10 gemas iniciales'
       ],
       billingHighlights: [
         'Diagnóstico inicial',
         'Ruta recomendada',
-        'Resultado resumido',
-        'Primer criterio'
+        'Builder limitado',
+        '10 gemas iniciales'
       ],
       promptLayer: {
         label: 'Mini prompt base',
@@ -147,17 +147,17 @@ const pricingContent = {
         'Prompt base para reformular la necesidad'
       ],
       perceptionGoal:
-        'Hacer sentir al usuario que sí hay una vía y que no parte de cero.',
+        'Hacer sentir al usuario que sí puede probar el sistema, construir una primera base y no parte de cero.',
       cta: {
         label: 'Empezar gratis',
         variant: 'secondary'
       },
       highlight: false,
-      unlocksNext: 'single_report',
+      unlocksNext: 'blueprint',
       visualRole: 'entry',
       strategicRole: {
-        includedCredits: 0,
-        builderMode: 'none',
+        includedCredits: 10,
+        builderMode: 'limited',
         exportPolicy: 'not_available'
       }
     },
@@ -175,30 +175,30 @@ const pricingContent = {
       builderAccess: 'base',
       exportAccess: 'quote_only_future',
       creditsIncluded: 60,
-      creditsLabel: '60 incluidos',
+      creditsLabel: '60 incluidas',
       price: 29,
       priceLabel: '29 €',
       periodLabel: '/ mes',
       headline: 'Activa una base real de trabajo.',
       description:
-        'Entrada seria al sistema para pasar del análisis a una base estructural con primera capacidad operativa.',
+        'Entrada seria al sistema para pasar del análisis a una base estructural con primera capacidad operativa ampliada.',
       bestFor:
         'Usuario que ya ve una oportunidad y quiere empezar a trabajarla dentro del sistema.',
       bestForShort:
         'Primera activación seria dentro del sistema.',
       valuePromise:
-        'Activa blueprint, ruta, prompts y una bolsa inicial de capacidad.',
+        'Activa blueprint, ruta, prompts y una bolsa inicial de gemas.',
       features: [
         'Todo lo del nivel Gratis',
         'Blueprint estructural',
         'Prioridades claras',
-        'Bolsa inicial de créditos'
+        '60 gemas incluidas'
       ],
       billingHighlights: [
         'Blueprint estructural',
         'Prioridades claras',
         'Builder base',
-        '60 créditos incluidos'
+        '60 gemas incluidas'
       ],
       promptLayer: {
         label: 'Prompts estructurales base',
@@ -243,7 +243,7 @@ const pricingContent = {
       builderAccess: 'operational',
       exportAccess: 'quote_priority_future',
       creditsIncluded: 220,
-      creditsLabel: '220 incluidos',
+      creditsLabel: '220 incluidas',
       price: 79,
       priceLabel: '79 €',
       periodLabel: '/ mes',
@@ -260,13 +260,13 @@ const pricingContent = {
         'Todo lo del Pro',
         'Continuidad operativa',
         'Construcción con más recorrido',
-        'Bolsa superior de créditos'
+        '220 gemas incluidas'
       ],
       billingHighlights: [
         'Continuidad operativa',
         'Builder con continuidad',
         'Optimización y mejora',
-        '220 créditos incluidos'
+        '220 gemas incluidas'
       ],
       promptLayer: {
         label: 'Prompts de continuidad y optimización',
@@ -310,7 +310,7 @@ const pricingContent = {
       builderAccess: 'advanced',
       exportAccess: 'advanced_quote_priority',
       creditsIncluded: 600,
-      creditsLabel: '600 incluidos',
+      creditsLabel: '600 incluidas',
       price: 199,
       priceLabel: '199 €',
       periodLabel: '/ mes',
@@ -327,13 +327,13 @@ const pricingContent = {
         'Todo lo de Growth',
         'Activación avanzada',
         'Prompt 99 y capa maestra',
-        'Mayor capacidad operativa'
+        '600 gemas incluidas'
       ],
       billingHighlights: [
         'Criterio maestro',
         'Builder avanzado',
         'Preparación de salida',
-        '600 créditos incluidos'
+        '600 gemas incluidas'
       ],
       promptLayer: {
         label: 'Prompt 99 y capa maestra',
@@ -388,7 +388,7 @@ const pricingContent = {
       exactHandoffRuleV1: {
         ruleName: 'first_project_closed',
         description:
-          'La invitación principal al 79 € se activa cuando el usuario cierra su primera fase seria dentro del Pro y necesita más continuidad y créditos.',
+          'La invitación principal al 79 € se activa cuando el usuario cierra su primera fase seria dentro del Pro y necesita más continuidad y gemas.',
         stateWhenUnlocked: 'eligible_for_upgrade',
         activePlanRequired: 'blueprint',
         completedProjectsRequired: 1,
@@ -449,7 +449,7 @@ const pricingContent = {
   },
 
   messagingRules: {
-    free: 'Reducir fricción y abrir posibilidad.',
+    free: 'Reducir fricción y permitir prueba real con Builder limitado.',
     single_report: 'Convertir curiosidad en primera compra útil.',
     blueprint: 'Presentarse como la entrada seria al sistema.',
     sistema: 'Transmitir continuidad operativa y construcción real.',
@@ -462,7 +462,7 @@ const pricingContent = {
       label: 'Tipo de acceso',
       values: {
         single_report: 'Pago único',
-        free: 'Gratis',
+        free: 'Registro gratuito',
         blueprint: 'Mensual',
         sistema: 'Mensual',
         premium: 'Mensual'
@@ -472,7 +472,7 @@ const pricingContent = {
       label: 'Función principal',
       values: {
         single_report: 'Validar',
-        free: 'Explorar',
+        free: 'Probar',
         blueprint: 'Activar',
         sistema: 'Continuar',
         premium: 'Escalar'
@@ -489,13 +489,23 @@ const pricingContent = {
       }
     },
     {
-      label: 'Créditos',
+      label: 'Gemas',
       values: {
-        single_report: 'No incluidos',
-        free: 'No incluidos',
-        blueprint: '60 incluidos',
-        sistema: '220 incluidos',
-        premium: '600 incluidos'
+        single_report: '10 iniciales',
+        free: '10 iniciales',
+        blueprint: '60 incluidas',
+        sistema: '220 incluidas',
+        premium: '600 incluidas'
+      }
+    },
+    {
+      label: 'Builder',
+      values: {
+        single_report: 'Builder limitado',
+        free: 'Builder limitado',
+        blueprint: 'Builder base',
+        sistema: 'Builder continuo',
+        premium: 'Builder avanzado'
       }
     },
     {
@@ -513,7 +523,7 @@ const pricingContent = {
   trustSignals: [
     'Escalera de valor clara',
     'Activación como capa real del producto',
-    'Créditos visibles como capacidad operativa',
+    'Gemas visibles como capacidad operativa',
     'De idea o URL a base de trabajo accionable',
     'Útil para proyecto propio u oportunidad real'
   ]
