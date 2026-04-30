@@ -7,9 +7,15 @@ const HomeFooter = () => {
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-zinc-700 bg-zinc-900 text-sm font-semibold text-white">
-              SM
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
+              <img
+                src="/sistema_maestro_gold_logo.png"
+                alt="Sistema Maestro"
+                className="h-full w-full object-contain"
+                draggable="false"
+              />
             </div>
+
             <div>
               <p className="text-sm font-semibold text-white">Sistema Maestro</p>
               <p className="text-xs text-zinc-400">Sistema para analizar, ordenar y construir mejor</p>
@@ -26,7 +32,7 @@ const HomeFooter = () => {
           <div className="mt-4 flex flex-col gap-3 text-sm text-zinc-400">
             <a href="#constructor-maestro" className="transition hover:text-white">Constructor</a>
             <a href="#como-funciona" className="transition hover:text-white">Cómo funciona</a>
-            <a href="#captacion-inteligente" className="transition hover:text-white">Captación</a>
+            <a href="#radar-ia" className="transition hover:text-white">Radar IA</a>
             <a href="#pricing" className="transition hover:text-white">Pricing</a>
           </div>
         </div>
