@@ -157,34 +157,47 @@ const ProjectsPage = () => {
           </div>
         </div>
 
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1 sm:max-w-md">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
-              <MagnifyingGlass size={18} className="text-[#A3A3A3]" />
-            </span>
+        <div className="mb-6 rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative flex-1">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-300/15 bg-cyan-400/10 text-cyan-100">
+                <MagnifyingGlass size={18} />
+              </span>
 
-            <input
-              type="text"
-              placeholder="Buscar proyectos..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="input-premium pl-14 pr-4"
-              data-testid="search-input"
-            />
+              <input
+                type="text"
+                placeholder="Buscar por idea, URL o contenido del proyecto..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="h-14 w-full rounded-2xl border border-white/10 bg-black/25 pl-16 pr-4 text-sm font-medium text-white outline-none transition placeholder:text-zinc-500 hover:border-white/16 focus:border-cyan-300/35 focus:bg-black/35 focus:ring-2 focus:ring-cyan-300/10"
+                data-testid="search-input"
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="rounded-2xl border border-white/10 bg-black/25 px-4 py-2.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                  Resultados
+                </p>
+                <p className="mt-0.5 text-sm font-semibold text-white">
+                  {loading ? '—' : filteredProjects.length} proyectos
+                </p>
+              </div>
+
+              <select
+                value={filterRoute}
+                onChange={(event) => setFilterRoute(event.target.value)}
+                className="h-14 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm font-semibold text-white outline-none transition hover:border-white/16 focus:border-cyan-300/35 focus:ring-2 focus:ring-cyan-300/10 sm:min-w-[230px]"
+                data-testid="filter-route"
+              >
+                <option value="all">Todas las rutas</option>
+                <option value="improve_existing">Mejorar existente</option>
+                <option value="sell_and_charge">Vender y cobrar</option>
+                <option value="automate_operation">Automatizar</option>
+                <option value="idea_to_project">Idea a proyecto</option>
+              </select>
+            </div>
           </div>
-
-          <select
-            value={filterRoute}
-            onChange={(event) => setFilterRoute(event.target.value)}
-            className="input-premium py-2 sm:min-w-[210px]"
-            data-testid="filter-route"
-          >
-            <option value="all">Todas las rutas</option>
-            <option value="improve_existing">Mejorar existente</option>
-            <option value="sell_and_charge">Vender y cobrar</option>
-            <option value="automate_operation">Automatizar</option>
-            <option value="idea_to_project">Idea a proyecto</option>
-          </select>
         </div>
 
         {loading ? (
