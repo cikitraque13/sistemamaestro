@@ -98,30 +98,6 @@ const peachPrimaryButton =
 const peachSecondaryButton =
   'inline-flex items-center justify-center rounded-2xl border border-amber-200/24 bg-[linear-gradient(135deg,rgba(255,242,204,0.11),rgba(242,180,90,0.08),rgba(244,114,182,0.08))] px-5 py-3.5 text-sm font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:border-amber-200/40 hover:bg-amber-200/[0.10]';
 
-const mobileValueItems = [
-  {
-    eyebrow: 'Registro gratis',
-    title: '10 gemas iniciales',
-    text: 'Activa tu cuenta y entra al sistema con capacidad real para empezar.',
-    className: 'border-emerald-300/14 bg-emerald-300/[0.055]',
-    eyebrowClassName: 'text-emerald-100/75',
-  },
-  {
-    eyebrow: 'Informe Maestro Gold',
-    title: 'Lectura guiada + 10 gemas extra',
-    text: 'Entra con una lectura más clara antes de usar tus gemas.',
-    className: 'border-amber-300/20 bg-amber-300/[0.085]',
-    eyebrowClassName: 'text-amber-100/85',
-  },
-  {
-    eyebrow: 'Entrada preparada',
-    title: 'Hasta 20 gemas para arrancar',
-    text: 'Más margen para construir una primera base con criterio.',
-    className: 'border-fuchsia-300/16 bg-fuchsia-300/[0.065]',
-    eyebrowClassName: 'text-fuchsia-100/78',
-  },
-];
-
 const MobileEntry = () => {
   return (
     <section
@@ -131,36 +107,35 @@ const MobileEntry = () => {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(245,158,11,0.20),transparent_30%),radial-gradient(circle_at_86%_24%,rgba(244,114,182,0.12),transparent_26%),radial-gradient(circle_at_50%_100%,rgba(6,182,212,0.08),transparent_34%)]" />
 
       <div className="relative mx-auto max-w-md">
-        <div className="overflow-hidden rounded-[32px] border border-amber-200/18 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.014))] p-5 shadow-[0_0_46px_rgba(245,158,11,0.08)]">
+        <div className="overflow-hidden rounded-[34px] border border-amber-200/18 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.14),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.014))] p-5 shadow-[0_0_50px_rgba(245,158,11,0.09)]">
           <div className="inline-flex rounded-full border border-amber-200/18 bg-amber-200/[0.07] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100">
-            Entrada Gold
+            Sistema Maestro Gold
           </div>
 
-          <h1 className="mt-5 text-[2.28rem] font-semibold leading-[0.96] tracking-tight text-white">
-            Sistema Maestro acelera proyectos digitales con IA.
+          <h1 className="mt-5 text-[2.2rem] font-semibold leading-[0.97] tracking-tight text-white">
+            Construye y acelera proyectos digitales con inteligencia artificial.
           </h1>
 
           <p className="mt-4 text-sm leading-7 text-zinc-300">
-            Ordena ideas, webs y oportunidades antes de construir. Activa tu entrada ahora y pruébalo con calma desde ordenador.
+            Una aplicación para ordenar ideas, webs, oportunidades y proyectos antes de construirlos con más criterio.
           </p>
 
-          <div className="mt-5 grid gap-2.5">
-            {mobileValueItems.map((item) => (
-              <div
-                key={item.eyebrow}
-                className={`rounded-2xl border px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.045)] ${item.className}`}
-              >
-                <p className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${item.eyebrowClassName}`}>
-                  {item.eyebrow}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-white">
-                  {item.title}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-zinc-400">
-                  {item.text}
-                </p>
-              </div>
-            ))}
+          <div className="mt-5 rounded-2xl border border-white/8 bg-black/25 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              Para quién es
+            </p>
+
+            <div className="mt-3 space-y-2.5 text-sm leading-6 text-zinc-300">
+              <p>
+                <span className="font-semibold text-white">Fundadores</span> que quieren ordenar una idea antes de invertir tiempo.
+              </p>
+              <p>
+                <span className="font-semibold text-white">Negocios</span> que necesitan mejorar su presencia digital con más dirección.
+              </p>
+              <p>
+                <span className="font-semibold text-white">Agencias y profesionales</span> que buscan acelerar proyectos con IA.
+              </p>
+            </div>
           </div>
 
           <div className="mt-5 grid gap-3">
@@ -172,103 +147,87 @@ const MobileEntry = () => {
               <ArrowRight className="h-4 w-4" />
             </Link>
 
-            <a
-              href="#informe-maestro-gold"
-              className={peachSecondaryButton}
-            >
-              Ver informe 6,99 € + 10 gemas
-            </a>
+            <p className="text-center text-xs leading-5 text-zinc-500">
+              Incluye 10 gemas iniciales para conocer el sistema.
+            </p>
           </div>
-
-          <p className="mt-4 text-xs leading-5 text-zinc-500">
-            Activa tu acceso desde el móvil. Cuando llegues al ordenador, entra al sistema y empieza con una ruta más clara.
-          </p>
         </div>
 
         <div
           id="informe-maestro-gold"
-          className="mt-4 overflow-hidden rounded-[30px] border border-amber-200/18 bg-[linear-gradient(135deg,rgba(255,228,163,0.08),rgba(244,114,182,0.06),rgba(6,182,212,0.035))] p-5 shadow-[0_0_34px_rgba(245,158,11,0.055)]"
+          className="mt-4 overflow-hidden rounded-[32px] border border-amber-200/18 bg-[linear-gradient(135deg,rgba(255,228,163,0.09),rgba(244,114,182,0.065),rgba(6,182,212,0.035))] p-5 shadow-[0_0_38px_rgba(245,158,11,0.065)]"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d5b16e]">
-            Informe Maestro Gold
+            Entrada al sistema
           </p>
 
           <h2 className="mt-3 text-2xl font-semibold leading-tight text-white">
-            Entra con una lectura mejor preparada.
+            Empieza gratis. Entra mejor preparado con el informe.
           </h2>
 
-          <p className="mt-3 text-sm leading-7 text-zinc-300">
-            El informe ordena tu punto de partida antes de consumir tus gemas: diagnóstico inicial, ruta priorizada y entrada más clara al sistema.
-          </p>
-
-          <div className="mt-4 grid gap-2">
-            <div className="rounded-2xl border border-white/8 bg-black/24 px-4 py-3">
-              <p className="text-sm font-semibold text-white">Idea sin ordenar</p>
+          <div className="mt-4 space-y-3">
+            <div className="rounded-2xl border border-emerald-300/14 bg-emerald-300/[0.055] px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100/75">
+                Registro gratis
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                10 gemas iniciales
+              </p>
               <p className="mt-1 text-xs leading-5 text-zinc-400">
-                Convierte una intuición en una ruta inicial.
+                Activa tu cuenta y entra al sistema para conocer la aplicación.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/8 bg-black/24 px-4 py-3">
-              <p className="text-sm font-semibold text-white">Web que necesita mejora</p>
+            <div className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.085] px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/85">
+                Informe Maestro Gold · 6,99 €
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                Lectura guiada + 10 gemas extra
+              </p>
               <p className="mt-1 text-xs leading-5 text-zinc-400">
-                Detecta foco, fricción y oportunidades visibles.
+                Una entrada más clara antes de gastar tus gemas dentro del sistema.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/8 bg-black/24 px-4 py-3">
-              <p className="text-sm font-semibold text-white">Proyecto digital</p>
+            <div className="rounded-2xl border border-fuchsia-300/16 bg-fuchsia-300/[0.065] px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fuchsia-100/78">
+                Arranque preparado
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                Hasta 20 gemas para empezar
+              </p>
               <p className="mt-1 text-xs leading-5 text-zinc-400">
-                Entra con dirección antes de avanzar.
+                Más margen para construir una primera base con dirección.
               </p>
             </div>
           </div>
 
-          <Link
-            to="/register"
-            className={`${peachPrimaryButton} mt-5 w-full`}
-          >
-            Entrar y sumar 10 gemas
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="mt-5 grid gap-3">
+            <a
+              href="#informe-maestro-gold"
+              className={peachPrimaryButton}
+            >
+              Ver Informe Maestro Gold
+              <ArrowRight className="h-4 w-4" />
+            </a>
 
-          <p className="mt-3 text-xs leading-5 text-zinc-500">
-            El informe se activa como entrada de preparación. La construcción seria continúa dentro del sistema.
-          </p>
-        </div>
-
-        <div className="mt-4 rounded-[28px] border border-white/10 bg-black/30 p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-            Para quién es
-          </p>
-
-          <p className="mt-3 text-sm leading-7 text-zinc-300">
-            Para fundadores, negocios, agencias y profesionales que quieren ordenar una idea, mejorar una web o entrar a un proyecto digital con una ruta más clara.
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-semibold text-zinc-200">
-              Fundadores
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-semibold text-zinc-200">
-              Negocios
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-semibold text-zinc-200">
-              Agencias
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-semibold text-zinc-200">
-              Proyectos digitales
-            </span>
+            <Link
+              to="/register"
+              className={peachSecondaryButton}
+            >
+              Crear cuenta y recibir 10 gemas
+            </Link>
           </div>
         </div>
 
-        <div className="mt-4 rounded-[28px] border border-amber-200/14 bg-amber-200/[0.045] p-5">
+        <div className="mt-4 rounded-[30px] border border-amber-200/14 bg-[linear-gradient(135deg,rgba(255,228,163,0.065),rgba(244,114,182,0.04),rgba(6,182,212,0.025))] p-5">
           <p className="text-sm font-semibold text-amber-100">
-            Guárdalo para probarlo bien.
+            Pensado para trabajar proyectos en serio desde ordenador.
           </p>
 
           <p className="mt-2 text-xs leading-5 text-zinc-400">
-            Sistema Maestro está pensado para trabajar proyectos en serio desde ordenador. Desde móvil entiendes, activas y preparas tu entrada.
+            Desde móvil puedes entender el sistema y activar tu acceso. Cuando llegues al ordenador, entra, usa tus gemas y trabaja con más profundidad.
           </p>
         </div>
       </div>
@@ -348,18 +307,12 @@ const DesktopEntry = () => {
             </div>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#pricing"
-                className={peachPrimaryButton}
-              >
+              <a href="#pricing" className={peachPrimaryButton}>
                 Ver informe de entrada
                 <ArrowRight className="h-4 w-4" />
               </a>
 
-              <Link
-                to="/register"
-                className={peachSecondaryButton}
-              >
+              <Link to="/register" className={peachSecondaryButton}>
                 Registrarme gratis
               </Link>
             </div>
@@ -473,18 +426,12 @@ const DesktopEntry = () => {
               </div>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#pricing"
-                  className={peachPrimaryButton}
-                >
+                <a href="#pricing" className={peachPrimaryButton}>
                   Informe 6,99 € + 10 gemas
                   <ArrowRight className="h-4 w-4" />
                 </a>
 
-                <Link
-                  to="/register"
-                  className={peachSecondaryButton}
-                >
+                <Link to="/register" className={peachSecondaryButton}>
                   Empezar gratis con 10 gemas
                 </Link>
               </div>

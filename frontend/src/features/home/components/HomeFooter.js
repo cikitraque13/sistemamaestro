@@ -3,104 +3,42 @@ import { Link } from 'react-router-dom';
 
 const HomeFooter = () => {
   return (
-    <footer className="border-t border-zinc-800 bg-black/30 px-6 py-10 md:px-10 md:py-12">
+    <footer className="border-t border-zinc-800 bg-black/30 px-6 py-8 md:px-10 md:py-12">
       <div className="mx-auto max-w-7xl md:hidden">
-        <div className="rounded-[30px] border border-amber-200/14 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.12),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-5 shadow-[0_0_38px_rgba(245,158,11,0.06)]">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
-              <img
-                src="/sistema_maestro_gold_logo.png"
-                alt="Sistema Maestro"
-                className="h-full w-full object-contain"
-                draggable="false"
-              />
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-white">Sistema Maestro</p>
-              <p className="text-xs text-zinc-400">Dirección, IA y continuidad</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
+            <img
+              src="/sistema_maestro_gold_logo.png"
+              alt="Sistema Maestro"
+              className="h-full w-full object-contain"
+              draggable="false"
+            />
           </div>
 
-          <p className="mt-4 text-sm leading-6 text-zinc-300">
-            Una plataforma para ordenar ideas, webs, oportunidades y proyectos digitales antes de construir con más criterio.
-          </p>
-
-          <div className="mt-5 rounded-2xl border border-amber-200/14 bg-amber-200/[0.055] p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100/75">
-              Entrada al sistema
-            </p>
-            <p className="mt-2 text-sm font-semibold text-white">
-              10 gemas gratis · Informe Gold + 10 gemas · hasta 20 gemas para arrancar.
-            </p>
+          <div>
+            <p className="text-sm font-semibold text-white">Sistema Maestro</p>
+            <p className="text-xs text-zinc-400">Dirección, IA y continuidad</p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-5">
-          <div className="rounded-[26px] border border-white/8 bg-black/25 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Sistema
-            </p>
+        <p className="mt-4 text-sm leading-6 text-zinc-400">
+          Arquitectura, inteligencia artificial y continuidad para proyectos digitales.
+        </p>
 
-            <div className="mt-4 grid gap-3 text-sm text-zinc-300">
-              <a href="#constructor-maestro" className="transition hover:text-white">
-                Qué es Sistema Maestro
-              </a>
-              <span>
-                Para fundadores, negocios, agencias y profesionales.
-              </span>
-              <span>
-                Dirección antes de construir.
-              </span>
-            </div>
-          </div>
-
-          <div className="rounded-[26px] border border-white/8 bg-black/25 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Herramientas
-            </p>
-
-            <div className="mt-4 grid gap-3 text-sm text-zinc-300">
-              <span>Gemas Maestras</span>
-              <a href="#informe-maestro-gold" className="transition hover:text-white">
-                Informe Maestro Gold
-              </a>
-              <span>Oportunidades monetizables</span>
-              <span>Proyectos con continuidad</span>
-            </div>
-          </div>
-
-          <div className="rounded-[26px] border border-white/8 bg-black/25 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Legal
-            </p>
-
-            <div className="mt-4 grid gap-3 text-sm text-zinc-400">
-              <Link to="/privacy" className="transition hover:text-white">
-                Privacidad
-              </Link>
-              <Link to="/cookies" className="transition hover:text-white">
-                Cookies
-              </Link>
-              <Link to="/terms" className="transition hover:text-white">
-                Términos
-              </Link>
-            </div>
-          </div>
+        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-zinc-400">
+          <Link to="/privacy" className="transition hover:text-white">
+            Privacidad
+          </Link>
+          <Link to="/cookies" className="transition hover:text-white">
+            Cookies
+          </Link>
+          <Link to="/terms" className="transition hover:text-white">
+            Términos y condiciones
+          </Link>
         </div>
 
-        <div className="mt-6 rounded-[26px] border border-amber-200/14 bg-[linear-gradient(135deg,rgba(255,228,163,0.065),rgba(244,114,182,0.04),rgba(6,182,212,0.025))] p-5">
-          <p className="text-sm font-semibold text-amber-100">
-            Activa tu entrada desde el móvil.
-          </p>
-
-          <p className="mt-2 text-xs leading-5 text-zinc-400">
-            Cuando llegues al ordenador, entra al sistema y trabaja tu proyecto con más profundidad, dirección y continuidad.
-          </p>
-        </div>
-
-        <p className="mt-6 text-xs text-zinc-600">
-          © Sistema Maestro. Arquitectura, IA y continuidad para proyectos digitales.
+        <p className="mt-5 text-xs text-zinc-600">
+          © Sistema Maestro.
         </p>
       </div>
 
