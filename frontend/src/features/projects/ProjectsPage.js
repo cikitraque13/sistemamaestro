@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
+  CaretDown,
+  Check,
   FileText,
   FolderOpen,
   Plus,
@@ -114,10 +116,34 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterRoute, setFilterRoute] = useState('all');
+  const [isRouteMenuOpen, setIsRouteMenuOpen] = useState(false);
   const searchInputRef = useRef(null);
+  const routeMenuRef = useRef(null);
 
   useEffect(() => {
     fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (!routeMenuRef.current?.contains(event.target)) {
+        setIsRouteMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsRouteMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, []);
 
   const fetchProjects = async () => {
@@ -162,6 +188,11 @@ const ProjectsPage = () => {
     searchInputRef.current?.focus();
   };
 
+  const handleRouteSelect = (routeValue) => {
+    setFilterRoute(routeValue);
+    setIsRouteMenuOpen(false);
+  };
+
   const clearFilters = () => {
     setSearch('');
     setFilterRoute('all');
@@ -194,6 +225,8 @@ const ProjectsPage = () => {
 
   const hasProjects = projects.length > 0;
   const hasActiveFilters = search.trim().length > 0 || filterRoute !== 'all';
+  const selectedRouteFilter =
+    ROUTE_FILTERS.find((filter) => filter.value === filterRoute) || ROUTE_FILTERS[0];
 
   return (
     <DashboardLayout title="Proyectos">
@@ -262,18 +295,56 @@ const ProjectsPage = () => {
                 </p>
               </div>
 
-              <select
-                value={filterRoute}
-                onChange={(event) => setFilterRoute(event.target.value)}
-                className="h-14 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm font-semibold text-white outline-none transition hover:border-white/16 focus:border-cyan-300/35 focus:ring-2 focus:ring-cyan-300/10 sm:min-w-[230px]"
-                data-testid="filter-route"
-              >
-                {ROUTE_FILTERS.map((filter) => (
-                  <option key={filter.value} value={filter.value}>
-                    {filter.label}
-                  </option>
-                ))}
-              </select>
+              <div ref={routeMenuRef} className="relative sm:min-w-[230px]">
+                <button
+                  type="button"
+                  onClick={() => setIsRouteMenuOpen((isOpen) => !isOpen)}
+                  className="flex h-14 w-full items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/25 px-4 text-left text-sm font-semibold text-white outline-none transition hover:border-white/16 focus:border-cyan-300/35 focus:ring-2 focus:ring-cyan-300/10"
+                  aria-haspopup="listbox"
+                  aria-expanded={isRouteMenuOpen}
+                  data-testid="filter-route"
+                >
+                  <span>{selectedRouteFilter.label}</span>
+                  <CaretDown
+                    size={16}
+                    className={`text-zinc-400 transition ${isRouteMenuOpen ? 'rotate-180 text-cyan-100' : ''}`}
+                  />
+                </button>
+
+                {isRouteMenuOpen && (
+                  <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-full min-w-[250px] overflow-hidden rounded-2xl border border-cyan-300/15 bg-[#080B0C] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.03)]">
+                    <div className="mb-1 px-3 py-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                        Filtrar por ruta
+                      </p>
+                    </div>
+
+                    <div role="listbox" aria-label="Filtrar proyectos por ruta" className="space-y-1">
+                      {ROUTE_FILTERS.map((filter) => {
+                        const isSelected = filter.value === filterRoute;
+
+                        return (
+                          <button
+                            key={filter.value}
+                            type="button"
+                            role="option"
+                            aria-selected={isSelected}
+                            onClick={() => handleRouteSelect(filter.value)}
+                            className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition ${
+                              isSelected
+                                ? 'border border-cyan-300/20 bg-cyan-400/12 text-cyan-50'
+                                : 'text-zinc-300 hover:bg-white/[0.045] hover:text-white'
+                            }`}
+                          >
+                            <span>{filter.label}</span>
+                            {isSelected && <Check size={15} className="text-cyan-100" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
