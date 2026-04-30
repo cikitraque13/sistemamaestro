@@ -13,13 +13,21 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-white">
       <HomeNav />
-      <HeroSection />
+
+      <div className="hidden md:block">
+        <HeroSection />
+      </div>
+
       <HomeEntrySection />
-      <HowItWorksSection />
-      <PricingSection />
-      <ValueAuthoritySection />
-      <AudienceSection />
-      <LeadCaptureSection />
+
+      <div className="hidden md:block">
+        <HowItWorksSection />
+        <PricingSection />
+        <ValueAuthoritySection />
+        <AudienceSection />
+        <LeadCaptureSection />
+      </div>
+
       <HomeFooter />
     </div>
   );

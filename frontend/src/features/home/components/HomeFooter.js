@@ -3,8 +3,72 @@ import { Link } from 'react-router-dom';
 
 const HomeFooter = () => {
   return (
-    <footer className="border-t border-zinc-800 bg-black/30 px-6 py-12 md:px-10">
-      <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
+    <footer className="border-t border-zinc-800 bg-black/30 px-6 py-10 md:px-10 md:py-12">
+      <div className="mx-auto max-w-7xl md:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
+            <img
+              src="/sistema_maestro_gold_logo.png"
+              alt="Sistema Maestro"
+              className="h-full w-full object-contain"
+              draggable="false"
+            />
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-white">Sistema Maestro</p>
+            <p className="text-xs text-zinc-400">Dirección, IA y continuidad</p>
+          </div>
+        </div>
+
+        <p className="mt-4 text-sm leading-6 text-zinc-400">
+          Plataforma para ordenar ideas, webs, oportunidades y proyectos digitales antes de construirlos con más criterio.
+        </p>
+
+        <div className="mt-7 grid gap-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Sistema
+            </p>
+            <div className="mt-3 grid gap-2 text-sm text-zinc-300">
+              <span>Qué es Sistema Maestro</span>
+              <span>Para fundadores, negocios y profesionales</span>
+              <span>Dirección antes de construir</span>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Herramientas
+            </p>
+            <div className="mt-3 grid gap-2 text-sm text-zinc-300">
+              <span>Gemas Maestras</span>
+              <span>Informe Maestro Gold</span>
+              <span>Oportunidades</span>
+              <span>Proyectos</span>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Legal
+            </p>
+            <div className="mt-3 grid gap-2 text-sm text-zinc-400">
+              <Link to="/privacy" className="transition hover:text-white">Privacidad</Link>
+              <Link to="/cookies" className="transition hover:text-white">Cookies</Link>
+              <Link to="/terms" className="transition hover:text-white">Términos</Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 border-t border-zinc-800 pt-5">
+          <p className="text-xs leading-5 text-zinc-500">
+            Activa tu entrada desde el móvil. Trabaja tu proyecto con más profundidad desde ordenador.
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto hidden max-w-7xl gap-10 md:grid md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
@@ -49,7 +113,7 @@ const HomeFooter = () => {
         </div>
       </div>
 
-      <div className="mx-auto mt-10 max-w-7xl border-t border-zinc-800 pt-6">
+      <div className="mx-auto mt-10 hidden max-w-7xl border-t border-zinc-800 pt-6 md:block">
         <p className="text-xs text-zinc-500">
           © Sistema Maestro. Arquitectura, IA, estructura y continuidad para proyectos digitales.
         </p>

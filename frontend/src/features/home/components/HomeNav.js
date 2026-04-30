@@ -13,7 +13,7 @@ const HomeNav = () => {
     <header className="sticky top-0 z-40 border-b border-white/5 bg-[#080808]/88 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-10">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_28px_rgba(245,158,11,0.10)]">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_28px_rgba(245,158,11,0.10)] md:h-12 md:w-12">
             <img
               src="/sistema_maestro_gold_logo.png"
               alt="Sistema Maestro"
@@ -50,7 +50,7 @@ const HomeNav = () => {
 
           <a
             href="#constructor-maestro"
-            className="hidden rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-2.5 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(245,158,11,0.18)] transition hover:scale-[1.01] hover:shadow-[0_12px_34px_rgba(244,114,182,0.22)] sm:inline-flex"
+            className="hidden rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-2.5 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(245,158,11,0.18)] transition hover:scale-[1.01] hover:shadow-[0_12px_34px_rgba(244,114,182,0.22)] md:inline-flex"
           >
             Empezar con mi proyecto
           </a>
