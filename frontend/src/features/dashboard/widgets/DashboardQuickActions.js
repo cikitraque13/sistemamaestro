@@ -37,7 +37,7 @@ const actions = [
   },
   {
     to: '/dashboard/billing',
-    label: 'Facturación y créditos',
+    label: 'Facturación y gemas',
     helper: 'Pagos, planes y capacidad operativa',
     icon: CreditCard,
     tone: 'fuchsia'
