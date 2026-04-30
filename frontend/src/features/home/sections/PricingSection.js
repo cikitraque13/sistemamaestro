@@ -30,6 +30,13 @@ const planToneClasses = {
   }
 };
 
+const planBadgeLabels = {
+  free: 'Entrada',
+  blueprint: 'Entrada seria',
+  sistema: 'Núcleo',
+  premium: 'Superior'
+};
+
 const visiblePlans = pricingPlans.filter((plan) =>
   ['free', 'blueprint', 'sistema', 'premium'].includes(plan.id)
 );
@@ -128,15 +135,15 @@ const PricingSection = () => {
               return (
                 <article
                   key={plan.id}
-                  className={`rounded-[28px] border p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] ${tone.card}`}
+                  className={`flex min-h-[560px] flex-col rounded-[28px] border p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] ${tone.card}`}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex min-h-[42px] items-start justify-between gap-3">
                     <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/75">
                       {plan.visibleName}
                     </p>
 
-                    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${tone.badge}`}>
-                      {plan.badge}
+                    <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${tone.badge}`}>
+                      {planBadgeLabels[plan.id] || plan.badge}
                     </span>
                   </div>
 
@@ -161,7 +168,7 @@ const PricingSection = () => {
 
                   <Link
                     to="/register"
-                    className={`mt-8 inline-flex w-full items-center justify-center rounded-2xl border px-5 py-3 text-sm font-semibold transition ${tone.button}`}
+                    className={`mt-auto inline-flex w-full items-center justify-center rounded-2xl border px-5 py-3 text-sm font-semibold transition ${tone.button}`}
                   >
                     {plan.id === 'free' ? 'Probar gratis' : `Entrar en ${plan.visibleName}`}
                   </Link>
@@ -170,25 +177,71 @@ const PricingSection = () => {
             })}
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_0.9fr]">
-            <div className="rounded-[24px] border border-white/6 bg-white/[0.02] p-5">
-              <p className="text-sm leading-7 text-zinc-300">
-                <span className="font-semibold text-white">Gema Maestra:</span> capacidad
-                operativa disponible dentro del sistema. Gratis permite probar Builder con
-                10 gemas iniciales; Pro, Growth y AI Master amplían recorrido y continuidad.
+          <div className="mt-8 grid gap-5 lg:grid-cols-[1.02fr_0.98fr]">
+            <div className="relative overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[radial-gradient(circle_at_top_left,rgba(6,182,212,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-6 shadow-[0_0_40px_rgba(6,182,212,0.06)]">
+              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-cyan-300/10 blur-3xl" />
+
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100/70">
+                Gema Maestra
               </p>
+
+              <h4 className="mt-3 text-2xl font-semibold tracking-tight text-white">
+                Capacidad operativa visible.
+              </h4>
+
+              <p className="mt-4 text-sm leading-7 text-zinc-300">
+                Las gemas muestran el margen real disponible para construir, iterar y avanzar
+                dentro de Sistema Maestro. No escondemos la capacidad: la hacemos visible para que
+                el usuario entienda cuándo puede probar, cuándo debe continuar y cuándo conviene escalar.
+              </p>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/8 bg-black/25 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    Inicio
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-white">10 gemas</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/8 bg-black/25 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    Continuidad
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-white">Pro y Growth</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/8 bg-black/25 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    Escala
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-white">AI Master</p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-[24px] border border-white/6 bg-white/[0.02] p-5">
-              <p className="text-sm font-semibold text-white">Señales de confianza</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {pricingTrustSignals.slice(0, 4).map((signal) => (
-                  <span
+            <div className="rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-6 shadow-[0_0_40px_rgba(255,255,255,0.035)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Señales de confianza
+              </p>
+
+              <h4 className="mt-3 text-2xl font-semibold tracking-tight text-white">
+                Un modelo claro antes de pedir más.
+              </h4>
+
+              <div className="mt-5 grid gap-3">
+                {pricingTrustSignals.slice(0, 4).map((signal, index) => (
+                  <div
                     key={signal}
-                    className="rounded-full border border-white/8 bg-black/25 px-3 py-2 text-xs font-medium text-zinc-300"
+                    className="flex items-start gap-4 rounded-2xl border border-white/8 bg-black/25 p-4"
                   >
-                    {signal}
-                  </span>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-emerald-300/20 bg-emerald-300/10 text-xs font-semibold text-emerald-100">
+                      {index + 1}
+                    </span>
+
+                    <p className="text-sm leading-6 text-zinc-200">
+                      {signal}
+                    </p>
+                  </div>
                 ))}
               </div>
             </div>
