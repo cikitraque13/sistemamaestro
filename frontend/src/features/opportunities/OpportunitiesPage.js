@@ -31,20 +31,59 @@ const ROUTE_NAMES = {
 };
 
 const DIFFICULTY_BADGES = {
-  facil: { label: 'Facil', color: 'bg-green-500/20 text-green-300' },
+  facil: { label: 'Fácil', color: 'bg-green-500/20 text-green-300' },
   media: { label: 'Media', color: 'bg-yellow-500/20 text-yellow-300' },
   avanzada: { label: 'Avanzada', color: 'bg-red-500/20 text-red-300' }
 };
 
+const COPY_REPLACEMENTS = [
+  [/Consultoría\s*\(\$299\)/gi, 'Paquete estratégico opcional ($299)'],
+  [/Consultoría/gi, 'Paquete estratégico'],
+  [/Pay-per-report/gi, 'Pago por informe'],
+  [/Vender reportes premium/gi, 'Preparar una oferta de reportes premium'],
+  [/Vender reportes/gi, 'Preparar una oferta de reportes'],
+  [/servicios de setup/gi, 'paquete de configuración inicial'],
+  [/servicios de implementación/gi, 'paquete de activación'],
+  [/llamadas comerciales/gi, 'flujo de captación'],
+  [/hacer llamadas/gi, 'activar contacto comercial'],
+  [/suscripción mensual para agencias/gi, 'suscripción mensual para equipos o clientes recurrentes'],
+  [/Suscripción mensual \+ servicios de setup/gi, 'Suscripción mensual + paquete de activación inicial'],
+  [/Membresía recurrente \+ eventos premium/gi, 'Membresía recurrente + contenidos premium'],
+  [/Freemium:/gi, 'Entrada gratuita:'],
+  [/Reporte completo/gi, 'Informe completo'],
+  [/reportes de mejora automáticos/gi, 'informes de mejora generados desde el sistema'],
+  [/reportes PDF profesionales/gi, 'informes PDF profesionales'],
+  [/recomendaciones detalladas/gi, 'recomendaciones accionables']
+];
+
+const sanitizeOpportunityCopy = (value, fallback = 'Por definir') => {
+  const initialText = String(value || '').trim();
+
+  if (!initialText) return fallback;
+
+  return COPY_REPLACEMENTS.reduce(
+    (text, [pattern, replacement]) => text.replace(pattern, replacement),
+    initialText
+  );
+};
+
 const normalizeOpportunity = (opp) => ({
   opportunity_id: opp.opportunity_id,
-  title: opp.title || 'Oportunidad',
-  description: opp.description || 'Sin descripcion disponible',
+  title: sanitizeOpportunityCopy(opp.title, 'Oportunidad'),
+  description: sanitizeOpportunityCopy(opp.description, 'Sin descripción disponible'),
   route: opp.route || 'idea',
   difficulty: opp.difficulty || 'media',
-  monetization: opp.monetization || opp.business_model || 'Por definir',
-  business_model: opp.business_model || 'Por definir',
-  steps: Array.isArray(opp.steps) ? opp.steps : []
+  monetization: sanitizeOpportunityCopy(
+    opp.monetization || opp.business_model,
+    'Ruta de monetización por definir'
+  ),
+  business_model: sanitizeOpportunityCopy(
+    opp.business_model,
+    'Modelo monetizable por definir'
+  ),
+  steps: Array.isArray(opp.steps)
+    ? opp.steps.map((step) => sanitizeOpportunityCopy(step, '')).filter(Boolean)
+    : []
 });
 
 const buildOpportunityPrompt = (opportunity) => {
@@ -54,11 +93,11 @@ const buildOpportunityPrompt = (opportunity) => {
   const monetization = String(opportunity?.monetization || '').trim();
 
   return [
-    title ? `Quiero desarrollar: ${title}.` : '',
+    title ? `Quiero convertir esta oportunidad en proyecto: ${title}.` : '',
     description ? `Idea base: ${description}.` : '',
-    businessModel ? `Modelo de negocio: ${businessModel}.` : '',
-    monetization ? `Monetizacion prevista: ${monetization}.` : '',
-    'Conviertelo en un proyecto construible en Builder, con primera version clara, CTA principal y siguiente mejora recomendada.'
+    businessModel ? `Modelo monetizable: ${businessModel}.` : '',
+    monetization ? `Ruta de monetización: ${monetization}.` : '',
+    'Conviértelo en una primera versión construible en Builder, con propuesta clara, pantalla inicial, CTA principal y siguiente mejora recomendada.'
   ]
     .filter(Boolean)
     .join(' ');
@@ -128,12 +167,12 @@ const OpportunitiesPage = () => {
                 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-white md:text-4xl"
                 data-testid="opportunities-title"
               >
-                Ideas monetizables listas para convertir en proyecto.
+                Plantillas monetizables listas para llevar al Builder.
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400 md:text-base">
-                Explora rutas, modelos de negocio y primeros pasos. Al usar una oportunidad,
-                Sistema Maestro la lleva al Dashboard Launcher para construirla en Builder.
+                Explora rutas, modelos de oferta y primeros sistemas construibles. Cada
+                oportunidad sirve como base para activar una versión clara en Builder.
               </p>
             </div>
 
@@ -145,7 +184,7 @@ const OpportunitiesPage = () => {
                 data-testid="upgrade-btn"
               >
                 <Lock size={16} />
-                Desbloquear mas
+                Desbloquear más
               </Link>
             )}
           </div>
@@ -302,7 +341,7 @@ const OpportunitiesPage = () => {
                     className="text-zinc-400 transition hover:text-white"
                     aria-label="Cerrar oportunidad"
                   >
-                    x
+                    ×
                   </button>
                 </div>
               </div>
@@ -310,7 +349,7 @@ const OpportunitiesPage = () => {
               <div className="space-y-6 p-6">
                 <div>
                   <p className="mb-2 text-sm text-zinc-500">
-                    Descripcion
+                    Descripción
                   </p>
 
                   <p className="leading-7 text-white">
@@ -320,7 +359,7 @@ const OpportunitiesPage = () => {
 
                 <div>
                   <p className="mb-2 text-sm text-zinc-500">
-                    Modelo de negocio
+                    Modelo monetizable
                   </p>
 
                   <p className="leading-7 text-white">
@@ -330,7 +369,7 @@ const OpportunitiesPage = () => {
 
                 <div>
                   <p className="mb-2 text-sm text-zinc-500">
-                    Monetizacion
+                    Ruta de monetización
                   </p>
 
                   <div className="rounded-2xl border border-white/8 bg-black/30 p-4">
@@ -344,7 +383,7 @@ const OpportunitiesPage = () => {
                 {selectedOpp.steps.length > 0 && (
                   <div>
                     <p className="mb-2 text-sm text-zinc-500">
-                      Primeros pasos
+                      Primer sistema a construir
                     </p>
 
                     <ol className="space-y-2">
