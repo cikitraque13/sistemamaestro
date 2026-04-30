@@ -12,16 +12,17 @@ const Logo = ({ size = 'default', linkTo = '/', className = '' }) => {
   const { img } = sizes[size] || sizes.default;
 
   return (
-    <Link 
-      to={linkTo} 
+    <Link
+      to={linkTo}
       className={`flex items-center gap-2 ${className}`}
       data-testid="logo"
     >
-      <img 
-        src="/logo.png" 
-        alt="Sistema Maestro" 
+      <img
+        src="/sistema_maestro_gold_logo.png"
+        alt="Sistema Maestro"
         style={{ height: img, width: 'auto' }}
         className="object-contain"
+        draggable="false"
       />
     </Link>
   );
