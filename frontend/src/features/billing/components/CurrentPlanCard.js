@@ -17,6 +17,20 @@ const TECH_TOKEN = TOKEN_PARTS.join('');
 const TECH_TOKEN_UPPER = TECH_TOKEN.toUpperCase();
 
 const PLAN_TONE_META = {
+  free: {
+    shell:
+      'border-zinc-300/14 bg-[radial-gradient(circle_at_14%_0%,rgba(161,161,170,0.10),transparent_30%),radial-gradient(circle_at_100%_0%,rgba(82,82,91,0.12),transparent_28%),linear-gradient(180deg,#141414_0%,#080808_100%)]',
+    leftPanel:
+      'border-zinc-300/12 bg-[linear-gradient(180deg,rgba(39,39,42,0.34)_0%,rgba(0,0,0,0.18)_100%)]',
+    rightPanel:
+      'border-zinc-300/12 bg-[radial-gradient(circle_at_top_right,rgba(113,113,122,0.10),transparent_30%),linear-gradient(180deg,#0D0D0F_0%,#070707_100%)]',
+    iconBox:
+      'border-zinc-300/14 bg-zinc-500/10 shadow-[0_0_30px_rgba(161,161,170,0.08)]',
+    icon: 'text-zinc-200',
+    kicker: 'text-zinc-300',
+    gemSlot:
+      'border-zinc-300/16 bg-[linear-gradient(180deg,rgba(63,63,70,0.18),rgba(7,7,7,0.88))]'
+  },
   blueprint: {
     shell:
       'border-[#8DE1D0]/18 bg-[radial-gradient(circle_at_14%_0%,rgba(141,225,208,0.13),transparent_30%),radial-gradient(circle_at_100%_0%,rgba(34,211,238,0.10),transparent_28%),linear-gradient(180deg,#151716_0%,#0A0D0D_100%)]',
@@ -65,13 +79,46 @@ const normalizeToken = (value) =>
   String(value || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .toUpperCase();
+    .toLowerCase()
+    .trim();
 
-const getPlanTone = (planId) =>
-  PLAN_TONE_META[planId] || PLAN_TONE_META.premium;
+const getPlanToneKey = (planId, planName) => {
+  const normalizedId = normalizeToken(planId);
+  const normalizedName = normalizeToken(planName);
+
+  if (
+    !normalizedId ||
+    normalizedId === 'free' ||
+    normalizedName === 'gratis' ||
+    normalizedName === 'free'
+  ) {
+    return 'free';
+  }
+
+  if (['pro', 'blueprint'].includes(normalizedId)) return 'blueprint';
+  if (['growth', 'sistema'].includes(normalizedId)) return 'sistema';
+
+  if (
+    [
+      'premium',
+      'ai_master',
+      'ai-master',
+      'ai_master_199',
+      'ai master 199'
+    ].includes(normalizedId) ||
+    normalizedName.includes('ai master')
+  ) {
+    return 'premium';
+  }
+
+  return 'free';
+};
+
+const getPlanTone = (planId, planName) =>
+  PLAN_TONE_META[getPlanToneKey(planId, planName)];
 
 const getVisibleOperationalLabel = (label) => {
-  const normalized = normalizeToken(label);
+  const normalized = normalizeToken(label).toUpperCase();
 
   if (normalized === 'ACTIVACION') return 'ACTIVACIÓN';
   if (normalized === 'EXPORTACION') return 'SALIDA';
@@ -116,12 +163,12 @@ const OperationalGrid = ({ items, tone }) => (
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
-          <p className={`text-[10px] uppercase tracking-[0.16em] ${isGems ? 'text-cyan-100' : accent.label}`}>
+          <p className={`text-[10px] uppercase tracking-[0.16em] ${isGems ? tone.kicker : accent.label}`}>
             {visibleLabel}
           </p>
 
           <div className="flex flex-1 items-end">
-            <p className={`text-sm font-medium leading-snug ${isGems ? 'text-cyan-100' : accent.value}`}>
+            <p className={`text-sm font-medium leading-snug ${isGems ? tone.icon : accent.value}`}>
               {visibleValue}
             </p>
           </div>
@@ -137,7 +184,7 @@ const CurrentPlanCard = ({
   currentPlanName,
   currentPlanFeatures
 }) => {
-  const tone = getPlanTone(currentPlanDefinition?.id);
+  const tone = getPlanTone(currentPlanDefinition?.id, currentPlanName);
   const operationalItems = buildOperationalItems(
     currentPlanDefinition,
     currentPlanIncludedCredits
@@ -150,9 +197,9 @@ const CurrentPlanCard = ({
       className={`card relative mb-8 overflow-hidden border ${tone.shell} shadow-[0_28px_90px_rgba(0,0,0,0.32)]`}
       data-testid="current-plan"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-fuchsia-400/10 blur-3xl" />
-      <div className="pointer-events-none absolute -left-20 -bottom-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/24 to-transparent" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-zinc-400/8 blur-3xl" />
+      <div className="pointer-events-none absolute -left-20 -bottom-24 h-72 w-72 rounded-full bg-cyan-400/8 blur-3xl" />
 
       <div className="relative z-10 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div className={`rounded-3xl border p-6 ${tone.leftPanel}`}>
