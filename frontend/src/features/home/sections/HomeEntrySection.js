@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   ChevronRight,
@@ -49,7 +50,7 @@ const getModeContent = (mode, type) => {
       eyebrow: 'Ordenar un proyecto vivo',
       title: 'Escala tu proyecto con una ruta de continuidad.',
       placeholder:
-        'Quiero ordenar builder, despliegue, continuidad y capacidad operativa de un proyecto que ya está vivo.',
+        'Quiero ordenar oferta, captación, continuidad y capacidad operativa de un proyecto que ya está vivo.',
       helper:
         'El sistema separa lo urgente de lo secundario y prepara el siguiente avance con criterio.',
     };
@@ -60,7 +61,7 @@ const getModeContent = (mode, type) => {
     title: 'Describe qué quieres crear y recibe una base más clara.',
     placeholder: getIdeaPlaceholderByType(type),
     helper:
-      'El sistema convierte una idea inicial en diagnóstico, ruta y prompt de arranque.',
+      'El sistema convierte una idea inicial en diagnóstico, ruta y entrada de arranque.',
   };
 };
 
@@ -82,8 +83,8 @@ const outputs = [
     iconClasses: 'bg-emerald-500/10 text-emerald-100',
   },
   {
-    title: 'Prompt de arranque',
-    text: 'Prepara una entrada útil para informe, Builder o continuidad dentro del sistema.',
+    title: 'Entrada de arranque',
+    text: 'Prepara una primera base útil para avanzar dentro del sistema con más criterio.',
     icon: FastForward,
     classes:
       'border-fuchsia-400/20 bg-[linear-gradient(180deg,rgba(61,16,60,0.92),rgba(38,10,39,0.92))] shadow-[inset_0_0_0_1px_rgba(217,70,239,0.08)]',
@@ -110,7 +111,7 @@ const HomeEntrySection = () => {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_88%,rgba(245,158,11,0.22),transparent_18%),radial-gradient(circle_at_72%_12%,rgba(217,70,239,0.14),transparent_22%),radial-gradient(circle_at_92%_20%,rgba(8,145,178,0.12),transparent_18%)]" />
 
       <div className="relative mx-auto max-w-7xl">
-        <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr] xl:items-end">
+        <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr] xl:items-end">
           <div className="max-w-4xl">
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
               Entrada guiada
@@ -124,7 +125,7 @@ const HomeEntrySection = () => {
             </h2>
           </div>
 
-          <div className="rounded-[28px] border border-white/8 bg-black/20 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+          <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d5b16e]">
               Qué prepara el sistema
             </p>
@@ -132,6 +133,51 @@ const HomeEntrySection = () => {
             <p className="mt-3 text-sm leading-7 text-zinc-300">
               Describe una idea, pega una URL o explica qué quieres mejorar. Sistema Maestro prepara una primera lectura útil para avanzar sin ruido.
             </p>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-emerald-300/12 bg-emerald-300/[0.05] p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100/70">
+                  Registro gratis
+                </p>
+                <p className="mt-2 text-sm font-semibold text-white">
+                  10 gemas iniciales
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-amber-300/14 bg-amber-300/[0.06] p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/75">
+                  Informe 6,99 €
+                </p>
+                <p className="mt-2 text-sm font-semibold text-white">
+                  Lectura guiada + 10 gemas
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-fuchsia-300/14 bg-fuchsia-300/[0.06] p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fuchsia-100/75">
+                  Arranque
+                </p>
+                <p className="mt-2 text-sm font-semibold text-white">
+                  Hasta 20 gemas de entrada
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.06]"
+              >
+                Registrarme gratis
+              </Link>
+
+              <a
+                href="#pricing"
+                className="inline-flex items-center justify-center rounded-2xl border border-amber-200/25 bg-amber-200/[0.07] px-4 py-3 text-sm font-semibold text-amber-100 transition hover:border-amber-200/40 hover:bg-amber-200/[0.10]"
+              >
+                Ver informe de entrada
+              </a>
+            </div>
           </div>
         </div>
 
@@ -201,23 +247,37 @@ const HomeEntrySection = () => {
                 </div>
               )}
 
-              <div className="relative mt-5">
+              <div className="relative mt-5 rounded-[24px] border border-white/10 bg-[#070808] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                    Entrada del usuario
+                  </p>
+
+                  <span className="rounded-full border border-cyan-300/14 bg-cyan-300/[0.06] px-3 py-1 text-[11px] font-semibold text-cyan-100">
+                    Interpretación inicial
+                  </span>
+                </div>
+
                 {isWebMode ? (
                   <input
                     type="text"
                     placeholder={current.placeholder}
-                    className="w-full rounded-[20px] border border-white/10 bg-[#0a0a0a] px-5 py-4 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-cyan-400/25"
+                    className="w-full rounded-[18px] border border-white/8 bg-black/35 px-5 py-4 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-cyan-400/25"
                   />
                 ) : (
                   <>
                     <textarea
                       rows={3}
                       placeholder={current.placeholder}
-                      className="w-full resize-none rounded-[20px] border border-white/10 bg-[#0a0a0a] px-5 py-4 pr-12 text-sm leading-7 text-white placeholder:text-zinc-500 outline-none transition focus:border-cyan-400/25"
+                      className="w-full resize-none rounded-[18px] border border-white/8 bg-black/35 px-5 py-4 pr-12 text-sm leading-7 text-white placeholder:text-zinc-500 outline-none transition focus:border-cyan-400/25"
                     />
-                    <Pencil className="pointer-events-none absolute bottom-4 right-4 h-4 w-4 text-zinc-500" />
+                    <Pencil className="pointer-events-none absolute bottom-8 right-7 h-4 w-4 text-zinc-500" />
                   </>
                 )}
+
+                <p className="mt-3 px-1 text-xs leading-5 text-zinc-500">
+                  Escribe lo esencial. La primera lectura ordenará foco, prioridad y vía de entrada.
+                </p>
               </div>
 
               <div className="mt-4 flex items-start gap-2 text-sm leading-6 text-zinc-300">
@@ -226,19 +286,19 @@ const HomeEntrySection = () => {
               </div>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#pricing"
+                <Link
+                  to="/register"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3.5 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
                 >
-                  Crear primera lectura
+                  Empezar gratis con 10 gemas
                   <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
 
                 <a
-                  href="#como-funciona"
+                  href="#pricing"
                   className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-3.5 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.04]"
                 >
-                  Ver cómo funciona
+                  Informe 6,99 € + 10 gemas
                 </a>
               </div>
             </div>
