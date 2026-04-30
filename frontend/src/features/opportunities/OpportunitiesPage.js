@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -16,6 +17,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 
 const API_BASE = '/api';
+const TOTAL_OPPORTUNITIES = 10;
 
 const BILLING_STATE = {
   suggestedPlan: 'premium',
@@ -147,7 +149,10 @@ const OpportunitiesPage = () => {
   };
 
   const canAccessAll = user?.plan === 'premium' || user?.role === 'admin';
-  const isLimited = !canAccessAll && opportunities.length <= 2;
+  const lockedOpportunitiesCount = canAccessAll
+    ? 0
+    : Math.max(TOTAL_OPPORTUNITIES - opportunities.length, 0);
+  const isLimited = lockedOpportunitiesCount > 0;
 
   return (
     <DashboardLayout title="Oportunidades">
@@ -174,6 +179,12 @@ const OpportunitiesPage = () => {
                 Explora rutas, modelos de oferta y primeros sistemas construibles. Cada
                 oportunidad sirve como base para activar una versión clara en Builder.
               </p>
+
+              {!canAccessAll && (
+                <p className="mt-4 inline-flex rounded-full border border-emerald-300/15 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-100">
+                  {opportunities.length} de {TOTAL_OPPORTUNITIES} oportunidades desbloqueadas
+                </p>
+              )}
             </div>
 
             {!canAccessAll && (
@@ -254,42 +265,46 @@ const OpportunitiesPage = () => {
               </motion.button>
             ))}
 
-            {isLimited && (
-              <>
-                {[1, 2, 3].map((item) => (
-                  <motion.div
-                    key={`locked-${item}`}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: (opportunities.length + item) * 0.05 }}
-                    className="relative overflow-hidden rounded-[26px] border border-white/8 bg-white/[0.02] p-5 opacity-80"
-                  >
-                    <div className="absolute inset-0 z-10 flex items-end justify-center bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent pb-6">
-                      <Link
-                        to="/dashboard/billing"
-                        state={BILLING_STATE}
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/35 hover:bg-emerald-400/15"
-                      >
-                        <Lock size={14} />
-                        Desbloquear
-                      </Link>
+            {isLimited &&
+              Array.from({ length: lockedOpportunitiesCount }).map((_, index) => (
+                <motion.div
+                  key={`locked-${index + 1}`}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: (opportunities.length + index + 1) * 0.05 }}
+                  className="relative overflow-hidden rounded-[26px] border border-white/8 bg-white/[0.02] p-5 opacity-85"
+                >
+                  <div className="absolute inset-0 z-10 flex items-end justify-center bg-gradient-to-t from-[#050505] via-[#050505]/75 to-transparent pb-6">
+                    <Link
+                      to="/dashboard/billing"
+                      state={BILLING_STATE}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/35 hover:bg-emerald-400/15"
+                    >
+                      <Lock size={14} />
+                      Desbloquear
+                    </Link>
+                  </div>
+
+                  <div className="mb-4 flex items-start gap-4">
+                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3">
+                      <Lightbulb size={24} className="text-zinc-500" />
                     </div>
 
-                    <div className="mb-4 flex items-start gap-4">
-                      <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3">
-                        <Lightbulb size={24} className="text-zinc-500" />
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="mb-2 h-5 w-3/4 rounded bg-white/10" />
-                        <div className="h-4 w-full rounded bg-white/8" />
-                        <div className="mt-2 h-4 w-2/3 rounded bg-white/8" />
-                      </div>
+                    <div className="flex-1">
+                      <p className="mb-2 text-sm font-semibold text-zinc-400">
+                        Plantilla premium bloqueada
+                      </p>
+                      <div className="h-4 w-full rounded bg-white/8" />
+                      <div className="mt-2 h-4 w-2/3 rounded bg-white/8" />
                     </div>
-                  </motion.div>
-                ))}
-              </>
-            )}
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <div className="h-7 w-28 rounded-full bg-white/8" />
+                    <div className="h-7 w-20 rounded-full bg-white/8" />
+                  </div>
+                </motion.div>
+              ))}
           </div>
         )}
 
@@ -341,7 +356,7 @@ const OpportunitiesPage = () => {
                     className="text-zinc-400 transition hover:text-white"
                     aria-label="Cerrar oportunidad"
                   >
-                    ×
+                    x
                   </button>
                 </div>
               </div>
