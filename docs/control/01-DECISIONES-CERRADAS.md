@@ -1162,3 +1162,427 @@ A fecha 2026-04-28 queda oficialmente cerrado que:
 - Resumen premium pasa a ser el siguiente frente visible;
 - deploy final sigue bloqueado;
 - deploys iterativos por microfase quedan permitidos.
+
+---
+
+## 45. Resumen premium alineado con Gema Maestra
+
+### Decisión cerrada 41
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+El Resumen del Dashboard queda alineado con el lenguaje visible de Gema Maestra / Gemas.
+
+La capacidad operativa deja de estar dominada por lenguaje visible de créditos y pasa a presentarse como capacidad premium del sistema.
+
+### Archivos principales
+
+```text
+frontend/src/features/dashboard/components/DashboardCreditsPanel.js
+frontend/src/features/dashboard/components/DashboardStatusPanel.js
+```
+
+### Resultado cerrado
+
+- No domina el lenguaje visible de créditos.
+- Capacidad operativa aparece como Gema Maestra / Gemas.
+- CTA hacia facturación queda como facturación y gemas.
+- Cards de capacidad y continuidad quedan compactadas.
+- Cards superiores Proyectos / Blueprints / Plan actual quedan compactadas.
+
+### Efecto operativo
+
+Dashboard queda alineado con Facturación Gold y con el lenguaje visible aprobado para capacidad operativa.
+
+El Resumen deja de arrastrar lectura técnica antigua y refuerza continuidad premium dentro de la app.
+
+---
+
+## 46. Proyectos saneado como capa de continuidad
+
+### Decisión cerrada 42
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+La pantalla de Proyectos queda saneada como capa de continuidad del sistema.
+
+Proyectos debe ayudar al usuario a encontrar, filtrar y retomar trabajo sin convertirse en una lista técnica plana ni desplazar al Builder como centro de continuidad.
+
+### Archivo principal
+
+```text
+frontend/src/features/projects/ProjectsPage.js
+```
+
+### Resultado cerrado
+
+- Barra de búsqueda elevada visualmente.
+- Lupa con acción/foco real.
+- Filtro de rutas corregido con alias reales.
+- Ruta técnica `sell` se muestra como `Vender y cobrar`.
+- Dropdown nativo sustituido por dropdown premium.
+- Empty state diferencia no tener proyectos de no tener resultados.
+
+### Efecto operativo
+
+Proyectos queda alineado con la lógica de continuidad:
+
+```text
+proyecto
+→ búsqueda / filtro / lectura clara
+→ continuidad
+→ Builder
+```
+
+La pantalla deja de ser una zona secundaria sin dirección y pasa a reforzar el retorno operativo del usuario.
+
+---
+
+## 47. Oportunidades V1 saneadas como biblioteca de rutas construibles
+
+### Decisión cerrada 43
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrado como V1.
+
+### Decisión
+
+Oportunidades queda saneada como biblioteca inicial de rutas construibles.
+
+No debe comunicar consultoría operativa, ejecución manual externa ni prometer acompañamiento fuera del sistema.
+
+Debe funcionar como catálogo inicial de oportunidades que orientan al usuario hacia rutas accionables dentro de Sistema Maestro.
+
+### Archivos principales
+
+```text
+frontend/src/features/opportunities/OpportunitiesPage.js
+backend/app/domain/opportunities.py
+```
+
+### Resultado cerrado
+
+- Lenguaje de monetización saneado.
+- No promete consultoría operativa ni ejecución manual externa.
+- Backend amplía a 10 oportunidades iniciales.
+- Free ve 2 oportunidades completas.
+- Admin/premium ve las 10 oportunidades.
+- Desbloquear desde Oportunidades recomienda Pro, no AI Master por defecto.
+
+### Regla aprobada
+
+```text
+Free → 2 oportunidades completas
+Admin / premium → 10 oportunidades completas
+```
+
+### Efecto operativo
+
+Oportunidades queda cerrada como V1 funcional.
+
+Su rol actual es:
+
+```text
+descubrir oportunidad
+→ entender ruta construible
+→ activar deseo de construcción
+→ conectar con plan
+```
+
+No queda aprobado convertirla todavía en marketplace, sistema complejo de plantillas o generación dinámica avanzada.
+
+---
+
+## 48. Gratis con 10 gemas iniciales reales
+
+### Decisión cerrada 44
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+El plan gratuito queda aprobado con 10 gemas iniciales reales.
+
+Gratis deja de comunicar ausencia total de Builder o ausencia total de Gemas y pasa a comunicar entrada limitada pero real al sistema.
+
+### Archivos principales
+
+```text
+backend/app/core/config.py
+backend/app/services/credits.py
+frontend/src/content/pricingContent.js
+frontend/src/features/billing/billing.constants.js
+frontend/src/features/billing/billing.utils.js
+```
+
+### Resultado cerrado
+
+- Railway tiene `CREDITS_FREE=10`.
+- Backend concede 10 gemas iniciales reales una sola vez al usuario sin historial previo.
+- Gratis deja de comunicar `Sin builder` / `Sin gemas`.
+- Gratis pasa a comunicar `Builder limitado + 10 gemas iniciales`.
+- Frontend diferencia 10 gemas iniciales de gemas incluidas recurrentes.
+
+### Escalera aprobada
+
+```text
+Gratis → 10 gemas iniciales
+Informe Maestro Gold → +10 gemas y lectura guiada
+Pro → 60 gemas incluidas
+Growth → 220 gemas incluidas
+AI Master 199 → 600 gemas incluidas
+```
+
+### Efecto operativo
+
+La entrada gratuita deja de ser una experiencia bloqueada.
+
+El usuario puede registrarse, recibir capacidad inicial real y probar el Builder limitado antes de una conversión mayor.
+
+---
+
+## 49. Home alineada con Sistema Maestro Gold
+
+### Decisión cerrada 45
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrado y validado en web.
+
+### Decisión
+
+Home queda alineada con Sistema Maestro Gold, Gema Maestra / Gemas y la nueva escalera de entrada gratuita + oferta Gold.
+
+Home deja de ser una landing aislada y queda conectada con el sistema real de activación.
+
+### Archivos principales
+
+```text
+frontend/public/index.html
+frontend/src/App.js
+frontend/src/components/Logo.js
+frontend/src/features/home/HomePage.js
+frontend/src/features/home/components/HomeNav.js
+frontend/src/features/home/components/HomeFooter.js
+frontend/src/features/home/sections/PricingSection.js
+frontend/src/features/home/sections/HomeEntrySection.js
+frontend/src/features/home/sections/LeadCaptureSection.js
+```
+
+### Resultado cerrado
+
+- Home pricing alineado con Gemas / Gema Maestra.
+- Logo Gold en header, footer, legales y favicon.
+- Favicon usa `sistema_maestro_gold_logo.png`.
+- Páginas legales cargan desde arriba con `ScrollToTop`.
+- Radar IA usa dropdowns premium.
+- Home móvil queda compacta y validada.
+
+### Efecto operativo
+
+Home comunica una promesa coherente con la experiencia interna:
+
+```text
+registro gratis
+→ 10 gemas iniciales
+→ Informe Maestro Gold
+→ Builder
+→ continuidad operativa
+```
+
+La entrada pública deja de contradecir Billing, Gratis y Gema Maestra.
+
+---
+
+## 50. Regla de Home móvil
+
+### Decisión cerrada 46
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrada.
+
+### Decisión
+
+Home móvil no debe intentar replicar la experiencia completa de escritorio.
+
+Queda aprobada esta separación funcional:
+
+```text
+Móvil = descubrir, entender, confiar, registrarse y preparar entrada.
+Desktop = explicar más, permitir entrada guiada y trabajar con más profundidad.
+```
+
+### Reglas aprobadas
+
+En móvil NO debe aparecer:
+
+- input largo
+- textarea
+- tabs Idea / URL / Escalar
+- selector Web / Herramienta / Automatización
+- bloques largos de output
+- footer con login o registro duplicado
+
+En móvil SÍ debe aparecer:
+
+- qué es Sistema Maestro
+- para quién es
+- registro gratis + 10 gemas
+- Informe Maestro Gold + 10 gemas
+- mensaje de trabajo serio desde ordenador
+- footer limpio de marca + legal
+
+### Efecto operativo
+
+Home móvil queda protegida como capa de descubrimiento, confianza y conversión inicial.
+
+No debe convertirse en Builder comprimido, dashboard reducido ni formulario complejo antes del registro.
+
+---
+
+## 51. Scroll-to-top para páginas legales
+
+### Decisión cerrada 47
+
+Fecha: 2026-05-02
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Las páginas legales deben cargar siempre desde arriba y no conservar la posición previa de scroll.
+
+### Archivo principal
+
+```text
+frontend/src/App.js
+```
+
+### Rutas afectadas
+
+```text
+/privacy
+/cookies
+/terms
+```
+
+### Resultado cerrado
+
+Las rutas legales cargan arriba y no conservan posición previa de scroll.
+
+### Efecto operativo
+
+La navegación legal queda saneada y evita una experiencia rota al entrar desde Home, footer o navegación interna.
+
+---
+
+## 52. Oportunidades bloqueadas como siguiente frente visible
+
+### Decisión cerrada 48
+
+Fecha: 2026-05-02
+
+### Estado
+
+Decisión de siguiente frente.
+
+### Decisión
+
+Tras cerrar Home Mobile Gold, el siguiente frente visible aprobado es mejorar la presentación de oportunidades bloqueadas para usuarios gratuitos.
+
+### Regla aprobada
+
+Usuario free:
+
+```text
+2 oportunidades desbloqueadas completas
+8 oportunidades bloqueadas con valor insinuado
+```
+
+Las oportunidades bloqueadas no deben parecer skeletons vacíos.
+
+### Criterio de producto
+
+Las oportunidades bloqueadas deben insinuar valor real sin revelar todo.
+
+Deben poder mostrar:
+
+- pista de título o tipo;
+- ruta;
+- dificultad;
+- niebla premium;
+- CTA de desbloqueo.
+
+No deben revelar:
+
+- contenido completo;
+- pasos internos accionables;
+- blueprint completo;
+- prompts completos;
+- estructura completa;
+- valor suficiente para copiar la oportunidad sin desbloquear.
+
+### Efecto operativo
+
+El siguiente frente visible queda definido y acotado.
+
+No se abre todavía:
+
+- marketplace de plantillas;
+- generación dinámica de oportunidades;
+- backend complejo de desbloqueos;
+- sistema de compra individual por oportunidad;
+- Builder automático desde oportunidad bloqueada.
+
+La prioridad inmediata es mejorar percepción, deseo y conversión dentro de Oportunidades sin romper la regla V1.
+
+---
+
+## 53. Veredicto operativo actualizado tras Home Mobile Gold
+
+A fecha 2026-05-02 queda oficialmente cerrado que:
+
+- Facturación / Gema Maestra / Centro de Capacidad Gold queda cerrada como microfase premium interna;
+- Resumen premium queda alineado con Gema Maestra / Gemas;
+- Proyectos queda saneado como capa de continuidad;
+- Oportunidades V1 queda saneada como biblioteca de rutas construibles;
+- Gratis queda aprobado con 10 gemas iniciales reales;
+- Home queda alineada con Sistema Maestro Gold;
+- Home Mobile Gold queda compacta, validada y separada funcionalmente de Desktop;
+- las páginas legales cargan desde arriba con ScrollToTop;
+- el siguiente frente visible aprobado es Oportunidades bloqueadas con preview premium;
+- Free debe mantener 2 oportunidades completas y 8 bloqueadas con valor insinuado;
+- Admin / premium debe mantener acceso a las 10 oportunidades completas;
+- el lenguaje visible debe seguir usando Gemas / Gema Maestra cuando hable al usuario;
+- créditos puede seguir existiendo como término técnico interno cuando el contrato lo requiera;
+- deploy final sigue bloqueado;
+- deploys iterativos por microfase siguen permitidos;
+- Builder lifecycle con mutaciones reales sigue siendo el frente estructural crítico de fondo, pero no desplaza el siguiente frente visible aprobado.
+
+---
