@@ -74,9 +74,6 @@ const HomeFooter = () => {
         <div>
           <p className="text-sm font-semibold text-white">Navegación</p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-zinc-400">
-            <a href="#constructor-maestro" className="transition hover:text-white">
-              Constructor
-            </a>
             <a href="#como-funciona" className="transition hover:text-white">
               Cómo funciona
             </a>
@@ -90,7 +87,7 @@ const HomeFooter = () => {
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-white">Legal y acceso</p>
+          <p className="text-sm font-semibold text-white">Legal</p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-zinc-400">
             <Link to="/privacy" className="transition hover:text-white">
               Privacidad
@@ -100,12 +97,6 @@ const HomeFooter = () => {
             </Link>
             <Link to="/terms" className="transition hover:text-white">
               Términos
-            </Link>
-            <Link to="/login" className="transition hover:text-white">
-              Iniciar sesión
-            </Link>
-            <Link to="/register" className="transition hover:text-white">
-              Crear cuenta
             </Link>
           </div>
         </div>

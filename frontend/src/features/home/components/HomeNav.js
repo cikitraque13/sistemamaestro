@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '../../../context/AuthContext';
+
 const navItems = [
   { label: 'Cómo funciona', href: '#como-funciona' },
   { label: 'Para quién es', href: '#para-quien-es' },
@@ -9,6 +11,11 @@ const navItems = [
 ];
 
 const HomeNav = () => {
+  const { user, loading } = useAuth();
+
+  const isAuthenticated = !loading && !!user && user !== false;
+  const primaryCtaTarget = isAuthenticated ? '/dashboard' : '/register';
+
   return (
     <header className="sticky top-0 z-40 border-b border-white/5 bg-[#080808]/88 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-10">
@@ -52,12 +59,12 @@ const HomeNav = () => {
             Iniciar sesión
           </Link>
 
-          <a
-            href="#constructor-maestro"
+          <Link
+            to={primaryCtaTarget}
             className="hidden rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-2.5 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(245,158,11,0.18)] transition hover:scale-[1.01] hover:shadow-[0_12px_34px_rgba(244,114,182,0.22)] md:inline-flex"
           >
             Empezar con mi proyecto
-          </a>
+          </Link>
         </div>
       </div>
     </header>
