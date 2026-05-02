@@ -43,7 +43,7 @@ const HomeNav = () => {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             to="/login"
-            className="inline-flex rounded-2xl border border-amber-200/24 bg-[linear-gradient(135deg,rgba(255,242,204,0.11),rgba(242,180,90,0.08),rgba(244,114,182,0.08))] px-3 py-2 text-xs font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:border-amber-200/40 hover:bg-amber-200/[0.10] sm:px-5 sm:py-2.5 sm:text-sm"
+            className="inline-flex rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,rgba(255,242,204,0.14),rgba(242,180,90,0.10),rgba(244,114,182,0.10))] px-3 py-2 text-xs font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_24px_rgba(245,158,11,0.08)] transition hover:border-amber-200/45 hover:bg-amber-200/[0.12] sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Iniciar sesión
           </Link>

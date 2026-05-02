@@ -5,25 +5,31 @@ const HomeFooter = () => {
   return (
     <footer className="border-t border-zinc-800 bg-black/30 px-6 py-8 md:px-10 md:py-12">
       <div className="mx-auto max-w-7xl md:hidden">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
-            <img
-              src="/sistema_maestro_gold_logo.png"
-              alt="Sistema Maestro"
-              className="h-full w-full object-contain"
-              draggable="false"
-            />
+        <div className="rounded-[28px] border border-amber-200/12 bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.10),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_24px_rgba(245,158,11,0.10)]">
+              <img
+                src="/sistema_maestro_gold_logo.png"
+                alt="Sistema Maestro"
+                className="h-full w-full object-contain"
+                draggable="false"
+              />
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-white">Sistema Maestro</p>
+              <p className="text-xs text-zinc-400">Dirección, IA y continuidad</p>
+            </div>
           </div>
 
-          <div>
-            <p className="text-sm font-semibold text-white">Sistema Maestro</p>
-            <p className="text-xs text-zinc-400">Dirección, IA y continuidad</p>
-          </div>
+          <p className="mt-4 text-sm leading-6 text-zinc-300">
+            Arquitectura, inteligencia artificial y continuidad para proyectos digitales.
+          </p>
+
+          <p className="mt-3 text-xs leading-5 text-zinc-500">
+            Pensado para activar tu entrada desde móvil y trabajar con más profundidad desde ordenador.
+          </p>
         </div>
-
-        <p className="mt-4 text-sm leading-6 text-zinc-400">
-          Arquitectura, inteligencia artificial y continuidad para proyectos digitales.
-        </p>
 
         <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-zinc-400">
           <Link to="/privacy" className="transition hover:text-white">

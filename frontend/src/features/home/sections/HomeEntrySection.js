@@ -204,13 +204,13 @@ const MobileEntry = () => {
           </div>
 
           <div className="mt-5 grid gap-3">
-            <a
-              href="#informe-maestro-gold"
+            <Link
+              to="/register"
               className={peachPrimaryButton}
             >
-              Ver Informe Maestro Gold
+              Activar informe y crear cuenta
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
 
             <Link
               to="/register"
