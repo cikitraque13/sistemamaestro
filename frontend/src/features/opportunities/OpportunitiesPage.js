@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -14,12 +13,11 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 import DashboardLayout from '../../components/DashboardLayout';
-import { useAuth } from '../../context/AuthContext';
 
 const API_BASE = '/api';
 const TOTAL_OPPORTUNITIES = 10;
 
-const BILLING_STATE = {
+const DEFAULT_BILLING_STATE = {
   suggestedPlan: 'blueprint',
   focusSection: 'opportunities',
   source: 'opportunities-page'
@@ -69,24 +67,49 @@ const sanitizeOpportunityCopy = (value, fallback = 'Por definir') => {
   );
 };
 
-const normalizeOpportunity = (opp) => ({
-  opportunity_id: opp.opportunity_id,
-  title: sanitizeOpportunityCopy(opp.title, 'Oportunidad'),
-  description: sanitizeOpportunityCopy(opp.description, 'Sin descripción disponible'),
-  route: opp.route || 'idea',
-  difficulty: opp.difficulty || 'media',
-  monetization: sanitizeOpportunityCopy(
-    opp.monetization || opp.business_model,
-    'Ruta de monetización por definir'
-  ),
-  business_model: sanitizeOpportunityCopy(
-    opp.business_model,
-    'Modelo monetizable por definir'
-  ),
-  steps: Array.isArray(opp.steps)
-    ? opp.steps.map((step) => sanitizeOpportunityCopy(step, '')).filter(Boolean)
-    : []
-});
+const normalizeOpportunity = (opp) => {
+  const isLocked = Boolean(opp.locked);
+
+  return {
+    opportunity_id: opp.opportunity_id,
+    title: sanitizeOpportunityCopy(opp.title, 'Oportunidad premium'),
+    description: sanitizeOpportunityCopy(
+      opp.description || opp.teaser,
+      isLocked
+        ? 'Ruta premium disponible para desbloquear y llevar al Builder.'
+        : 'Sin descripción disponible'
+    ),
+    teaser: sanitizeOpportunityCopy(
+      opp.teaser || opp.description,
+      'Ruta premium disponible para desbloquear y llevar al Builder.'
+    ),
+    route: opp.route || 'idea',
+    difficulty: opp.difficulty || 'media',
+    locked: isLocked,
+    access_level: opp.access_level || (isLocked ? 'locked' : 'unlocked'),
+    required_plan: opp.required_plan || (isLocked ? 'blueprint' : null),
+    required_plan_label: opp.required_plan_label || (isLocked ? 'Pro' : null),
+    unlock_message: sanitizeOpportunityCopy(
+      opp.unlock_message,
+      isLocked ? 'Disponible al desbloquear plantillas con Pro.' : ''
+    ),
+    monetization: isLocked
+      ? ''
+      : sanitizeOpportunityCopy(
+          opp.monetization || opp.business_model,
+          'Ruta de monetización por definir'
+        ),
+    business_model: isLocked
+      ? ''
+      : sanitizeOpportunityCopy(
+          opp.business_model,
+          'Modelo monetizable por definir'
+        ),
+    steps: !isLocked && Array.isArray(opp.steps)
+      ? opp.steps.map((step) => sanitizeOpportunityCopy(step, '')).filter(Boolean)
+      : []
+  };
+};
 
 const buildOpportunityPrompt = (opportunity) => {
   const title = String(opportunity?.title || '').trim();
@@ -119,8 +142,23 @@ const buildLauncherState = (opportunity) => ({
   }
 });
 
+const buildBillingState = (opportunity = null) => ({
+  ...DEFAULT_BILLING_STATE,
+  suggestedPlan: opportunity?.required_plan || DEFAULT_BILLING_STATE.suggestedPlan,
+  source: opportunity?.locked
+    ? 'opportunities-locked-template'
+    : DEFAULT_BILLING_STATE.source
+});
+
+const getUnlockLabel = (opportunity) => (
+  opportunity?.required_plan_label || 'Pro'
+);
+
+const getDifficultyMeta = (difficulty) => (
+  DIFFICULTY_BADGES[difficulty] || DIFFICULTY_BADGES.media
+);
+
 const OpportunitiesPage = () => {
-  const { user } = useAuth();
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOpp, setSelectedOpp] = useState(null);
@@ -148,11 +186,26 @@ const OpportunitiesPage = () => {
     }
   };
 
-  const canAccessAll = user?.plan === 'premium' || user?.role === 'admin';
-  const lockedOpportunitiesCount = canAccessAll
-    ? 0
-    : Math.max(TOTAL_OPPORTUNITIES - opportunities.length, 0);
-  const isLimited = lockedOpportunitiesCount > 0;
+  const unlockedOpportunitiesCount = opportunities.filter((opp) => !opp.locked).length;
+  const lockedOpportunitiesCount = opportunities.filter((opp) => opp.locked).length;
+  const firstLockedOpportunity = opportunities.find((opp) => opp.locked) || null;
+  const hasLockedOpportunities = lockedOpportunitiesCount > 0;
+  const totalVisibleOpportunities = Math.max(opportunities.length, TOTAL_OPPORTUNITIES);
+  const suggestedUnlockLabel = getUnlockLabel(firstLockedOpportunity);
+
+  const handleOpportunityClick = (opportunity) => {
+    if (opportunity.locked) return;
+    setSelectedOpp(opportunity);
+  };
+
+  const handleOpportunityKeyDown = (event, opportunity) => {
+    if (opportunity.locked) return;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setSelectedOpp(opportunity);
+    }
+  };
 
   return (
     <DashboardLayout title="Oportunidades">
@@ -172,30 +225,37 @@ const OpportunitiesPage = () => {
                 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-white md:text-4xl"
                 data-testid="opportunities-title"
               >
-                Plantillas monetizables listas para llevar al Builder.
+                Rutas monetizables para descubrir valor y llevar al Builder cuando estén desbloqueadas.
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400 md:text-base">
-                Explora rutas, modelos de oferta y primeros sistemas construibles. Cada
-                oportunidad sirve como base para activar una versión clara en Builder.
+                Explora oportunidades, rutas de activación y plantillas premium. Gratis
+                permite descubrir el catálogo; Pro desbloquea las primeras plantillas
+                utilizables para empezar a construir en serio.
               </p>
 
-              {!canAccessAll && (
-                <p className="mt-4 inline-flex rounded-full border border-emerald-300/15 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-100">
-                  {opportunities.length} de {TOTAL_OPPORTUNITIES} oportunidades desbloqueadas
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <p className="inline-flex rounded-full border border-emerald-300/15 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-100">
+                  {unlockedOpportunitiesCount} de {totalVisibleOpportunities} plantillas desbloqueadas
                 </p>
-              )}
+
+                {hasLockedOpportunities && (
+                  <p className="inline-flex rounded-full border border-amber-300/15 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-100">
+                    {lockedOpportunitiesCount} disponibles al desbloquear
+                  </p>
+                )}
+              </div>
             </div>
 
-            {!canAccessAll && (
+            {hasLockedOpportunities && (
               <Link
                 to="/dashboard/billing"
-                state={BILLING_STATE}
+                state={buildBillingState(firstLockedOpportunity)}
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-5 py-3 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/35 hover:bg-emerald-400/15"
                 data-testid="upgrade-btn"
               >
                 <Lock size={16} />
-                Desbloquear más
+                Desbloquear con {suggestedUnlockLabel}
               </Link>
             )}
           </div>
@@ -207,104 +267,134 @@ const OpportunitiesPage = () => {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
-            {opportunities.map((opp, index) => (
-              <motion.button
-                type="button"
-                key={opp.opportunity_id}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="group rounded-[26px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01))] p-5 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition hover:border-emerald-300/20 hover:bg-white/[0.03]"
-                onClick={() => setSelectedOpp(opp)}
-                data-testid={`opportunity-${opp.opportunity_id}`}
-              >
-                <div className="mb-4 flex items-start gap-4">
-                  <div className="rounded-2xl border border-emerald-300/15 bg-emerald-400/10 p-3">
-                    <Lightbulb size={24} className="text-emerald-200" />
-                  </div>
+            {opportunities.map((opp, index) => {
+              const difficultyMeta = getDifficultyMeta(opp.difficulty);
+              const unlockLabel = getUnlockLabel(opp);
 
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-semibold leading-6 text-white">
-                      {opp.title}
-                    </h3>
-
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">
-                      {opp.description}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-200">
-                    {ROUTE_NAMES[opp.route] || 'Idea a proyecto'}
-                  </span>
-
-                  <span
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium ${
-                      DIFFICULTY_BADGES[opp.difficulty]?.color ||
-                      DIFFICULTY_BADGES.media.color
-                    }`}
-                  >
-                    {DIFFICULTY_BADGES[opp.difficulty]?.label || 'Media'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-4 text-sm">
-                  <span className="flex min-w-0 items-center gap-2 text-zinc-400">
-                    <CurrencyDollar size={16} className="shrink-0" />
-                    <span className="truncate">
-                      {opp.monetization}
-                    </span>
-                  </span>
-
-                  <span className="flex shrink-0 items-center gap-1 font-medium text-emerald-200">
-                    Ver detalles
-                    <ArrowRight size={14} />
-                  </span>
-                </div>
-              </motion.button>
-            ))}
-
-            {isLimited &&
-              Array.from({ length: lockedOpportunitiesCount }).map((_, index) => (
+              return (
                 <motion.div
-                  key={`locked-${index + 1}`}
+                  key={opp.opportunity_id}
+                  role={opp.locked ? 'article' : 'button'}
+                  tabIndex={opp.locked ? -1 : 0}
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: (opportunities.length + index + 1) * 0.05 }}
-                  className="relative overflow-hidden rounded-[26px] border border-white/8 bg-white/[0.02] p-5 opacity-85"
+                  transition={{ delay: index * 0.05 }}
+                  className={`group relative overflow-hidden rounded-[26px] border p-5 text-left shadow-[0_0_0_1px_rgba(255,255,255,0.02)] transition ${
+                    opp.locked
+                      ? 'border-amber-200/10 bg-[linear-gradient(180deg,rgba(251,191,36,0.045),rgba(255,255,255,0.012))]'
+                      : 'cursor-pointer border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01))] hover:border-emerald-300/20 hover:bg-white/[0.03]'
+                  }`}
+                  onClick={() => handleOpportunityClick(opp)}
+                  onKeyDown={(event) => handleOpportunityKeyDown(event, opp)}
+                  data-testid={`opportunity-${opp.opportunity_id}`}
                 >
-                  <div className="absolute inset-0 z-10 flex items-end justify-center bg-gradient-to-t from-[#050505] via-[#050505]/75 to-transparent pb-6">
-                    <Link
-                      to="/dashboard/billing"
-                      state={BILLING_STATE}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/35 hover:bg-emerald-400/15"
-                    >
-                      <Lock size={14} />
-                      Desbloquear
-                    </Link>
-                  </div>
+                  {opp.locked && (
+                    <div className="absolute inset-0 z-20 flex items-end justify-center bg-gradient-to-t from-[#050505] via-[#050505]/65 to-transparent p-5">
+                      <div className="w-full rounded-3xl border border-amber-200/15 bg-black/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)] backdrop-blur-md">
+                        <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-100/80">
+                          <Lock size={14} />
+                          Plantilla bloqueada
+                        </div>
 
-                  <div className="mb-4 flex items-start gap-4">
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3">
-                      <Lightbulb size={24} className="text-zinc-500" />
+                        <p className="mb-4 text-sm leading-6 text-zinc-300">
+                          {opp.unlock_message || `Disponible al desbloquear con ${unlockLabel}.`}
+                        </p>
+
+                        <Link
+                          to="/dashboard/billing"
+                          state={buildBillingState(opp)}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-2.5 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/35 hover:bg-emerald-400/15"
+                          data-testid={`unlock-${opp.opportunity_id}`}
+                        >
+                          Desbloquear con {unlockLabel}
+                          <ArrowRight size={15} />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className={opp.locked ? 'blur-[1.5px] saturate-50' : ''}>
+                    <div className="mb-4 flex items-start gap-4">
+                      <div
+                        className={`rounded-2xl border p-3 ${
+                          opp.locked
+                            ? 'border-amber-200/10 bg-amber-400/10'
+                            : 'border-emerald-300/15 bg-emerald-400/10'
+                        }`}
+                      >
+                        <Lightbulb
+                          size={24}
+                          className={opp.locked ? 'text-amber-100/70' : 'text-emerald-200'}
+                        />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          {opp.locked && (
+                            <span className="rounded-full border border-amber-200/15 bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold text-amber-100">
+                              Premium
+                            </span>
+                          )}
+
+                          {!opp.locked && (
+                            <span className="rounded-full border border-emerald-300/15 bg-emerald-400/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-100">
+                              Desbloqueada
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="text-lg font-semibold leading-6 text-white">
+                          {opp.title}
+                        </h3>
+
+                        <p className="mt-2 line-clamp-3 text-sm leading-6 text-zinc-400">
+                          {opp.locked ? opp.teaser : opp.description}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex-1">
-                      <p className="mb-2 text-sm font-semibold text-zinc-400">
-                        Plantilla premium bloqueada
-                      </p>
-                      <div className="h-4 w-full rounded bg-white/8" />
-                      <div className="mt-2 h-4 w-2/3 rounded bg-white/8" />
-                    </div>
-                  </div>
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-200">
+                        {ROUTE_NAMES[opp.route] || 'Idea a proyecto'}
+                      </span>
 
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    <div className="h-7 w-28 rounded-full bg-white/8" />
-                    <div className="h-7 w-20 rounded-full bg-white/8" />
+                      <span
+                        className={`rounded-full px-3 py-1.5 text-xs font-medium ${difficultyMeta.color}`}
+                      >
+                        {difficultyMeta.label}
+                      </span>
+                    </div>
+
+                    {opp.locked ? (
+                      <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                          Preview premium
+                        </p>
+
+                        <p className="mt-2 text-sm leading-6 text-zinc-400">
+                          Esta ruta puede convertirse en una plantilla utilizable dentro
+                          de Builder cuando el acceso esté desbloqueado.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between gap-4 text-sm">
+                        <span className="flex min-w-0 items-center gap-2 text-zinc-400">
+                          <CurrencyDollar size={16} className="shrink-0" />
+                          <span className="truncate">
+                            {opp.monetization}
+                          </span>
+                        </span>
+
+                        <span className="flex shrink-0 items-center gap-1 font-medium text-emerald-200">
+                          Ver detalles
+                          <ArrowRight size={14} />
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
-              ))}
+              );
+            })}
           </div>
         )}
 
@@ -339,12 +429,11 @@ const OpportunitiesPage = () => {
 
                         <span
                           className={`rounded-full px-3 py-1.5 text-xs font-medium ${
-                            DIFFICULTY_BADGES[selectedOpp.difficulty]?.color ||
-                            DIFFICULTY_BADGES.media.color
+                            getDifficultyMeta(selectedOpp.difficulty).color
                           }`}
                         >
                           <Gauge size={12} className="mr-1 inline" />
-                          {DIFFICULTY_BADGES[selectedOpp.difficulty]?.label || 'Media'}
+                          {getDifficultyMeta(selectedOpp.difficulty).label}
                         </span>
                       </div>
                     </div>
