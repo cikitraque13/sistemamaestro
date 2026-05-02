@@ -207,8 +207,13 @@ const MobileEntry = () => {
             <Link
               to="/register"
               className={peachPrimaryButton}
+              state={{
+                entryOfferId: 'single_report',
+                focusSection: 'entry-offer',
+                source: 'home-mobile-gold'
+              }}
             >
-              Activar informe y crear cuenta
+              Activar Informe Maestro Gold
               <ArrowRight className="h-4 w-4" />
             </Link>
 
