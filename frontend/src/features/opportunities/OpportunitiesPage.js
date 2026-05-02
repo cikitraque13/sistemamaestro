@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -30,10 +31,48 @@ const ROUTE_NAMES = {
   idea: 'Idea a proyecto'
 };
 
+const PLAN_META = {
+  blueprint: {
+    label: 'Pro',
+    shortLabel: 'Pro',
+    chipClass: 'border-emerald-300/20 bg-emerald-400/10 text-emerald-100',
+    statusClass: 'border-emerald-300/15 bg-emerald-400/10 text-emerald-100'
+  },
+  sistema: {
+    label: 'Growth',
+    shortLabel: 'Growth',
+    chipClass: 'border-cyan-300/20 bg-cyan-400/10 text-cyan-100',
+    statusClass: 'border-cyan-300/15 bg-cyan-400/10 text-cyan-100'
+  },
+  premium: {
+    label: 'AI Master 199',
+    shortLabel: 'AI Master',
+    chipClass: 'border-fuchsia-300/20 bg-fuchsia-400/10 text-fuchsia-100',
+    statusClass: 'border-fuchsia-300/15 bg-fuchsia-400/10 text-fuchsia-100'
+  }
+};
+
+const PLAN_ORDER = ['blueprint', 'sistema', 'premium'];
+
+const PLAN_BREAKDOWN_FALLBACK = {
+  blueprint: 3,
+  sistema: 4,
+  premium: 3
+};
+
 const DIFFICULTY_BADGES = {
-  facil: { label: 'Fácil', color: 'bg-green-500/20 text-green-300' },
-  media: { label: 'Media', color: 'bg-yellow-500/20 text-yellow-300' },
-  avanzada: { label: 'Avanzada', color: 'bg-red-500/20 text-red-300' }
+  facil: {
+    label: 'Fácil',
+    color: 'border border-emerald-300/15 bg-emerald-400/10 text-emerald-100'
+  },
+  media: {
+    label: 'Media',
+    color: 'border border-emerald-300/15 bg-emerald-400/10 text-emerald-100'
+  },
+  avanzada: {
+    label: 'Avanzada',
+    color: 'border border-emerald-300/15 bg-emerald-400/10 text-emerald-100'
+  }
 };
 
 const COPY_REPLACEMENTS = [
@@ -67,8 +106,51 @@ const sanitizeOpportunityCopy = (value, fallback = 'Por definir') => {
   );
 };
 
+const getPlanMeta = (planId) => (
+  PLAN_META[planId] || PLAN_META.blueprint
+);
+
+const getDifficultyMeta = (difficulty) => (
+  DIFFICULTY_BADGES[difficulty] || DIFFICULTY_BADGES.media
+);
+
+const getOpportunityCtaLabel = (opportunity) => {
+  if (opportunity?.cta_label) return opportunity.cta_label;
+
+  if (opportunity?.required_plan === 'sistema') return 'Ampliar con Growth';
+  if (opportunity?.required_plan === 'premium') return 'Acceder con AI Master';
+
+  return 'Desbloquear con Pro';
+};
+
+const buildPlanBreakdown = (items) => {
+  const counts = {
+    ...PLAN_BREAKDOWN_FALLBACK
+  };
+
+  if (items.length > 0) {
+    PLAN_ORDER.forEach((planId) => {
+      counts[planId] = 0;
+    });
+
+    items.forEach((item) => {
+      if (counts[item.required_plan] !== undefined) {
+        counts[item.required_plan] += 1;
+      }
+    });
+  }
+
+  return [
+    `${counts.blueprint} Pro`,
+    `${counts.sistema} Growth`,
+    `${counts.premium} AI Master`
+  ].join(' · ');
+};
+
 const normalizeOpportunity = (opp) => {
   const isLocked = Boolean(opp.locked);
+  const requiredPlan = opp.required_plan || (isLocked ? 'blueprint' : null);
+  const requiredPlanMeta = getPlanMeta(requiredPlan);
 
   return {
     opportunity_id: opp.opportunity_id,
@@ -87,12 +169,14 @@ const normalizeOpportunity = (opp) => {
     difficulty: opp.difficulty || 'media',
     locked: isLocked,
     access_level: opp.access_level || (isLocked ? 'locked' : 'unlocked'),
-    required_plan: opp.required_plan || (isLocked ? 'blueprint' : null),
-    required_plan_label: opp.required_plan_label || (isLocked ? 'Pro' : null),
+    required_plan: requiredPlan,
+    required_plan_label: opp.required_plan_label || requiredPlanMeta.label,
+    plan_tier: opp.plan_tier || requiredPlan || 'blueprint',
     unlock_message: sanitizeOpportunityCopy(
       opp.unlock_message,
-      isLocked ? 'Disponible al desbloquear plantillas con Pro.' : ''
+      isLocked ? `Disponible con ${requiredPlanMeta.label}.` : ''
     ),
+    cta_label: opp.cta_label || (isLocked ? getOpportunityCtaLabel({ required_plan: requiredPlan }) : null),
     monetization: isLocked
       ? ''
       : sanitizeOpportunityCopy(
@@ -150,14 +234,6 @@ const buildBillingState = (opportunity = null) => ({
     : DEFAULT_BILLING_STATE.source
 });
 
-const getUnlockLabel = (opportunity) => (
-  opportunity?.required_plan_label || 'Pro'
-);
-
-const getDifficultyMeta = (difficulty) => (
-  DIFFICULTY_BADGES[difficulty] || DIFFICULTY_BADGES.media
-);
-
 const OpportunitiesPage = () => {
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -191,7 +267,10 @@ const OpportunitiesPage = () => {
   const firstLockedOpportunity = opportunities.find((opp) => opp.locked) || null;
   const hasLockedOpportunities = lockedOpportunitiesCount > 0;
   const totalVisibleOpportunities = Math.max(opportunities.length, TOTAL_OPPORTUNITIES);
-  const suggestedUnlockLabel = getUnlockLabel(firstLockedOpportunity);
+  const catalogBreakdown = buildPlanBreakdown(opportunities);
+  const headerCtaLabel = firstLockedOpportunity
+    ? getOpportunityCtaLabel(firstLockedOpportunity)
+    : 'Catálogo completo';
 
   const handleOpportunityClick = (opportunity) => {
     if (opportunity.locked) return;
@@ -225,13 +304,13 @@ const OpportunitiesPage = () => {
                 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-white md:text-4xl"
                 data-testid="opportunities-title"
               >
-                Rutas monetizables para descubrir valor y llevar al Builder cuando estén desbloqueadas.
+                Catálogo premium escalonado para descubrir, empezar y ampliar dentro del Builder.
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400 md:text-base">
-                Explora oportunidades, rutas de activación y plantillas premium. Gratis
-                permite descubrir el catálogo; Pro desbloquea las primeras plantillas
-                utilizables para empezar a construir en serio.
+                Gratis mira el mapa. Pro empieza con las primeras plantillas.
+                Growth amplía sistemas con continuidad. AI Master domina las rutas
+                más complejas.
               </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -239,11 +318,9 @@ const OpportunitiesPage = () => {
                   {unlockedOpportunitiesCount} de {totalVisibleOpportunities} plantillas desbloqueadas
                 </p>
 
-                {hasLockedOpportunities && (
-                  <p className="inline-flex rounded-full border border-amber-300/15 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-100">
-                    {lockedOpportunitiesCount} disponibles al desbloquear
-                  </p>
-                )}
+                <p className="inline-flex rounded-full border border-amber-300/15 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-100">
+                  {catalogBreakdown}
+                </p>
               </div>
             </div>
 
@@ -255,7 +332,7 @@ const OpportunitiesPage = () => {
                 data-testid="upgrade-btn"
               >
                 <Lock size={16} />
-                Desbloquear con {suggestedUnlockLabel}
+                {headerCtaLabel}
               </Link>
             )}
           </div>
@@ -268,8 +345,9 @@ const OpportunitiesPage = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {opportunities.map((opp, index) => {
+              const planMeta = getPlanMeta(opp.required_plan);
               const difficultyMeta = getDifficultyMeta(opp.difficulty);
-              const unlockLabel = getUnlockLabel(opp);
+              const ctaLabel = getOpportunityCtaLabel(opp);
 
               return (
                 <motion.div
@@ -297,7 +375,7 @@ const OpportunitiesPage = () => {
                         </div>
 
                         <p className="mb-4 text-sm leading-6 text-zinc-300">
-                          {opp.unlock_message || `Disponible al desbloquear con ${unlockLabel}.`}
+                          {opp.unlock_message || `Disponible con ${planMeta.label}.`}
                         </p>
 
                         <Link
@@ -306,7 +384,7 @@ const OpportunitiesPage = () => {
                           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-2.5 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300/35 hover:bg-emerald-400/15"
                           data-testid={`unlock-${opp.opportunity_id}`}
                         >
-                          Desbloquear con {unlockLabel}
+                          {ctaLabel}
                           <ArrowRight size={15} />
                         </Link>
                       </div>
@@ -330,14 +408,16 @@ const OpportunitiesPage = () => {
 
                       <div className="min-w-0 flex-1">
                         <div className="mb-2 flex flex-wrap items-center gap-2">
-                          {opp.locked && (
-                            <span className="rounded-full border border-amber-200/15 bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold text-amber-100">
-                              Premium
-                            </span>
-                          )}
+                          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${planMeta.chipClass}`}>
+                            {planMeta.label}
+                          </span>
 
-                          {!opp.locked && (
-                            <span className="rounded-full border border-emerald-300/15 bg-emerald-400/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-100">
+                          {opp.locked ? (
+                            <span className="rounded-full border border-amber-200/15 bg-amber-400/10 px-2.5 py-1 text-[11px] font-semibold text-amber-100">
+                              Bloqueada
+                            </span>
+                          ) : (
+                            <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${planMeta.statusClass}`}>
                               Desbloqueada
                             </span>
                           )}
@@ -423,6 +503,13 @@ const OpportunitiesPage = () => {
                       </h3>
 
                       <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                          getPlanMeta(selectedOpp.required_plan).chipClass
+                        }`}
+                        >
+                          {selectedOpp.required_plan_label || getPlanMeta(selectedOpp.required_plan).label}
+                        </span>
+
                         <span className="rounded-full bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-200">
                           {ROUTE_NAMES[selectedOpp.route] || 'Idea a proyecto'}
                         </span>
