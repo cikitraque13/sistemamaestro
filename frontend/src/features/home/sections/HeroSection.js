@@ -1,10 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { useAuth } from '../../../context/AuthContext';
 
 const cards = [
   {
     eyebrow: 'Entrada',
     title: 'Empieza con una idea o una web',
-    text: 'El sistema interpreta el punto de partida y lo convierte en una lectura util.',
+    text: 'El sistema interpreta el punto de partida y lo convierte en una lectura útil.',
     classes:
       'border-amber-500/15 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(255,255,255,0.02))]',
   },
@@ -25,6 +28,11 @@ const cards = [
 ];
 
 const HeroSection = () => {
+  const { user, loading } = useAuth();
+
+  const isAuthenticated = !loading && !!user && user !== false;
+  const primaryCtaTarget = isAuthenticated ? '/dashboard' : '/register';
+
   return (
     <section className="relative overflow-hidden px-6 pb-6 pt-8 md:px-10 md:pb-8 md:pt-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(245,158,11,0.10),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(244,114,182,0.08),transparent_20%)]" />
@@ -41,7 +49,7 @@ const HeroSection = () => {
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300 md:text-[1.08rem] md:leading-8">
             Sistema Maestro interpreta tu idea o tu web, ordena prioridades y te mete en una ruta
-            real de construccion, despliegue y continuidad.
+            real de construcción, despliegue y continuidad.
           </p>
         </div>
 
@@ -66,18 +74,18 @@ const HeroSection = () => {
           </div>
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="#constructor-maestro"
+            <Link
+              to={primaryCtaTarget}
               className="inline-flex items-center justify-center rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
             >
               Pon tu idea
-            </a>
+            </Link>
 
             <a
               href="#pricing"
               className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.05]"
             >
-              Ver como entra al sistema
+              Ver cómo entra al sistema
             </a>
           </div>
         </div>
