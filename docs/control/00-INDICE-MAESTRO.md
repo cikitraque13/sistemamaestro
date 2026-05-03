@@ -900,3 +900,16 @@ A partir de aquí:
 La memoria canónica manda sobre el impulso operativo.
 
 El siguiente salto técnico solo se autoriza cuando la documentación queda alineada.
+
+---
+
+## Actualización 2026-05-03
+
+Estado consolidado tras saneamiento mayor:
+
+- producción Railway viva con `/health`;
+- cuenta factory `admin@sistemamaestro.com` eliminada;
+- Lucas configurado como admin/premium;
+- Stripe webhook firmado configurado;
+- ProjectsPage corregido para usar `apiClient`;
+- próximo frente canónico: QA Builder 10 plantillas.

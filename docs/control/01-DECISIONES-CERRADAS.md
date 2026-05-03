@@ -1586,3 +1586,74 @@ A fecha 2026-05-02 queda oficialmente cerrado que:
 - Builder lifecycle con mutaciones reales sigue siendo el frente estructural crítico de fondo, pero no desplaza el siguiente frente visible aprobado.
 
 ---
+
+# Actualización canónica — 2026-05-03
+
+## Estado
+
+Decisiones cerradas tras el saneamiento mayor de seguridad, créditos, deploy, administración, Stripe, frontend API y carga de proyectos.
+
+Esta sección consolida las decisiones tomadas durante la intervención de hardening y puesta en producción validada.
+
+---
+
+## 1. Seguridad backend cerrada
+
+### Decisión
+
+El backend no debe confiar en payloads del frontend para identidad, saldo, plan, permisos o pagos.
+
+### Cerrado
+
+- `JWT_SECRET` debe ser explícito y obligatorio.
+- El refresh token verifica firma.
+- Se elimina cualquier uso de `verify_signature=False`.
+- Los webhooks de Stripe exigen firma válida.
+- El webhook de Stripe ya no acepta `json.loads(body)` sin verificación.
+- `/api/builder/build` exige usuario autenticado.
+- Builder valida que `projectId` pertenezca al usuario autenticado.
+- `/consumption/execute` usa usuario autenticado real.
+- Las acciones IA caras pasan por el motor de consumo antes de ejecutar IA.
+
+### Motivo
+
+La identidad, el saldo, el plan y los pagos son autoridad del servidor.  
+El frontend solo expresa intención.
+
+---
+
+## 2. Créditos antes de IA
+
+### Decisión
+
+Toda acción que pueda generar coste IA debe cobrar/verificar créditos antes de ejecutar modelos o agentes.
+
+### Cerrado
+
+- Builder AI cobra antes de `run_builder_agent`.
+- Creación de proyecto cobra `idea_analysis` o `url_analysis` antes de `analyze_with_ai`.
+- Blueprint cobra `blueprint_generation` antes de `generate_blueprint`.
+- El catálogo de créditos normaliza:
+  - `plan_requirement` → `required_plan`
+  - `consumption_type_allowed` → `consumption_type`
+- `/consumption/execute` ya no ejecuta solo `evaluate_consumption(payload)` confiando en datos del cliente.
+
+### Motivo
+
+Primero se valida acceso, plan y créditos.  
+Después se ejecuta IA.
+
+---
+
+## 3. Stripe firmado
+
+### Decisión
+
+Stripe solo puede finalizar pagos mediante eventos firmados.
+
+### Cerrado
+
+- Webhook creado en Stripe para:
+
+```text
+https://sistemamaestro.com/api/payments/webhook/stripe
