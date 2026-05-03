@@ -5,7 +5,7 @@
 - Estado: activo
 - Tipo: guía operativa de despliegue
 - Alcance: despliegue y mantenimiento de `Sistema Maestro` en Railway
-- Objetivo: reflejar la vía real de despliegue actual sin arrastres heredados ni rutas falsas
+- Objetivo: reflejar la vía real de despliegue actual sin arrastres heredados, rutas falsas ni variables críticas omitidas.
 
 ---
 
@@ -17,156 +17,438 @@ La vía canónica actual de despliegue en Railway es esta:
 2. `Dockerfile`
 3. `backend.app.main:app`
 
-### Lectura correcta
+La referencia real de runtime es:
+
+```bash
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}
+```
 
 Railway no debe interpretarse ya como un despliegue basado en:
 
 - `railway/server_railway.py`
-- ni `backend/server.py`
+- `backend/server.py`
+- un dev server separado de frontend
+- una orden manual paralela al `Dockerfile`
 
-La referencia real de runtime actual es:
-
-```bash
-uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}
-```
+Una sola verdad. Dos verdades de deploy = una forma elegante de romper producción.
 
 ---
 
-## 2. Qué usa realmente Railway hoy
+## 2. Archivos canónicos de despliegue
 
 ### `railway.json`
 
-Railway está configurado para construir con:
+`railway.json` debe declarar explícitamente:
 
-- `builder: DOCKERFILE`
-- `dockerfilePath: Dockerfile`
+- builder Dockerfile;
+- ruta del Dockerfile;
+- comando de arranque;
+- healthcheck;
+- política de reinicio.
 
-Y para verificar salud con:
+Configuración esperada:
 
-- `healthcheckPath: /health`
+```json
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
 
 ### `Dockerfile`
 
-El `Dockerfile` actual:
+El `Dockerfile` actual debe:
 
-- compila el frontend;
-- instala dependencias del backend;
-- copia el backend;
-- copia el build del frontend;
-- y arranca el sistema con `backend.app.main:app`.
+- usar Node 22 para compilar frontend;
+- ejecutar `npm ci`, no `npm install`;
+- no hardcodear `REACT_APP_BACKEND_URL`;
+- compilar `frontend/build`;
+- usar Python 3.11 para runtime;
+- instalar dependencias desde `backend/requirements.txt`;
+- copiar `backend/`;
+- copiar el build del frontend a `/app/frontend/build`;
+- arrancar con `python -m uvicorn backend.app.main:app`.
+
+Dockerfile esperado:
+
+```dockerfile
+# Frontend build
+FROM node:22-alpine AS frontend-build
+
+WORKDIR /app/frontend
+
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+
+# Backend runtime
+FROM python:3.11-slim
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH=/app
+ENV PORT=8080
+
+COPY backend/requirements.txt /app/backend/requirements.txt
+
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir -r /app/backend/requirements.txt
+
+COPY backend/ /app/backend/
+COPY --from=frontend-build /app/frontend/build /app/frontend/build
+
+EXPOSE 8080
+
+CMD ["sh", "-c", "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+```
 
 ### Backend real de runtime
 
 La entrada real del backend es:
 
-- `backend/app/main.py`
+```text
+backend/app/main.py
+```
 
 La referencia canónica de runtime es:
 
-- `backend.app.main:app`
+```text
+backend.app.main:app
+```
 
 ---
 
-## 3. Legacy de deploy ya retirado del repo activo
+## 3. Qué sirve el backend en producción
 
-Las siguientes piezas ya no forman parte del perímetro activo de runtime/deploy dentro del repo:
+`backend/app/main.py` debe cubrir:
+
+- `/health`;
+- routers `/api/...`;
+- `/static`;
+- `/`;
+- fallback SPA para rutas frontend.
+
+La ruta de salud esperada es:
+
+```text
+/health
+```
+
+Debe responder algo equivalente a:
+
+```json
+{"status": "ok"}
+```
+
+El frontend se sirve como build estático desde FastAPI:
+
+```text
+/app/frontend/build
+```
+
+No hay dev server de React en Railway. Si alguien intenta desplegar con `npm start` como runtime principal, está lanzando el cohete desde el aparcamiento.
+
+---
+
+## 4. Legacy de deploy retirado
+
+Las siguientes piezas no son vía activa de runtime/deploy:
 
 - `backend/server.py`
 - `railway/server_railway.py`
 - `railway/requirements.txt`
 
-### Estado real
+Reglas:
 
-Estas piezas fueron retiradas del repo activo y movidas a un área de safety externa para cierre controlado del legado.
-
-### Regla
-
-- no reintroducirlas en el runtime;
-- no documentarlas como vía activa;
-- no volver a abrir una segunda verdad de despliegue.
+- no reintroducirlas;
+- no documentarlas como entrada activa;
+- no crear una segunda vía de arranque;
+- no mezclar comandos heredados con el Dockerfile actual.
 
 ---
 
-## 4. Requisitos previos reales
+## 5. Requirements: producción vs entorno local
 
-Antes de dar por válido el despliegue, deben existir y estar alineados:
+Hay dos archivos de dependencias Python:
 
-- `Dockerfile`
-- `railway.json`
-- `backend/app/main.py`
-- `backend/requirements.txt`
-- `frontend/package.json`
+```text
+backend/requirements.txt
+requirements.txt
+```
 
-Además, el proyecto debe estar en un estado estructural suficientemente estable.
+### `backend/requirements.txt`
 
-### Regla
+Es la fuente usada por Docker/Railway.
 
-No abrir deploy final si el sistema sigue mezclando:
+Uso:
 
-- higiene pendiente;
-- documentación desalineada;
-- frentes estructurales abiertos;
-- y decisiones no cerradas.
+```dockerfile
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir -r /app/backend/requirements.txt
+```
+
+Este archivo debe contener dependencias fijadas/pineadas para producción.
+
+### `requirements.txt` en raíz
+
+Es una lista mínima útil para entorno local, pruebas o desarrollo.
+
+Puede incluir:
+
+```text
+pytest
+```
+
+No debe asumirse como fuente canónica del contenedor Railway mientras el Dockerfile use `backend/requirements.txt`.
 
 ---
 
-## 5. Variables de entorno mínimas
+## 6. Variables de entorno mínimas en Railway
 
-En Railway, la base mínima de variables del backend debe cubrir al menos:
+En Railway deben existir, como mínimo:
 
 ```env
 MONGO_URL=mongodb+srv://usuario:password@cluster.mongodb.net/?retryWrites=true&w=majority
 DB_NAME=sistemamaestro
-JWT_SECRET=una_cadena_larga_segura
+
+JWT_SECRET=una_cadena_larga_segura_de_minimo_32_caracteres
+
 OPENAI_API_KEY=sk-xxx
+
 STRIPE_SECRET_KEY=sk_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com
+
+ALLOWED_ORIGINS=https://sistemamaestro.com,https://www.sistemamaestro.com
+COOKIE_SECURE=true
+```
+
+### Variables administradas por Railway
+
+Railway gestiona:
+
+```env
+PORT
+```
+
+El contenedor usa:
+
+```bash
+${PORT:-8080}
+```
+
+### Variables opcionales o futuras
+
+Si existen flujos administrativos internos, se pueden usar:
+
+```env
 ADMIN_EMAIL=tu-email-real@dominio.com
 ADMIN_PASSWORD=una_password_segura
+```
+
+Solo deben configurarse si el código realmente las utiliza. Variable muerta = confusión con forma de configuración.
+
+---
+
+## 7. Reglas de seguridad de entorno
+
+### `JWT_SECRET`
+
+Debe ser largo y estable.
+
+No debe regenerarse en cada deploy.
+
+Si cambia, los tokens existentes dejan de servir. Eso puede ser deseado en una rotación, pero no como accidente.
+
+### `STRIPE_WEBHOOK_SECRET`
+
+Es obligatorio para procesar webhooks Stripe.
+
+No es lo mismo que:
+
+```env
+STRIPE_SECRET_KEY
+```
+
+- `STRIPE_SECRET_KEY`: permite crear/consultar sesiones Stripe.
+- `STRIPE_WEBHOOK_SECRET`: verifica que el webhook recibido realmente viene de Stripe.
+
+Sin `STRIPE_WEBHOOK_SECRET`, el webhook debe fallar. Eso es correcto. Aceptar webhooks sin firma es fan fiction financiera.
+
+### `COOKIE_SECURE`
+
+En producción debe ser:
+
+```env
+COOKIE_SECURE=true
+```
+
+En local puede ser:
+
+```env
+COOKIE_SECURE=false
+```
+
+Producción debe usar HTTPS. Cookies sensibles sin `secure=true` en producción es pedirle al universo que te enseñe criptografía a golpes.
+
+### `ALLOWED_ORIGINS`
+
+Debe reflejar los dominios reales activos.
+
+Ejemplo:
+
+```env
 ALLOWED_ORIGINS=https://sistemamaestro.com,https://www.sistemamaestro.com
 ```
 
-### Notas
-
-- no subir secretos al repositorio;
-- no usar placeholders en producción;
-- `ALLOWED_ORIGINS` debe reflejar el dominio real activo;
-- `PORT` lo gestiona Railway junto al runtime del contenedor.
+No usar `*` en producción.
 
 ---
 
-## 6. Flujo real de build
+## 8. Frontend y API base
 
-El build actual hace esto:
+El frontend usa un cliente centralizado:
+
+```text
+frontend/src/lib/apiClient.js
+```
+
+La regla actual:
+
+- si existe `REACT_APP_API_BASE_URL`, se usa;
+- si existe `REACT_APP_BACKEND_URL`, se usa;
+- si no, se usa `window.location.origin`.
+
+En Railway, como frontend y backend viven en el mismo contenedor/origen, normalmente no hace falta hardcodear:
+
+```env
+REACT_APP_BACKEND_URL=https://sistemamaestro.com
+```
+
+El Dockerfile no debe quemar un dominio fijo dentro del build.
+
+Hardcodear dominio en build rompe previews, dominios alternativos y despliegues temporales. Es meter coordenadas absolutas en un sistema que puede moverse.
+
+---
+
+## 9. Flujo real de build
 
 ### Etapa frontend
 
-- usa imagen Node;
-- copia `frontend/package*.json`;
-- ejecuta `npm install`;
-- copia `frontend/`;
-- ejecuta `npm run build`.
+El Dockerfile hace:
+
+```text
+FROM node:22-alpine
+COPY frontend/package*.json
+npm ci
+COPY frontend/
+npm run build
+```
+
+Resultado:
+
+```text
+/app/frontend/build
+```
 
 ### Etapa backend
 
-- usa imagen Python;
-- copia `backend/requirements.txt`;
-- instala dependencias del backend;
-- copia `backend/`;
-- copia el build del frontend al contenedor final;
-- expone el puerto `8080`;
-- arranca con `uvicorn backend.app.main:app`.
+El Dockerfile hace:
 
-### Consecuencia
+```text
+FROM python:3.11-slim
+COPY backend/requirements.txt
+pip install -r backend/requirements.txt
+COPY backend/
+COPY frontend build
+CMD python -m uvicorn backend.app.main:app
+```
 
-El frontend en Railway se sirve como build estático dentro del backend FastAPI, no como dev server separado.
+Resultado:
+
+- un solo contenedor;
+- FastAPI sirve API + frontend;
+- Railway no arranca React dev server;
+- `/health` valida el despliegue.
 
 ---
 
-## 7. Ruta de despliegue en Railway
+## 10. Validación local antes de deploy
 
-### Paso 1 — Proyecto conectado
+Antes de hacer deploy o merge:
 
-Railway debe estar conectado al repositorio correcto y detectar:
+```powershell
+python -m pytest backend\tests
+```
+
+Debe pasar:
+
+```text
+4 passed
+```
+
+Luego:
+
+```powershell
+cd backend
+python -m compileall app
+cd ..
+```
+
+Debe compilar sin errores.
+
+Luego:
+
+```powershell
+cd frontend
+npm.cmd run build
+cd ..
+```
+
+Debe terminar con:
+
+```text
+Compiled successfully.
+```
+
+Finalmente:
+
+```powershell
+git status
+```
+
+Debe decir:
+
+```text
+nothing to commit, working tree clean
+```
+
+Deploy con árbol sucio = despegar con la caja de herramientas dentro del motor.
+
+---
+
+## 11. Ruta de despliegue en Railway
+
+### Paso 1 — Repositorio conectado
+
+Railway debe estar conectado al repo correcto y detectar:
 
 - `railway.json`
 - `Dockerfile`
@@ -175,137 +457,279 @@ Railway debe estar conectado al repositorio correcto y detectar:
 
 Railway debe usar:
 
-- `Dockerfile` como fuente de build
+```text
+DOCKERFILE
+```
 
-No debe configurarse una orden paralela que arranque:
+con:
+
+```text
+Dockerfile
+```
+
+No debe existir una orden paralela que arranque:
 
 - `server.py`
-- ni `server_railway.py`
+- `server_railway.py`
+- `npm start`
+- frontend dev server
 
 ### Paso 3 — Variables cargadas
 
-El servicio debe tener cargadas las variables mínimas del bloque anterior.
+Cargar las variables mínimas del bloque de entorno:
 
-### Paso 4 — Build y arranque
+- `MONGO_URL`
+- `DB_NAME`
+- `JWT_SECRET`
+- `OPENAI_API_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `GOOGLE_CLIENT_ID`
+- `ALLOWED_ORIGINS`
+- `COOKIE_SECURE`
 
-Railway construye la imagen, arranca el backend y sirve el frontend compilado desde el mismo contenedor.
+### Paso 4 — Build
 
-### Paso 5 — Verificación de salud
+Railway construye imagen Docker.
 
-El healthcheck esperado es:
+Debe verse, conceptualmente:
+
+```text
+frontend npm ci
+frontend npm run build
+backend pip install
+uvicorn backend.app.main:app
+```
+
+### Paso 5 — Healthcheck
+
+Railway debe validar:
 
 ```text
 /health
 ```
 
+Respuesta esperada:
+
+```json
+{"status": "ok"}
+```
+
 ---
 
-## 8. Qué comprobar después del deploy
-
-La verificación mínima debe cubrir esto:
+## 12. Qué comprobar después del deploy
 
 ### Backend
 
-- `/health` responde correctamente;
-- el proceso levanta sin error de imports;
+Comprobar:
+
+- `/health` responde 200;
+- el proceso arranca sin error de imports;
 - Mongo conecta;
-- el arranque depende de `backend.app.main:app`;
-- no hay error de variables de entorno faltantes.
+- `backend.app.main:app` es el runtime;
+- no faltan variables críticas;
+- Stripe no procesa webhooks sin firma;
+- refresh token sigue validando firma;
+- `/api/builder/build` exige auth.
 
 ### Frontend
 
-- la home carga;
-- el `index.html` del build se sirve correctamente;
-- las rutas del frontend no rompen;
-- los estáticos se sirven desde `/static`.
+Comprobar:
 
-### Integración general
+- home carga;
+- `index.html` se sirve correctamente;
+- rutas SPA no rompen al refrescar;
+- estáticos cargan desde `/static`;
+- login carga;
+- registro carga;
+- Google Sign-In puede pedir `/api/public/config`.
 
-- auth no rompe el arranque;
-- billing no rompe imports;
-- OpenAI no rompe startup por configuración ausente si no se invoca todavía;
-- Stripe no rompe startup por configuración ausente si no se invoca todavía.
+### Integración
+
+Comprobar:
+
+- login normal;
+- registro normal;
+- Google login si está configurado;
+- crear proyecto;
+- generar análisis;
+- Builder AI;
+- consumo de créditos;
+- billing;
+- Stripe checkout;
+- Stripe webhook firmado.
 
 ---
 
-## 9. Estado del dominio
+## 13. Estado del dominio
 
-El dominio no debe tratarse aquí como hipótesis abstracta. Puede haber dos estados válidos.
+Hay dos estados válidos.
 
-### Caso A — Dominio ya conectado
+### Caso A — Dominio conectado
 
-Si el dominio ya está conectado y el sistema ya ha respondido correctamente al refresco y carga de páginas, la validación correcta es esta:
+Validar:
 
-- el dominio principal resuelve;
-- el certificado SSL responde correctamente;
-- `/health` responde por la vía desplegada;
-- la home carga sin depender de entorno local;
-- `ALLOWED_ORIGINS` coincide con el dominio real activo.
+- dominio principal resuelve;
+- certificado SSL responde;
+- `/health` responde por HTTPS;
+- home carga;
+- rutas internas cargan;
+- `ALLOWED_ORIGINS` coincide con dominio real;
+- cookies funcionan con `COOKIE_SECURE=true`.
 
-### Caso B — Dominio aún no conectado o no validado
+### Caso B — Dominio no conectado o no validado
 
-Si todavía no está confirmado del todo:
+Pasos:
 
 - conectar dominio personalizado en Railway;
-- apuntar DNS correctamente;
+- configurar DNS;
 - esperar propagación;
 - actualizar `ALLOWED_ORIGINS`;
-- volver a validar `/health`, home y rutas.
+- validar `/health`;
+- validar home;
+- validar login;
+- validar rutas.
 
-### Regla
-
-La documentación debe reflejar el estado real del despliegue y no una narrativa antigua.
-
----
-
-## 10. Errores típicos a evitar
-
-### Error 1
-Tomar `railway/server_railway.py` como vía activa de deploy actual.
-
-### Error 2
-Tomar `backend/server.py` como entrada principal del sistema desplegado.
-
-### Error 3
-Mezclar una orden manual de arranque con la referencia canónica del `Dockerfile`.
-
-### Error 4
-Olvidar variables críticas como:
-
-- `MONGO_URL`
-- `JWT_SECRET`
-- `OPENAI_API_KEY`
-- `STRIPE_SECRET_KEY`
-
-### Error 5
-Dar por hecho que Railway despliega un dev server de frontend.
-
-No. El frontend actual se sirve como build estático integrado en el contenedor final.
-
-### Error 6
-Seguir documentando el deploy como si el legacy siguiera vivo dentro del repo activo.
+No asumir dominio operativo hasta probarlo. DNS no cree en la fe.
 
 ---
 
-## 11. Veredicto operativo
+## 14. Errores típicos a evitar
 
-La verdad actual del despliegue en Railway queda fijada así:
+### Error 1 — Reintroducir deploy legacy
+
+No usar:
+
+```text
+railway/server_railway.py
+backend/server.py
+```
+
+### Error 2 — Ejecutar frontend dev server en producción
+
+No usar:
+
+```bash
+npm start
+```
+
+Railway debe servir el build estático vía FastAPI.
+
+### Error 3 — Olvidar `STRIPE_WEBHOOK_SECRET`
+
+Después del hardening, el webhook exige firma.
+
+Sin `STRIPE_WEBHOOK_SECRET`, el webhook debe rechazar. Correcto.
+
+### Error 4 — Usar `COOKIE_SECURE=false` en producción
+
+En Railway con HTTPS:
+
+```env
+COOKIE_SECURE=true
+```
+
+### Error 5 — Hardcodear `REACT_APP_BACKEND_URL` en Dockerfile
+
+No quemar dominio fijo dentro del build.
+
+El frontend debe funcionar en mismo origen usando `window.location.origin`, salvo necesidad explícita.
+
+### Error 6 — Confundir requirements
+
+Railway usa:
+
+```text
+backend/requirements.txt
+```
+
+No asumir que usa:
+
+```text
+requirements.txt
+```
+
+mientras el Dockerfile no lo indique.
+
+### Error 7 — Deploy sin build local
+
+Antes de deploy:
+
+```powershell
+python -m pytest backend\tests
+cd backend
+python -m compileall app
+cd ..
+cd frontend
+npm.cmd run build
+cd ..
+```
+
+Si no pasa local, no lo mandes a producción esperando que Railway tenga magia. Railway no es Hogwarts con logs.
+
+---
+
+## 15. Checklist operativo predeploy
+
+```text
+[ ] git status limpio
+[ ] python -m pytest backend\tests pasa
+[ ] python -m compileall app pasa en backend
+[ ] npm.cmd run build pasa en frontend
+[ ] railway.json apunta a Dockerfile
+[ ] Dockerfile usa npm ci
+[ ] Dockerfile no hardcodea REACT_APP_BACKEND_URL
+[ ] Dockerfile usa backend/requirements.txt
+[ ] Dockerfile arranca python -m uvicorn backend.app.main:app
+[ ] /health existe
+[ ] FRONTEND_BUILD_DIR apunta a frontend/build
+[ ] ALLOWED_ORIGINS configurado
+[ ] COOKIE_SECURE=true en producción
+[ ] JWT_SECRET configurado
+[ ] STRIPE_SECRET_KEY configurado
+[ ] STRIPE_WEBHOOK_SECRET configurado
+[ ] GOOGLE_CLIENT_ID configurado si Google Sign-In está activo
+[ ] OPENAI_API_KEY configurado
+[ ] MONGO_URL configurado
+```
+
+---
+
+## 16. Veredicto operativo
+
+La verdad actual del despliegue queda fijada así:
 
 - `railway.json` configura Railway;
-- `Dockerfile` construye y arranca;
-- `backend/app/main.py` es la entrada backend real;
-- `backend.app.main:app` es la referencia canónica de runtime;
-- `/health` es la ruta de healthcheck;
-- el frontend se sirve como build estático desde FastAPI;
-- el legacy de deploy ya fue retirado del repo activo.
+- `Dockerfile` construye frontend y backend;
+- `backend/requirements.txt` alimenta el runtime Python;
+- `frontend/package-lock.json` alimenta `npm ci`;
+- `backend/app/main.py` es la entrada real;
+- `backend.app.main:app` es el runtime canónico;
+- `/health` es el healthcheck;
+- FastAPI sirve API + frontend estático;
+- el deploy legacy queda fuera;
+- los webhooks Stripe requieren firma;
+- las cookies seguras se activan con `COOKIE_SECURE=true`.
 
 ---
 
-## 12. Conclusión operativa
+## 17. Conclusión operativa
 
 A partir de este documento:
 
 - Railway queda alineado con la arquitectura real actual;
 - se elimina la confusión entre deploy heredado y deploy canónico;
-- `server.py` y `server_railway.py` dejan de presentarse como eje actual del despliegue;
-- y cualquier ajuste futuro de deploy debe partir de `Dockerfile` + `railway.json` + `backend.app.main:app`.
+- se documentan variables críticas añadidas por el hardening;
+- se evita hardcodear dominios en el build frontend;
+- se fija `backend/requirements.txt` como fuente de producción;
+- se establece una checklist mínima antes de desplegar;
+- y cualquier ajuste futuro de deploy debe partir de:
+
+```text
+Dockerfile
+railway.json
+backend.app.main:app
+/health
+```
+
+Menos narrativa. Más realidad ejecutable.
