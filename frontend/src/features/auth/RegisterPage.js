@@ -1,10 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight } from '@phosphor-icons/react';
-import { useAuth } from '../../context/AuthContext';
 import { toast } from 'sonner';
+
 import GoogleSignInButton from '../../components/GoogleSignInButton';
+import { useAuth } from '../../context/AuthContext';
 import AuthScreenShell from './components/AuthScreenShell';
+
+
+const EMPTY_LOCATION_STATE = {};
+
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -17,19 +22,22 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const inputData = location.state || {};
+  const inputData = useMemo(
+    () => location.state || EMPTY_LOCATION_STATE,
+    [location.state]
+  );
 
   const authRedirect = useMemo(() => {
     if (inputData.inputContent) {
       return {
         path: '/flow',
-        state: inputData
+        state: inputData,
       };
     }
 
     return {
       path: '/dashboard',
-      state: null
+      state: null,
     };
   }, [inputData]);
 
@@ -37,13 +45,14 @@ const RegisterPage = () => {
     if (isAuthenticated) {
       navigate(authRedirect.path, {
         state: authRedirect.state || undefined,
-        replace: true
+        replace: true,
       });
     }
   }, [isAuthenticated, navigate, authRedirect]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
     setError('');
     setLoading(true);
 
@@ -57,9 +66,10 @@ const RegisterPage = () => {
 
     if (result.success) {
       toast.success('Cuenta creada correctamente');
+
       navigate(authRedirect.path, {
         state: authRedirect.state || undefined,
-        replace: true
+        replace: true,
       });
     } else {
       setError(result.error);
@@ -98,11 +108,14 @@ const RegisterPage = () => {
         )}
 
         <div className="mb-4">
-          <label className="block text-sm text-[#A3A3A3] mb-2">Nombre</label>
+          <label className="block text-sm text-[#A3A3A3] mb-2">
+            Nombre
+          </label>
+
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(event) => setName(event.target.value)}
             placeholder="Tu nombre"
             className="input-premium"
             required
@@ -111,11 +124,14 @@ const RegisterPage = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm text-[#A3A3A3] mb-2">Email</label>
+          <label className="block text-sm text-[#A3A3A3] mb-2">
+            Email
+          </label>
+
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
             placeholder="tu@email.com"
             className="input-premium"
             required
@@ -124,11 +140,14 @@ const RegisterPage = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm text-[#A3A3A3] mb-2">Contraseña</label>
+          <label className="block text-sm text-[#A3A3A3] mb-2">
+            Contraseña
+          </label>
+
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
             placeholder="Mínimo 6 caracteres"
             className="input-premium"
             required
@@ -156,6 +175,7 @@ const RegisterPage = () => {
 
       <p className="text-center text-[#A3A3A3] text-sm mt-6">
         ¿Ya tienes cuenta?{' '}
+
         <Link
           to="/login"
           className="text-[#0F5257] hover:text-[#39ff88] transition-colors"
@@ -167,5 +187,6 @@ const RegisterPage = () => {
     </AuthScreenShell>
   );
 };
+
 
 export default RegisterPage;

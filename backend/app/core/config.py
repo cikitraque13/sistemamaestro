@@ -1,6 +1,5 @@
 ﻿from pathlib import Path
 import os
-import secrets
 
 from dotenv import load_dotenv
 
@@ -10,16 +9,37 @@ ENV_FILE = BACKEND_ROOT / ".env"
 
 load_dotenv(ENV_FILE)
 
-MONGO_URL = os.environ["MONGO_URL"]
+
+def required_env(name: str) -> str:
+    value = os.environ.get(name)
+
+    if not value or not value.strip():
+        raise RuntimeError(f"Missing required environment variable: {name}")
+
+    return value.strip()
+
+
+MONGO_URL = required_env("MONGO_URL")
 DB_NAME = os.environ.get("DB_NAME", "sistemamaestro")
 
 JWT_ALGORITHM = "HS256"
-JWT_SECRET = os.environ.get("JWT_SECRET", secrets.token_hex(32))
+JWT_SECRET = required_env("JWT_SECRET")
+
+if len(JWT_SECRET) < 32:
+    raise RuntimeError("JWT_SECRET must be at least 32 characters")
 
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY") or os.environ.get("STRIPE_API_KEY")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
+
+COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "false").lower() == "true"
 
 FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
 FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"

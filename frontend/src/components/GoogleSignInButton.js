@@ -1,20 +1,24 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+
 import { useAuth } from '../context/AuthContext';
+import { API_BASE, apiFetch } from '../lib/apiClient';
+
 
 const GOOGLE_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 const FALLBACK_GOOGLE_CLIENT_ID = '265766842238-fmk21udhv7f1om2j6a2ljvs7hv8ebkeq.apps.googleusercontent.com';
 
-const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || (typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'https://sistemamaestro.com'))
-  .trim()
-  .replace(/\/$/, '');
-
-const PUBLIC_CONFIG_URL = `${BACKEND_URL}/api/public/config`;
-
 let googleScriptPromise = null;
 
+
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 
 const loadGoogleScriptOnce = () => {
   if (window.google?.accounts?.id) {
@@ -26,7 +30,9 @@ const loadGoogleScriptOnce = () => {
   }
 
   googleScriptPromise = new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
+    const existing = document.querySelector(
+      `script[src="${GOOGLE_SCRIPT_SRC}"]`
+    );
 
     if (existing) {
       if (window.google?.accounts?.id) {
@@ -40,20 +46,24 @@ const loadGoogleScriptOnce = () => {
         () => reject(new Error('No se pudo cargar Google Sign-In')),
         { once: true }
       );
+
       return;
     }
 
     const script = document.createElement('script');
+
     script.src = GOOGLE_SCRIPT_SRC;
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('No se pudo cargar Google Sign-In'));
+
     document.head.appendChild(script);
   });
 
   return googleScriptPromise;
 };
+
 
 const getGoogleClientId = async () => {
   const envClientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
@@ -63,10 +73,8 @@ const getGoogleClientId = async () => {
   }
 
   try {
-    const response = await fetch(PUBLIC_CONFIG_URL, {
+    const response = await apiFetch('/public/config', {
       method: 'GET',
-      credentials: 'include',
-      headers: { Accept: 'application/json' }
     });
 
     if (!response.ok) {
@@ -74,28 +82,65 @@ const getGoogleClientId = async () => {
     }
 
     const data = await response.json();
+
     return (data?.google_client_id || FALLBACK_GOOGLE_CLIENT_ID).trim();
   } catch (error) {
-    console.error(`Error cargando ${PUBLIC_CONFIG_URL}:`, error);
+    console.error(`Error cargando ${API_BASE}/public/config:`, error);
+
     return FALLBACK_GOOGLE_CLIENT_ID;
   }
 };
 
+
 const MATRIX_CHARS = [
-  '0', '1', 'A', 'U', 'T', 'H', 'X', '9', 'K', 'Î£', 'Î›', '7', 'N', 'O', 'D', 'E',
-  'S', 'Y', 'S', 'Q', 'R', 'I', 'V', 'M', 'C', '8', '2', '5', 'F', 'P'
+  '0',
+  '1',
+  'A',
+  'U',
+  'T',
+  'H',
+  'X',
+  '9',
+  'K',
+  'Σ',
+  'Λ',
+  '7',
+  'N',
+  'O',
+  'D',
+  'E',
+  'S',
+  'Y',
+  'S',
+  'Q',
+  'R',
+  'I',
+  'V',
+  'M',
+  'C',
+  '8',
+  '2',
+  '5',
+  'F',
+  'P',
 ];
+
 
 const buildMatrixColumn = (length = 28) =>
   Array.from({ length }, (_, index) => ({
     id: index,
-    char: MATRIX_CHARS[(index * 7 + length) % MATRIX_CHARS.length]
+    char: MATRIX_CHARS[(index * 7 + length) % MATRIX_CHARS.length],
   }));
 
+
 const hasRenderedGoogleButton = (node) => {
-  if (!node) return false;
+  if (!node) {
+    return false;
+  }
+
   return Boolean(node.querySelector('iframe, div[role="button"]'));
 };
+
 
 const MatrixRain = () => {
   const columns = useMemo(
@@ -106,7 +151,7 @@ const MatrixRain = () => {
         duration: 5.8 + (index % 7) * 0.65,
         delay: (index % 9) * 0.28,
         opacity: 0.14 + (index % 5) * 0.045,
-        chars: buildMatrixColumn(24 + (index % 8))
+        chars: buildMatrixColumn(24 + (index % 8)),
       })),
     []
   );
@@ -121,7 +166,7 @@ const MatrixRain = () => {
             left: column.left,
             opacity: column.opacity,
             animation: `matrixDrop ${column.duration}s linear infinite`,
-            animationDelay: `${column.delay}s`
+            animationDelay: `${column.delay}s`,
           }}
         >
           {column.chars.map((item, charIndex) => (
@@ -129,7 +174,7 @@ const MatrixRain = () => {
               key={item.id}
               className={charIndex === 0 ? 'text-[#d1ffe5]' : ''}
               style={{
-                opacity: Math.max(0.18, 1 - charIndex * 0.045)
+                opacity: Math.max(0.18, 1 - charIndex * 0.045),
               }}
             >
               {item.char}
@@ -141,6 +186,7 @@ const MatrixRain = () => {
   );
 };
 
+
 const GoogleConnectingOverlay = ({ stepText }) => {
   return (
     <div className="fixed inset-0 z-[120] bg-[#010302] flex items-center justify-center px-6">
@@ -150,15 +196,18 @@ const GoogleConnectingOverlay = ({ stepText }) => {
           8% { opacity: 1; }
           100% { transform: translateY(150%); opacity: 0; }
         }
+
         @keyframes matrixPulse {
           0%, 100% { opacity: 0.45; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.08); }
         }
+
         @keyframes matrixScan {
           0% { transform: translateY(-130%); opacity: 0; }
           10% { opacity: 0.18; }
           100% { transform: translateY(130%); opacity: 0; }
         }
+
         @keyframes terminalBlink {
           0%, 49% { opacity: 1; }
           50%, 100% { opacity: 0; }
@@ -166,13 +215,16 @@ const GoogleConnectingOverlay = ({ stepText }) => {
       `}</style>
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(57,255,136,0.09),transparent_45%)]" />
+
       <div className="absolute inset-0 opacity-55">
         <MatrixRain />
       </div>
 
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ animation: 'matrixScan 2.4s linear infinite' }}
+        style={{
+          animation: 'matrixScan 2.4s linear infinite',
+        }}
       >
         <div className="h-28 w-full bg-gradient-to-b from-transparent via-[#39ff88]/10 to-transparent" />
       </div>
@@ -189,8 +241,11 @@ const GoogleConnectingOverlay = ({ stepText }) => {
               <div className="inline-flex items-center gap-3 rounded-full border border-[#39ff88]/20 bg-[#0a1711] px-4 py-2">
                 <span
                   className="h-2.5 w-2.5 rounded-full bg-[#39ff88]"
-                  style={{ animation: 'matrixPulse 1.2s ease-in-out infinite' }}
+                  style={{
+                    animation: 'matrixPulse 1.2s ease-in-out infinite',
+                  }}
                 />
+
                 <span className="font-mono text-[11px] sm:text-xs tracking-[0.28em] text-[#b8ffd4] uppercase">
                   Sistema Maestro
                 </span>
@@ -220,9 +275,12 @@ const GoogleConnectingOverlay = ({ stepText }) => {
 
                   <p className="font-mono text-sm sm:text-base tracking-[0.16em] uppercase text-[#e9fff1]">
                     {stepText}
+
                     <span
                       className="ml-1 inline-block text-[#39ff88]"
-                      style={{ animation: 'terminalBlink 1s step-end infinite' }}
+                      style={{
+                        animation: 'terminalBlink 1s step-end infinite',
+                      }}
                     >
                       _
                     </span>
@@ -240,14 +298,17 @@ const GoogleConnectingOverlay = ({ stepText }) => {
                     <span className="text-[#9aa4a0]">Handshake</span>
                     <span className="text-[#d7ffe7]">OK</span>
                   </div>
+
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-[#9aa4a0]">Token</span>
                     <span className="text-[#d7ffe7]">ACTIVE</span>
                   </div>
+
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-[#9aa4a0]">Session</span>
                     <span className="text-[#d7ffe7]">SECURE</span>
                   </div>
+
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-[#9aa4a0]">Workspace</span>
                     <span className="text-[#d7ffe7]">LOADING</span>
@@ -258,6 +319,7 @@ const GoogleConnectingOverlay = ({ stepText }) => {
                   <div className="font-mono text-[11px] tracking-[0.20em] uppercase text-[#6ee7a8] mb-2">
                     Log
                   </div>
+
                   <div className="space-y-1 font-mono text-[11px] text-[#b8c4be]">
                     <div>&gt; identity.provider = google</div>
                     <div>&gt; auth.channel = secure</div>
@@ -276,7 +338,11 @@ const GoogleConnectingOverlay = ({ stepText }) => {
   );
 };
 
-const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null }) => {
+
+const GoogleSignInButton = ({
+  redirectPath = '/dashboard',
+  redirectState = null,
+}) => {
   const containerRef = useRef(null);
   const wrapperRef = useRef(null);
   const initializedRef = useRef(false);
@@ -287,7 +353,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   const authRef = useRef({
     loginWithGoogleCredential: null,
     redirectPath: '/dashboard',
-    redirectState: null
+    redirectState: null,
   });
 
   const navigate = useNavigate();
@@ -303,18 +369,28 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
     authRef.current = {
       loginWithGoogleCredential,
       redirectPath,
-      redirectState
+      redirectState,
     };
   }, [loginWithGoogleCredential, redirectPath, redirectState]);
 
   useEffect(() => {
-    if (!wrapperRef.current) return undefined;
+    if (!wrapperRef.current) {
+      return undefined;
+    }
 
     const updateWidth = () => {
-      if (!wrapperRef.current) return;
+      if (!wrapperRef.current) {
+        return;
+      }
+
       const width = wrapperRef.current.clientWidth;
       const safeWidth = Math.max(220, Math.min(360, width));
-      setButtonWidth((current) => (current === safeWidth ? current : safeWidth));
+
+      setButtonWidth((current) => (
+        current === safeWidth
+          ? current
+          : safeWidth
+      ));
     };
 
     updateWidth();
@@ -343,14 +419,18 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
             setStatus('missing_client');
             setErrorMessage('Google Sign-In no está disponible temporalmente.');
           }
+
           return;
         }
 
         await loadGoogleScriptOnce();
 
-        if (!mountedRef.current) return;
+        if (!mountedRef.current) {
+          return;
+        }
 
         const googleId = window.google?.accounts?.id;
+
         if (!googleId) {
           throw new Error('Google Identity Services no está disponible');
         }
@@ -370,7 +450,9 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                   throw new Error('Google no devolvió credencial');
                 }
 
-                if (!mountedRef.current) return;
+                if (!mountedRef.current) {
+                  return;
+                }
 
                 setIsAuthenticating(true);
                 setOverlayStep('Validando acceso');
@@ -378,26 +460,30 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                 const {
                   loginWithGoogleCredential: loginFn,
                   redirectPath: nextPath,
-                  redirectState: nextState
+                  redirectState: nextState,
                 } = authRef.current;
 
                 const [result] = await Promise.all([
                   loginFn(response.credential),
-                  wait(700)
+                  wait(700),
                 ]);
 
-                if (!mountedRef.current) return;
+                if (!mountedRef.current) {
+                  return;
+                }
 
                 if (result.success) {
                   setOverlayStep('Cargando sesión');
                   await wait(420);
+
                   setOverlayStep('Preparando dashboard');
                   await wait(520);
 
                   navigate(nextPath, {
                     replace: true,
-                    state: nextState
+                    state: nextState,
                   });
+
                   return;
                 }
 
@@ -405,12 +491,14 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
                 toast.error(result.error || 'Error al iniciar sesión con Google');
               } catch (callbackError) {
                 console.error('Google callback error:', callbackError);
+
                 if (mountedRef.current) {
                   setIsAuthenticating(false);
                 }
+
                 toast.error('Error al completar el acceso con Google');
               }
-            }
+            },
           });
 
           initializedRef.current = true;
@@ -431,12 +519,13 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
             text: 'continue_with',
             shape: 'rectangular',
             logo_alignment: 'left',
-            width: buttonWidth
+            width: buttonWidth,
           });
 
           lastRenderedWidthRef.current = buttonWidth;
 
           window.clearTimeout(renderTimeoutRef.current);
+
           renderTimeoutRef.current = window.setTimeout(() => {
             const ok = hasRenderedGoogleButton(containerRef.current);
 
@@ -452,6 +541,7 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
         }
       } catch (error) {
         console.error('Google Sign-In init error:', error);
+
         if (mountedRef.current) {
           setStatus('error');
           setErrorMessage('No se pudo inicializar Google Sign-In.');
@@ -471,7 +561,9 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
 
   return (
     <>
-      {isAuthenticating && <GoogleConnectingOverlay stepText={overlayStep} />}
+      {isAuthenticating && (
+        <GoogleConnectingOverlay stepText={overlayStep} />
+      )}
 
       {status === 'missing_client' || status === 'error' ? (
         <div className="w-full mb-6">
@@ -503,5 +595,5 @@ const GoogleSignInButton = ({ redirectPath = '/dashboard', redirectState = null 
   );
 };
 
-export default GoogleSignInButton;
 
+export default GoogleSignInButton;

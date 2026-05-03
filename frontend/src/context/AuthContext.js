@@ -1,13 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
-const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || (typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'https://sistemamaestro.com'))
-  .trim()
-  .replace(/\/$/, '');
+import { api } from '../lib/apiClient';
 
-const API_BASE = `${BACKEND_URL}/api`;
 
 const AuthContext = createContext(null);
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -18,6 +21,7 @@ export const useAuth = () => {
 
   return context;
 };
+
 
 const ERROR_TRANSLATIONS = {
   'Invalid credentials': 'Credenciales incorrectas',
@@ -37,11 +41,15 @@ const ERROR_TRANSLATIONS = {
   'Transaction not found': 'Transacción no encontrada',
 };
 
+
 const SESSION_NOT_PERSISTED_ERROR =
   'La sesión no ha quedado guardada correctamente. Vuelve a iniciar sesión y comprueba que frontend y backend usan el mismo host.';
 
+
 const formatApiErrorDetail = (detail) => {
-  if (detail == null) return 'Algo salió mal. Intenta de nuevo.';
+  if (detail == null) {
+    return 'Algo salió mal. Intenta de nuevo.';
+  }
 
   if (typeof detail === 'string') {
     return ERROR_TRANSLATIONS[detail] || detail;
@@ -49,7 +57,11 @@ const formatApiErrorDetail = (detail) => {
 
   if (Array.isArray(detail)) {
     return detail
-      .map((entry) => (entry && typeof entry.msg === 'string' ? entry.msg : JSON.stringify(entry)))
+      .map((entry) => (
+        entry && typeof entry.msg === 'string'
+          ? entry.msg
+          : JSON.stringify(entry)
+      ))
       .filter(Boolean)
       .join(' ');
   }
@@ -61,13 +73,12 @@ const formatApiErrorDetail = (detail) => {
   return String(detail);
 };
 
-const getRequestError = (error) =>
-  formatApiErrorDetail(error?.response?.data?.detail) || error?.message || 'Algo salió mal.';
 
-const api = axios.create({
-  baseURL: API_BASE,
-  withCredentials: true,
-});
+const getRequestError = (error) =>
+  formatApiErrorDetail(error?.response?.data?.detail) ||
+  error?.message ||
+  'Algo salió mal.';
+
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // null = checking, false = not auth, object = auth
@@ -75,7 +86,9 @@ export const AuthProvider = ({ children }) => {
 
   const confirmBackendSession = useCallback(async () => {
     const response = await api.get('/auth/me');
+
     setUser(response.data);
+
     return response.data;
   }, []);
 
@@ -102,13 +115,21 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      await api.post('/auth/login', { email, password });
+      await api.post('/auth/login', {
+        email,
+        password,
+      });
 
       try {
         const confirmedUser = await confirmBackendSession();
-        return { success: true, user: confirmedUser };
+
+        return {
+          success: true,
+          user: confirmedUser,
+        };
       } catch (sessionError) {
         setUser(false);
+
         return {
           success: false,
           error: SESSION_NOT_PERSISTED_ERROR,
@@ -126,13 +147,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, name) => {
     try {
-      await api.post('/auth/register', { email, password, name });
+      await api.post('/auth/register', {
+        email,
+        password,
+        name,
+      });
 
       try {
         const confirmedUser = await confirmBackendSession();
-        return { success: true, user: confirmedUser };
+
+        return {
+          success: true,
+          user: confirmedUser,
+        };
       } catch (sessionError) {
         setUser(false);
+
         return {
           success: false,
           error: SESSION_NOT_PERSISTED_ERROR,
@@ -150,13 +180,20 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogleCredential = async (credential) => {
     try {
-      await api.post('/auth/google/session', { credential });
+      await api.post('/auth/google/session', {
+        credential,
+      });
 
       try {
         const confirmedUser = await confirmBackendSession();
-        return { success: true, user: confirmedUser };
+
+        return {
+          success: true,
+          user: confirmedUser,
+        };
       } catch (sessionError) {
         setUser(false);
+
         return {
           success: false,
           error: SESSION_NOT_PERSISTED_ERROR,
@@ -174,13 +211,20 @@ export const AuthProvider = ({ children }) => {
 
   const handleGoogleCallback = async (sessionId) => {
     try {
-      await api.post('/auth/google/session', { session_id: sessionId });
+      await api.post('/auth/google/session', {
+        session_id: sessionId,
+      });
 
       try {
         const confirmedUser = await confirmBackendSession();
-        return { success: true, user: confirmedUser };
+
+        return {
+          success: true,
+          user: confirmedUser,
+        };
       } catch (sessionError) {
         setUser(false);
+
         return {
           success: false,
           error: SESSION_NOT_PERSISTED_ERROR,
@@ -199,9 +243,13 @@ export const AuthProvider = ({ children }) => {
   const refreshToken = async () => {
     try {
       await api.post('/auth/refresh', {});
+
       const confirmedUser = await confirmBackendSession();
 
-      return { success: true, user: confirmedUser };
+      return {
+        success: true,
+        user: confirmedUser,
+      };
     } catch (error) {
       setUser(false);
 

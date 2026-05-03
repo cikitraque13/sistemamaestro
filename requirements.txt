@@ -11,3 +11,5 @@ PyJWT
 email-validator
 stripe
 python-multipart
+
+pytest
