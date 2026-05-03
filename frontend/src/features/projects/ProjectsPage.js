@@ -11,14 +11,10 @@ import {
   Trash,
   MagnifyingGlass
 } from '@phosphor-icons/react';
-import axios from 'axios';
 import { toast } from 'sonner';
 
 import DashboardLayout from '../../components/DashboardLayout';
-
-const API_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
-  .trim()
-  .replace(/\/$/, '');
+import { api } from '../../lib/apiClient';
 
 const BUILDER_LAUNCHER_STATE = {
   focus: 'builder-launcher',
@@ -111,6 +107,23 @@ const formatDate = (dateString) => {
 const buildBuilderUrl = (projectId) =>
   `/dashboard/builder?project_id=${encodeURIComponent(projectId)}`;
 
+const getApiErrorMessage = (error) => {
+  const detail = error?.response?.data?.detail;
+
+  if (typeof detail === 'string') {
+    return detail;
+  }
+
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => item?.msg || JSON.stringify(item))
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  return error?.message || 'Error desconocido';
+};
+
 const ProjectsPage = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,13 +163,21 @@ const ProjectsPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get(`${API_URL}/api/projects`, {
-        withCredentials: true
-      });
+      const response = await api.get('/projects');
+      const data = response.data;
 
-      setProjects(Array.isArray(response.data) ? response.data : []);
+      if (!Array.isArray(data)) {
+        console.error('Unexpected /projects response:', data);
+        setProjects([]);
+        toast.error('Respuesta inesperada al cargar proyectos');
+        return;
+      }
+
+      setProjects(data);
     } catch (error) {
-      toast.error('Error al cargar proyectos');
+      console.error('Projects load error:', error);
+      toast.error(`Error al cargar proyectos: ${getApiErrorMessage(error)}`);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -169,9 +190,7 @@ const ProjectsPage = () => {
     if (!window.confirm('¿Seguro que quieres eliminar este proyecto?')) return;
 
     try {
-      await axios.delete(`${API_URL}/api/projects/${projectId}`, {
-        withCredentials: true
-      });
+      await api.delete(`/projects/${projectId}`);
 
       setProjects((prev) =>
         prev.filter((project) => project.project_id !== projectId)
@@ -179,7 +198,8 @@ const ProjectsPage = () => {
 
       toast.success('Proyecto eliminado');
     } catch (error) {
-      toast.error('Error al eliminar proyecto');
+      console.error('Project delete error:', error);
+      toast.error(`Error al eliminar proyecto: ${getApiErrorMessage(error)}`);
     }
   };
 
