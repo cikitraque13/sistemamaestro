@@ -2,16 +2,21 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from backend.app.core.credits_config_loader import get_credits_config_bundle
+from backend.app.core.security import get_current_user
 from backend.app.schemas.consumption import (
     ConsumptionErrorEnvelope,
     ConsumptionExecutionEnvelope,
     ConsumptionRequest,
     ConsumptionSimulationEnvelope,
 )
-from backend.app.services.consumption_engine import evaluate_consumption
+from backend.app.services.consumption_engine import (
+    evaluate_consumption,
+    execute_consumption_for_user,
+)
+
 
 router = APIRouter(
     prefix="/consumption",
@@ -29,8 +34,10 @@ def _serialize_engine_error(exc: Exception) -> Dict[str, Any]:
 def _model_to_dict(model: Any) -> Dict[str, Any]:
     if hasattr(model, "model_dump"):
         return model.model_dump()
+
     if hasattr(model, "dict"):
         return model.dict()
+
     return {"error": "serialization_failed"}
 
 
@@ -55,15 +62,24 @@ def get_consumption_config_summary() -> Dict[str, Any]:
             "engine_version": "consumption_v1",
             "catalog_version": "credits_v1",
             "summary": {
-                "action_catalog_count": len(action_catalog) if isinstance(action_catalog, list) else 0,
+                "action_catalog_count": (
+                    len(action_catalog)
+                    if isinstance(action_catalog, list)
+                    else 0
+                ),
                 "has_tier_amounts": bool(tier_amounts),
                 "has_threshold_rules": bool(threshold_rules),
                 "has_plan_levels": bool(plan_levels),
-                "has_request_schema": bool(contracts.get("consumption_request")),
-                "has_response_schema": bool(contracts.get("consumption_response")),
+                "has_request_schema": bool(
+                    contracts.get("consumption_request")
+                ),
+                "has_response_schema": bool(
+                    contracts.get("consumption_response")
+                ),
             },
             "paths": paths,
         }
+
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -79,7 +95,9 @@ def get_consumption_config_summary() -> Dict[str, Any]:
     response_model=ConsumptionSimulationEnvelope,
     summary="Simula una acción del motor de consumo",
 )
-def simulate_consumption(payload: ConsumptionRequest) -> ConsumptionSimulationEnvelope:
+def simulate_consumption(
+    payload: ConsumptionRequest,
+) -> ConsumptionSimulationEnvelope:
     if payload.mode != "simulate":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -97,7 +115,12 @@ def simulate_consumption(payload: ConsumptionRequest) -> ConsumptionSimulationEn
 
     try:
         result = evaluate_consumption(payload)
-        return ConsumptionSimulationEnvelope(ok=True, data=result)
+
+        return ConsumptionSimulationEnvelope(
+            ok=True,
+            data=result,
+        )
+
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -114,9 +137,12 @@ def simulate_consumption(payload: ConsumptionRequest) -> ConsumptionSimulationEn
 @router.post(
     "/execute",
     response_model=ConsumptionExecutionEnvelope,
-    summary="Evalúa una acción en modo ejecución",
+    summary="Ejecuta una acción del motor de consumo",
 )
-def execute_consumption(payload: ConsumptionRequest) -> ConsumptionExecutionEnvelope:
+async def execute_consumption(
+    payload: ConsumptionRequest,
+    request: Request,
+) -> ConsumptionExecutionEnvelope:
     if payload.mode != "execute":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -133,8 +159,21 @@ def execute_consumption(payload: ConsumptionRequest) -> ConsumptionExecutionEnve
         )
 
     try:
-        result = evaluate_consumption(payload)
-        return ConsumptionExecutionEnvelope(ok=True, data=result)
+        user = await get_current_user(request)
+
+        result = await execute_consumption_for_user(
+            runtime_user=user,
+            payload=payload,
+        )
+
+        return ConsumptionExecutionEnvelope(
+            ok=True,
+            data=result,
+        )
+
+    except HTTPException:
+        raise
+
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
