@@ -60,6 +60,11 @@ DEFAULT_THRESHOLD_RULES: Dict[str, Any] = {
 
 DEFAULT_PLAN_LEVELS: Dict[str, int] = {
     "free": 0,
+    "blueprint": 1,
+    "sistema": 2,
+    "premium": 3,
+
+    # Legacy aliases. Harmless fallback if old data still exists somewhere.
     "pro": 1,
     "growth": 2,
     "master": 3,
@@ -72,6 +77,7 @@ DEFAULT_CONSUMPTION_RESPONSE_SCHEMA: Dict[str, Any] = {}
 def _read_json_file(path: Path, default: Any) -> Any:
     """
     Lee un JSON de configuración.
+
     - Si no existe, devuelve default.
     - Si existe pero está vacío, devuelve default.
     - Si existe y el JSON es inválido, lanza ValueError.
@@ -80,11 +86,13 @@ def _read_json_file(path: Path, default: Any) -> Any:
         return default
 
     raw = path.read_text(encoding="utf-8").strip()
+
     if not raw:
         return default
 
     try:
         return json.loads(raw)
+
     except json.JSONDecodeError as exc:
         raise ValueError(f"Invalid JSON in {path}") from exc
 
@@ -92,6 +100,7 @@ def _read_json_file(path: Path, default: Any) -> Any:
 def _ensure_dict(value: Any, *, name: str) -> Dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{name} must be a JSON object")
+
     return value
 
 
@@ -106,21 +115,57 @@ def _ensure_list_of_dicts(value: Any, *, name: str) -> List[Dict[str, Any]]:
     return value
 
 
+def normalize_action_config(action: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Normaliza una acción del catálogo para que el motor de créditos reciba
+    siempre las claves canónicas que espera.
+
+    El catálogo histórico usa:
+    - plan_requirement
+    - consumption_type_allowed
+
+    El motor puede leer:
+    - required_plan
+    - consumption_type
+
+    Sin esta normalización, una acción cara puede parecer gratuita.
+    Eso no es pricing. Eso es regalar gasolina porque el contador está apagado.
+    """
+    normalized = dict(action)
+
+    if "required_plan" not in normalized:
+        normalized["required_plan"] = normalized.get(
+            "plan_requirement",
+            "free",
+        )
+
+    if "consumption_type" not in normalized:
+        normalized["consumption_type"] = normalized.get(
+            "consumption_type_allowed",
+            "standard",
+        )
+
+    return normalized
+
+
 @lru_cache(maxsize=1)
 def load_action_catalog() -> List[Dict[str, Any]]:
     data = _read_json_file(ACTION_CATALOG_FILE, DEFAULT_ACTION_CATALOG)
+
     return _ensure_list_of_dicts(data, name="action_catalog")
 
 
 @lru_cache(maxsize=1)
 def load_tier_amounts() -> Dict[str, Any]:
     data = _read_json_file(TIER_AMOUNTS_FILE, DEFAULT_TIER_AMOUNTS)
+
     return _ensure_dict(data, name="tier_amounts")
 
 
 @lru_cache(maxsize=1)
 def load_threshold_rules() -> Dict[str, Any]:
     data = _read_json_file(THRESHOLD_RULES_FILE, DEFAULT_THRESHOLD_RULES)
+
     return _ensure_dict(data, name="threshold_rules")
 
 
@@ -130,11 +175,14 @@ def load_plan_levels() -> Dict[str, int]:
     data = _ensure_dict(data, name="plan_levels")
 
     normalized: Dict[str, int] = {}
+
     for key, value in data.items():
         if not isinstance(key, str):
             raise ValueError("plan_levels keys must be strings")
+
         if not isinstance(value, int):
             raise ValueError(f"plan_levels['{key}'] must be an integer")
+
         normalized[key] = value
 
     return normalized
@@ -146,6 +194,7 @@ def load_consumption_request_schema() -> Dict[str, Any]:
         CONSUMPTION_REQUEST_SCHEMA_FILE,
         DEFAULT_CONSUMPTION_REQUEST_SCHEMA,
     )
+
     return _ensure_dict(data, name="consumption_request_schema")
 
 
@@ -155,6 +204,7 @@ def load_consumption_response_schema() -> Dict[str, Any]:
         CONSUMPTION_RESPONSE_SCHEMA_FILE,
         DEFAULT_CONSUMPTION_RESPONSE_SCHEMA,
     )
+
     return _ensure_dict(data, name="consumption_response_schema")
 
 
@@ -164,7 +214,7 @@ def get_action_config(action_key: str) -> Optional[Dict[str, Any]]:
 
     for action in load_action_catalog():
         if action.get("action_key") == action_key:
-            return action
+            return normalize_action_config(action)
 
     return None
 
@@ -172,12 +222,14 @@ def get_action_config(action_key: str) -> Optional[Dict[str, Any]]:
 def get_plan_level(plan_name: str) -> Optional[int]:
     if not plan_name:
         return None
+
     return load_plan_levels().get(plan_name)
 
 
 def has_required_plan(user_plan: str, required_plan: str) -> bool:
     """
     Devuelve True si user_plan cumple o supera required_plan.
+
     Si required_plan es vacío o 'free', se considera permitido.
     """
     if not required_plan or required_plan == "free":
@@ -195,6 +247,7 @@ def has_required_plan(user_plan: str, required_plan: str) -> bool:
 def get_credits_config_bundle() -> Dict[str, Any]:
     """
     Devuelve toda la configuración consolidada.
+
     Útil para servicios, simulación y diagnóstico.
     """
     return {
@@ -222,6 +275,7 @@ def get_credits_config_bundle() -> Dict[str, Any]:
 def clear_credits_config_cache() -> None:
     """
     Limpia caché en caliente.
+
     Útil si luego quieres recargar JSONs sin reiniciar.
     """
     load_action_catalog.cache_clear()
