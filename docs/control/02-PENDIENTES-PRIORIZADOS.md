@@ -1337,3 +1337,51 @@ RegisterPage
 hasta cerrar la presentación premium de oportunidades bloqueadas para Free.
 
 ---
+
+# Actualización priorizada — 2026-05-03
+
+## Estado
+
+Pendientes tras cierre de seguridad, deploy, Stripe, cuenta admin, frontend API client y carga de proyectos.
+
+---
+
+## Cerrado recientemente
+
+Los siguientes frentes dejan de ser prioridad activa:
+
+- Seguridad backend crítica.
+- Refresh token firmado.
+- Stripe webhook firmado.
+- Builder AI autenticado.
+- Créditos antes de IA.
+- `consumption/execute` con usuario real.
+- Railway Docker deploy.
+- Eliminación de `deploy.startCommand`.
+- `npm ci` corregido mediante lockfile.
+- `COOKIE_SECURE=true` en Railway.
+- `STRIPE_WEBHOOK_SECRET` configurado.
+- `admin@sistemamaestro.com` eliminado.
+- Lucas configurado como admin/premium.
+- `ProjectsPage.js` usando `apiClient`.
+- `/health` validado en producción.
+- Home, login, dashboard y oportunidades validados.
+
+---
+
+## Prioridad 1 — QA Builder 10 plantillas
+
+### Objetivo
+
+Validar el núcleo comercial:
+
+```text
+plantilla
+→ Builder
+→ primera generación
+→ output de mejora
+→ mejora del usuario
+→ mutación en vivo
+→ nuevo output
+→ iteraciones sucesivas
+→ proyecto terminado
