@@ -1,67 +1,404 @@
-# 03 - Agent Contracts
+# 03 — Agent Contracts
 
-## Proposito
-Definir el contrato minimo que debe cumplir cada agente del sistema.
+## Estado del documento
 
-## Contrato base obligatorio
+- Estado: activo
+- Tipo: contrato canónico de agentes
+- Alcance: definición, límites, entradas, salidas, herramientas y guardrails
+- Objetivo: evitar agentes genéricos, solapados o imposibles de auditar.
+
+---
+
+## 1. Propósito
+
+Este documento define el contrato mínimo que debe cumplir cada agente del sistema.
+
+Un agente no es un prompt suelto.
+
+Un agente es una unidad operativa con:
+
+- misión;
+- entradas;
+- límites;
+- herramientas;
+- salida esperada;
+- guardrails;
+- trazabilidad.
+
+---
+
+## 2. Contrato base obligatorio
+
 Cada agente debe definir:
 
-### 1. Nombre canonico
-Identificador unico y estable.
+### 2.1 Nombre canónico
 
-### 2. Rol
-Que tipo de especialista es.
+Identificador único y estable.
 
-### 3. Mision
-Que problema resuelve.
+Ejemplo:
 
-### 4. Entradas
-Que recibe exactamente.
+```text
+builder_agent
+```
 
-### 5. Herramientas permitidas
-Que puede usar.
+### 2.2 Rol
 
-### 6. Limites
-Que no puede hacer.
+Qué tipo de especialista es.
 
-### 7. Salida esperada
-Que devuelve y en que formato.
+### 2.3 Misión
 
-### 8. Guards aplicables
-Que validaciones lo limitan.
+Qué problema resuelve.
 
-### 9. Telemetria
-Que trazas minimas debe emitir.
+### 2.4 Entradas
 
-## Ejemplo resumido
+Qué recibe exactamente.
 
-### `builder_agent`
-- mision: construir o modificar codigo
-- entradas: orden cerrada, contexto tecnico, archivos objetivo
-- herramientas permitidas: repo tools, validators, code templates
-- limites: no despliega por su cuenta, no decide pricing, no invade seguridad
-- salida: cambio tecnico estructurado y verificable
+### 2.5 Herramientas permitidas
 
-### `rescue_sre_agent`
-- mision: diagnosticar y corregir fallos de arranque o estabilidad
-- entradas: logs, errores, healthchecks, runtime state
-- herramientas permitidas: runtime checks, log analysis, env validation
-- limites: no rediseña producto, no toca UX comercial
-- salida: causa raiz probable y correccion minima segura
+Qué puede usar.
 
-### `security_architect_agent`
-- mision: detectar brechas y endurecer sistema
-- entradas: auth, cookies, pagos, permisos, abuso
-- herramientas permitidas: security rules, policy checks, audit patterns
-- limites: no construye producto general, no redefine crecimiento
-- salida: hallazgo, severidad, mitigacion, prioridad
+### 2.6 Límites
 
-### `red_team_agent`
-- mision: detectar vectores hostiles y superficies de abuso desde una perspectiva adversarial defensiva
-- entradas: auth, sesiones, pagos, creditos, admin, outputs sensibles y eventos de guards
-- herramientas permitidas: policy_validator, session_audit, abuse_patterns, output_sampler, consistency_checker
-- limites: no ejecuta ataques reales, no toca produccion, no despliega, no modifica pagos, no usa repo_writer
-- salida: vector detectado, severidad, superficie afectada, mitigacion y necesidad de revision humana
+Qué no puede hacer.
 
-## Regla critica
-Si un agente responde a mas de una mision principal, esta mal definido.
+### 2.7 Salida esperada
+
+Qué devuelve y en qué formato.
+
+### 2.8 Guards aplicables
+
+Qué validaciones limitan su salida.
+
+### 2.9 Telemetría
+
+Qué trazas mínimas debe emitir.
+
+---
+
+## 3. Regla crítica
+
+Si un agente responde a más de una misión principal, está mal definido.
+
+Debe dividirse o limitarse.
+
+---
+
+## 4. Contrato `builder_agent`
+
+### Misión
+
+Construir, modificar o mejorar salidas del Builder.
+
+### Entradas
+
+- intención del usuario;
+- contexto de plantilla o proyecto;
+- estado actual del Builder;
+- modo de operación;
+- restricciones de producto;
+- señales de continuidad.
+
+### Herramientas permitidas
+
+- playbooks Builder;
+- mutation registry;
+- code templates;
+- structure registry;
+- output map;
+- sector profiles;
+- policy guards.
+
+### Límites
+
+No debe:
+
+- desplegar por su cuenta;
+- decidir pricing;
+- saltarse créditos;
+- modificar pagos;
+- inventar ownership;
+- ignorar estado actual;
+- reemplazar todo si se pidió una mejora puntual.
+
+### Salida esperada
+
+Debe devolver estructura compatible con Builder:
+
+```text
+intent
+projectKind
+sector
+objective
+tone
+mutations
+previewModelPatch
+codeModelPatch
+structureModelPatch
+assistantMessage
+nextAction
+warnings
+```
+
+---
+
+## 5. Contrato `rescue_sre_agent`
+
+### Misión
+
+Diagnosticar y corregir fallos de arranque, runtime o estabilidad.
+
+### Entradas
+
+- logs;
+- errores;
+- healthchecks;
+- estado de runtime;
+- configuración;
+- diferencias de deploy.
+
+### Herramientas permitidas
+
+- log analysis;
+- env validation;
+- runtime checks;
+- dependency checks.
+
+### Límites
+
+No debe:
+
+- rediseñar producto;
+- tocar UX comercial;
+- decidir pricing;
+- modificar datos de usuario;
+- hacer cambios destructivos sin confirmación.
+
+### Salida esperada
+
+- causa raíz probable;
+- evidencia;
+- corrección mínima segura;
+- validación esperada;
+- rollback si aplica.
+
+---
+
+## 6. Contrato `security_architect_agent`
+
+### Misión
+
+Detectar brechas y endurecer sistema.
+
+### Entradas
+
+- auth;
+- cookies;
+- JWT;
+- permisos;
+- pagos;
+- webhooks;
+- roles;
+- secretos;
+- entorno.
+
+### Herramientas permitidas
+
+- security rules;
+- policy checks;
+- audit patterns;
+- auth flow review.
+
+### Límites
+
+No debe:
+
+- crear features comerciales;
+- redefinir producto;
+- modificar producción sin control;
+- exponer secretos.
+
+### Salida esperada
+
+- hallazgo;
+- severidad;
+- impacto;
+- mitigación;
+- prioridad;
+- prueba de cierre.
+
+---
+
+## 7. Contrato `red_team_agent`
+
+### Misión
+
+Detectar vectores hostiles y superficies de abuso desde una perspectiva defensiva.
+
+### Entradas
+
+- auth;
+- sesiones;
+- pagos;
+- créditos;
+- admin;
+- outputs sensibles;
+- eventos de guards.
+
+### Herramientas permitidas
+
+- policy validator;
+- session audit;
+- abuse patterns;
+- output sampler;
+- consistency checker.
+
+### Límites
+
+No debe:
+
+- ejecutar ataques reales;
+- tocar producción;
+- modificar pagos;
+- desplegar;
+- usar herramientas de escritura sin aprobación.
+
+### Salida esperada
+
+- vector detectado;
+- severidad;
+- superficie afectada;
+- mitigación;
+- necesidad de revisión humana.
+
+---
+
+## 8. Contrato `audit_agent`
+
+### Misión
+
+Detectar fricciones de negocio, claridad, estructura, conversión y monetización.
+
+### Entradas
+
+- idea;
+- URL;
+- proyecto;
+- contenido;
+- señales de usuario.
+
+### Salida esperada
+
+- diagnóstico;
+- fortalezas;
+- debilidades;
+- quick wins;
+- acciones prioritarias;
+- recomendación de continuidad.
+
+---
+
+## 9. Contrato `report_agent`
+
+### Misión
+
+Convertir diagnóstico en informe estructurado y accionable.
+
+### Salida esperada
+
+- resumen ejecutivo;
+- diagnóstico principal;
+- lectura por dimensiones;
+- prioridades;
+- acción inmediata;
+- continuidad recomendada.
+
+---
+
+## 10. Contrato `system_architect_agent`
+
+### Misión
+
+Convertir una intención en arquitectura de proyecto.
+
+### Salida esperada
+
+- módulos;
+- entidades;
+- rutas;
+- servicios;
+- estructura;
+- dependencias;
+- riesgos;
+- siguiente paso técnico.
+
+---
+
+## 11. Contrato `deploy_agent`
+
+### Misión
+
+Validar despliegue y runtime.
+
+### Salida esperada
+
+- ruta canónica de deploy;
+- variables requeridas;
+- healthcheck;
+- build;
+- runtime;
+- fallos probables;
+- corrección mínima.
+
+---
+
+## 12. Contrato `algorithmic_auditor_agent`
+
+### Misión
+
+Auditar decisiones algorítmicas, scoring y consistencia.
+
+### Salida esperada
+
+- inconsistencia detectada;
+- regla afectada;
+- impacto;
+- recomendación;
+- test o caso de validación.
+
+---
+
+## 13. Relación con guards
+
+Todo agente sensible debe pasar por guards.
+
+Especialmente:
+
+- pagos;
+- auth;
+- créditos;
+- Builder;
+- exportación;
+- deploy;
+- outputs técnicos.
+
+---
+
+## 14. Relación con créditos
+
+Un agente puede recomendar una acción.
+
+No puede autorizar coste por sí mismo.
+
+Toda acción intensiva debe pasar por:
+
+```text
+Consumption Engine
+```
+
+---
+
+## 15. Veredicto operativo
+
+Un agente válido tiene una misión estrecha, una salida verificable y límites claros.
+
+Si no se puede auditar, no está listo para producción.
