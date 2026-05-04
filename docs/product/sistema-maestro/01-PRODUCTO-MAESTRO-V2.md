@@ -1,8 +1,8 @@
-\# 01 — Producto Maestro V2
+# 01 — Producto Maestro V2
 
 
 
-\## 1. Definición del producto
+## 1. Definición del producto
 
 
 
@@ -38,11 +38,11 @@ Cuando proceda, también vende salida profesional mediante exportación, transfe
 
 
 
-\---
+---
 
 
 
-\## 2. Punto de partida real
+## 2. Punto de partida real
 
 
 
@@ -50,33 +50,33 @@ La versión ya operativa del sistema dispone de una base funcional de producto:
 
 
 
-\- análisis inicial;
+- análisis inicial;
 
-\- diagnóstico visible;
+- diagnóstico visible;
 
-\- preguntas de afinado;
+- preguntas de afinado;
 
-\- recomendación de plan;
+- recomendación de plan;
 
-\- facturación contextual;
+- facturación contextual;
 
-\- blueprint;
+- blueprint;
 
-\- flujo estabilizado de análisis y resultado;
+- flujo estabilizado de análisis y resultado;
 
-\- Home;
+- Home;
 
-\- Dashboard;
+- Dashboard;
 
-\- App Shell;
+- App Shell;
 
-\- Builder;
+- Builder;
 
-\- backend canónico;
+- backend canónico;
 
-\- capa de créditos estructural;
+- capa de créditos estructural;
 
-\- documentación canónica en reconducción avanzada.
+- documentación canónica en reconducción avanzada.
 
 
 
@@ -88,7 +88,7 @@ Está en fase de evolución estructural hacia un producto superior.
 
 
 
-\### Lectura actual
+### Lectura actual
 
 
 
@@ -100,11 +100,11 @@ La siguiente etapa crítica es que construya de forma visible, acumulativa y ver
 
 
 
-\---
+---
 
 
 
-\## 3. Problema que debe resolver la siguiente etapa
+## 3. Problema que debe resolver la siguiente etapa
 
 
 
@@ -120,19 +120,19 @@ Pero el punto crítico del producto es cerrar completamente el puente entre:
 
 
 
-\- entender;
+- entender;
 
-\- activar;
+- activar;
 
-\- construir;
+- construir;
 
-\- mostrar;
+- mostrar;
 
-\- iterar;
+- iterar;
 
-\- monetizar;
+- monetizar;
 
-\- exportar o desplegar cuando proceda.
+- exportar o desplegar cuando proceda.
 
 
 
@@ -140,7 +140,7 @@ Ese puente es la siguiente capa crítica del producto.
 
 
 
-\### Riesgo principal
+### Riesgo principal
 
 
 
@@ -152,19 +152,19 @@ Eso afecta a:
 
 
 
-\- valor percibido;
+- valor percibido;
 
-\- confianza;
+- confianza;
 
-\- reputación;
+- reputación;
 
-\- conversión;
+- conversión;
 
-\- uso de créditos;
+- uso de créditos;
 
-\- futura exportación;
+- futura exportación;
 
-\- futura promesa de deploy.
+- futura promesa de deploy.
 
 
 
@@ -176,15 +176,15 @@ Es estructural.
 
 
 
-\---
+---
 
 
 
-\## 4. Entradas principales del sistema
+## 4. Entradas principales del sistema
 
 
 
-\## 4.1 Entrada A — URL existente
+## 4.1 Entrada A — URL existente
 
 
 
@@ -192,45 +192,45 @@ El usuario introduce una URL para analizar, rediseñar, elevar o reestructurar u
 
 
 
-\### Objetivos
+### Objetivos
 
 
 
-\- detectar fricciones visibles y comerciales;
+- detectar fricciones visibles y comerciales;
 
-\- encontrar oportunidades de mejora;
+- encontrar oportunidades de mejora;
 
-\- proponer una nueva estructura;
+- proponer una nueva estructura;
 
-\- activar una reconstrucción o mejora vendible;
+- activar una reconstrucción o mejora vendible;
 
-\- preparar una posible construcción visible;
+- preparar una posible construcción visible;
 
-\- preparar continuidad, exportación o propuesta externa cuando proceda.
-
-
-
-\### Casos de uso
+- preparar continuidad, exportación o propuesta externa cuando proceda.
 
 
 
-\- negocio propio;
-
-\- negocio de un cliente;
-
-\- modo operador / consultor / agencia;
-
-\- rediseño de activos existentes para vender una propuesta;
-
-\- mejora de conversión;
-
-\- diagnóstico comercial;
-
-\- reconstrucción de landing, web o app.
+### Casos de uso
 
 
 
-\### Valor esperado
+- negocio propio;
+
+- negocio de un cliente;
+
+- modo operador / consultor / agencia;
+
+- rediseño de activos existentes para vender una propuesta;
+
+- mejora de conversión;
+
+- diagnóstico comercial;
+
+- reconstrucción de landing, web o app.
+
+
+
+### Valor esperado
 
 
 
@@ -238,23 +238,23 @@ El usuario debe sentir:
 
 
 
-\- que el sistema entiende lo que falla;
+- que el sistema entiende lo que falla;
 
-\- que detecta potencial real;
+- que detecta potencial real;
 
-\- que puede convertir esa lectura en una propuesta accionable;
+- que puede convertir esa lectura en una propuesta accionable;
 
-\- que puede construir una nueva base;
+- que puede construir una nueva base;
 
-\- que puede continuar dentro del sistema o preparar salida profesional.
-
-
-
-\---
+- que puede continuar dentro del sistema o preparar salida profesional.
 
 
 
-\## 4.2 Entrada B — Idea a proyecto
+---
+
+
+
+## 4.2 Entrada B — Idea a proyecto
 
 
 
@@ -262,43 +262,43 @@ El usuario introduce una idea, necesidad o problema y el sistema la convierte en
 
 
 
-\### Objetivos
+### Objetivos
 
 
 
-\- reducir niebla mental;
+- reducir niebla mental;
 
-\- ordenar la idea;
+- ordenar la idea;
 
-\- convertirla en estructura;
+- convertirla en estructura;
 
-\- preparar activación;
+- preparar activación;
 
-\- preparar construcción visible;
+- preparar construcción visible;
 
-\- definir siguiente decisión;
+- definir siguiente decisión;
 
-\- conectar con Builder, créditos y continuidad.
-
-
-
-\### Casos de uso
+- conectar con Builder, créditos y continuidad.
 
 
 
-\- usuario no técnico con idea;
-
-\- usuario técnico que quiere acelerar;
-
-\- operador que quiere prototipar rápido;
-
-\- creación de web, herramienta, landing o producto digital desde cero;
-
-\- generación de estructura de proyecto desde prompt experto.
+### Casos de uso
 
 
 
-\### Valor esperado
+- usuario no técnico con idea;
+
+- usuario técnico que quiere acelerar;
+
+- operador que quiere prototipar rápido;
+
+- creación de web, herramienta, landing o producto digital desde cero;
+
+- generación de estructura de proyecto desde prompt experto.
+
+
+
+### Valor esperado
 
 
 
@@ -306,21 +306,21 @@ El usuario debe sentir:
 
 
 
-\- que su idea deja de ser humo;
+- que su idea deja de ser humo;
 
-\- que existe una vía concreta;
+- que existe una vía concreta;
 
-\- que el sistema no solo analiza;
+- que el sistema no solo analiza;
 
-\- que empieza a preparar o construir una base real.
-
-
-
-\---
+- que empieza a preparar o construir una base real.
 
 
 
-\## 4.3 Entrada C — Prompt experto
+---
+
+
+
+## 4.3 Entrada C — Prompt experto
 
 
 
@@ -328,27 +328,27 @@ El usuario introduce un prompt avanzado para crear una aplicación, estructura t
 
 
 
-\### Objetivos
+### Objetivos
 
 
 
-\- interpretar intención técnica;
+- interpretar intención técnica;
 
-\- clasificar tipo de proyecto;
+- clasificar tipo de proyecto;
 
-\- generar estructura de carpetas;
+- generar estructura de carpetas;
 
-\- proponer páginas, componentes y rutas;
+- proponer páginas, componentes y rutas;
 
-\- preparar código coherente;
+- preparar código coherente;
 
-\- mostrar preview cuando aplique;
+- mostrar preview cuando aplique;
 
-\- preparar continuidad, exportación o deploy futuro.
+- preparar continuidad, exportación o deploy futuro.
 
 
 
-\### Valor esperado
+### Valor esperado
 
 
 
@@ -356,23 +356,23 @@ El usuario técnico debe sentir:
 
 
 
-\- aceleración;
+- aceleración;
 
-\- estructura;
+- estructura;
 
-\- control;
+- control;
 
-\- capacidad de convertir un prompt en una base seria;
+- capacidad de convertir un prompt en una base seria;
 
-\- posibilidad de sacar el proyecto o seguir iterando dentro del sistema.
-
-
-
-\---
+- posibilidad de sacar el proyecto o seguir iterando dentro del sistema.
 
 
 
-\## 5. Capa superior del producto
+---
+
+
+
+## 5. Capa superior del producto
 
 
 
@@ -384,23 +384,23 @@ Es la unión de estas piezas:
 
 
 
-1\. Diagnóstico.
+1. Diagnóstico.
 
-2\. Activación.
+2. Activación.
 
-3\. Builder visible.
+3. Builder visible.
 
-4\. Estado vivo de construcción.
+4. Estado vivo de construcción.
 
-5\. Preview, código y estructura sincronizados.
+5. Preview, código y estructura sincronizados.
 
-6\. Continuidad interna.
+6. Continuidad interna.
 
-7\. Créditos para acciones intensivas.
+7. Créditos para acciones intensivas.
 
-8\. Exportación / transferencia.
+8. Exportación / transferencia.
 
-9\. Deployment cuando proceda.
+9. Deployment cuando proceda.
 
 
 
@@ -416,11 +416,11 @@ Debe crecer como secuencia lógica.
 
 
 
-\---
+---
 
 
 
-\## 6. Qué transforma realmente el sistema
+## 6. Qué transforma realmente el sistema
 
 
 
@@ -428,23 +428,23 @@ Sistema Maestro debe transformar:
 
 
 
-\- confusión en claridad;
+- confusión en claridad;
 
-\- idea en estructura;
+- idea en estructura;
 
-\- URL en oportunidad de rediseño;
+- URL en oportunidad de rediseño;
 
-\- análisis en activación;
+- análisis en activación;
 
-\- blueprint en construcción visible;
+- blueprint en construcción visible;
 
-\- prompt en estructura;
+- prompt en estructura;
 
-\- input en BuilderBuildState;
+- input en BuilderBuildState;
 
-\- BuilderBuildState en preview, código y estructura;
+- BuilderBuildState en preview, código y estructura;
 
-\- proyecto interno en activo evolutivo o exportable.
+- proyecto interno en activo evolutivo o exportable.
 
 
 
@@ -456,11 +456,11 @@ No solo declarativa.
 
 
 
-\---
+---
 
 
 
-\## 7. Secuencia maestra del producto
+## 7. Secuencia maestra del producto
 
 
 
@@ -492,7 +492,7 @@ entrada
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -504,11 +504,11 @@ Ninguna capa debe prometer lo que la siguiente todavía no puede sostener.
 
 
 
-\---
+---
 
 
 
-\## 8. Builder como núcleo de valor percibido
+## 8. Builder como núcleo de valor percibido
 
 
 
@@ -532,25 +532,25 @@ Debe ser el lugar donde el usuario ve que el sistema:
 
 
 
-\- interpreta;
+- interpreta;
 
-\- decide;
+- decide;
 
-\- construye;
+- construye;
 
-\- modifica;
+- modifica;
 
-\- genera;
+- genera;
 
-\- muestra;
+- muestra;
 
-\- propone;
+- propone;
 
-\- evoluciona.
+- evoluciona.
 
 
 
-\### Regla antisimulación
+### Regla antisimulación
 
 
 
@@ -558,17 +558,17 @@ El Builder no puede limitarse a:
 
 
 
-\- mensajes del agente;
+- mensajes del agente;
 
-\- progreso visual;
+- progreso visual;
 
-\- código animado sin conexión;
+- código animado sin conexión;
 
-\- preview fija;
+- preview fija;
 
-\- estructura estática;
+- estructura estática;
 
-\- preguntas repetidas.
+- preguntas repetidas.
 
 
 
@@ -576,29 +576,29 @@ Una acción válida debe producir al menos uno de estos efectos:
 
 
 
-\- estado vivo actualizado;
+- estado vivo actualizado;
 
-\- preview modificada;
+- preview modificada;
 
-\- código modificado;
+- código modificado;
 
-\- estructura modificada;
+- estructura modificada;
 
-\- CTA modificado;
+- CTA modificado;
 
-\- bloque nuevo;
+- bloque nuevo;
 
-\- archivo nuevo;
+- archivo nuevo;
 
-\- siguiente decisión contextual distinta.
-
-
-
-\---
+- siguiente decisión contextual distinta.
 
 
 
-\## 9. Piedra angular técnica del producto visible
+---
+
+
+
+## 9. Piedra angular técnica del producto visible
 
 
 
@@ -618,7 +618,7 @@ BuilderBuildState
 
 
 
-\### Función
+### Función
 
 
 
@@ -634,7 +634,7 @@ La experiencia visible debe salir de ese estado vivo.
 
 
 
-\### Contrato de producto
+### Contrato de producto
 
 
 
@@ -660,7 +660,7 @@ input usuario
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -684,15 +684,15 @@ Después UI visual del agente.
 
 
 
-\---
+---
 
 
 
-\## 10. Modalidades de valor del sistema
+## 10. Modalidades de valor del sistema
 
 
 
-\## 10.1 Valor dentro del sistema
+## 10.1 Valor dentro del sistema
 
 
 
@@ -700,33 +700,33 @@ El usuario trabaja dentro de la aplicación y obtiene:
 
 
 
-\- análisis;
+- análisis;
 
-\- activación;
+- activación;
 
-\- agentes;
+- agentes;
 
-\- construcción visible;
+- construcción visible;
 
-\- continuidad;
+- continuidad;
 
-\- iteración;
+- iteración;
 
-\- mejoras progresivas;
+- mejoras progresivas;
 
-\- uso de créditos para acciones intensivas;
+- uso de créditos para acciones intensivas;
 
-\- evolución del proyecto dentro del ecosistema;
+- evolución del proyecto dentro del ecosistema;
 
-\- historial;
+- historial;
 
-\- siguientes decisiones;
+- siguientes decisiones;
 
-\- posibilidad de exportación futura.
+- posibilidad de exportación futura.
 
 
 
-\### Principio
+### Principio
 
 
 
@@ -738,11 +738,11 @@ El usuario debe sentir que seguir dentro le da potencia, continuidad y control.
 
 
 
-\---
+---
 
 
 
-\## 10.2 Valor fuera del sistema
+## 10.2 Valor fuera del sistema
 
 
 
@@ -750,23 +750,23 @@ Cuando el usuario quiere sacar el proyecto fuera del entorno del sistema, entra 
 
 
 
-\- exportación;
+- exportación;
 
-\- empaquetado;
+- empaquetado;
 
-\- preparación de salida;
+- preparación de salida;
 
-\- transferencia;
+- transferencia;
 
-\- entrega del activo;
+- entrega del activo;
 
-\- posible conexión con GitHub;
+- posible conexión con GitHub;
 
-\- posible despliegue.
+- posible despliegue.
 
 
 
-\### Principio
+### Principio
 
 
 
@@ -778,7 +778,7 @@ Debe tratarse como una acción premium y operativa con valoración propia.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -790,23 +790,23 @@ La salida profesional exige:
 
 
 
-\- estado vivo;
+- estado vivo;
 
-\- código coherente;
+- código coherente;
 
-\- estructura coherente;
+- estructura coherente;
 
-\- valoración;
+- valoración;
 
-\- proceso de entrega.
-
-
-
-\---
+- proceso de entrega.
 
 
 
-\## 11. Principio de monetización estructural
+---
+
+
+
+## 11. Principio de monetización estructural
 
 
 
@@ -814,15 +814,15 @@ Sistema Maestro debe sostenerse sobre tres motores de monetización:
 
 
 
-1\. Suscripción.
+1. Suscripción.
 
-2\. Créditos.
+2. Créditos.
 
-3\. Exportación / transferencia.
+3. Exportación / transferencia.
 
 
 
-\## 11.1 Suscripción
+## 11.1 Suscripción
 
 
 
@@ -830,7 +830,7 @@ La suscripción da acceso al sistema, a un nivel de intervención y a una base d
 
 
 
-\## 11.2 Créditos
+## 11.2 Créditos
 
 
 
@@ -838,7 +838,7 @@ Los créditos financian construcción, acciones intensivas, uso de agentes, iter
 
 
 
-\## 11.3 Exportación / transferencia
+## 11.3 Exportación / transferencia
 
 
 
@@ -846,7 +846,7 @@ La exportación se cobra aparte cuando el usuario decide sacar el proyecto del s
 
 
 
-\### Regla madre
+### Regla madre
 
 
 
@@ -862,7 +862,7 @@ exportación = salida profesional
 
 
 
-\### Protección reputacional
+### Protección reputacional
 
 
 
@@ -874,11 +874,11 @@ No se cobra por una acción que no produzca salida real, visible o técnicamente
 
 
 
-\---
+---
 
 
 
-\## 12. Política de exportación
+## 12. Política de exportación
 
 
 
@@ -890,41 +890,41 @@ Debe presentarse como un servicio claro y profesional de liberación y transfere
 
 
 
-\### Regla
+### Regla
 
 
 
-\- permanecer dentro del sistema es una modalidad válida;
+- permanecer dentro del sistema es una modalidad válida;
 
-\- sacar el proyecto fuera también es posible;
+- sacar el proyecto fuera también es posible;
 
-\- la salida requiere valoración y precio claro.
-
-
-
-\### Principios
+- la salida requiere valoración y precio claro.
 
 
 
-\- facilidad;
-
-\- transparencia;
-
-\- precio claro;
-
-\- proceso limpio;
-
-\- sin fricción artificial;
-
-\- sin sensación de bloqueo opaco;
-
-\- sin regalar una operación premium;
-
-\- sin exportar estructura incoherente.
+### Principios
 
 
 
-\### Narrativa correcta
+- facilidad;
+
+- transparencia;
+
+- precio claro;
+
+- proceso limpio;
+
+- sin fricción artificial;
+
+- sin sensación de bloqueo opaco;
+
+- sin regalar una operación premium;
+
+- sin exportar estructura incoherente.
+
+
+
+### Narrativa correcta
 
 
 
@@ -940,11 +940,11 @@ Si el usuario quiere salida, se la facilita mediante una capa de exportación y 
 
 
 
-\---
+---
 
 
 
-\## 13. Tipos de salida futura
+## 13. Tipos de salida futura
 
 
 
@@ -952,17 +952,17 @@ La arquitectura debe prever, como mínimo, varios niveles de salida:
 
 
 
-\- exportación básica;
+- exportación básica;
 
-\- transferencia estándar;
+- transferencia estándar;
 
-\- salida avanzada con mayor complejidad;
+- salida avanzada con mayor complejidad;
 
-\- preparación de repositorio;
+- preparación de repositorio;
 
-\- despliegue asistido;
+- despliegue asistido;
 
-\- integración futura con GitHub.
+- integración futura con GitHub.
 
 
 
@@ -970,7 +970,7 @@ Los niveles exactos, criterios y precios cerrados se definirán en el documento 
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -978,11 +978,11 @@ La salida debe depender de la complejidad real del proyecto y de la coherencia e
 
 
 
-\---
+---
 
 
 
-\## 14. Papel del modo operador
+## 14. Papel del modo operador
 
 
 
@@ -994,25 +994,25 @@ También debe servir para usuarios que trabajan sobre activos de terceros.
 
 
 
-\### Ejemplo
+### Ejemplo
 
 
 
-\- detectar una web mejorable;
+- detectar una web mejorable;
 
-\- analizar la URL;
+- analizar la URL;
 
-\- proponer una estructura superior;
+- proponer una estructura superior;
 
-\- construir una nueva base;
+- construir una nueva base;
 
-\- vender esa mejora a un tercero;
+- vender esa mejora a un tercero;
 
-\- continuar dentro del sistema;
+- continuar dentro del sistema;
 
-\- exportar el resultado;
+- exportar el resultado;
 
-\- preparar una entrega o propuesta.
+- preparar una entrega o propuesta.
 
 
 
@@ -1020,7 +1020,7 @@ Esto convierte a Sistema Maestro en una herramienta de producción, venta y tran
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1050,11 +1050,11 @@ preview/código/estructura
 
 
 
-\---
+---
 
 
 
-\## 15. Dirección correcta del producto
+## 15. Dirección correcta del producto
 
 
 
@@ -1086,29 +1086,29 @@ Esa arquitectura maestra debe gobernar:
 
 
 
-\- pricing;
+- pricing;
 
-\- billing;
+- billing;
 
-\- Builder;
+- Builder;
 
-\- créditos;
+- créditos;
 
-\- exportación;
+- exportación;
 
-\- despliegue;
+- despliegue;
 
-\- experiencia visible;
+- experiencia visible;
 
-\- contratos técnicos;
+- contratos técnicos;
 
-\- roadmap;
+- roadmap;
 
-\- documentación canónica.
+- documentación canónica.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1116,15 +1116,15 @@ No se aprueban módulos nuevos que no sepan dónde encajan dentro de esa secuenc
 
 
 
-\---
+---
 
 
 
-\## 16. Relación entre Home, Dashboard, App Shell y Builder
+## 16. Relación entre Home, Dashboard, App Shell y Builder
 
 
 
-\## 16.1 Home
+## 16.1 Home
 
 
 
@@ -1136,7 +1136,7 @@ No debe absorber lógica interna del Builder.
 
 
 
-\## 16.2 Dashboard
+## 16.2 Dashboard
 
 
 
@@ -1144,21 +1144,21 @@ Dashboard debe activar al usuario y conducirlo hacia:
 
 
 
-\- proyectos;
+- proyectos;
 
-\- Builder;
+- Builder;
 
-\- créditos;
+- créditos;
 
-\- informes;
+- informes;
 
-\- oportunidades;
+- oportunidades;
 
-\- continuidad.
+- continuidad.
 
 
 
-\## 16.3 App Shell
+## 16.3 App Shell
 
 
 
@@ -1166,7 +1166,7 @@ App Shell debe ordenar navegación, módulos, estados y sensación premium inter
 
 
 
-\## 16.4 Builder
+## 16.4 Builder
 
 
 
@@ -1178,7 +1178,7 @@ Debe ser el centro visible de valor operativo.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1210,11 +1210,11 @@ Ninguna capa debe prometer lo que otra no soporta.
 
 
 
-\---
+---
 
 
 
-\## 17. Relación con IA
+## 17. Relación con IA
 
 
 
@@ -1226,31 +1226,31 @@ Debe:
 
 
 
-\- interpretar intención;
+- interpretar intención;
 
-\- clasificar tipo de proyecto;
+- clasificar tipo de proyecto;
 
-\- detectar sector;
+- detectar sector;
 
-\- identificar objetivo;
+- identificar objetivo;
 
-\- decidir flujo;
+- decidir flujo;
 
-\- coordinar agentes;
+- coordinar agentes;
 
-\- normalizar salida;
+- normalizar salida;
 
-\- reducir alucinaciones;
+- reducir alucinaciones;
 
-\- proponer siguientes decisiones;
+- proponer siguientes decisiones;
 
-\- alimentar el BuilderBuildKernel;
+- alimentar el BuilderBuildKernel;
 
-\- evitar respuestas repetidas.
+- evitar respuestas repetidas.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1262,11 +1262,11 @@ Debe producir contexto útil para construir.
 
 
 
-\---
+---
 
 
 
-\## 18. Relación con Backend
+## 18. Relación con Backend
 
 
 
@@ -1274,31 +1274,31 @@ Backend debe sostener:
 
 
 
-\- auth;
+- auth;
 
-\- proyectos;
+- proyectos;
 
-\- pagos;
+- pagos;
 
-\- créditos;
+- créditos;
 
-\- persistencia;
+- persistencia;
 
-\- informes;
+- informes;
 
-\- consumo;
+- consumo;
 
-\- futura continuidad avanzada;
+- futura continuidad avanzada;
 
-\- futura exportación;
+- futura exportación;
 
-\- futuro despliegue;
+- futuro despliegue;
 
-\- futura persistencia del BuilderState.
+- futura persistencia del BuilderState.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1306,11 +1306,11 @@ La primera fase del estado vivo puede empezar en frontend, pero toda acción que
 
 
 
-\---
+---
 
 
 
-\## 19. Regla de diseño de producto
+## 19. Regla de diseño de producto
 
 
 
@@ -1318,7 +1318,7 @@ Toda mejora futura debe responder a una de estas preguntas:
 
 
 
-\### A
+### A
 
 
 
@@ -1326,7 +1326,7 @@ Toda mejora futura debe responder a una de estas preguntas:
 
 
 
-\### B
+### B
 
 
 
@@ -1334,7 +1334,7 @@ Toda mejora futura debe responder a una de estas preguntas:
 
 
 
-\### C
+### C
 
 
 
@@ -1342,7 +1342,7 @@ Toda mejora futura debe responder a una de estas preguntas:
 
 
 
-\### D
+### D
 
 
 
@@ -1354,11 +1354,11 @@ Si no mejora una de esas capas, no debe priorizarse.
 
 
 
-\---
+---
 
 
 
-\## 20. Riesgos que el producto debe evitar
+## 20. Riesgos que el producto debe evitar
 
 
 
@@ -1366,39 +1366,39 @@ Sistema Maestro debe evitar:
 
 
 
-\- parecer una IA de informes;
+- parecer una IA de informes;
 
-\- prometer construcción sin construir;
+- prometer construcción sin construir;
 
-\- consumir créditos sin salida;
+- consumir créditos sin salida;
 
-\- exportar sin estructura;
+- exportar sin estructura;
 
-\- desplegar sin coherencia técnica;
+- desplegar sin coherencia técnica;
 
-\- duplicar Builders;
+- duplicar Builders;
 
-\- crear rutas paralelas;
+- crear rutas paralelas;
 
-\- mezclar Home con lógica interna;
+- mezclar Home con lógica interna;
 
-\- hacer del agente un elemento decorativo;
+- hacer del agente un elemento decorativo;
 
-\- repetir preguntas genéricas;
+- repetir preguntas genéricas;
 
-\- tratar Builder como pantalla aislada;
+- tratar Builder como pantalla aislada;
 
-\- usar el chat como memoria canónica;
+- usar el chat como memoria canónica;
 
-\- crecer por impulsos visuales.
-
-
-
-\---
+- crecer por impulsos visuales.
 
 
 
-\## 21. Criterio de producto Sistema Maestro Gold
+---
+
+
+
+## 21. Criterio de producto Sistema Maestro Gold
 
 
 
@@ -1418,23 +1418,23 @@ produce:
 
 
 
-\- interpretación clara;
+- interpretación clara;
 
-\- activación adecuada;
+- activación adecuada;
 
-\- BuilderBuildState actualizado;
+- BuilderBuildState actualizado;
 
-\- preview con bloques reales;
+- preview con bloques reales;
 
-\- código coherente;
+- código coherente;
 
-\- estructura coherente;
+- estructura coherente;
 
-\- siguientes decisiones útiles;
+- siguientes decisiones útiles;
 
-\- coste claro si aplica;
+- coste claro si aplica;
 
-\- continuidad posible.
+- continuidad posible.
 
 
 
@@ -1454,23 +1454,23 @@ produce:
 
 
 
-\- estructura frontend/backend;
+- estructura frontend/backend;
 
-\- páginas, rutas y componentes;
+- páginas, rutas y componentes;
 
-\- preview coherente con la app;
+- preview coherente con la app;
 
-\- código alineado con la estructura;
+- código alineado con la estructura;
 
-\- siguientes decisiones técnicas no repetidas.
-
-
-
-\---
+- siguientes decisiones técnicas no repetidas.
 
 
 
-\## 22. Cierre doctrinal de esta pieza
+---
+
+
+
+## 22. Cierre doctrinal de esta pieza
 
 
 
@@ -1478,21 +1478,21 @@ Sistema Maestro V2 debe entenderse como:
 
 
 
-\- plataforma de entrada por idea, URL o prompt;
+- plataforma de entrada por idea, URL o prompt;
 
-\- sistema de diagnóstico real;
+- sistema de diagnóstico real;
 
-\- capa de activación productizada;
+- capa de activación productizada;
 
-\- entorno de construcción visible;
+- entorno de construcción visible;
 
-\- sistema vivo basado en estado;
+- sistema vivo basado en estado;
 
-\- producto de continuidad;
+- producto de continuidad;
 
-\- herramienta de transformación para usuarios propios y operadores;
+- herramienta de transformación para usuarios propios y operadores;
 
-\- plataforma con salida profesional valorada por separado.
+- plataforma con salida profesional valorada por separado.
 
 
 
@@ -1504,17 +1504,17 @@ Los documentos derivados desarrollan:
 
 
 
-\- Activación;
+- Activación;
 
-\- economía de créditos;
+- economía de créditos;
 
-\- experiencia del constructor visible;
+- experiencia del constructor visible;
 
-\- contratos técnicos;
+- contratos técnicos;
 
-\- roadmap de implementación;
+- roadmap de implementación;
 
-\- procedimientos operativos.
+- procedimientos operativos.
 
 
 
@@ -1541,4 +1541,3 @@ diagnóstico
 
 
 No se aprueba volver a tratar Sistema Maestro como una suma de pantallas, informes o respuestas aisladas.
-

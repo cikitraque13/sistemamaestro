@@ -1,8 +1,8 @@
-\# 03 — Créditos y Economía
+# 03 — Créditos y Economía
 
 
 
-\## 1. Función de esta pieza
+## 1. Función de esta pieza
 
 
 
@@ -26,11 +26,11 @@ Debe ser clara, escalable, trazable y coherente con la arquitectura del producto
 
 
 
-\---
+---
 
 
 
-\## 2. Principio económico general
+## 2. Principio económico general
 
 
 
@@ -38,15 +38,15 @@ Sistema Maestro debe sostenerse sobre tres motores de monetización complementar
 
 
 
-1\. Suscripción.
+1. Suscripción.
 
-2\. Créditos.
+2. Créditos.
 
-3\. Exportación / transferencia.
+3. Exportación / transferencia.
 
 
 
-\## 2.1 Suscripción
+## 2.1 Suscripción
 
 
 
@@ -54,7 +54,7 @@ La suscripción da acceso al sistema, al nivel de intervención y a una base de 
 
 
 
-\## 2.2 Créditos
+## 2.2 Créditos
 
 
 
@@ -62,23 +62,23 @@ Los créditos financian acciones intensivas del sistema:
 
 
 
-\- construcción;
+- construcción;
 
-\- iteración;
+- iteración;
 
-\- uso de agentes;
+- uso de agentes;
 
-\- regeneraciones;
+- regeneraciones;
 
-\- operaciones premium;
+- operaciones premium;
 
-\- generación avanzada;
+- generación avanzada;
 
-\- despliegues u otras acciones de mayor coste.
+- despliegues u otras acciones de mayor coste.
 
 
 
-\## 2.3 Exportación / transferencia
+## 2.3 Exportación / transferencia
 
 
 
@@ -86,7 +86,7 @@ La salida del proyecto fuera del sistema se cobra aparte como acción premium y 
 
 
 
-\### Regla madre
+### Regla madre
 
 
 
@@ -102,11 +102,11 @@ exportación = salida profesional del proyecto
 
 
 
-\---
+---
 
 
 
-\## 3. Qué problema resuelven los créditos
+## 3. Qué problema resuelven los créditos
 
 
 
@@ -118,19 +118,19 @@ Sin economía de créditos, el sistema corre estos riesgos:
 
 
 
-\- consumo descontrolado;
+- consumo descontrolado;
 
-\- producto difícil de sostener;
+- producto difícil de sostener;
 
-\- fricción económica oculta;
+- fricción económica oculta;
 
-\- pricing poco profesional;
+- pricing poco profesional;
 
-\- degradación de experiencia para todos;
+- degradación de experiencia para todos;
 
-\- coste de IA no gobernado;
+- coste de IA no gobernado;
 
-\- mala reputación si se promete construcción sin entrega real.
+- mala reputación si se promete construcción sin entrega real.
 
 
 
@@ -138,11 +138,11 @@ Los créditos existen para resolver ese problema de forma limpia.
 
 
 
-\---
+---
 
 
 
-\## 4. Qué no deben ser los créditos
+## 4. Qué no deben ser los créditos
 
 
 
@@ -150,19 +150,19 @@ Los créditos no deben sentirse como:
 
 
 
-\- castigo;
+- castigo;
 
-\- trampa;
+- trampa;
 
-\- fricción opaca;
+- fricción opaca;
 
-\- bloqueo arbitrario;
+- bloqueo arbitrario;
 
-\- sustituto confuso de la suscripción;
+- sustituto confuso de la suscripción;
 
-\- peaje por acciones decorativas;
+- peaje por acciones decorativas;
 
-\- cobro por simulaciones.
+- cobro por simulaciones.
 
 
 
@@ -170,37 +170,37 @@ Los créditos deben sentirse como:
 
 
 
-\- unidad operativa clara;
+- unidad operativa clara;
 
-\- medida visible de consumo intensivo;
+- medida visible de consumo intensivo;
 
-\- palanca de continuidad;
+- palanca de continuidad;
 
-\- mecanismo profesional de uso avanzado;
+- mecanismo profesional de uso avanzado;
 
-\- forma transparente de sostener construcción real;
+- forma transparente de sostener construcción real;
 
-\- modo de financiar acciones con salida verificable.
-
-
-
-\---
+- modo de financiar acciones con salida verificable.
 
 
 
-\## 5. Regla estructural principal
+---
 
 
 
-\### La suscripción da acceso al sistema.
+## 5. Regla estructural principal
 
 
 
-\### Los créditos financian construcción y operaciones intensivas.
+### La suscripción da acceso al sistema.
 
 
 
-\### La exportación se cobra aparte.
+### Los créditos financian construcción y operaciones intensivas.
+
+
+
+### La exportación se cobra aparte.
 
 
 
@@ -208,7 +208,7 @@ Esta regla debe gobernar toda la monetización futura.
 
 
 
-\### Regla de protección reputacional
+### Regla de protección reputacional
 
 
 
@@ -220,11 +220,11 @@ No se monetiza una simulación.
 
 
 
-\---
+---
 
 
 
-\## 6. Qué debe entrar en suscripción
+## 6. Qué debe entrar en suscripción
 
 
 
@@ -232,29 +232,29 @@ La suscripción debe cubrir:
 
 
 
-\- acceso al sistema;
+- acceso al sistema;
 
-\- análisis;
+- análisis;
 
-\- diagnóstico;
+- diagnóstico;
 
-\- afinado;
+- afinado;
 
-\- blueprint según nivel;
+- blueprint según nivel;
 
-\- activación según plan;
+- activación según plan;
 
-\- continuidad básica o avanzada según plan;
+- continuidad básica o avanzada según plan;
 
-\- una bolsa inicial de créditos según plan;
+- una bolsa inicial de créditos según plan;
 
-\- acceso al Builder según plan;
+- acceso al Builder según plan;
 
-\- lectura y gestión del proyecto dentro del sistema.
+- lectura y gestión del proyecto dentro del sistema.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -270,11 +270,11 @@ Los créditos gobiernan el uso intensivo.
 
 
 
-\---
+---
 
 
 
-\## 7. Qué debe entrar en créditos
+## 7. Qué debe entrar en créditos
 
 
 
@@ -282,39 +282,39 @@ Los créditos deben aplicarse a acciones que consumen recursos y generan coste o
 
 
 
-\### Ejemplos de acciones candidatas
+### Ejemplos de acciones candidatas
 
 
 
-\- construir una primera versión visible;
+- construir una primera versión visible;
 
-\- regenerar módulos;
+- regenerar módulos;
 
-\- iterar pantallas;
+- iterar pantallas;
 
-\- ejecutar mejoras complejas;
+- ejecutar mejoras complejas;
 
-\- correr agentes de construcción;
+- correr agentes de construcción;
 
-\- rehacer partes del proyecto;
+- rehacer partes del proyecto;
 
-\- lanzar operaciones premium;
+- lanzar operaciones premium;
 
-\- preparar despliegues;
+- preparar despliegues;
 
-\- acciones avanzadas de continuidad;
+- acciones avanzadas de continuidad;
 
-\- generación intensiva de estructuras o componentes;
+- generación intensiva de estructuras o componentes;
 
-\- generación de código avanzado;
+- generación de código avanzado;
 
-\- preparación técnica de exportación;
+- preparación técnica de exportación;
 
-\- uso intensivo del Builder sobre varias iteraciones.
+- uso intensivo del Builder sobre varias iteraciones.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -326,7 +326,7 @@ Solo lo intensivo.
 
 
 
-\### Regla vinculada al Builder
+### Regla vinculada al Builder
 
 
 
@@ -334,33 +334,33 @@ Una acción candidata a consumir créditos debe poder mapearse, cuando aplique, 
 
 
 
-\- `BuilderMutation`;
+- `BuilderMutation`;
 
-\- `BuilderBuildState`;
+- `BuilderBuildState`;
 
-\- preview;
+- preview;
 
-\- código;
+- código;
 
-\- estructura;
+- estructura;
 
-\- archivo;
+- archivo;
 
-\- bloque;
+- bloque;
 
-\- CTA;
+- CTA;
 
-\- exportación;
+- exportación;
 
-\- deploy.
-
-
-
-\---
+- deploy.
 
 
 
-\## 8. Qué no debería consumir créditos
+---
+
+
+
+## 8. Qué no debería consumir créditos
 
 
 
@@ -368,33 +368,33 @@ No conviene gastar créditos en acciones de entrada o lectura simple.
 
 
 
-\### Ejemplos
+### Ejemplos
 
 
 
-\- navegar por el sistema;
+- navegar por el sistema;
 
-\- leer diagnóstico;
+- leer diagnóstico;
 
-\- ver recomendaciones;
+- ver recomendaciones;
 
-\- revisar blueprint ya generado;
+- revisar blueprint ya generado;
 
-\- consultar información del proyecto;
+- consultar información del proyecto;
 
-\- acciones de exploración básica;
+- acciones de exploración básica;
 
-\- abrir el Dashboard;
+- abrir el Dashboard;
 
-\- consultar proyectos existentes;
+- consultar proyectos existentes;
 
-\- leer estados o trazabilidad;
+- leer estados o trazabilidad;
 
-\- visualizar una salida ya generada.
+- visualizar una salida ya generada.
 
 
 
-\### Principio
+### Principio
 
 
 
@@ -406,19 +406,19 @@ La ejecución intensiva sí debe gobernarse.
 
 
 
-\---
+---
 
 
 
-\## 9. Reparto doctrinal por nivel
+## 9. Reparto doctrinal por nivel
 
 
 
-\## 9.1 Gratis
+## 9.1 Gratis
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -426,23 +426,23 @@ Entrada al sistema.
 
 
 
-\### Qué recibe
+### Qué recibe
 
 
 
-\- acceso inicial;
+- acceso inicial;
 
-\- diagnóstico;
+- diagnóstico;
 
-\- primera orientación;
+- primera orientación;
 
-\- primera clasificación;
+- primera clasificación;
 
-\- sin capacidad real de construcción intensa o con capacidad extremadamente limitada.
+- sin capacidad real de construcción intensa o con capacidad extremadamente limitada.
 
 
 
-\### Créditos
+### Créditos
 
 
 
@@ -450,7 +450,7 @@ Puede no incluir créditos o incluir una muestra mínima puramente demostrativa 
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -462,15 +462,15 @@ Debe demostrar valor sin abrir consumo intensivo descontrolado.
 
 
 
-\---
+---
 
 
 
-\## 9.2 Informe puntual 6,99
+## 9.2 Informe puntual 6,99
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -478,21 +478,21 @@ Compra puente.
 
 
 
-\### Qué recibe
+### Qué recibe
 
 
 
-\- validación más seria;
+- validación más seria;
 
-\- una salida útil puntual;
+- una salida útil puntual;
 
-\- lectura concreta;
+- lectura concreta;
 
-\- primera recomendación accionable.
+- primera recomendación accionable.
 
 
 
-\### Créditos
+### Créditos
 
 
 
@@ -500,7 +500,7 @@ No debe convertirse en paquete principal de créditos.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -512,15 +512,15 @@ El informe puntual no sustituye a la suscripción ni al Builder.
 
 
 
-\---
+---
 
 
 
-\## 9.3 Pro 29
+## 9.3 Pro 29
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -528,35 +528,35 @@ Entrada seria al sistema.
 
 
 
-\### Qué debe incluir
+### Qué debe incluir
 
 
 
-\- acceso al sistema con activación base;
+- acceso al sistema con activación base;
 
-\- primeros créditos reales para construir o probar;
+- primeros créditos reales para construir o probar;
 
-\- acceso inicial al Builder con alcance controlado;
+- acceso inicial al Builder con alcance controlado;
 
-\- continuidad básica.
-
-
-
-\### Función de esos créditos
+- continuidad básica.
 
 
 
-\- permitir una primera experiencia de construcción;
-
-\- demostrar el valor del Builder;
-
-\- llevar al usuario desde análisis a acción visible;
-
-\- permitir una o varias acciones de valor medido sin abrir consumo alto.
+### Función de esos créditos
 
 
 
-\### Regla
+- permitir una primera experiencia de construcción;
+
+- demostrar el valor del Builder;
+
+- llevar al usuario desde análisis a acción visible;
+
+- permitir una o varias acciones de valor medido sin abrir consumo alto.
+
+
+
+### Regla
 
 
 
@@ -568,15 +568,15 @@ Pro 29 no debe prometer construcción ilimitada.
 
 
 
-\---
+---
 
 
 
-\## 9.4 Growth 79
+## 9.4 Growth 79
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -584,41 +584,41 @@ Núcleo operativo del sistema.
 
 
 
-\### Qué debe incluir
+### Qué debe incluir
 
 
 
-\- activación operativa;
+- activación operativa;
 
-\- continuidad más seria;
+- continuidad más seria;
 
-\- una bolsa mayor de créditos;
+- una bolsa mayor de créditos;
 
-\- más recorrido en Builder;
+- más recorrido en Builder;
 
-\- más capacidad de iteración;
+- más capacidad de iteración;
 
-\- más profundidad de mejora.
-
-
-
-\### Función de esos créditos
+- más profundidad de mejora.
 
 
 
-\- permitir más iteración;
-
-\- más construcción;
-
-\- más mejora de proyecto;
-
-\- más continuidad útil dentro del sistema;
-
-\- hacer que el Builder sea una herramienta recurrente, no una prueba puntual.
+### Función de esos créditos
 
 
 
-\### Regla
+- permitir más iteración;
+
+- más construcción;
+
+- más mejora de proyecto;
+
+- más continuidad útil dentro del sistema;
+
+- hacer que el Builder sea una herramienta recurrente, no una prueba puntual.
+
+
+
+### Regla
 
 
 
@@ -630,15 +630,15 @@ Debe ser el plan donde el usuario empieza a trabajar de verdad dentro del sistem
 
 
 
-\---
+---
 
 
 
-\## 9.5 Master 199
+## 9.5 Master 199
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -646,41 +646,41 @@ Capa superior.
 
 
 
-\### Qué debe incluir
+### Qué debe incluir
 
 
 
-\- activación avanzada;
+- activación avanzada;
 
-\- mayor potencia operativa;
+- mayor potencia operativa;
 
-\- mayor volumen de créditos;
+- mayor volumen de créditos;
 
-\- mejor capacidad para casos complejos;
+- mejor capacidad para casos complejos;
 
-\- más recorrido en construcción;
+- más recorrido en construcción;
 
-\- más capacidad para usuarios técnicos, operadores y agencias;
+- más capacidad para usuarios técnicos, operadores y agencias;
 
-\- mejor preparación para exportación o salida si procede.
-
-
-
-\### Función de esos créditos
+- mejor preparación para exportación o salida si procede.
 
 
 
-\- soportar proyectos más exigentes;
-
-\- facilitar trabajo profundo;
-
-\- habilitar mayor intensidad para usuarios avanzados y operadores;
-
-\- sostener mayor consumo sin romper la economía del sistema.
+### Función de esos créditos
 
 
 
-\### Regla
+- soportar proyectos más exigentes;
+
+- facilitar trabajo profundo;
+
+- habilitar mayor intensidad para usuarios avanzados y operadores;
+
+- sostener mayor consumo sin romper la economía del sistema.
+
+
+
+### Regla
 
 
 
@@ -692,11 +692,11 @@ Debe vender capacidad superior del sistema, incluyendo una base operativa más f
 
 
 
-\---
+---
 
 
 
-\## 10. Recargas
+## 10. Recargas
 
 
 
@@ -704,7 +704,7 @@ Las recargas deben existir como capa separada de la suscripción.
 
 
 
-\### Principio
+### Principio
 
 
 
@@ -716,7 +716,7 @@ Debe poder comprar más y seguir trabajando.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -732,11 +732,11 @@ La recarga debe ser simple, clara y trazable.
 
 
 
-\---
+---
 
 
 
-\## 11. Tipos de recarga
+## 11. Tipos de recarga
 
 
 
@@ -744,15 +744,15 @@ La economía futura debe prever recargas cerradas y simples.
 
 
 
-\### Ejemplos conceptuales
+### Ejemplos conceptuales
 
 
 
-\- recarga pequeña;
+- recarga pequeña;
 
-\- recarga media;
+- recarga media;
 
-\- recarga grande.
+- recarga grande.
 
 
 
@@ -760,7 +760,7 @@ No conviene empezar con demasiadas variantes.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -772,11 +772,11 @@ El usuario debe entender qué compra y qué podrá hacer aproximadamente con esa
 
 
 
-\---
+---
 
 
 
-\## 12. Ledger y trazabilidad
+## 12. Ledger y trazabilidad
 
 
 
@@ -784,55 +784,55 @@ Toda operación económica debe poder quedar registrada.
 
 
 
-\### El ledger debe permitir saber
+### El ledger debe permitir saber
 
 
 
-\- usuario;
+- usuario;
 
-\- proyecto si aplica;
+- proyecto si aplica;
 
-\- acción;
+- acción;
 
-\- tipo de movimiento;
+- tipo de movimiento;
 
-\- saldo antes o después;
+- saldo antes o después;
 
-\- motivo;
+- motivo;
 
-\- coste;
+- coste;
 
-\- fecha;
+- fecha;
 
-\- resultado asociado.
-
-
-
-\### Tipos de movimiento previstos
+- resultado asociado.
 
 
 
-\- `plan\_grant`;
-
-\- `topup\_purchase`;
-
-\- `build\_consumption`;
-
-\- `iteration\_consumption`;
-
-\- `deployment\_consumption`;
-
-\- `export\_consumption`;
-
-\- `adjustment`;
-
-\- `refund`;
-
-\- `bonus`.
+### Tipos de movimiento previstos
 
 
 
-\### Regla
+- `plan\_grant`;
+
+- `topup\_purchase`;
+
+- `build\_consumption`;
+
+- `iteration\_consumption`;
+
+- `deployment\_consumption`;
+
+- `export\_consumption`;
+
+- `adjustment`;
+
+- `refund`;
+
+- `bonus`.
+
+
+
+### Regla
 
 
 
@@ -844,11 +844,11 @@ No descontar créditos sin poder explicar qué acción los consumió y qué sali
 
 
 
-\---
+---
 
 
 
-\## 13. Acciones premium especiales
+## 13. Acciones premium especiales
 
 
 
@@ -856,25 +856,25 @@ Además del consumo normal de créditos, el sistema debe prever ciertas acciones
 
 
 
-\### Ejemplos
+### Ejemplos
 
 
 
-\- despliegue;
+- despliegue;
 
-\- exportación técnica parcial;
+- exportación técnica parcial;
 
-\- preparación especial del proyecto;
+- preparación especial del proyecto;
 
-\- operaciones intensivas muy concretas;
+- operaciones intensivas muy concretas;
 
-\- integración con GitHub;
+- integración con GitHub;
 
-\- construcción técnica profunda;
+- construcción técnica profunda;
 
-\- generación avanzada de backend;
+- generación avanzada de backend;
 
-\- migraciones o transferencias concretas.
+- migraciones o transferencias concretas.
 
 
 
@@ -882,11 +882,11 @@ Estas acciones pueden:
 
 
 
-\- costar créditos;
+- costar créditos;
 
-\- costar dinero directo;
+- costar dinero directo;
 
-\- o combinar ambas lógicas.
+- o combinar ambas lógicas.
 
 
 
@@ -894,7 +894,7 @@ La decisión exacta se cerrará en contratos técnicos y pricing final.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -906,11 +906,11 @@ Debe existir tipología.
 
 
 
-\---
+---
 
 
 
-\## 14. Despliegue
+## 14. Despliegue
 
 
 
@@ -918,7 +918,7 @@ El despliegue no debe darse por incluido sin coste.
 
 
 
-\### Principio
+### Principio
 
 
 
@@ -926,21 +926,21 @@ Si desplegar implica una acción operativa clara de alto valor, debe tener una l
 
 
 
-\### Posibles modelos
+### Posibles modelos
 
 
 
-\- despliegue consumiendo créditos;
+- despliegue consumiendo créditos;
 
-\- despliegue como acción premium aparte;
+- despliegue como acción premium aparte;
 
-\- despliegue condicionado por plan + coste operativo;
+- despliegue condicionado por plan + coste operativo;
 
-\- despliegue mediante valoración específica.
+- despliegue mediante valoración específica.
 
 
 
-\### Regla doctrinal
+### Regla doctrinal
 
 
 
@@ -948,7 +948,7 @@ Desplegar debe ser fácil para el usuario, pero no invisible económicamente.
 
 
 
-\### Dependencia
+### Dependencia
 
 
 
@@ -960,23 +960,23 @@ Debe existir:
 
 
 
-\- estado de proyecto;
+- estado de proyecto;
 
-\- código coherente;
+- código coherente;
 
-\- estructura coherente;
+- estructura coherente;
 
-\- validación técnica;
+- validación técnica;
 
-\- coste o permiso claro.
-
-
-
-\---
+- coste o permiso claro.
 
 
 
-\## 15. Exportación / transferencia
+---
+
+
+
+## 15. Exportación / transferencia
 
 
 
@@ -984,7 +984,7 @@ La exportación no debe confundirse con créditos normales.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -992,7 +992,7 @@ La exportación es una capa aparte.
 
 
 
-\### Motivo
+### Motivo
 
 
 
@@ -1004,21 +1004,21 @@ Es también:
 
 
 
-\- empaquetado;
+- empaquetado;
 
-\- preparación de salida;
+- preparación de salida;
 
-\- lógica de entrega;
+- lógica de entrega;
 
-\- transferencia de un activo fuera del entorno del sistema;
+- transferencia de un activo fuera del entorno del sistema;
 
-\- responsabilidad reputacional;
+- responsabilidad reputacional;
 
-\- soporte de estructura y código coherente.
+- soporte de estructura y código coherente.
 
 
 
-\### Conclusión
+### Conclusión
 
 
 
@@ -1026,7 +1026,7 @@ La exportación debe valorarse con precio cerrado o por bandas de complejidad, n
 
 
 
-\### Dependencia
+### Dependencia
 
 
 
@@ -1038,23 +1038,23 @@ Debe existir:
 
 
 
-\- estado vivo;
+- estado vivo;
 
-\- estructura coherente;
+- estructura coherente;
 
-\- código coherente;
+- código coherente;
 
-\- valoración;
+- valoración;
 
-\- proceso de entrega.
-
-
-
-\---
+- proceso de entrega.
 
 
 
-\## 16. Política de agotamiento
+---
+
+
+
+## 16. Política de agotamiento
 
 
 
@@ -1062,45 +1062,45 @@ Cuando el usuario agote créditos, el sistema debe responder con claridad.
 
 
 
-\### No debe hacer
+### No debe hacer
 
 
 
-\- romper la experiencia;
+- romper la experiencia;
 
-\- bloquear sin explicación;
+- bloquear sin explicación;
 
-\- esconder el motivo;
+- esconder el motivo;
 
-\- castigar sin contexto;
+- castigar sin contexto;
 
-\- impedir lectura del proyecto;
+- impedir lectura del proyecto;
 
-\- borrar estado construido.
-
-
-
-\### Debe hacer
+- borrar estado construido.
 
 
 
-\- avisar con claridad;
-
-\- mostrar consumo y saldo;
-
-\- ofrecer recarga simple;
-
-\- explicar qué acción requiere más créditos;
-
-\- permitir seguir navegando y leyendo el proyecto;
-
-\- permitir conservar lo ya construido;
-
-\- ofrecer alternativa de menor coste si procede.
+### Debe hacer
 
 
 
-\### Principio
+- avisar con claridad;
+
+- mostrar consumo y saldo;
+
+- ofrecer recarga simple;
+
+- explicar qué acción requiere más créditos;
+
+- permitir seguir navegando y leyendo el proyecto;
+
+- permitir conservar lo ya construido;
+
+- ofrecer alternativa de menor coste si procede.
+
+
+
+### Principio
 
 
 
@@ -1108,11 +1108,11 @@ Agotar créditos debe cerrar ejecución intensiva, no romper el producto complet
 
 
 
-\---
+---
 
 
 
-\## 17. Transparencia económica
+## 17. Transparencia económica
 
 
 
@@ -1120,21 +1120,21 @@ El usuario debe poder entender:
 
 
 
-\- cuántos créditos tiene;
+- cuántos créditos tiene;
 
-\- qué acción consume créditos;
+- qué acción consume créditos;
 
-\- cuánto consume cada acción;
+- cuánto consume cada acción;
 
-\- qué plan tiene;
+- qué plan tiene;
 
-\- qué incluye su plan;
+- qué incluye su plan;
 
-\- cuándo una acción es exportación y no continuidad normal;
+- cuándo una acción es exportación y no continuidad normal;
 
-\- qué obtuvo a cambio de una acción intensiva;
+- qué obtuvo a cambio de una acción intensiva;
 
-\- qué coste puede tener el siguiente paso.
+- qué coste puede tener el siguiente paso.
 
 
 
@@ -1146,7 +1146,7 @@ La transparencia aumenta continuidad.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1158,11 +1158,11 @@ No debe sorprender al usuario después.
 
 
 
-\---
+---
 
 
 
-\## 18. Relación con BuilderBuildState
+## 18. Relación con BuilderBuildState
 
 
 
@@ -1174,7 +1174,7 @@ Deben conectarse a acciones que el Builder pueda representar.
 
 
 
-\### Flujo esperado
+### Flujo esperado
 
 
 
@@ -1200,7 +1200,7 @@ acción solicitada
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1208,11 +1208,11 @@ Si una acción no puede actualizar estado, preview, código, estructura o salida
 
 
 
-\---
+---
 
 
 
-\## 19. Relación con BuilderBuildKernel
+## 19. Relación con BuilderBuildKernel
 
 
 
@@ -1220,23 +1220,23 @@ El BuilderBuildKernel debe poder informar, cuando aplique:
 
 
 
-\- tipo de acción;
+- tipo de acción;
 
-\- intensidad;
+- intensidad;
 
-\- coste estimado;
+- coste estimado;
 
-\- salida esperada;
+- salida esperada;
 
-\- bloques afectados;
+- bloques afectados;
 
-\- archivos afectados;
+- archivos afectados;
 
-\- siguiente acción posible.
+- siguiente acción posible.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1252,11 +1252,11 @@ Se cobra por construir, transformar, generar, iterar, preparar o ejecutar algo c
 
 
 
-\---
+---
 
 
 
-\## 20. Relación con Activación
+## 20. Relación con Activación
 
 
 
@@ -1268,7 +1268,7 @@ Los créditos financian parte de la ejecución intensiva que puede venir despué
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1284,21 +1284,21 @@ Ejemplos:
 
 
 
-\- construir una versión;
+- construir una versión;
 
-\- generar una estructura avanzada;
+- generar una estructura avanzada;
 
-\- iterar una pantalla;
+- iterar una pantalla;
 
-\- preparar exportación;
+- preparar exportación;
 
-\- preparar deploy;
+- preparar deploy;
 
-\- ejecutar mejora intensiva.
+- ejecutar mejora intensiva.
 
 
 
-\### Protección
+### Protección
 
 
 
@@ -1306,11 +1306,11 @@ La activación no debe prometer acciones que el saldo, plan o estado técnico no
 
 
 
-\---
+---
 
 
 
-\## 21. Relación con fidelización
+## 21. Relación con fidelización
 
 
 
@@ -1318,43 +1318,43 @@ La economía del sistema debe favorecer continuidad sin forzarla.
 
 
 
-\## 21.1 Continuidad sana
+## 21.1 Continuidad sana
 
 
 
-\- el usuario permanece porque le compensa;
+- el usuario permanece porque le compensa;
 
-\- construir dentro del sistema tiene valor real;
+- construir dentro del sistema tiene valor real;
 
-\- las recargas son fáciles;
+- las recargas son fáciles;
 
-\- la evolución es cómoda;
+- la evolución es cómoda;
 
-\- el sistema sigue siendo el mejor lugar para trabajar el proyecto.
-
-
-
-\## 21.2 Salida sana
+- el sistema sigue siendo el mejor lugar para trabajar el proyecto.
 
 
 
-\- si el usuario quiere sacar el proyecto, se le facilita;
-
-\- la salida tiene valoración y precio claro;
-
-\- no hay castigo;
-
-\- tampoco hay regalo operativo;
-
-\- el proceso es profesional.
+## 21.2 Salida sana
 
 
 
-\---
+- si el usuario quiere sacar el proyecto, se le facilita;
+
+- la salida tiene valoración y precio claro;
+
+- no hay castigo;
+
+- tampoco hay regalo operativo;
+
+- el proceso es profesional.
 
 
 
-\## 22. Regla de producto
+---
+
+
+
+## 22. Regla de producto
 
 
 
@@ -1362,7 +1362,7 @@ Cada decisión futura sobre créditos debe pasar esta prueba:
 
 
 
-\### A
+### A
 
 
 
@@ -1370,7 +1370,7 @@ Cada decisión futura sobre créditos debe pasar esta prueba:
 
 
 
-\### B
+### B
 
 
 
@@ -1378,7 +1378,7 @@ Cada decisión futura sobre créditos debe pasar esta prueba:
 
 
 
-\### C
+### C
 
 
 
@@ -1386,7 +1386,7 @@ Cada decisión futura sobre créditos debe pasar esta prueba:
 
 
 
-\### D
+### D
 
 
 
@@ -1398,11 +1398,11 @@ Si falla una de estas preguntas, la implementación no debe aprobarse.
 
 
 
-\---
+---
 
 
 
-\## 23. Estructura futura de pricing operativo
+## 23. Estructura futura de pricing operativo
 
 
 
@@ -1410,25 +1410,25 @@ La arquitectura económica futura debe contemplar, como mínimo:
 
 
 
-\- plan;
+- plan;
 
-\- bolsa inicial de créditos;
+- bolsa inicial de créditos;
 
-\- recargas;
+- recargas;
 
-\- acciones premium;
+- acciones premium;
 
-\- coste por tipo de acción;
+- coste por tipo de acción;
 
-\- exportación / transferencia;
+- exportación / transferencia;
 
-\- despliegue;
+- despliegue;
 
-\- consumo trazado;
+- consumo trazado;
 
-\- bloqueo suave;
+- bloqueo suave;
 
-\- alternativas si no hay saldo.
+- alternativas si no hay saldo.
 
 
 
@@ -1436,23 +1436,23 @@ Esta estructura permite un sistema:
 
 
 
-\- más sostenible;
+- más sostenible;
 
-\- más flexible;
+- más flexible;
 
-\- más monetizable;
+- más monetizable;
 
-\- más profesional;
+- más profesional;
 
-\- más apto para continuidad y uso serio.
-
-
-
-\---
+- más apto para continuidad y uso serio.
 
 
 
-\## 24. Riesgos que debe evitar la economía
+---
+
+
+
+## 24. Riesgos que debe evitar la economía
 
 
 
@@ -1460,31 +1460,31 @@ La economía de Sistema Maestro debe evitar:
 
 
 
-\- cobrar por simulaciones;
+- cobrar por simulaciones;
 
-\- consumir créditos sin salida;
+- consumir créditos sin salida;
 
-\- esconder costes;
+- esconder costes;
 
-\- bloquear al usuario sin alternativa;
+- bloquear al usuario sin alternativa;
 
-\- mezclar suscripción, créditos y exportación sin claridad;
+- mezclar suscripción, créditos y exportación sin claridad;
 
-\- prometer uso ilimitado de acciones intensivas;
+- prometer uso ilimitado de acciones intensivas;
 
-\- regalar operaciones caras sin control;
+- regalar operaciones caras sin control;
 
-\- dañar la reputación por monetización mal explicada;
+- dañar la reputación por monetización mal explicada;
 
-\- crear sensación de trampa.
-
-
-
-\---
+- crear sensación de trampa.
 
 
 
-\## 25. Criterio de cierre económico
+---
+
+
+
+## 25. Criterio de cierre económico
 
 
 
@@ -1492,23 +1492,23 @@ La economía estará correctamente alineada cuando cada acción intensiva pueda 
 
 
 
-\- qué acción es;
+- qué acción es;
 
-\- qué coste tiene;
+- qué coste tiene;
 
-\- por qué consume;
+- por qué consume;
 
-\- qué salida genera;
+- qué salida genera;
 
-\- dónde queda registrado;
+- dónde queda registrado;
 
-\- qué ocurre si no hay saldo;
+- qué ocurre si no hay saldo;
 
-\- si pertenece a suscripción, créditos, exportación o premium.
+- si pertenece a suscripción, créditos, exportación o premium.
 
 
 
-\### Criterio específico del Builder
+### Criterio específico del Builder
 
 
 
@@ -1516,33 +1516,33 @@ Una acción del Builder solo podrá consumir créditos cuando produzca al menos 
 
 
 
-\- estado vivo actualizado;
+- estado vivo actualizado;
 
-\- preview modificada;
+- preview modificada;
 
-\- código modificado;
+- código modificado;
 
-\- estructura modificada;
+- estructura modificada;
 
-\- CTA modificado;
+- CTA modificado;
 
-\- bloque nuevo;
+- bloque nuevo;
 
-\- archivo nuevo;
+- archivo nuevo;
 
-\- preparación real de exportación;
+- preparación real de exportación;
 
-\- preparación real de deploy;
+- preparación real de deploy;
 
-\- siguiente decisión contextual distinta.
-
-
-
-\---
+- siguiente decisión contextual distinta.
 
 
 
-\## 26. Cierre doctrinal
+---
+
+
+
+## 26. Cierre doctrinal
 
 
 
@@ -1554,13 +1554,13 @@ Debe vender una combinación clara de:
 
 
 
-\- acceso;
+- acceso;
 
-\- capacidad operativa;
+- capacidad operativa;
 
-\- continuidad;
+- continuidad;
 
-\- salida profesional.
+- salida profesional.
 
 
 
@@ -1609,4 +1609,3 @@ no exportación sin estructura
 no deploy sin coherencia técnica
 
 ```
-
