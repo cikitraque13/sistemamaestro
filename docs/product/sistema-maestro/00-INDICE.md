@@ -1,8 +1,8 @@
-\# Sistema Maestro V2 — Índice documental
+# Sistema Maestro V2 — Índice documental
 
 
 
-\## Estado
+## Estado
 
 
 
@@ -10,7 +10,7 @@ Capa documental canónica para definir la evolución del producto antes de segui
 
 
 
-\## Objetivo
+## Objetivo
 
 
 
@@ -22,11 +22,11 @@ Este índice ordena la capa de producto de Sistema Maestro V2 y fija la lectura 
 
 
 
-\---
+---
 
 
 
-\## Regla madre
+## Regla madre
 
 
 
@@ -57,4 +57,3 @@ entrada
 → créditos si hay acción intensiva
 
 → exportación o deploy si procede
-

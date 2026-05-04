@@ -1,8 +1,8 @@
-\# 02 — Activación Doctrina
+# 02 — Activación Doctrina
 
 
 
-\## 1. Definición de Activación
+## 1. Definición de Activación
 
 
 
@@ -26,17 +26,17 @@ Activación es el puente entre:
 
 
 
-\- diagnóstico;
+- diagnóstico;
 
-\- estructura;
+- estructura;
 
-\- construcción;
+- construcción;
 
-\- continuidad;
+- continuidad;
 
-\- Builder visible;
+- Builder visible;
 
-\- exportación o despliegue futuro.
+- exportación o despliegue futuro.
 
 
 
@@ -44,33 +44,33 @@ Su función es responder con claridad:
 
 
 
-\- qué construir;
+- qué construir;
 
-\- con qué stack;
+- con qué stack;
 
-\- con qué base;
+- con qué base;
 
-\- en qué orden;
+- en qué orden;
 
-\- con qué prompts;
+- con qué prompts;
 
-\- con qué lógica de ejecución;
+- con qué lógica de ejecución;
 
-\- qué debe hacer un usuario técnico;
+- qué debe hacer un usuario técnico;
 
-\- qué debe hacer un usuario no técnico;
+- qué debe hacer un usuario no técnico;
 
-\- qué debe preparar el sistema antes de construir;
+- qué debe preparar el sistema antes de construir;
 
-\- qué debe quedar listo para que el Builder ejecute y muestre.
-
-
-
-\---
+- qué debe quedar listo para que el Builder ejecute y muestre.
 
 
 
-\## 2. Problema que resuelve
+---
+
+
+
+## 2. Problema que resuelve
 
 
 
@@ -78,13 +78,13 @@ Sin Activación, el usuario puede pensar:
 
 
 
-\- entiendo mejor mi caso;
+- entiendo mejor mi caso;
 
-\- veo el problema;
+- veo el problema;
 
-\- veo el potencial;
+- veo el potencial;
 
-\- pero todavía no sé cómo llevarlo a lo real.
+- pero todavía no sé cómo llevarlo a lo real.
 
 
 
@@ -96,7 +96,7 @@ Activación existe para cerrar esa brecha.
 
 
 
-\### Problema operativo detectado
+### Problema operativo detectado
 
 
 
@@ -116,11 +116,11 @@ La ejecución pertenece al Builder visible.
 
 
 
-\---
+---
 
 
 
-\## 3. Qué no es Activación
+## 3. Qué no es Activación
 
 
 
@@ -128,23 +128,23 @@ Activación no debe confundirse con:
 
 
 
-\- una consultoría manual;
+- una consultoría manual;
 
-\- webinars;
+- webinars;
 
-\- llamadas;
+- llamadas;
 
-\- acompañamiento humano continuo;
+- acompañamiento humano continuo;
 
-\- bloques de texto más largos;
+- bloques de texto más largos;
 
-\- soporte artesanal por cada cliente;
+- soporte artesanal por cada cliente;
 
-\- preview decorativa;
+- preview decorativa;
 
-\- simulación de construcción;
+- simulación de construcción;
 
-\- mensajes del agente sin salida real.
+- mensajes del agente sin salida real.
 
 
 
@@ -152,29 +152,29 @@ La dirección correcta del producto es:
 
 
 
-\- activación productizada;
+- activación productizada;
 
-\- escalable;
+- escalable;
 
-\- clara;
+- clara;
 
-\- guiada;
+- guiada;
 
-\- usable;
+- usable;
 
-\- replicable;
+- replicable;
 
-\- conectable al Builder;
+- conectable al Builder;
 
-\- útil para usuario técnico y no técnico.
-
-
-
-\---
+- útil para usuario técnico y no técnico.
 
 
 
-\## 4. Qué debe incluir Activación
+---
+
+
+
+## 4. Qué debe incluir Activación
 
 
 
@@ -182,35 +182,35 @@ Toda activación debe traducir el caso del usuario a una capa de trabajo concret
 
 
 
-\### Elementos posibles de Activación
+### Elementos posibles de Activación
 
 
 
-\- estructura recomendada;
+- estructura recomendada;
 
-\- stack sugerido;
+- stack sugerido;
 
-\- plantilla sugerida;
+- plantilla sugerida;
 
-\- secuencia de ejecución;
+- secuencia de ejecución;
 
-\- prompts listos;
+- prompts listos;
 
-\- checklist;
+- checklist;
 
-\- base técnica inicial;
+- base técnica inicial;
 
-\- ruta técnico / no técnico;
+- ruta técnico / no técnico;
 
-\- continuidad sugerida;
+- continuidad sugerida;
 
-\- condiciones para construir, iterar o desplegar;
+- condiciones para construir, iterar o desplegar;
 
-\- recomendación de siguiente acción en Builder;
+- recomendación de siguiente acción en Builder;
 
-\- preparación de bloques, módulos o rutas;
+- preparación de bloques, módulos o rutas;
 
-\- criterio de coste o esfuerzo futuro si procede.
+- criterio de coste o esfuerzo futuro si procede.
 
 
 
@@ -222,7 +222,7 @@ La intensidad cambia según plan.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -234,11 +234,11 @@ No debe generar promesas que el Builder, créditos, exportación o deploy no pue
 
 
 
-\---
+---
 
 
 
-\## 5. Principio por nivel
+## 5. Principio por nivel
 
 
 
@@ -250,7 +250,7 @@ Debe repartirse por cambio real de nivel.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -266,15 +266,15 @@ Se sube de nivel añadiendo más capacidad real de acción, continuidad, constru
 
 
 
-\---
+---
 
 
 
-\## 6. Intensidades del sistema
+## 6. Intensidades del sistema
 
 
 
-\### Nivel 0 — Exploración
+### Nivel 0 — Exploración
 
 
 
@@ -286,7 +286,7 @@ Debe recibir orientación inicial y una primera clasificación clara.
 
 
 
-\### Nivel 1 — Validación puntual
+### Nivel 1 — Validación puntual
 
 
 
@@ -298,7 +298,7 @@ Debe sentir que la lectura ya tiene valor, pero no que ha entrado al núcleo com
 
 
 
-\### Nivel 2 — Activación base
+### Nivel 2 — Activación base
 
 
 
@@ -314,7 +314,7 @@ Aquí aparece una primera conexión seria con estructura, stack, prompts, checkl
 
 
 
-\### Nivel 3 — Activación operativa
+### Nivel 3 — Activación operativa
 
 
 
@@ -326,7 +326,7 @@ Aquí la activación debe preparar iteraciones, mejoras, acciones de Builder y c
 
 
 
-\### Nivel 4 — Activación avanzada
+### Nivel 4 — Activación avanzada
 
 
 
@@ -338,19 +338,19 @@ Aquí la activación debe preparar proyectos más complejos, arquitectura más s
 
 
 
-\---
+---
 
 
 
-\## 7. Reparto doctrinal por oferta
+## 7. Reparto doctrinal por oferta
 
 
 
-\## 7.1 Gratis
+## 7.1 Gratis
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -358,7 +358,7 @@ Entrada al sistema.
 
 
 
-\### Objetivo
+### Objetivo
 
 
 
@@ -366,45 +366,45 @@ Reducir fricción y demostrar que existe una vía.
 
 
 
-\### Qué debe recibir
+### Qué debe recibir
 
 
 
-\- diagnóstico inicial;
+- diagnóstico inicial;
 
-\- lectura resumida;
+- lectura resumida;
 
-\- ruta recomendada;
+- ruta recomendada;
 
-\- primera clasificación del caso;
+- primera clasificación del caso;
 
-\- primera sugerencia de dirección.
-
-
-
-\### Qué no debe recibir
+- primera sugerencia de dirección.
 
 
 
-\- activación profunda;
-
-\- stack completo;
-
-\- secuencia completa;
-
-\- prompts maestros;
-
-\- construcción visible real;
-
-\- exportación;
-
-\- deploy;
-
-\- operaciones intensivas.
+### Qué no debe recibir
 
 
 
-\### Sensación correcta
+- activación profunda;
+
+- stack completo;
+
+- secuencia completa;
+
+- prompts maestros;
+
+- construcción visible real;
+
+- exportación;
+
+- deploy;
+
+- operaciones intensivas.
+
+
+
+### Sensación correcta
 
 
 
@@ -412,7 +412,7 @@ Reducir fricción y demostrar que existe una vía.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -420,15 +420,15 @@ Gratis debe abrir el camino, no entregar el núcleo completo.
 
 
 
-\---
+---
 
 
 
-\## 7.2 Informe puntual 6,99
+## 7.2 Informe puntual 6,99
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -436,7 +436,7 @@ Validación de oportunidad.
 
 
 
-\### Objetivo
+### Objetivo
 
 
 
@@ -444,43 +444,43 @@ Convertir curiosidad en primera compra útil.
 
 
 
-\### Qué debe recibir
+### Qué debe recibir
 
 
 
-\- lectura más concreta;
+- lectura más concreta;
 
-\- oportunidad mejor enfocada;
+- oportunidad mejor enfocada;
 
-\- primera orientación de mejora o monetización;
+- primera orientación de mejora o monetización;
 
-\- una pequeña salida accionable;
+- una pequeña salida accionable;
 
-\- un prompt útil de avance;
+- un prompt útil de avance;
 
-\- recomendación clara de siguiente paso.
-
-
-
-\### Qué no debe recibir
+- recomendación clara de siguiente paso.
 
 
 
-\- activación completa;
-
-\- base técnica profunda;
-
-\- Builder completo;
-
-\- continuidad profunda;
-
-\- exportación incluida;
-
-\- deploy.
+### Qué no debe recibir
 
 
 
-\### Sensación correcta
+- activación completa;
+
+- base técnica profunda;
+
+- Builder completo;
+
+- continuidad profunda;
+
+- exportación incluida;
+
+- deploy.
+
+
+
+### Sensación correcta
 
 
 
@@ -488,7 +488,7 @@ Convertir curiosidad en primera compra útil.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -500,15 +500,15 @@ Es un bloque puente, no la pieza maestra.
 
 
 
-\---
+---
 
 
 
-\## 7.3 Pro 29
+## 7.3 Pro 29
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -516,7 +516,7 @@ Entrada seria al sistema.
 
 
 
-\### Objetivo
+### Objetivo
 
 
 
@@ -528,51 +528,51 @@ Aquí empieza la Activación base.
 
 
 
-\### Qué debe recibir
+### Qué debe recibir
 
 
 
-\- todo lo anterior;
+- todo lo anterior;
 
-\- blueprint estructural;
+- blueprint estructural;
 
-\- prioridades claras;
+- prioridades claras;
 
-\- primeros prompts estructurales;
+- primeros prompts estructurales;
 
-\- primera lógica de ejecución;
+- primera lógica de ejecución;
 
-\- base de stack sugerido;
+- base de stack sugerido;
 
-\- ruta inicial técnico / no técnico;
+- ruta inicial técnico / no técnico;
 
-\- checklist base de construcción;
+- checklist base de construcción;
 
-\- primeros créditos del sistema para construir o probar;
+- primeros créditos del sistema para construir o probar;
 
-\- acceso a una primera experiencia de Builder con alcance controlado.
-
-
-
-\### Qué no debe recibir todavía
+- acceso a una primera experiencia de Builder con alcance controlado.
 
 
 
-\- activación avanzada completa;
-
-\- capa de optimización fuerte;
-
-\- profundidad maestra;
-
-\- exportación incluida;
-
-\- operaciones intensivas amplias;
-
-\- deploy incluido por defecto.
+### Qué no debe recibir todavía
 
 
 
-\### Sensación correcta
+- activación avanzada completa;
+
+- capa de optimización fuerte;
+
+- profundidad maestra;
+
+- exportación incluida;
+
+- operaciones intensivas amplias;
+
+- deploy incluido por defecto.
+
+
+
+### Sensación correcta
 
 
 
@@ -580,7 +580,7 @@ Aquí empieza la Activación base.
 
 
 
-\### Regla doctrinal
+### Regla doctrinal
 
 
 
@@ -592,15 +592,15 @@ Debe vender entrada seria a la activación.
 
 
 
-\---
+---
 
 
 
-\## 7.4 Growth 79
+## 7.4 Growth 79
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -608,7 +608,7 @@ Núcleo operativo del sistema.
 
 
 
-\### Objetivo
+### Objetivo
 
 
 
@@ -620,53 +620,53 @@ Aquí empieza la Activación operativa.
 
 
 
-\### Qué debe recibir
+### Qué debe recibir
 
 
 
-\- todo lo de Pro;
+- todo lo de Pro;
 
-\- mayor profundidad de activación;
+- mayor profundidad de activación;
 
-\- mejor secuencia de trabajo;
+- mejor secuencia de trabajo;
 
-\- mejor lógica de continuidad;
+- mejor lógica de continuidad;
 
-\- prompts de optimización;
+- prompts de optimización;
 
-\- capa de CRO / growth / mejora estructural;
+- capa de CRO / growth / mejora estructural;
 
-\- más créditos incluidos;
+- más créditos incluidos;
 
-\- construcción visible con mayor recorrido;
+- construcción visible con mayor recorrido;
 
-\- capacidad de iterar con más intensidad;
+- capacidad de iterar con más intensidad;
 
-\- mejor transición entre análisis, activación y ejecución;
+- mejor transición entre análisis, activación y ejecución;
 
-\- mejores siguientes decisiones del Builder;
+- mejores siguientes decisiones del Builder;
 
-\- preparación más clara para exportación o deploy futuro si procede.
-
-
-
-\### Qué no debe recibir todavía
+- preparación más clara para exportación o deploy futuro si procede.
 
 
 
-\- salida incluida por defecto;
-
-\- intervención maestra máxima;
-
-\- complejidad superior reservada al 199;
-
-\- operaciones ilimitadas sin coste;
-
-\- exportación o deploy sin valoración.
+### Qué no debe recibir todavía
 
 
 
-\### Sensación correcta
+- salida incluida por defecto;
+
+- intervención maestra máxima;
+
+- complejidad superior reservada al 199;
+
+- operaciones ilimitadas sin coste;
+
+- exportación o deploy sin valoración.
+
+
+
+### Sensación correcta
 
 
 
@@ -674,7 +674,7 @@ Aquí empieza la Activación operativa.
 
 
 
-\### Regla doctrinal
+### Regla doctrinal
 
 
 
@@ -686,15 +686,15 @@ Es la capa central de activación operativa y mejora real del proyecto.
 
 
 
-\---
+---
 
 
 
-\## 7.5 Master 199
+## 7.5 Master 199
 
 
 
-\### Rol
+### Rol
 
 
 
@@ -702,7 +702,7 @@ Capa superior del sistema.
 
 
 
-\### Objetivo
+### Objetivo
 
 
 
@@ -714,55 +714,55 @@ Aquí empieza la Activación avanzada.
 
 
 
-\### Qué debe recibir
+### Qué debe recibir
 
 
 
-\- todo lo de Growth;
+- todo lo de Growth;
 
-\- profundidad estratégica superior;
+- profundidad estratégica superior;
 
-\- mejor lectura de complejidad;
+- mejor lectura de complejidad;
 
-\- arquitectura de trabajo más avanzada;
+- arquitectura de trabajo más avanzada;
 
-\- criterio fuerte de CRO, growth, monetización e IA;
+- criterio fuerte de CRO, growth, monetización e IA;
 
-\- mayor potencia para proyectos complejos;
+- mayor potencia para proyectos complejos;
 
-\- más capacidad operativa dentro del sistema;
+- más capacidad operativa dentro del sistema;
 
-\- activación avanzada para usuario técnico, no técnico y operador;
+- activación avanzada para usuario técnico, no técnico y operador;
 
-\- preparación de salida más seria si procede;
+- preparación de salida más seria si procede;
 
-\- mejor capacidad de transformar una URL o idea en activo serio;
+- mejor capacidad de transformar una URL o idea en activo serio;
 
-\- mayor recorrido en Builder visible;
+- mayor recorrido en Builder visible;
 
-\- mejores decisiones técnicas y comerciales;
+- mejores decisiones técnicas y comerciales;
 
-\- mejor preparación para exportación, integración o deploy.
-
-
-
-\### Qué no debe vender
+- mejor preparación para exportación, integración o deploy.
 
 
 
-\- más soporte humano;
-
-\- más reuniones;
-
-\- más texto;
-
-\- más pantallas sin valor;
-
-\- promesas que Builder, exportación o deploy no puedan cumplir.
+### Qué no debe vender
 
 
 
-\### Sensación correcta
+- más soporte humano;
+
+- más reuniones;
+
+- más texto;
+
+- más pantallas sin valor;
+
+- promesas que Builder, exportación o deploy no puedan cumplir.
+
+
+
+### Sensación correcta
 
 
 
@@ -770,7 +770,7 @@ Aquí empieza la Activación avanzada.
 
 
 
-\### Regla doctrinal
+### Regla doctrinal
 
 
 
@@ -778,15 +778,15 @@ Aquí empieza la Activación avanzada.
 
 
 
-\---
+---
 
 
 
-\## 8. Activación por perfil de usuario
+## 8. Activación por perfil de usuario
 
 
 
-\## 8.1 Usuario no técnico
+## 8.1 Usuario no técnico
 
 
 
@@ -794,21 +794,21 @@ Debe recibir:
 
 
 
-\- lenguaje claro;
+- lenguaje claro;
 
-\- pasos comprensibles;
+- pasos comprensibles;
 
-\- recomendación de stack interpretada;
+- recomendación de stack interpretada;
 
-\- orden de acción simplificado;
+- orden de acción simplificado;
 
-\- facilidad para construir sin saber programar;
+- facilidad para construir sin saber programar;
 
-\- continuidad guiada dentro del sistema;
+- continuidad guiada dentro del sistema;
 
-\- siguiente acción clara en Builder;
+- siguiente acción clara en Builder;
 
-\- explicación de qué se está preparando y por qué.
+- explicación de qué se está preparando y por qué.
 
 
 
@@ -816,7 +816,7 @@ La activación no debe exigir conocimientos técnicos como condición de uso.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -828,11 +828,11 @@ No debe sentirse abandonado delante de términos técnicos.
 
 
 
-\---
+---
 
 
 
-\## 8.2 Usuario técnico
+## 8.2 Usuario técnico
 
 
 
@@ -840,23 +840,23 @@ Debe recibir:
 
 
 
-\- mayor claridad estructural;
+- mayor claridad estructural;
 
-\- stack accionable;
+- stack accionable;
 
-\- secuencia utilizable;
+- secuencia utilizable;
 
-\- prompts más precisos;
+- prompts más precisos;
 
-\- capacidad de acelerar implementación;
+- capacidad de acelerar implementación;
 
-\- mejor traducción entre diagnóstico y ejecución real;
+- mejor traducción entre diagnóstico y ejecución real;
 
-\- estructura de carpetas cuando proceda;
+- estructura de carpetas cuando proceda;
 
-\- rutas, componentes o módulos sugeridos;
+- rutas, componentes o módulos sugeridos;
 
-\- criterios para exportar o continuar construyendo.
+- criterios para exportar o continuar construyendo.
 
 
 
@@ -864,7 +864,7 @@ La activación debe acelerar, no estorbar.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -872,11 +872,11 @@ El usuario técnico debe poder convertir la activación en implementación sin r
 
 
 
-\---
+---
 
 
 
-\## 8.3 Operador / consultor / agencia
+## 8.3 Operador / consultor / agencia
 
 
 
@@ -884,21 +884,21 @@ Debe recibir:
 
 
 
-\- capacidad de trabajar con activos de terceros;
+- capacidad de trabajar con activos de terceros;
 
-\- lectura vendible;
+- lectura vendible;
 
-\- base de propuesta;
+- base de propuesta;
 
-\- estructura presentable;
+- estructura presentable;
 
-\- lógica para construir, elevar o transformar un activo y entregarlo o exportarlo;
+- lógica para construir, elevar o transformar un activo y entregarlo o exportarlo;
 
-\- argumentos de valor;
+- argumentos de valor;
 
-\- siguiente acción comercial o técnica;
+- siguiente acción comercial o técnica;
 
-\- uso del Builder como herramienta de demostración.
+- uso del Builder como herramienta de demostración.
 
 
 
@@ -906,7 +906,7 @@ La activación debe convertir el sistema también en herramienta de producción 
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -918,11 +918,11 @@ Necesita convertir diagnóstico en propuesta, construcción, mejora o entrega.
 
 
 
-\---
+---
 
 
 
-\## 9. Relación entre Activación y Constructor Visible
+## 9. Relación entre Activación y Constructor Visible
 
 
 
@@ -934,7 +934,7 @@ Lo prepara.
 
 
 
-\### Secuencia correcta
+### Secuencia correcta
 
 
 
@@ -954,15 +954,15 @@ La activación decide:
 
 
 
-\- qué se va a construir;
+- qué se va a construir;
 
-\- con qué lógica;
+- con qué lógica;
 
-\- con qué límites;
+- con qué límites;
 
-\- con qué base;
+- con qué base;
 
-\- qué camino inicial debe seguir el Builder.
+- qué camino inicial debe seguir el Builder.
 
 
 
@@ -970,7 +970,7 @@ El constructor visible ejecuta y muestra.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -986,11 +986,11 @@ Si el Builder no puede mostrar preview, código o estructura, la activación no 
 
 
 
-\---
+---
 
 
 
-\## 10. Relación entre Activación y BuilderBuildState
+## 10. Relación entre Activación y BuilderBuildState
 
 
 
@@ -998,7 +998,7 @@ La activación debe poder alimentar el estado vivo del Builder.
 
 
 
-\### Función
+### Función
 
 
 
@@ -1006,27 +1006,27 @@ La activación puede aportar:
 
 
 
-\- tipo de proyecto;
+- tipo de proyecto;
 
-\- sector;
+- sector;
 
-\- objetivo;
+- objetivo;
 
-\- stack sugerido;
+- stack sugerido;
 
-\- bloques iniciales;
+- bloques iniciales;
 
-\- acciones recomendadas;
+- acciones recomendadas;
 
-\- rutas iniciales;
+- rutas iniciales;
 
-\- prioridad de construcción;
+- prioridad de construcción;
 
-\- contexto para preguntas siguientes.
+- contexto para preguntas siguientes.
 
 
 
-\### Contrato esperado
+### Contrato esperado
 
 
 
@@ -1046,7 +1046,7 @@ Activación
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1058,11 +1058,11 @@ Debe darle mejor contexto para construir bien.
 
 
 
-\---
+---
 
 
 
-\## 11. Relación entre Activación y Créditos
+## 11. Relación entre Activación y Créditos
 
 
 
@@ -1074,7 +1074,7 @@ Los créditos financian ciertas acciones intensivas.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1090,17 +1090,17 @@ Ejemplos futuros:
 
 
 
-\- construir iteraciones;
+- construir iteraciones;
 
-\- regenerar módulos;
+- regenerar módulos;
 
-\- ejecutar mejoras intensivas;
+- ejecutar mejoras intensivas;
 
-\- preparar despliegues;
+- preparar despliegues;
 
-\- generar estructura avanzada;
+- generar estructura avanzada;
 
-\- ciertas operaciones premium.
+- ciertas operaciones premium.
 
 
 
@@ -1108,7 +1108,7 @@ Los detalles exactos se fijan en el documento económico.
 
 
 
-\### Regla de protección
+### Regla de protección
 
 
 
@@ -1120,11 +1120,11 @@ Cuando una acción consume créditos, debe producir una salida real, visible o t
 
 
 
-\---
+---
 
 
 
-\## 12. Relación entre Activación y Exportación
+## 12. Relación entre Activación y Exportación
 
 
 
@@ -1132,7 +1132,7 @@ La activación puede preparar un proyecto para seguir dentro del sistema o para 
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1148,19 +1148,19 @@ La activación puede preparar:
 
 
 
-\- continuidad interna;
+- continuidad interna;
 
-\- evolución dentro del sistema;
+- evolución dentro del sistema;
 
-\- eventual salida valorada y transferible;
+- eventual salida valorada y transferible;
 
-\- estructura mínima para valorar la exportación;
+- estructura mínima para valorar la exportación;
 
-\- criterios de complejidad.
+- criterios de complejidad.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1168,11 +1168,11 @@ No se debe presentar exportación como algo trivial si el proyecto todavía no t
 
 
 
-\---
+---
 
 
 
-\## 13. Relación entre Activación y Deploy
+## 13. Relación entre Activación y Deploy
 
 
 
@@ -1180,27 +1180,27 @@ La activación puede preparar la dirección de despliegue, pero no activa deploy
 
 
 
-\### Puede preparar
+### Puede preparar
 
 
 
-\- stack recomendado;
+- stack recomendado;
 
-\- tipo de hosting;
+- tipo de hosting;
 
-\- integración futura;
+- integración futura;
 
-\- dependencias;
+- dependencias;
 
-\- complejidad;
+- complejidad;
 
-\- riesgos;
+- riesgos;
 
-\- checklist previo.
+- checklist previo.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1208,23 +1208,23 @@ Deploy pertenece a una fase posterior y exige:
 
 
 
-\- estructura coherente;
+- estructura coherente;
 
-\- código coherente;
+- código coherente;
 
-\- estado del proyecto;
+- estado del proyecto;
 
-\- validación técnica;
+- validación técnica;
 
-\- permisos o coste claro.
-
-
-
-\---
+- permisos o coste claro.
 
 
 
-\## 14. Activación como entrada al Builder
+---
+
+
+
+## 14. Activación como entrada al Builder
 
 
 
@@ -1232,29 +1232,29 @@ La activación debe convertirse en una entrada fuerte para el Builder.
 
 
 
-\### Debe poder producir
+### Debe poder producir
 
 
 
-\- `project\_kind`;
+- `project\_kind`;
 
-\- `activation\_level`;
+- `activation\_level`;
 
-\- `suggested\_stack`;
+- `suggested\_stack`;
 
-\- `initial\_blocks`;
+- `initial\_blocks`;
 
-\- `recommended\_mutations`;
+- `recommended\_mutations`;
 
-\- `technical\_path`;
+- `technical\_path`;
 
-\- `non\_technical\_path`;
+- `non\_technical\_path`;
 
-\- `next\_best\_actions`.
+- `next\_best\_actions`.
 
 
 
-\### Ejemplo
+### Ejemplo
 
 
 
@@ -1262,15 +1262,15 @@ Si el usuario quiere una web de restaurante, la activación puede preparar:
 
 
 
-\- tipo: restaurante;
+- tipo: restaurante;
 
-\- objetivo: reservas;
+- objetivo: reservas;
 
-\- bloques iniciales: hero, carta, reservas, ubicación, reseñas;
+- bloques iniciales: hero, carta, reservas, ubicación, reseñas;
 
-\- CTA: reservar mesa;
+- CTA: reservar mesa;
 
-\- siguiente acción: activar reservas.
+- siguiente acción: activar reservas.
 
 
 
@@ -1278,11 +1278,11 @@ El Builder debe convertir eso en estado vivo, preview, código y estructura.
 
 
 
-\---
+---
 
 
 
-\## 15. Preguntas y continuidad
+## 15. Preguntas y continuidad
 
 
 
@@ -1290,7 +1290,7 @@ La activación debe ayudar a formular mejores preguntas.
 
 
 
-\### Regla
+### Regla
 
 
 
@@ -1302,11 +1302,11 @@ No deben volver siempre a:
 
 
 
-\- más premium;
+- más premium;
 
-\- más claridad;
+- más claridad;
 
-\- más conversión.
+- más conversión.
 
 
 
@@ -1314,25 +1314,25 @@ Deben depender de:
 
 
 
-\- tipo de proyecto;
+- tipo de proyecto;
 
-\- sector;
+- sector;
 
-\- intención;
+- intención;
 
-\- nivel del usuario;
+- nivel del usuario;
 
-\- acciones ya aplicadas;
+- acciones ya aplicadas;
 
-\- estado vivo;
+- estado vivo;
 
-\- potencial de mejora;
+- potencial de mejora;
 
-\- coste o valor de la siguiente acción.
+- coste o valor de la siguiente acción.
 
 
 
-\### Resultado esperado
+### Resultado esperado
 
 
 
@@ -1340,11 +1340,11 @@ El usuario siente que el sistema avanza con él, no que repite una plantilla.
 
 
 
-\---
+---
 
 
 
-\## 16. Regla de producto
+## 16. Regla de producto
 
 
 
@@ -1352,7 +1352,7 @@ Cada vez que se diseñe una mejora del sistema, debe preguntarse:
 
 
 
-\### A
+### A
 
 
 
@@ -1360,7 +1360,7 @@ Cada vez que se diseñe una mejora del sistema, debe preguntarse:
 
 
 
-\### B
+### B
 
 
 
@@ -1368,7 +1368,7 @@ Cada vez que se diseñe una mejora del sistema, debe preguntarse:
 
 
 
-\### C
+### C
 
 
 
@@ -1376,7 +1376,7 @@ Cada vez que se diseñe una mejora del sistema, debe preguntarse:
 
 
 
-\### D
+### D
 
 
 
@@ -1388,11 +1388,11 @@ Si no mejora una de esas cosas, no debe priorizarse.
 
 
 
-\---
+---
 
 
 
-\## 17. Riesgos que debe evitar Activación
+## 17. Riesgos que debe evitar Activación
 
 
 
@@ -1400,31 +1400,31 @@ Activación debe evitar:
 
 
 
-\- convertirse en texto largo;
+- convertirse en texto largo;
 
-\- parecer consultoría manual disfrazada;
+- parecer consultoría manual disfrazada;
 
-\- prometer Builder sin construcción visible;
+- prometer Builder sin construcción visible;
 
-\- prometer exportación sin estructura;
+- prometer exportación sin estructura;
 
-\- prometer deploy sin validación;
+- prometer deploy sin validación;
 
-\- consumir créditos sin salida real;
+- consumir créditos sin salida real;
 
-\- duplicar lógica que pertenece al Builder;
+- duplicar lógica que pertenece al Builder;
 
-\- confundir al usuario técnico;
+- confundir al usuario técnico;
 
-\- abandonar al usuario no técnico.
-
-
-
-\---
+- abandonar al usuario no técnico.
 
 
 
-\## 18. Criterio de cierre de Activación
+---
+
+
+
+## 18. Criterio de cierre de Activación
 
 
 
@@ -1432,29 +1432,29 @@ Activación está correctamente definida cuando puede responder:
 
 
 
-\- qué se construirá;
+- qué se construirá;
 
-\- por qué se construirá;
+- por qué se construirá;
 
-\- en qué orden;
+- en qué orden;
 
-\- con qué stack o base;
+- con qué stack o base;
 
-\- qué necesita el usuario;
+- qué necesita el usuario;
 
-\- qué necesita el Builder;
+- qué necesita el Builder;
 
-\- qué puede consumir créditos;
+- qué puede consumir créditos;
 
-\- qué puede acabar en exportación;
+- qué puede acabar en exportación;
 
-\- qué puede acabar en deploy;
+- qué puede acabar en deploy;
 
-\- qué siguiente decisión tiene sentido.
+- qué siguiente decisión tiene sentido.
 
 
 
-\### Cierre operativo
+### Cierre operativo
 
 
 
@@ -1466,11 +1466,11 @@ Activación está cerrada cuando prepara una construcción real.
 
 
 
-\---
+---
 
 
 
-\## 19. Cierre doctrinal
+## 19. Cierre doctrinal
 
 
 
@@ -1482,15 +1482,15 @@ No debe tratarse como:
 
 
 
-\- bloque secundario;
+- bloque secundario;
 
-\- texto ampliado;
+- texto ampliado;
 
-\- soporte artesanal encubierto;
+- soporte artesanal encubierto;
 
-\- sustituto del Builder;
+- sustituto del Builder;
 
-\- promesa sin ejecución.
+- promesa sin ejecución.
 
 
 
@@ -1498,17 +1498,17 @@ Debe tratarse como:
 
 
 
-\- puente estructural;
+- puente estructural;
 
-\- capa productizada;
+- capa productizada;
 
-\- activación usable;
+- activación usable;
 
-\- eje de valor real entre diagnóstico y construcción;
+- eje de valor real entre diagnóstico y construcción;
 
-\- entrada de calidad para BuilderBuildKernel;
+- entrada de calidad para BuilderBuildKernel;
 
-\- preparación de continuidad, exportación o deploy cuando proceda.
+- preparación de continuidad, exportación o deploy cuando proceda.
 
 
 
@@ -1539,4 +1539,3 @@ diagnóstico
 → continuidad o salida
 
 ```
-
