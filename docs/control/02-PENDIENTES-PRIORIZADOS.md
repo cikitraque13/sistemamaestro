@@ -1369,6 +1369,135 @@ Los siguientes frentes dejan de ser prioridad activa:
 
 ---
 
+# 0. CRÍTICA — Auditoría y saneamiento raíz del proyecto
+
+Prioridad: crítica estructural previa.  
+Tipo: higiene técnica / saneamiento de repo.  
+Estado: siguiente frente operativo.
+
+---
+
+## Contexto
+
+Tras cerrar el orden documental canónico de `docs/`, no se reanuda todavía el frente de plantillas ni QA Builder.
+
+La microfase documental queda cerrada con:
+
+```text
+docs/architecture/
+docs/control/
+docs/design/
+docs/product/
+docs/qa/
+docs/system/
+docs/system/credits/
+```
+
+También queda confirmado que `docs/control/audit/` fue eliminado como carpeta activa tras retirar auditorías generadas, y que `docs/` no presenta basura visible, directorios vacíos ni cambios pendientes.
+
+Antes de continuar con producto, se ejecutará una auditoría de raíz para detectar y clasificar suciedad operativa, archivos temporales, entornos locales, duplicados, backups y artefactos regenerables.
+
+---
+
+## Objetivo
+
+Dejar la raíz del proyecto limpia, trazable y profesional antes de continuar con producto.
+
+La limpieza debe distinguir entre:
+
+```text
+CONSERVAR
+MOVER
+ELIMINAR
+PROTEGER / ROTAR
+IGNORAR EN GIT
+```
+
+---
+
+## Elementos a auditar
+
+Auditar especialmente:
+
+```text
+.env
+.env.local
+.env.*
+.venv/
+venv/
+uv/
+uv.lock
+node_modules/
+build/
+dist/
+coverage/
+__pycache__/
+.pytest_cache/
+.cache/
+.DS_Store
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+logs/
+backups/
+audit logs generados
+archivos duplicados
+paquetes comprimidos antiguos
+artefactos generados
+```
+
+---
+
+## Regla operativa
+
+No se borra nada a ciegas.
+
+Cada hallazgo debe clasificarse antes de ejecutar cambios.
+
+La limpieza debe hacerse en commits separados y con finalidad única:
+
+1. auditoría sin borrar;
+2. eliminación de temporales claros;
+3. limpieza de backups;
+4. limpieza de entornos locales;
+5. actualización de `.gitignore` si procede;
+6. validación de build/test.
+
+---
+
+## Criterio de cierre
+
+La microfase queda cerrada si:
+
+- la raíz del proyecto queda limpia;
+- no quedan `.env` ni secretos dentro del repo activo;
+- no quedan entornos locales versionables;
+- no quedan builds o cachés innecesarios;
+- no quedan backups contaminando el árbol activo;
+- no quedan dumps de auditoría usados como memoria paralela;
+- los documentos canónicos permanecen intactos;
+- `git status` queda limpio;
+- build frontend pasa;
+- backend valida arranque o health si procede;
+- no se rompe la estructura `frontend/`, `backend/`, `docs/`.
+
+---
+
+## Después de esta microfase
+
+Una vez cerrado el saneamiento raíz, se podrá reanudar el siguiente frente de producto:
+
+```text
+QA Builder 10 plantillas / plantillas construibles
+```
+
+Hasta entonces, no se abre trabajo nuevo de producto.
+
+---
+
 ## Prioridad 1 — QA Builder 10 plantillas
 
 ### Objetivo
@@ -1385,3 +1514,4 @@ plantilla
 → nuevo output
 → iteraciones sucesivas
 → proyecto terminado
+```

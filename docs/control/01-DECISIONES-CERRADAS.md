@@ -1657,3 +1657,116 @@ Stripe solo puede finalizar pagos mediante eventos firmados.
 
 ```text
 https://sistemamaestro.com/api/payments/webhook/stripe
+
+
+```
+
+## 54. Orden documental canónico y eliminación de auditorías generadas
+
+### Decisión cerrada 49
+
+Fecha: 2026-05-04
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Queda cerrado el orden documental canónico del proyecto dentro de `docs/`.
+
+La documentación queda organizada y saneada por familias funcionales:
+
+```text
+docs/architecture/
+docs/control/
+docs/design/
+docs/product/
+docs/qa/
+docs/system/
+docs/system/credits/
+```
+
+### Cerrado en esta microfase
+
+- Se rellenan los 4 archivos canónicos de `docs/system/credits/`:
+
+```text
+docs/system/credits/00-POLITICA-CANONICA-CREDITOS-V1.md
+docs/system/credits/01-MATRIZ-OPERATIVA-CREDITOS-V1.md
+docs/system/credits/02-MOTOR-CONSUMO-V1.md
+docs/system/credits/03-CONTRATO-TECNICO-V1.md
+```
+
+- Se actualiza la estructura canónica dentro de `docs/system/`.
+- Se corrige y sanea documentación de `docs/architecture/`.
+- Se limpia Markdown escapado, ruido de formato y restos documentales no canónicos.
+- Se normaliza `docs/qa/` con su README/capa de lectura QA.
+- Se normaliza `docs/design/` con su README/capa de lectura Design.
+- Se mantiene `docs/control/` como memoria canónica de decisiones, pendientes y gobierno.
+- Se elimina `docs/control/audit/` como carpeta activa tras retirar los archivos generados de auditoría.
+- La auditoría posterior confirma que `docs/control/audit/` ya no existe en el árbol actual.
+- La auditoría posterior confirma que `docs/` no tiene basura visible, directorios vacíos ni cambios pendientes.
+
+### Evidencia operativa
+
+La auditoría limpia de `docs/` confirma:
+
+```text
+docs/                  → 31 archivos / 8 subcarpetas
+docs/architecture/     → 4 archivos
+docs/control/          → 9 archivos
+docs/control/audit/    → no existe
+docs/design/           → 2 archivos
+docs/product/          → 9 archivos / 1 subcarpeta
+docs/qa/               → 2 archivos
+docs/system/           → 5 archivos / 1 subcarpeta
+docs/system/credits/   → 4 archivos
+```
+
+También confirma:
+
+```text
+posibles archivos basura en docs → ninguno detectado
+directorios vacíos en docs       → ninguno detectado
+git status --short -- docs       → limpio
+git diff --stat -- docs          → limpio
+```
+
+### Historial relacionado
+
+La secuencia documental reciente queda reconocida como:
+
+```text
+971dc2e  Add canonical system credits documentation
+1dc8f9e  Update architecture docs canonical structure
+9e32ce9  Clean markdown escaping in product docs
+5866449  Remove obsolete product structure snapshot
+71245f9  Clean system AI adapter documentation
+1c166ed  Document QA and design guidelines purpose
+ba53558  Remove generated control audit logs
+```
+
+### Motivo
+
+El proyecto necesitaba dejar de depender de documentación dispersa, dumps generados, auditorías temporales, chat o archivos sueltos como memoria operativa.
+
+La memoria estructural queda concentrada en documentos canónicos y carpetas con función clara.
+
+### Efecto operativo
+
+A partir de este cierre:
+
+- el chat no se usa como memoria canónica;
+- los dumps de auditoría no sustituyen a decisiones cerradas ni pendientes priorizados;
+- `docs/control/` mantiene la autoridad de gobierno;
+- `docs/architecture/`, `docs/design/`, `docs/product/`, `docs/qa/` y `docs/system/` quedan como familias documentales reconocidas;
+- `docs/system/credits/` queda reconocido como bloque canónico de créditos técnicos / consumo;
+- cualquier nueva decisión cerrada debe registrarse en `01-DECISIONES-CERRADAS.md`;
+- cualquier trabajo pendiente debe registrarse en `02-PENDIENTES-PRIORIZADOS.md`.
+
+### Límite
+
+Este cierre no implica reanudar todavía plantillas ni QA Builder.
+
+Antes de seguir con producto, se abre una microfase de auditoría y saneamiento de raíz del proyecto.
