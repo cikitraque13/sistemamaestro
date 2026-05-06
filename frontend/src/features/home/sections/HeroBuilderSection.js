@@ -1,19 +1,19 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import BuilderIntentTabs from '../components/BuilderIntentTabs';
 import BuilderTypeTabs from '../components/BuilderTypeTabs';
 import BuilderCapabilityChips from '../components/BuilderCapabilityChips';
 import BuilderProjectTabs from '../components/BuilderProjectTabs';
 import BuilderInputPanel from '../components/BuilderInputPanel';
-import BuilderCodePreview from '../components/BuilderCodePreview';
-import BuilderVisualPreview from '../components/BuilderVisualPreview';
+import BuilderCodePreview from '../../builder/panels/BuilderCodePreview';
+import BuilderVisualPreview from '../../builder/panels/BuilderVisualPreview';
 import BuilderWorkspaceTabs from '../components/BuilderWorkspaceTabs';
-import BuilderChatDock from '../components/BuilderChatDock';
+import BuilderChatDock from '../../builder/components/BuilderChatDock';
 import BuilderCreditBar from '../components/BuilderCreditBar';
-import BuilderDeployPreview from '../components/BuilderDeployPreview';
-import BuilderStructurePreview from '../components/BuilderStructurePreview';
+import BuilderDeployPreview from '../../builder/panels/BuilderDeployPreview';
+import BuilderStructurePreview from '../../builder/panels/BuilderStructurePreview';
 import builderIntents from '../data/builderIntents';
 import builderTypes from '../data/builderTypes';
-import builderProjects from '../data/builderProjects';
+import builderProjects from '../../builder/data/builderProjects';
 import builderWorkspaceTabs from '../data/builderWorkspaceTabs';
 
 const HeroBuilderSection = () => {
@@ -43,16 +43,16 @@ const HeroBuilderSection = () => {
           </p>
 
           <h1 className="text-4xl font-semibold tracking-tight text-white md:text-6xl">
-            ¿Qué quieres crear, mejorar o escalar hoy?
+            Â¿QuÃ© quieres crear, mejorar o escalar hoy?
           </h1>
 
           <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-300 md:text-xl md:leading-9">
-            Sistema Maestro convierte una idea o una web en una ruta clara de estructura, construcción y continuidad con criterio profesional.
+            Sistema Maestro convierte una idea o una web en una ruta clara de estructura, construcciÃ³n y continuidad con criterio profesional.
           </p>
 
           <div className="mt-7">
             <BuilderCapabilityChips
-              items={['SEO', 'Conversión', 'Arquitectura', 'IA', 'Código', 'Deploy', 'Seguridad']}
+              items={['SEO', 'ConversiÃ³n', 'Arquitectura', 'IA', 'CÃ³digo', 'Deploy', 'Seguridad']}
             />
           </div>
         </div>
@@ -65,7 +65,7 @@ const HeroBuilderSection = () => {
               onChange={setActiveProject}
             />
 
-            <BuilderCreditBar credits={120} bonus={25} usageLabel="Créditos listos para construir, iterar y desplegar." />
+            <BuilderCreditBar credits={120} bonus={25} usageLabel="CrÃ©ditos listos para construir, iterar y desplegar." />
           </div>
 
           <div className="mt-5">
