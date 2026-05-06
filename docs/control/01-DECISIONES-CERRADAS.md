@@ -1770,3 +1770,102 @@ A partir de este cierre:
 Este cierre no implica reanudar todavía plantillas ni QA Builder.
 
 Antes de seguir con producto, se abre una microfase de auditoría y saneamiento de raíz del proyecto.
+
+
+## 55. Saneamiento frontend post-hangar cerrado
+
+### Decisión cerrada 50
+
+Fecha: 2026-05-06
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Queda cerrado el saneamiento estructural del frontend tras la fase de limpieza del hangar.
+
+La intervención se limita a eliminar residuos, duplicados muertos, placeholders vacíos, documentación local obsoleta y legacy no referenciado, sin modificar la lógica viva del producto.
+
+### Cerrado en esta microfase
+
+- Se elimina `yarn.lock` de raíz por no ser el gestor aprobado.
+- Se elimina `.gitconfig` de raíz por ser configuración local/agente.
+- Se elimina `estructura.txt` por ser dump documental antiguo.
+- Se eliminan artefactos locales seguros:
+  - `.venv/`
+  - `.pytest_cache/`
+  - `__pycache__/`
+  - `frontend/node_modules/`
+  - `frontend/build/`
+  - `storage/_tmp/`
+  - backups locales no versionados.
+- Se eliminan duplicados exactos de Builder dentro de Home.
+- Se elimina el reporte local obsoleto `frontend/docs/_reports/builder-ecosystem-report.txt`.
+- Se eliminan placeholders vacíos no referenciados:
+  - `frontend/src/features/home/utils/homeApi.js`
+  - `frontend/src/features/opportunities/components/OpportunityTemplateCard.js`
+  - `frontend/src/features/opportunities/components/OpportunityTemplateGrid.js`
+  - `frontend/src/features/opportunities/data/opportunityTemplates.js`
+- Se elimina el legacy monolítico `frontend/src/components/reports/PremiumReportPdfTemplate.js`.
+- Se eliminan restos muertos del antiguo Builder dentro de Home:
+  - `frontend/src/features/home/components/BuilderCapabilityChips.js`
+  - `frontend/src/features/home/components/BuilderCreditBar.js`
+  - `frontend/src/features/home/components/BuilderFlowPreview.js`
+  - `frontend/src/features/home/components/BuilderInputPanel.js`
+  - `frontend/src/features/home/components/BuilderIntentTabs.js`
+  - `frontend/src/features/home/components/BuilderOutputsPreview.js`
+  - `frontend/src/features/home/components/BuilderProjectTabs.js`
+  - `frontend/src/features/home/components/BuilderTypeTabs.js`
+  - `frontend/src/features/home/components/BuilderWorkspaceTabs.js`
+  - `frontend/src/features/home/data/builderIntents.js`
+  - `frontend/src/features/home/data/builderOutputs.js`
+  - `frontend/src/features/home/data/builderStages.js`
+  - `frontend/src/features/home/data/builderTypes.js`
+  - `frontend/src/features/home/data/builderWorkspaceTabs.js`
+  - `frontend/src/features/home/sections/BuilderShowcaseSection.js`
+  - `frontend/src/features/home/sections/HeroBuilderSection.js`
+
+### Validación final
+
+La auditoría final frontend post-saneamiento confirma:
+
+```text
+Restos Builder muertos en Home → 0 referencias
+Placeholders vacíos → eliminados
+Archivos vacíos → 0
+Carpetas vacías → 0
+Reports legacy → eliminados
+frontend/docs/_reports → eliminado
+Duplicados exactos por hash → 0
+```
+
+Quedan únicamente duplicados por nombre considerados normales o semánticamente distintos:
+
+```text
+index.js
+BuilderWorkspaceTabs.js
+```
+
+### Efecto operativo
+
+A partir de este cierre:
+
+- Home queda limpia de restos del antiguo Builder.
+- Builder real queda protegido dentro de `frontend/src/features/builder/`.
+- La Home vuelve a cumplir su función correcta: presentación, confianza, registro y entrada comercial.
+- Dashboard / Builder conserva la función de herramienta real de construcción.
+- No se deben reintroducir piezas Builder reales dentro de Home.
+- No se deben usar auditorías locales como memoria paralela.
+- No se debe tocar Builder runtime, lifecycle, state o workspace dentro de saneamiento superficial.
+
+### Límite
+
+Este cierre no implica que Builder esté comercialmente cerrado.
+
+Builder lifecycle con mutaciones reales acumulativas sigue siendo frente estructural pendiente y debe tratarse en microfase propia.
+
+### Siguiente frente permitido
+
+Tras cerrar este saneamiento, el siguiente frente debe elegirse desde `02-PENDIENTES-PRIORIZADOS.md`, sin abrir limpieza adicional a ciegas.

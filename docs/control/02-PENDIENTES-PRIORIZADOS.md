@@ -1515,3 +1515,36 @@ plantilla
 → iteraciones sucesivas
 → proyecto terminado
 ```
+
+
+# Actualización priorizada — 2026-05-06
+
+## Cerrado recientemente — Saneamiento frontend post-hangar
+
+Queda cerrada la microfase de saneamiento estructural del frontend.
+
+### Cerrado
+
+- Raíz del proyecto saneada de artefactos obsoletos.
+- `docs/` ya estaba cerrado como memoria canónica.
+- Backend auditado y conservado sin cambios destructivos.
+- Frontend raíz auditado.
+- Home saneada de restos muertos del antiguo Builder.
+- Builder real protegido dentro de `frontend/src/features/builder/`.
+- Placeholders vacíos eliminados.
+- Reports legacy eliminados.
+- `frontend/docs/_reports` eliminado como memoria local obsoleta.
+- Carpetas vacías locales frontend eliminadas.
+- Duplicados exactos por hash eliminados o inexistentes.
+- Build frontend validado tras las microfases.
+- Railway desplegó correctamente tras los PRs cerrados.
+
+### Estado actual
+
+El frontend queda estructuralmente más limpio y alineado:
+
+```text
+Home → presentación, confianza, registro y entrada comercial
+Dashboard / Builder → herramienta real de construcción
+Builder real → frontend/src/features/builder/
+Docs canónicos → docs/control y familias docs/*
