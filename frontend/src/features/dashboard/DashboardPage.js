@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowRight,
@@ -11,16 +10,13 @@ import {
 
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../lib/apiClient';
 
 import DashboardBuilderLauncher from './components/DashboardBuilderLauncher';
 import DashboardWelcomePanel from './components/DashboardWelcomePanel';
 import DashboardStatusPanel from './components/DashboardStatusPanel';
 import DashboardCreditsPanel from './components/DashboardCreditsPanel';
 import DashboardQuickActions from './widgets/DashboardQuickActions';
-
-const API_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
-  .trim()
-  .replace(/\/$/, '');
 
 const BUILDER_LAUNCHER_STATE = {
   focus: 'builder-launcher',
@@ -95,9 +91,9 @@ const DashboardPage = () => {
     const fetchData = async () => {
       try {
         const [statsRes, projectsRes, billingRes] = await Promise.allSettled([
-          axios.get(`${API_URL}/api/user/stats`, { withCredentials: true }),
-          axios.get(`${API_URL}/api/projects`, { withCredentials: true }),
-          axios.get(`${API_URL}/api/user/billing`, { withCredentials: true })
+          api.get('/user/stats'),
+          api.get('/projects'),
+          api.get('/user/billing')
         ]);
 
         if (statsRes.status === 'fulfilled') {
@@ -141,7 +137,10 @@ const DashboardPage = () => {
           transition={{ duration: 0.35 }}
           className="scroll-mt-32 outline-none"
         >
-          <DashboardBuilderLauncher user={user} />
+          <DashboardBuilderLauncher
+            user={user}
+            launcherState={location.state || null}
+          />
         </motion.div>
 
         <motion.div

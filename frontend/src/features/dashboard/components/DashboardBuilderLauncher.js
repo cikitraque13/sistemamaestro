@@ -1,13 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'sonner';
 
-const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
-  .trim()
-  .replace(/\/$/, '');
-
-const API_URL = `${BACKEND_URL}/api`;
+import { api } from '../../../lib/apiClient';
 
 const MODES = [
   {
@@ -222,6 +217,37 @@ const getUserFirstName = (user) => {
   return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
 };
 
+const resolveLauncherMode = (launcherState = null) => {
+  const rawMode = String(
+    launcherState?.initialMode ||
+    launcherState?.launchContext?.route ||
+    launcherState?.inputType ||
+    ''
+  ).toLowerCase();
+
+  const modeMap = {
+    landing: 'landing',
+    sell: 'landing',
+    sell_and_charge: 'landing',
+    idea: 'landing',
+    idea_to_project: 'landing',
+    text: 'landing',
+    web: 'webapp',
+    app: 'webapp',
+    webapp: 'webapp',
+    dashboard: 'webapp',
+    automate: 'automation',
+    automation: 'automation',
+    automate_operation: 'automation',
+    url: 'url',
+    improve: 'url',
+    improve_existing: 'url',
+    blueprint: 'blueprint',
+  };
+
+  return modeMap[rawMode] || 'landing';
+};
+
 const buildLaunchPrompt = ({
   prompt,
   selectedMode,
@@ -342,7 +368,7 @@ const CompactDropUp = ({
   );
 };
 
-const DashboardBuilderLauncher = ({ user }) => {
+const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
   const navigate = useNavigate();
 
   const [activeMode, setActiveMode] = useState('landing');
@@ -353,6 +379,35 @@ const DashboardBuilderLauncher = ({ user }) => {
   const [prompt, setPrompt] = useState('');
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
+
+  const launcherHydrationKey = useMemo(() => {
+    if (!launcherState || launcherState.focus !== 'builder-launcher') return '';
+
+    return [
+      launcherState.source || '',
+      launcherState.initialPrompt || '',
+      launcherState.initialMode || '',
+      launcherState.inputType || '',
+      launcherState.launchContext?.opportunityId || '',
+      launcherState.launchContext?.route || '',
+    ].join('|');
+  }, [launcherState]);
+
+  useEffect(() => {
+    if (!launcherState || launcherState.focus !== 'builder-launcher') return;
+
+    const incomingPrompt =
+      typeof launcherState.initialPrompt === 'string'
+        ? launcherState.initialPrompt.trim()
+        : '';
+
+    if (incomingPrompt) {
+      setPrompt(incomingPrompt);
+      setError('');
+    }
+
+    setActiveMode(resolveLauncherMode(launcherState));
+  }, [launcherState, launcherHydrationKey]);
 
   const selectedMode = useMemo(
     () => MODES.find((item) => item.id === activeMode) || MODES[0],
@@ -402,19 +457,10 @@ const DashboardBuilderLauncher = ({ user }) => {
     setCreating(true);
 
     try {
-      const response = await axios.post(
-        `${API_URL}/projects`,
-        {
-          input_type: selectedMode.inputType,
-          input_content: launchPrompt,
-        },
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-          },
-        }
-      );
+      const response = await api.post('/projects', {
+        input_type: selectedMode.inputType,
+        input_content: launchPrompt,
+      });
 
       const project = response.data;
 
