@@ -1,20 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'sonner';
 
 import { useAuth } from '../../../context/AuthContext';
+import { api } from '../../../lib/apiClient';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
 
 import builderProjects from '../data/builderProjects';
 import builderWorkspaceTabs from '../data/builderWorkspaceTabs';
-
-const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000')
-  .trim()
-  .replace(/\/$/, '');
-
-const API_URL = `${BACKEND_URL}/api`;
 
 const ACTIVE_BUILDER_PROJECT_STORAGE_KEY =
   'sistema_maestro.active_builder_project_id';
@@ -101,9 +95,13 @@ const resolveBuilderIntent = (mode) => {
     idea: 'create',
     url: 'improve',
     builder: 'create',
+    landing: 'create',
+    webapp: 'create',
     automation: 'scale',
+    automate: 'scale',
     deploy: 'scale',
     business: 'improve',
+    blueprint: 'create',
   };
 
   return intentMap[mode] || 'create';
@@ -114,9 +112,13 @@ const resolveBuilderType = (mode) => {
     idea: 'website',
     url: 'website',
     builder: 'app',
+    landing: 'website',
+    webapp: 'app',
     automation: 'tool',
+    automate: 'tool',
     deploy: 'app',
     business: 'website',
+    blueprint: 'website',
   };
 
   return typeMap[mode] || 'website';
@@ -147,7 +149,7 @@ const getErrorMessage = (error) => {
     return detail.msg || JSON.stringify(detail);
   }
 
-  return error?.message || 'Error de conexion con el backend.';
+  return error?.message || 'Error de conexión con el backend.';
 };
 
 export default function BuilderWorkspacePage() {
@@ -218,9 +220,7 @@ export default function BuilderWorkspacePage() {
       setProjectError('');
 
       try {
-        const response = await axios.get(`${API_URL}/projects/${runtimeProjectId}`, {
-          withCredentials: true,
-        });
+        const response = await api.get(`/projects/${runtimeProjectId}`);
 
         if (!mounted) return;
 
@@ -312,15 +312,9 @@ export default function BuilderWorkspacePage() {
     setGeneratingBlueprint(true);
 
     try {
-      const response = await axios.post(
-        `${API_URL}/projects/${project.project_id}/blueprint`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-          },
-        }
+      const response = await api.post(
+        `/projects/${project.project_id}/blueprint`,
+        {}
       );
 
       setProject(response.data);
@@ -335,10 +329,10 @@ export default function BuilderWorkspacePage() {
   };
 
   const contextBody = project
-    ? `Proyecto real ${project.project_id}. Estado: ${project.status || 'sin estado'}. El Builder ya esta conectado al diagnostico del backend.`
+    ? `Proyecto real ${project.project_id}. Estado: ${project.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
     : initialPrompt
-      ? `Entrada recibida: "${initialPrompt}". El Builder esta esperando proyecto real.`
-      : 'Builder operativo para construir, revisar diagnostico, generar blueprint y preparar continuidad.';
+      ? `Entrada recibida: "${initialPrompt}". El Builder está esperando proyecto real.`
+      : 'Builder operativo para construir, revisar diagnóstico, generar blueprint y preparar continuidad.';
 
   return (
     <AppShellLayout
@@ -353,7 +347,7 @@ export default function BuilderWorkspacePage() {
       onWorkspaceTabChange={setActiveWorkspaceTab}
       credits={user?.credit_balance ?? 0}
       bonus={user?.credit_lifetime_granted ?? 0}
-      usageLabel="Creditos visibles para analisis, builder, blueprint, exportacion y deploy."
+      usageLabel="Créditos visibles para análisis, builder, blueprint, exportación y deploy."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
       contextTitle={project ? `Proyecto ${project.project_id}` : 'Builder activo'}
