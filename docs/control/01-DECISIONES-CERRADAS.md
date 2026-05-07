@@ -1869,3 +1869,156 @@ Builder lifecycle con mutaciones reales acumulativas sigue siendo frente estruct
 ### Siguiente frente permitido
 
 Tras cerrar este saneamiento, el siguiente frente debe elegirse desde `02-PENDIENTES-PRIORIZADOS.md`, sin abrir limpieza adicional a ciegas.
+
+
+
+
+## 56. Sprint Reactor 01 como siguiente fase de producto
+
+### Decisión cerrada 51
+
+Fecha: 2026-05-06
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Tras cerrar el saneamiento frontend post-hangar, el proyecto entra en fase de **Sprint Reactor 01 — Prueba de Vida del Builder**.
+
+La prioridad deja de ser limpieza estructural y pasa a ser demostrar causalidad verificable dentro del Builder.
+
+### Regla aprobada
+
+Sistema Maestro no debe avanzar a 10 plantillas, marketplace, exportación, deploy final, n8n ni nuevas capas de producto hasta validar primero que el Builder carga un proyecto real y aplica una mutación atómica sobre estado vivo.
+
+La regla de arquitectura queda fijada así:
+
+```text
+OpenAI interpreta.
+OpenAI propone comandos.
+El sistema valida.
+El Kernel aplica.
+BuilderBuildState manda.
+OutputMap representa.
+```
+
+### Fuente de verdad
+
+La única fuente de verdad de lo construido dentro del Builder debe ser:
+
+```text
+BuilderBuildState
+```
+
+Nada debe tocar preview, código o estructura si no pasa por `BuilderBuildState`.
+
+### Secuencia aprobada
+
+El orden de ejecución queda cerrado así:
+
+```text
+1. Cerrar y desplegar el fix del apiClient del Builder.
+2. Validar Gate 1: project_id real.
+3. Limpiar mojibake visible del runtime Builder.
+4. Implementar Command Contract V1.
+5. Ejecutar Mutación Atómica.
+6. Solo después abrir Plantilla 1 como circuito maestro.
+```
+
+### Gate 1 — Project ID real
+
+Antes de tocar mutaciones, plantillas o lifecycle profundo, debe validarse:
+
+```text
+Oportunidades
+→ Dashboard Launcher
+→ Crear proyecto
+→ /dashboard/builder?project_id=REAL_ID
+→ Builder carga proyecto real
+```
+
+Gate 1 solo queda cerrado si se puede reportar:
+
+```text
+project_id real: sí
+```
+
+### Command Contract V1
+
+El contrato inicial de comandos queda limitado a:
+
+```text
+UPDATE_THEME
+UPDATE_CTA
+ADD_SECTION
+```
+
+No se aprueba abrir una arquitectura de comandos más amplia hasta validar una mutación atómica.
+
+### Mutación Atómica
+
+La primera prueba de vida del Builder queda definida como:
+
+```text
+Cambia el CTA principal a Reservar consulta y ponlo naranja.
+```
+
+Esta prueba solo queda superada si cambian las cinco dimensiones:
+
+```text
+BuilderBuildState muta: sí
+preview cambia: sí
+código cambia: sí
+estructura cambia: sí
+siguiente decisión cambia: sí
+```
+
+### Plantilla 1
+
+La Plantilla 1 no se trata como contenido ni como diseño.
+
+Se trata como circuito maestro para validar que una oportunidad puede convertirse en proyecto construible acumulativo.
+
+Primera plantilla objetivo:
+
+```text
+opp_001 — Asistente web para atención y captación
+```
+
+No se aprueba avanzar a 10 plantillas hasta que Plantilla 1 demuestre el recorrido completo:
+
+```text
+oportunidad
+→ prompt correcto
+→ proyecto real
+→ Builder
+→ primera versión específica
+→ mejora del usuario
+→ mutación aplicada
+→ estado actualizado
+→ preview/código/estructura cambiados
+→ siguiente decisión contextual
+
+```
+
+### Efecto operativo
+
+A partir de esta decisión:
+
+- no se abre más limpieza a ciegas;
+- no se abre n8n;
+- no se abre marketplace;
+- no se abre export avanzado;
+- no se abren 10 plantillas;
+- no se reabre Home;
+- no se toca Builder por estética;
+- no se cobra como construcción cerrada si no hay estado mutado y verificable;
+- cualquier avance del Builder debe demostrar estado vivo.
+
+### Límite
+
+Esta decisión no cierra Builder comercialmente.
+
+Solo fija el marco de ejecución para demostrar la primera prueba de vida del Builder.
