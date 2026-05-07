@@ -1548,3 +1548,387 @@ Home → presentación, confianza, registro y entrada comercial
 Dashboard / Builder → herramienta real de construcción
 Builder real → frontend/src/features/builder/
 Docs canónicos → docs/control y familias docs/*
+
+
+---
+
+# Actualización priorizada — 2026-05-06 — Sprint Reactor 01
+
+## Estado operativo vigente
+
+Tras cerrar el saneamiento frontend post-hangar, el frente operativo vigente pasa a ser:
+
+```text
+Sprint Reactor 01 — Prueba de Vida del Builder
+```
+
+Este bloque prevalece sobre prioridades anteriores mientras no se cierre Gate 1.
+
+La prioridad inmediata ya no es seguir limpiando, rediseñar, abrir nuevas plantillas ni añadir más capas. La prioridad inmediata es demostrar que el Builder trabaja con un proyecto real y que puede mutar estado vivo.
+
+---
+
+# 0. CRÍTICA — Sprint Reactor 01: Prueba de Vida del Builder
+
+Prioridad: crítica estructural.  
+Tipo: validación del núcleo real del producto.  
+Estado: siguiente frente operativo.
+
+---
+
+## Objetivo
+
+Demostrar que Sistema Maestro no solo responde, sino que construye mediante estado vivo.
+
+La cadena mínima a validar es:
+
+```text
+input humano
+→ comando válido
+→ mutación atómica
+→ BuilderBuildState
+→ OutputMap
+→ preview / código / estructura
+→ siguiente decisión
+```
+
+La fuente de verdad del Builder debe ser:
+
+```text
+BuilderBuildState
+```
+
+Nada debe tocar preview, código o estructura si no pasa por `BuilderBuildState`.
+
+---
+
+## Regla de foco
+
+Hasta cerrar Sprint Reactor 01, queda bloqueado abrir:
+
+```text
+n8n
+marketplace
+export avanzado
+deploy final
+10 plantillas
+más diseño Home
+más limpieza
+más agentes
+más pricing
+```
+
+Cualquier frente anterior queda subordinado a Gate 1.
+
+---
+
+## Secuencia obligatoria
+
+```text
+1. Cerrar PR fix/builder-workspace-api-client.
+2. Desplegar en Railway.
+3. Validar Gate 1: project_id real.
+4. Limpiar mojibake visible del runtime Builder.
+5. Implementar Command Contract V1.
+6. Ejecutar Mutación Atómica.
+7. Convertir Plantilla 1 en circuito maestro.
+```
+
+---
+
+## Gate 1 — Project ID real
+
+### Objetivo
+
+Validar que el Builder carga el proyecto real creado desde el flujo de entrada.
+
+### Flujo a probar
+
+```text
+Oportunidades
+→ Dashboard Launcher
+→ Crear proyecto
+→ /dashboard/builder?project_id=REAL_ID
+→ Builder carga proyecto real
+```
+
+### Informe requerido
+
+```text
+Deploy Railway: sí/no
+URL producción cargada: sí/no
+Login válido: sí/no
+
+Flujo:
+Oportunidades → Dashboard Launcher → Builder
+
+Prompt cargado en launcher: sí/no
+Crear proyecto: sí/no
+project_id en URL: sí/no
+Builder carga proyecto real: sí/no
+
+Resultado:
+continuar / abortar
+
+Observación técnica:
+solo si falla
+```
+
+### Criterio de cierre
+
+Gate 1 queda cerrado solo si:
+
+```text
+project_id real: sí
+```
+
+Si Gate 1 falla, se aborta cualquier avance posterior y se repara el cable exacto.
+
+---
+
+## Gate 2 — Mojibake runtime
+
+### Objetivo
+
+Eliminar caracteres corruptos visibles del runtime del Builder.
+
+### Archivos prioritarios
+
+```text
+frontend/src/features/builder/workspace/hooks/useBuilderWorkspaceRuntime.js
+frontend/src/features/builder/state/builderMutationRegistry.js
+frontend/src/features/builder/state/builderQuestionFlowRegistry.js
+```
+
+### Patrones a eliminar
+
+```text
+Ã
+Â
+AÃ
+crÃ
+versiÃ
+conversiÃ
+```
+
+### Criterio de cierre
+
+```text
+mojibake visible: 0
+build: ok
+PR: ok
+Railway: ok
+```
+
+---
+
+## Gate 3 — Command Contract V1
+
+### Objetivo
+
+Forzar que OpenAI deje de gobernar directamente preview, código o estructura.
+
+La relación correcta es:
+
+```text
+OpenAI propone comandos
+→ el sistema valida
+→ el Kernel aplica
+→ BuilderBuildState manda
+→ OutputMap representa
+```
+
+### Comandos V1
+
+```text
+UPDATE_THEME
+UPDATE_CTA
+ADD_SECTION
+```
+
+### Criterio de cierre
+
+El contrato queda validado si:
+
+- una instrucción del usuario se transforma en comando soportado;
+- un comando no soportado se rechaza;
+- ningún cambio visible se aplica si no pasa por el validador;
+- la mutación resultante pasa por `BuilderBuildState`.
+
+---
+
+## Gate 4 — Mutación Atómica
+
+### Prueba única
+
+```text
+Cambia el CTA principal a Reservar consulta y ponlo naranja.
+```
+
+### Criterio de cierre
+
+La prueba solo queda cerrada si:
+
+```text
+BuilderBuildState muta: sí
+preview cambia: sí
+código cambia: sí
+estructura cambia: sí
+siguiente decisión cambia: sí
+```
+
+### Siguiente decisión esperada
+
+```text
+¿Quieres que el CTA lleve a formulario, WhatsApp, calendario o email?
+```
+
+---
+
+# 1. ALTA — Plantilla 1 como circuito maestro
+
+Prioridad: alta.  
+Tipo: validación de producto construible.  
+Estado: pendiente posterior a Mutación Atómica.
+
+---
+
+## Plantilla objetivo
+
+```text
+opp_001 — Asistente web para atención y captación
+```
+
+## Regla
+
+Plantilla 1 no se trata como diseño ni como contenido estático.
+
+Se trata como circuito maestro para validar una oportunidad convertida en proyecto construible acumulativo.
+
+## Recorrido esperado
+
+```text
+oportunidad
+→ prompt correcto
+→ proyecto real
+→ Builder
+→ primera versión específica
+→ mejora del usuario
+→ mutación aplicada
+→ estado actualizado
+→ preview/código/estructura cambiados
+→ siguiente decisión contextual
+```
+
+## Fases mínimas
+
+```text
+1. Base estratégica
+2. Promesa
+3. Flujo conversacional
+4. CTA / conversión
+5. Confianza
+6. Captación
+7. Seguimiento
+8. Salida técnica
+```
+
+## Cada fase debe producir
+
+```text
+output visible
+mutación aplicable
+estado actualizado
+siguiente decisión
+```
+
+## Criterio de cierre
+
+Plantilla 1 queda cerrada si completa un recorrido verificable desde oportunidad hasta estado acumulativo y produce mutaciones reales en:
+
+```text
+BuilderBuildState
+preview
+código
+estructura
+siguiente decisión
+```
+
+---
+
+# 2. CRÍTICO POSTERIOR — Builder lifecycle → mutaciones reales acumulativas
+
+Prioridad: crítica estructural.  
+Tipo: núcleo Builder.  
+Estado: pendiente posterior a Sprint Reactor 01.
+
+---
+
+## Condición de apertura
+
+No se abre este frente hasta cerrar:
+
+```text
+Gate 1 — project_id real
+Gate 2 — mojibake runtime
+Gate 3 — Command Contract V1
+Gate 4 — Mutación Atómica
+```
+
+## Objetivo
+
+Que cada acción lifecycle aceptada por el usuario modifique de forma acumulativa:
+
+```text
+preview
+código
+estructura
+estado acumulado
+readinessScore
+siguiente decisión
+```
+
+---
+
+# 3. PENDIENTE POSTERIOR — Reserva y confirmación de Gemas
+
+Prioridad: alta.  
+Tipo: monetización / justicia de consumo.  
+Estado: pendiente posterior a estado vivo.
+
+---
+
+## Regla futura
+
+El consumo de Gemas debe evolucionar hacia:
+
+```text
+reservar gemas
+→ ejecutar IA/kernel
+→ validar BuildSnapshot
+→ confirmar consumo
+```
+
+No se aprueba consolidar un modelo donde el usuario pierde Gemas por un flujo que no produce estado útil.
+
+## Condición de apertura
+
+Este frente se abre después de validar que el Builder produce mutaciones reales y verificables.
+
+---
+
+# Resumen ejecutivo vigente
+
+El backlog operativo inmediato queda así:
+
+```text
+1. Sprint Reactor 01 — Gate 1: project_id real.
+2. Mojibake runtime.
+3. Command Contract V1.
+4. Mutación Atómica.
+5. Plantilla 1 como circuito maestro.
+6. Builder lifecycle → mutaciones reales acumulativas.
+7. Reserva/commit de Gemas.
+```
+
+Hasta cerrar Gate 1, no se abre ningún otro frente.
