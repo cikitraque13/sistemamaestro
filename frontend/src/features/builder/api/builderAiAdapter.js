@@ -94,28 +94,44 @@ const normalizePreview = ({
   builderAIOutput = {},
   copy = {},
 } = {}) => {
+  const previewPatch = asObject(builderAIOutput.previewModelPatch);
   const preview = asObject(builderAIOutput.preview);
   const landing = asObject(builderAIOutput.landing);
+  const patchSections = asArray(previewPatch.sections);
 
   return {
     ...landing,
     ...preview,
-    title: pickFirstString(preview.title, landing.title, copy.title),
-    headline: pickFirstString(preview.headline, landing.headline, copy.headline),
-    subtitle: pickFirstString(preview.subtitle, landing.subtitle, copy.subtitle),
+    ...previewPatch,
+    title: pickFirstString(previewPatch.title, previewPatch.headline, preview.title, landing.title, copy.title),
+    headline: pickFirstString(previewPatch.headline, previewPatch.title, preview.headline, landing.headline, copy.headline),
+    subtitle: pickFirstString(previewPatch.subtitle, previewPatch.description, preview.subtitle, landing.subtitle, copy.subtitle),
     description: pickFirstString(
+      previewPatch.description,
+      previewPatch.subtitle,
       preview.description,
       landing.description,
       copy.description
     ),
     primaryCTA: pickFirstString(
+      previewPatch.primaryCTA,
+      previewPatch.cta,
       preview.primaryCTA,
       landing.primaryCTA,
       copy.primaryCTA
     ),
-    sections: asArray(preview.sections).length
-      ? preview.sections
-      : asArray(landing.sections),
+    cta: pickFirstString(
+      previewPatch.cta,
+      previewPatch.primaryCTA,
+      preview.cta,
+      landing.cta,
+      copy.cta
+    ),
+    sections: patchSections.length
+      ? patchSections
+      : asArray(preview.sections).length
+        ? preview.sections
+        : asArray(landing.sections),
   };
 };
 
@@ -125,7 +141,32 @@ const normalizeCode = ({
   copy = {},
 } = {}) => {
   const previousCode = asObject(previousKernelOutput?.code);
+  const codePatch = asObject(builderAIOutput.codeModelPatch);
+  const patchFiles = asArray(codePatch.files);
   const incomingCode = builderAIOutput.code;
+
+  if (patchFiles.length) {
+    const codeFromPatch = patchFiles.reduce((acc, file) => {
+      const path = asString(file?.path);
+      const content = typeof file?.content === 'string' ? file.content : '';
+
+      if (path && content) {
+        acc[path] = content;
+
+        if (path === 'src/App.jsx') {
+          acc.tsx = content;
+          acc['src/App.jsx'] = content;
+        }
+      }
+
+      return acc;
+    }, {});
+
+    return {
+      ...previousCode,
+      ...codeFromPatch,
+    };
+  }
 
   if (incomingCode && typeof incomingCode === 'object' && !Array.isArray(incomingCode)) {
     return {
@@ -160,7 +201,31 @@ const normalizeStructure = ({
   previousKernelOutput = null,
 } = {}) => {
   const previousStructure = asObject(previousKernelOutput?.structure);
+  const structurePatch = asObject(builderAIOutput.structureModelPatch);
+  const patchNodes = asArray(structurePatch.nodes);
+  const patchFolders = asArray(structurePatch.folders);
+  const patchFiles = asArray(structurePatch.files);
+  const patchRoutes = asArray(structurePatch.routes);
+  const patchApiRoutes = asArray(structurePatch.apiRoutes);
   const incomingStructure = builderAIOutput.structure;
+
+  if (
+    patchNodes.length ||
+    patchFolders.length ||
+    patchFiles.length ||
+    patchRoutes.length ||
+    patchApiRoutes.length
+  ) {
+    return {
+      ...previousStructure,
+      ...structurePatch,
+      ...(patchNodes.length ? { nodes: patchNodes } : {}),
+      ...(patchFolders.length ? { folders: patchFolders } : {}),
+      ...(patchFiles.length ? { files: patchFiles } : {}),
+      ...(patchRoutes.length ? { routes: patchRoutes } : {}),
+      ...(patchApiRoutes.length ? { apiRoutes: patchApiRoutes } : {}),
+    };
+  }
 
   if (
     incomingStructure &&
