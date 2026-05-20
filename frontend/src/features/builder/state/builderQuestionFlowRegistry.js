@@ -31,6 +31,20 @@ const priorityActions = [
   BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
 ];
 
+const actionToImpact = {
+  [BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS]: "Acceso",
+  [BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX]: "Seguimiento",
+  [BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION]: "Confianza",
+  [BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS]: "Claridad",
+  [BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW]: "Conversión",
+  [BUILDER_MUTATION_TYPES.ADD_LEADS_FORM]: "Captación",
+  [BUILDER_MUTATION_TYPES.ADD_DASHBOARD]: "Producto",
+  [BUILDER_MUTATION_TYPES.ADD_AUTH_FLOW]: "Activación",
+  [BUILDER_MUTATION_TYPES.ADD_API_LAYER]: "Arquitectura",
+  [BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE]: "Estructura",
+  [BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN]: "Extracción",
+};
+
 const actionToPrompt = {
   [BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS]:
     "Añade acceso con Google visible en la landing y prepara componente de autenticación.",
@@ -64,7 +78,8 @@ const createOptionFromMutation = (type, index = 0) => ({
   label: getBuilderMutationLabel(type),
   description: getBuilderMutation(type)?.description || "",
   prompt: actionToPrompt[type] || getBuilderMutation(type)?.description || getBuilderMutationLabel(type),
-  phase: "builder_decision_loop_v1",
+  phase: "decisión_guiada",
+  impact: actionToImpact[type] || "Construcción",
   source: "builder_question_flow",
   creditTier: getBuilderMutationCreditTier(type),
   priority: 10 + index,

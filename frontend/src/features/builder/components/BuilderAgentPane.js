@@ -298,7 +298,7 @@ const DecisionPanel = ({
         )}
 
         <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-100">
-          Decisiones accionables
+          Decision Center
         </span>
 
         {!compact && (
@@ -326,13 +326,17 @@ const DecisionPanel = ({
               </span>
 
               <span className="block truncate text-[11px] text-zinc-500">
-                {action.description || action.prompt || action.phase || `Coste ${formatCreditTier(action.creditTier)}`}
+                {action.description || action.prompt || `Coste ${formatCreditTier(action.creditTier)}`}
+              </span>
+
+              <span className="mt-1 block truncate text-[10px] uppercase tracking-[0.14em] text-zinc-600">
+                {action.impact || 'Construcción'} · {action.phase || 'decisión'} · {action.mutationAction || action.type || 'mutación'}
               </span>
             </span>
 
             {!compact && (
-              <span className="self-center rounded-full border border-white/[0.08] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-zinc-400">
-                {action.phase || action.mutationAction || action.type || 'mutación'}
+              <span className="self-center rounded-full border border-emerald-200/20 bg-emerald-200/[0.06] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-emerald-100">
+                Aplicar
               </span>
             )}
           </button>
