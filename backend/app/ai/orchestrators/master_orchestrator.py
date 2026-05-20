@@ -11,7 +11,11 @@ State:
 """
 
 from dataclasses import dataclass, asdict
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
+
+from backend.app.ai.agents.report_agent import run_report_agent
+from backend.app.ai.agents.security_architect_agent import run_security_architect_agent
+from backend.app.ai.agents.system_architect_agent import run_system_architect_agent
 
 
 ORCHESTRATOR_NAME = "master_orchestrator"
@@ -175,4 +179,67 @@ def get_orchestrator_manifest() -> Dict[str, object]:
         "phase_1_agents": list(PHASE_1_AGENT_KEYS),
         "runtime_multiagent": False,
         "guards": list(GUARD_LAYERS),
+    }
+
+def run_builder_phase_2_review(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Coordinate a pure phase-2 Builder review without touching live runtime."""
+
+    builder_output = context.get("builder_ai_output") or {}
+    project_id = context.get("project_id")
+    user_id = context.get("user_id")
+
+    architecture = run_system_architect_agent(
+        {
+            "scope": project_id or "builder_phase_2_review",
+            "project_id": project_id,
+            "layers": ["builder_ai_output", "BuilderBuildState", "preview", "code", "structure"],
+            "builder_ai_output": builder_output,
+        }
+    )
+
+    touched_surfaces = set(context.get("touched_surfaces") or [])
+    if builder_output.get("monetizationSignal"):
+        touched_surfaces.add("payments")
+
+    security = run_security_architect_agent(
+        {
+            "project_id": project_id,
+            "user_id": user_id,
+            "touched_surfaces": sorted(touched_surfaces),
+            "builder_ai_output": builder_output,
+        }
+    )
+
+    report = run_report_agent(
+        {
+            "title": "Builder Phase 2 Review",
+            "summary": "Revisión pura de salida Builder AI sin conexión al runtime vivo.",
+            "findings": [
+                *architecture.get("findings", []),
+                *security.get("findings", []),
+            ],
+            "recommendations": [
+                *architecture.get("recommendations", []),
+                *security.get("recommendations", []),
+            ],
+            "next_actions": [
+                *architecture.get("next_actions", []),
+                *security.get("next_actions", []),
+            ],
+            "source": "builder_phase_2_review",
+        }
+    )
+
+    return {
+        "status": "reviewed",
+        "state": ORCHESTRATOR_STATE,
+        "runtime_multiagent": False,
+        "agents_used": [
+            "system_architect_agent",
+            "security_architect_agent",
+            "report_agent",
+        ],
+        "architecture": architecture,
+        "security": security,
+        "report": report,
     }
