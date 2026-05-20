@@ -330,13 +330,13 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
-    label: "Añadir bloque de confianza",
-    description: "Añade prueba, autoridad y seguridad para mejorar conversión.",
+    label: "Añadir confianza",
+    description: "Añade prueba, autoridad, seguridad y objeciones resueltas para mejorar conversión."
     matchers: ["confianza", "reseÃ±as", "resenas", "testimonios", "autoridad", "garantia", "garantÃ­a", "seguridad", "medica", "mÃ©dica", "experiencia"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
-      label: "Añadir bloque de confianza",
+      label: "Añadir confianza",
       source,
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
@@ -358,14 +358,25 @@ export const BUILDER_MUTATION_REGISTRY = {
           content:
             "export function TrustSection(){ return <section><h2>Confianza médica desde la primera visita</h2><ul><li>Equipo especializado</li><li>Tecnología avanzada</li><li>Seguimiento cercano</li></ul></section>; }",
         }),
+        file({
+          path: "src/App.jsx",
+          type: "entry",
+          description: "Entrada actualizada para renderizar la sección de confianza.",
+          content:
+            "import { TrustSection } from './components/sections/TrustSection.jsx';\n\nexport default function App(){ return <main><TrustSection /></main>; }",
+        }),
       ],
       previewModel: { activeSectionId: "trust-section" },
-      codeModel: { entryFile: "src/components/sections/TrustSection.jsx" },
+      codeModel: { entryFile: "src/App.jsx" },
       structureModel: {
         folders: ["src/components/sections"],
-        files: ["src/components/sections/TrustSection.jsx"],
+        files: ["src/App.jsx", "src/components/sections/TrustSection.jsx"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Añadir bloque de confianza."),
+      meta: {
+        runtimeValidation: "Builder_Runtime_Validation_E2E_V1",
+        expectedSnapshots: ["preview", "code", "structure"],
+      },
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Añadir confianza con salida verificable."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
         BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
