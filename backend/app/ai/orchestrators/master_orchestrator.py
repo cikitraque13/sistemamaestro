@@ -17,6 +17,12 @@ from typing import Dict, Tuple
 ORCHESTRATOR_NAME = "master_orchestrator"
 ORCHESTRATOR_VERSION = "v1"
 ORCHESTRATOR_STATE = "bridge"
+PHASE_1_AGENT_KEYS: Tuple[str, ...] = (
+    "builder_agent",
+    "system_architect_agent",
+    "security_architect_agent",
+    "report_agent",
+)
 
 
 @dataclass(frozen=True)
@@ -56,7 +62,7 @@ AGENT_REGISTRY: Dict[str, AgentContract] = {
         allowed_tools=("report_formatter", "output_schema_validator"),
         forbidden_domains=("deploy", "infra_changes", "code_write"),
         output_type="report_document",
-        phase="now",
+        phase="phase_1_minimal",
     ),
     "system_architect_agent": AgentContract(
         key="system_architect_agent",
@@ -65,7 +71,7 @@ AGENT_REGISTRY: Dict[str, AgentContract] = {
         allowed_tools=("structure_mapper", "decision_registry"),
         forbidden_domains=("payments", "marketing_copy"),
         output_type="architecture_decision",
-        phase="next",
+        phase="phase_1_minimal",
     ),
     "builder_agent": AgentContract(
         key="builder_agent",
@@ -74,7 +80,7 @@ AGENT_REGISTRY: Dict[str, AgentContract] = {
         allowed_tools=("repo_reader", "repo_writer", "code_validator"),
         forbidden_domains=("pricing_strategy", "security_policy", "autonomous_deploy"),
         output_type="code_change_set",
-        phase="next",
+        phase="phase_1_minimal",
     ),
     "rescue_sre_agent": AgentContract(
         key="rescue_sre_agent",
@@ -92,7 +98,7 @@ AGENT_REGISTRY: Dict[str, AgentContract] = {
         allowed_tools=("policy_validator", "session_audit", "abuse_patterns"),
         forbidden_domains=("marketing_copy", "general_ui_build"),
         output_type="security_findings",
-        phase="next",
+        phase="phase_1_minimal",
     ),
     "red_team_agent": AgentContract(
         key="red_team_agent",
@@ -166,5 +172,7 @@ def get_orchestrator_manifest() -> Dict[str, object]:
         "version": ORCHESTRATOR_VERSION,
         "state": ORCHESTRATOR_STATE,
         "agents": {key: asdict(value) for key, value in AGENT_REGISTRY.items()},
+        "phase_1_agents": list(PHASE_1_AGENT_KEYS),
+        "runtime_multiagent": False,
         "guards": list(GUARD_LAYERS),
     }
