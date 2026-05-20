@@ -77,8 +77,13 @@ const normalizeDecisionOption = (option, index, decisionMessage = {}) => {
 
   return {
     id: option.id || option.lifecycleActionId || `lifecycle-decision-${index}`,
+    type: option.type || option.mutationType || '',
+    mutationType: option.mutationType || option.type || '',
+    mutationAction: option.mutationAction || option.type || option.mutationType || '',
     label: label || prompt,
+    description: option.description || option.text || '',
     prompt: prompt || label,
+    phase: option.phase || option.lifecycleStageId || decisionMessage?.meta?.targetStageId || '',
     source: option.source || 'builder_lifecycle',
     lifecycleActionId: option.lifecycleActionId || option.id || '',
     lifecycleStageId:
@@ -308,9 +313,9 @@ const InlineSuggestionRows = ({
               {action.label}
             </span>
 
-            {action.creditTier && action.creditTier !== 'none' && (
+            {(action.description || action.phase || action.creditTier) && (
               <span className="block truncate text-[10px] uppercase tracking-[0.14em] text-zinc-600">
-                Coste {formatCreditTier(action.creditTier)}
+                {action.description || action.phase || `Coste ${formatCreditTier(action.creditTier)}`}
                 {action.scoreGain ? ` · +${action.scoreGain} madurez` : ''}
               </span>
             )}
@@ -576,7 +581,7 @@ export default function BuilderAgentPane({
     if (!prompt) return;
 
     if (typeof action?.onDecision === 'function') {
-      action.onDecision(prompt);
+      action.onDecision(action);
       return;
     }
 

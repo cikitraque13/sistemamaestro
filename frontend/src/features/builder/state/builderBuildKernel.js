@@ -7,6 +7,7 @@ import {
 } from "./builderBuildState";
 
 import {
+  buildMutationFromType,
   buildMutationsFromKnowledge,
   buildMutationsFromInput,
 } from "./builderMutationRegistry";
@@ -148,6 +149,61 @@ export function runBuilderBuildKernel({
       summary: getBuildStateSummary(failedState),
     };
   }
+}
+
+export function runBuilderDecisionMutation({
+  action = null,
+  currentState = null,
+  project = null,
+  initialPrompt = "",
+  source = "builder_decision_loop",
+} = {}) {
+  const actionType = action?.type || action?.mutationType || action?.id || "";
+  const previousState = currentState
+    ? normalizeBuildState(currentState)
+    : createBuilderKernelInitialState({ project, initialPrompt });
+  const mutation = buildMutationFromType(actionType, {
+    source,
+    decisionId: action?.id || "",
+  });
+
+  if (!mutation) {
+    return runBuilderBuildKernel({
+      input: action?.prompt || action?.label || "",
+      message: action?.prompt || action?.label || "",
+      project,
+      initialPrompt,
+      currentState: previousState,
+      source,
+    });
+  }
+
+  const nextState = applyBuildMutation(previousState, {
+    ...mutation,
+    source,
+    meta: {
+      ...(mutation.meta || {}),
+      decisionId: action?.id || "",
+      phase: action?.phase || action?.lifecycleStageId || "builder_decision",
+    },
+  });
+  const structure = normalizeBuilderStructure(nextState);
+  const output = createBuilderOutputMap(nextState, { structure });
+  const decisionMessage = createBuilderDecisionMessage(nextState, { structure });
+
+  return {
+    version: BUILDER_BUILD_KERNEL_VERSION,
+    ok: true,
+    input: action?.prompt || action?.label || actionType,
+    previousState,
+    state: nextState,
+    mutations: [mutation],
+    mutationTypes: [mutation.type],
+    output,
+    structure,
+    decisionMessage,
+    summary: getBuildStateSummary(nextState),
+  };
 }
 
 export function previewBuilderBuildKernel(args = {}) {

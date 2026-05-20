@@ -17,6 +17,7 @@ import {
 
 import {
   runBuilderBuildKernel,
+  runBuilderDecisionMutation,
 } from '../../state/builderBuildKernel';
 
 import {
@@ -705,6 +706,31 @@ export default function useBuilderWorkspaceRuntime({
 
   const handleDecision = useCallback(
     (option) => {
+      if (option && typeof option === 'object' && (option.type || option.mutationType || option.mutationAction)) {
+        const kernelResult = runBuilderDecisionMutation({
+          action: option,
+          currentState: builderBuildState,
+          project: projectSnapshot || project,
+          initialPrompt,
+        });
+
+        applyKernelResult(kernelResult);
+        setManualMessages((current) => [
+          ...current,
+          createAgentMessage(`Aplicado: ${option.label || option.type}`, {
+            source: 'builder_decision_loop_v1',
+            builderKernel: {
+              ok: kernelResult?.ok,
+              mutationTypes: kernelResult?.mutationTypes || [],
+              summary: kernelResult?.summary || null,
+            },
+          }),
+        ]);
+        setProgress(96);
+        setIsRunning(false);
+        return;
+      }
+
       const prompt =
         typeof option === 'string'
           ? option
@@ -713,6 +739,11 @@ export default function useBuilderWorkspaceRuntime({
       submitMessage(prompt);
     },
     [
+      applyKernelResult,
+      builderBuildState,
+      initialPrompt,
+      project,
+      projectSnapshot,
       submitMessage,
     ]
   );
