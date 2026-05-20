@@ -59,8 +59,12 @@ const actionToPrompt = {
 const createOptionFromMutation = (type, index = 0) => ({
   id: `flow-${type}`,
   type,
+  mutationType: type,
+  mutationAction: type,
   label: getBuilderMutationLabel(type),
+  description: getBuilderMutation(type)?.description || "",
   prompt: actionToPrompt[type] || getBuilderMutation(type)?.description || getBuilderMutationLabel(type),
+  phase: "builder_decision_loop_v1",
   source: "builder_question_flow",
   creditTier: getBuilderMutationCreditTier(type),
   priority: 10 + index,
@@ -115,7 +119,7 @@ export function resolveBuilderNextActions(buildState = {}, context = {}) {
     ...fallback,
   ])
     .filter((option) => !hasAppliedAction(state, option.type))
-    .slice(0, 4);
+    .slice(0, 3);
 }
 
 export function resolveBuilderQuestionPreset(buildState = {}, context = {}) {
