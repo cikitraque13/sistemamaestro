@@ -158,7 +158,7 @@ export const BUILDER_MUTATION_REGISTRY = {
   [BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS,
     label: "Preparar acceso con Google",
-    description: "Prepara autenticaciÃ³n con Google como capacidad interna, no como bloque de landing.",
+    description: "Prepara autenticación con Google como capacidad interna, no como bloque de landing.",
     matchers: ["google", "entrar con google", "login con google", "acceso google", "signin google"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
@@ -170,7 +170,7 @@ export const BUILDER_MUTATION_REGISTRY = {
       components: [
         component("google-access-card", "GoogleAccessCard", "src/components/auth/GoogleAccessCard.jsx"),
       ],
-      folders: [folder("src/components/auth", "Componentes de autenticaciÃ³n.")],
+      folders: [folder("src/components/auth", "Componentes de autenticación.")],
       files: [
         file({
           path: "src/components/auth/GoogleAccessCard.jsx",
@@ -196,45 +196,45 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX,
-    label: "AÃ±adir captaciÃ³n por email",
-    description: "AÃ±ade un bloque de captaciÃ³n por email orientado a pacientes o clientes.",
+    label: "Añadir captación por email",
+    description: "Añade un bloque de captación por email orientado a pacientes o clientes.",
     matchers: ["suscribete", "suscrÃ­bete", "newsletter", "suscripcion", "suscripciÃ³n", "email", "mail", "correo"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX,
-      label: "AÃ±adir captaciÃ³n por email",
+      label: "Añadir captación por email",
       source,
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
-        block("email-capture", "lead_capture", "CaptaciÃ³n por email", 30, {
-          title: "Recibe informaciÃ³n antes de reservar",
-          subtitle: "DÃ©janos tu email y te enviaremos disponibilidad, detalles del servicio y prÃ³ximos pasos.",
+        block("email-capture", "lead_capture", "Captación por email", 30, {
+          title: "Recibe información antes de reservar",
+          subtitle: "Déjanos tu email y te enviaremos disponibilidad, detalles del servicio y próximos pasos.",
           placeholder: "tu@email.com",
-          buttonLabel: "Enviar informaciÃ³n",
+          buttonLabel: "Enviar información",
         }),
       ],
       components: [
         component("email-capture-box", "EmailCaptureBox", "src/components/conversion/EmailCaptureBox.jsx"),
       ],
-      folders: [folder("src/components/conversion", "Componentes de conversiÃ³n y captaciÃ³n.")],
+      folders: [folder("src/components/conversion", "Componentes de conversión y captación.")],
       files: [
         file({
           path: "src/components/conversion/EmailCaptureBox.jsx",
           type: "component",
-          description: "Bloque de captaciÃ³n por email.",
+          description: "Bloque de captación por email.",
           content:
-            "export function EmailCaptureBox(){ return <section><h2>Recibe informaciÃ³n antes de reservar</h2><input placeholder='tu@email.com'/><button>Enviar informaciÃ³n</button></section>; }",
+            "export function EmailCaptureBox(){ return <section><h2>Recibe información antes de reservar</h2><input placeholder='tu@email.com'/><button>Enviar información</button></section>; }",
         }),
       ],
-      ctas: [cta("cta-email-capture", "Enviar informaciÃ³n", "/", "lead")],
+      ctas: [cta("cta-email-capture", "Enviar información", "/", "lead")],
       previewModel: { activeSectionId: "email-capture" },
       codeModel: { entryFile: "src/components/conversion/EmailCaptureBox.jsx" },
       structureModel: {
         folders: ["src/components/conversion"],
         files: ["src/components/conversion/EmailCaptureBox.jsx"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "AÃ±adir captaciÃ³n de leads por email."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Añadir captación de leads por email."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
@@ -245,24 +245,24 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_GEMA_MAESTRA_SECTION]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_GEMA_MAESTRA_SECTION,
-    label: "Preparar monetizaciÃ³n por crÃ©ditos",
-    description: "Registra Gema Maestra como capacidad interna de monetizaciÃ³n, no como bloque visual de landing.",
+    label: "Preparar monetización por créditos",
+    description: "Registra Gema Maestra como capacidad interna de monetización, no como bloque visual de landing.",
     matchers: ["gema", "gema maestra", "creditos", "crÃ©ditos", "bonus"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_GEMA_MAESTRA_SECTION,
-      label: "Preparar monetizaciÃ³n por crÃ©ditos",
+      label: "Preparar monetización por créditos",
       source,
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
-      folders: [folder("src/components/credits", "Componentes internos de crÃ©ditos.")],
+      folders: [folder("src/components/credits", "Componentes internos de créditos.")],
       files: [
         file({
           path: "src/components/credits/CreditsBadge.jsx",
           type: "component",
-          description: "Indicador interno de crÃ©ditos.",
+          description: "Indicador interno de créditos.",
           content:
-            "export function CreditsBadge(){ return <aside>CrÃ©ditos disponibles</aside>; }",
+            "export function CreditsBadge(){ return <aside>Créditos disponibles</aside>; }",
         }),
       ],
       structureModel: {
@@ -270,7 +270,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         files: ["src/components/credits/CreditsBadge.jsx"],
       },
       codeModel: { entryFile: "src/components/credits/CreditsBadge.jsx" },
-      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Preparar monetizaciÃ³n interna por crÃ©ditos."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Preparar monetización interna por créditos."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
@@ -280,21 +280,21 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS,
-    label: "AÃ±adir proceso de cliente",
+    label: "Añadir proceso de cliente",
     description: "Explica el proceso del negocio desde la solicitud hasta la cita o contacto.",
     matchers: ["como funciona", "cÃ³mo funciona", "pasos", "proceso", "explicar"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS,
-      label: "AÃ±adir proceso de cliente",
+      label: "Añadir proceso de cliente",
       source,
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
         block("client-process", "process", "Proceso", 50, {
-          title: "CÃ³mo serÃ¡ tu primera visita",
+          title: "Cómo será tu primera visita",
           steps: [
-            "CuÃ©ntanos quÃ© tratamiento o servicio necesitas.",
+            "Cuéntanos qué tratamiento o servicio necesitas.",
             "Revisamos tu caso y resolvemos tus dudas.",
             "Confirmamos la cita y el siguiente paso contigo.",
           ],
@@ -308,9 +308,9 @@ export const BUILDER_MUTATION_REGISTRY = {
         file({
           path: "src/components/sections/ClientProcessSection.jsx",
           type: "component",
-          description: "SecciÃ³n de proceso para cliente.",
+          description: "Sección de proceso para cliente.",
           content:
-            "export function ClientProcessSection(){ return <section><h2>CÃ³mo serÃ¡ tu primera visita</h2><ol><li>CuÃ©ntanos quÃ© necesitas.</li><li>Revisamos tu caso.</li><li>Confirmamos tu cita.</li></ol></section>; }",
+            "export function ClientProcessSection(){ return <section><h2>Cómo será tu primera visita</h2><ol><li>Cuéntanos qué necesitas.</li><li>Revisamos tu caso.</li><li>Confirmamos tu cita.</li></ol></section>; }",
         }),
       ],
       previewModel: { activeSectionId: "client-process" },
@@ -319,7 +319,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         folders: ["src/components/sections"],
         files: ["src/components/sections/ClientProcessSection.jsx"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "AÃ±adir explicaciÃ³n del proceso de cliente."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Añadir explicación del proceso de cliente."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
@@ -330,20 +330,20 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
-    label: "AÃ±adir bloque de confianza",
-    description: "AÃ±ade prueba, autoridad y seguridad para mejorar conversiÃ³n.",
+    label: "Añadir bloque de confianza",
+    description: "Añade prueba, autoridad y seguridad para mejorar conversión.",
     matchers: ["confianza", "reseÃ±as", "resenas", "testimonios", "autoridad", "garantia", "garantÃ­a", "seguridad", "medica", "mÃ©dica", "experiencia"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
-      label: "AÃ±adir bloque de confianza",
+      label: "Añadir bloque de confianza",
       source,
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
         block("trust-section", "trust", "Confianza", 60, {
-          title: "Confianza mÃ©dica desde la primera visita",
-          points: ["Equipo especializado", "TecnologÃ­a avanzada", "Seguimiento cercano"],
+          title: "Confianza médica desde la primera visita",
+          points: ["Equipo especializado", "Tecnología avanzada", "Seguimiento cercano"],
         }),
       ],
       components: [
@@ -354,9 +354,9 @@ export const BUILDER_MUTATION_REGISTRY = {
         file({
           path: "src/components/sections/TrustSection.jsx",
           type: "component",
-          description: "SecciÃ³n de confianza.",
+          description: "Sección de confianza.",
           content:
-            "export function TrustSection(){ return <section><h2>Confianza mÃ©dica desde la primera visita</h2><ul><li>Equipo especializado</li><li>TecnologÃ­a avanzada</li><li>Seguimiento cercano</li></ul></section>; }",
+            "export function TrustSection(){ return <section><h2>Confianza médica desde la primera visita</h2><ul><li>Equipo especializado</li><li>Tecnología avanzada</li><li>Seguimiento cercano</li></ul></section>; }",
         }),
       ],
       previewModel: { activeSectionId: "trust-section" },
@@ -365,7 +365,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         folders: ["src/components/sections"],
         files: ["src/components/sections/TrustSection.jsx"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "AÃ±adir bloque de confianza."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Añadir bloque de confianza."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
         BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
@@ -377,7 +377,7 @@ export const BUILDER_MUTATION_REGISTRY = {
   [BUILDER_MUTATION_TYPES.ADD_RESTAURANT_BASE]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_RESTAURANT_BASE,
     label: "Crear base de restaurante",
-    description: "Crea hero, carta, reservas y ubicaciÃ³n para restaurante.",
+    description: "Crea hero, carta, reservas y ubicación para restaurante.",
     matchers: ["restaurante", "bar", "cafeteria", "cafeterÃ­a", "menu", "menÃº", "carta"],
     creditTier: CREDIT_TIERS.MEDIUM,
     build: ({ source = "user" } = {}) => ({
@@ -391,7 +391,7 @@ export const BUILDER_MUTATION_REGISTRY = {
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
         block("restaurant-hero", "hero", "Hero restaurante", 10, {
-          title: "Reserva una experiencia gastronÃ³mica memorable",
+          title: "Reserva una experiencia gastronómica memorable",
           subtitle: "Carta cuidada, ambiente cercano y reserva directa en pocos pasos.",
           buttonLabel: "Reservar mesa",
         }),
@@ -399,16 +399,16 @@ export const BUILDER_MUTATION_REGISTRY = {
           title: "Carta destacada",
           items: ["Entrantes", "Platos principales", "Postres", "Bebidas"],
         }),
-        block("restaurant-location", "location", "UbicaciÃ³n", 40, {
+        block("restaurant-location", "location", "Ubicación", 40, {
           title: "Estamos cerca de ti",
-          subtitle: "Consulta ubicaciÃ³n y horario antes de reservar.",
+          subtitle: "Consulta ubicación y horario antes de reservar.",
         }),
       ],
       components: [
         component("restaurant-landing", "RestaurantLanding", "src/pages/RestaurantLanding.jsx", "page"),
       ],
       folders: [
-        folder("src/pages", "PÃ¡ginas principales."),
+        folder("src/pages", "Páginas principales."),
         folder("src/components/restaurant", "Componentes de restaurante."),
       ],
       files: [
@@ -417,7 +417,7 @@ export const BUILDER_MUTATION_REGISTRY = {
           type: "page",
           description: "Landing inicial de restaurante.",
           content:
-            "export function RestaurantLanding(){ return <main><h1>Reserva una experiencia gastronÃ³mica memorable</h1><button>Reservar mesa</button></main>; }",
+            "export function RestaurantLanding(){ return <main><h1>Reserva una experiencia gastronómica memorable</h1><button>Reservar mesa</button></main>; }",
         }),
       ],
       ctas: [cta("cta-book-table", "Reservar mesa", "/", "booking")],
@@ -443,21 +443,21 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
-    label: "AÃ±adir sistema de citas",
-    description: "AÃ±ade estructura de reserva, CTA y componente inicial para citas o solicitudes.",
+    label: "Añadir sistema de citas",
+    description: "Añade estructura de reserva, CTA y componente inicial para citas o solicitudes.",
     matchers: ["reserva", "reservas", "citas", "cita", "agenda", "booking", "pedir cita", "solicitar cita"],
     creditTier: CREDIT_TIERS.MEDIUM,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
-      label: "AÃ±adir sistema de citas",
+      label: "Añadir sistema de citas",
       source,
       objective: "booking",
       creditTier: CREDIT_TIERS.MEDIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
         block("booking-flow", "booking", "Reserva de cita", 35, {
-          title: "Reserva tu primera valoraciÃ³n",
-          fields: ["nombre", "telÃ©fono", "tratamiento", "fecha preferida"],
+          title: "Reserva tu primera valoración",
+          fields: ["nombre", "teléfono", "tratamiento", "fecha preferida"],
           buttonLabel: "Solicitar cita",
         }),
       ],
@@ -471,7 +471,7 @@ export const BUILDER_MUTATION_REGISTRY = {
           type: "component",
           description: "Formulario inicial de citas.",
           content:
-            "export function BookingForm(){ return <form><input placeholder='Nombre'/><input placeholder='TelÃ©fono'/><input placeholder='Tratamiento'/><button>Solicitar cita</button></form>; }",
+            "export function BookingForm(){ return <form><input placeholder='Nombre'/><input placeholder='Teléfono'/><input placeholder='Tratamiento'/><button>Solicitar cita</button></form>; }",
         }),
       ],
       ctas: [cta("cta-confirm-booking", "Solicitar cita", "/", "booking")],
@@ -481,7 +481,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         folders: ["src/components/booking"],
         files: ["src/components/booking/BookingForm.jsx"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "AÃ±adir reservas visibles."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "Añadir reservas visibles."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
         BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
@@ -492,35 +492,35 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_LEADS_FORM]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
-    label: "AÃ±adir formulario de captaciÃ³n",
-    description: "AÃ±ade formulario de captaciÃ³n para clÃ­nicas, servicios y negocios locales.",
+    label: "Añadir formulario de captación",
+    description: "Añade formulario de captación para clínicas, servicios y negocios locales.",
     matchers: ["leads", "contacto", "formulario", "captar", "clientes", "presupuesto", "solicitud", "valoracion", "valoraciÃ³n"],
     creditTier: CREDIT_TIERS.MEDIUM,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
-      label: "AÃ±adir formulario de captaciÃ³n",
+      label: "Añadir formulario de captación",
       source,
       objective: "lead_generation",
       creditTier: CREDIT_TIERS.MEDIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
         block("lead-form", "lead_form", "Formulario de contacto", 45, {
-          title: "CuÃ©ntanos quÃ© necesitas",
-          fields: ["nombre", "email", "telÃ©fono", "mensaje"],
-          buttonLabel: "Solicitar informaciÃ³n",
+          title: "Cuéntanos qué necesitas",
+          fields: ["nombre", "email", "teléfono", "mensaje"],
+          buttonLabel: "Solicitar información",
         }),
       ],
       components: [
         component("lead-form", "LeadForm", "src/components/conversion/LeadForm.jsx"),
       ],
-      folders: [folder("src/components/conversion", "Componentes de conversiÃ³n.")],
+      folders: [folder("src/components/conversion", "Componentes de conversión.")],
       files: [
         file({
           path: "src/components/conversion/LeadForm.jsx",
           type: "component",
-          description: "Formulario de captaciÃ³n de leads.",
+          description: "Formulario de captación de leads.",
           content:
-            "export function LeadForm(){ return <form><input placeholder='Nombre'/><input placeholder='Email'/><input placeholder='TelÃ©fono'/><textarea placeholder='Mensaje'/><button>Solicitar informaciÃ³n</button></form>; }",
+            "export function LeadForm(){ return <form><input placeholder='Nombre'/><input placeholder='Email'/><input placeholder='Teléfono'/><textarea placeholder='Mensaje'/><button>Solicitar información</button></form>; }",
         }),
       ],
       previewModel: { activeSectionId: "lead-form" },
@@ -529,7 +529,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         folders: ["src/components/conversion"],
         files: ["src/components/conversion/LeadForm.jsx"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "AÃ±adir formulario de captaciÃ³n."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "Añadir formulario de captación."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
@@ -541,7 +541,7 @@ export const BUILDER_MUTATION_REGISTRY = {
   [BUILDER_MUTATION_TYPES.ADD_DASHBOARD]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_DASHBOARD,
     label: "Preparar dashboard interno",
-    description: "AÃ±ade estructura inicial de dashboard para app o SaaS. No se usa como bloque de landing.",
+    description: "Añade estructura inicial de dashboard para app o SaaS. No se usa como bloque de landing.",
     matchers: ["dashboard", "panel", "area privada", "Ã¡rea privada"],
     creditTier: CREDIT_TIERS.HIGH,
     build: ({ source = "user" } = {}) => ({
@@ -555,16 +555,16 @@ export const BUILDER_MUTATION_REGISTRY = {
         component("dashboard-page", "DashboardPage", "src/pages/DashboardPage.jsx", "page"),
       ],
       folders: [
-        folder("src/pages", "PÃ¡ginas principales."),
+        folder("src/pages", "Páginas principales."),
         folder("src/components/dashboard", "Componentes del dashboard."),
       ],
       files: [
         file({
           path: "src/pages/DashboardPage.jsx",
           type: "page",
-          description: "PÃ¡gina inicial de dashboard.",
+          description: "Página inicial de dashboard.",
           content:
-            "export function DashboardPage(){ return <main><h1>Panel principal</h1><section>Actividad Â· Proyectos Â· PrÃ³ximas acciones</section></main>; }",
+            "export function DashboardPage(){ return <main><h1>Panel principal</h1><section>Actividad · Proyectos · Próximas acciones</section></main>; }",
         }),
       ],
       routes: [route("/dashboard", "Dashboard", "DashboardPage")],
@@ -584,18 +584,18 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_AUTH_FLOW]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_AUTH_FLOW,
-    label: "Preparar autenticaciÃ³n",
-    description: "AÃ±ade estructura de login, registro y callback. No se usa como bloque de landing.",
+    label: "Preparar autenticación",
+    description: "Añade estructura de login, registro y callback. No se usa como bloque de landing.",
     matchers: ["auth", "autenticacion", "autenticaciÃ³n", "login", "registro", "register"],
     creditTier: CREDIT_TIERS.HIGH,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_AUTH_FLOW,
-      label: "Preparar autenticaciÃ³n",
+      label: "Preparar autenticación",
       source,
       creditTier: CREDIT_TIERS.HIGH,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       folders: [
-        folder("src/features/auth", "MÃ³dulo de autenticaciÃ³n."),
+        folder("src/features/auth", "Módulo de autenticación."),
         folder("src/features/auth/pages", "Pantallas de acceso."),
       ],
       files: [
@@ -624,7 +624,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         routes: ["/login", "/register"],
       },
       codeModel: { entryFile: "src/features/auth/pages/LoginPage.jsx" },
-      creditEstimate: creditEstimate(CREDIT_TIERS.HIGH, "Preparar autenticaciÃ³n inicial."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.HIGH, "Preparar autenticación inicial."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_API_LAYER,
         BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
@@ -634,13 +634,13 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.ADD_API_LAYER]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_API_LAYER,
-    label: "AÃ±adir capa API",
+    label: "Añadir capa API",
     description: "Prepara rutas API y estructura backend inicial.",
     matchers: ["api", "backend", "endpoint", "fastapi", "servidor", "base de datos"],
     creditTier: CREDIT_TIERS.HIGH,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.ADD_API_LAYER,
-      label: "AÃ±adir capa API",
+      label: "Añadir capa API",
       source,
       creditTier: CREDIT_TIERS.HIGH,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
@@ -670,7 +670,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         language: "python",
         entryFile: "backend/app/routers/leads.py",
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.HIGH, "AÃ±adir API inicial."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.HIGH, "Añadir API inicial."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
@@ -695,10 +695,10 @@ export const BUILDER_MUTATION_REGISTRY = {
         folder("src", "Fuente frontend."),
         folder("src/components", "Componentes reutilizables."),
         folder("src/components/booking", "Componentes de reserva."),
-        folder("src/components/conversion", "Componentes de conversiÃ³n."),
+        folder("src/components/conversion", "Componentes de conversión."),
         folder("src/components/sections", "Secciones de landing."),
-        folder("src/pages", "PÃ¡ginas."),
-        folder("backend/app", "AplicaciÃ³n backend."),
+        folder("src/pages", "Páginas."),
+        folder("backend/app", "Aplicación backend."),
         folder("backend/app/routers", "Rutas API."),
         folder("backend/app/services", "Servicios backend."),
       ],
@@ -744,24 +744,24 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN]: defineMutation({
     type: BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
-    label: "Preparar plan de exportaciÃ³n",
-    description: "Prepara salida profesional sin ejecutar exportaciÃ³n todavÃ­a.",
+    label: "Preparar plan de exportación",
+    description: "Prepara salida profesional sin ejecutar exportación todavía.",
     matchers: ["exportar", "sacar", "descargar", "zip", "github", "transferir"],
     creditTier: CREDIT_TIERS.PREMIUM,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
-      label: "Preparar plan de exportaciÃ³n",
+      label: "Preparar plan de exportación",
       source,
       creditTier: CREDIT_TIERS.PREMIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
-      folders: [folder("export", "PreparaciÃ³n conceptual de salida.")],
+      folders: [folder("export", "Preparación conceptual de salida.")],
       files: [
         file({
           path: "export/README.md",
           type: "documentation",
           language: "markdown",
-          description: "Plan inicial de exportaciÃ³n.",
-          content: "# ExportaciÃ³n\n\nPendiente de valoraciÃ³n, empaquetado y entrega profesional.\n",
+          description: "Plan inicial de exportación.",
+          content: "# Exportación\n\nPendiente de valoración, empaquetado y entrega profesional.\n",
         }),
       ],
       structureModel: {
@@ -778,26 +778,26 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION]: defineMutation({
     type: BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
-    label: "Mejorar conversiÃ³n premium",
-    description: "Refuerza propuesta de valor, CTA y narrativa de conversiÃ³n.",
+    label: "Mejorar conversión premium",
+    description: "Refuerza propuesta de valor, CTA y narrativa de conversión.",
     matchers: ["premium", "conversion", "conversiÃ³n", "vender", "cta", "mejorar landing", "mÃ¡s potente", "mas potente"],
     creditTier: CREDIT_TIERS.MEDIUM,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
-      label: "Mejorar conversiÃ³n premium",
+      label: "Mejorar conversión premium",
       source,
       creditTier: CREDIT_TIERS.MEDIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
       blocks: [
-        block("premium-conversion", "conversion", "ConversiÃ³n premium", 25, {
-          title: "Consigue mÃ¡s citas con una landing premium",
-          subtitle: "Presenta servicios, confianza mÃ©dica y una llamada clara para pedir cita.",
+        block("premium-conversion", "conversion", "Conversión premium", 25, {
+          title: "Consigue más citas con una landing premium",
+          subtitle: "Presenta servicios, confianza médica y una llamada clara para pedir cita.",
           buttonLabel: "Pedir cita",
         }),
       ],
       ctas: [cta("cta-create-project", "Pedir cita", "/", "primary_conversion")],
       previewModel: { activeSectionId: "premium-conversion" },
-      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "Mejorar conversiÃ³n principal."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "Mejorar conversión principal."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
@@ -885,7 +885,7 @@ export function resolveBuilderMutationTypesFromInput(input = "") {
       "implantes",
       "implante",
       "ortodoncia",
-      "estÃ©tica dental",
+      "estética dental",
       "estetica dental",
       "sonrisa",
     ])
@@ -901,9 +901,9 @@ export function resolveBuilderMutationTypesFromInput(input = "") {
   if (
     includesAny(input, [
       "estetica",
-      "estÃ©tica",
+      "estética",
       "medicina estetica",
-      "medicina estÃ©tica",
+      "medicina estética",
       "belleza",
       "rejuvenecimiento",
       "facial",
@@ -918,7 +918,7 @@ export function resolveBuilderMutationTypesFromInput(input = "") {
     ];
   }
 
-  if (includesAny(input, ["restaurante", "bar", "cafeteria", "cafeterÃ­a", "menu", "menÃº", "carta"])) {
+  if (includesAny(input, ["restaurante", "bar", "cafeteria", "cafetería", "menu", "menú", "carta"])) {
     return [
       BUILDER_MUTATION_TYPES.ADD_RESTAURANT_BASE,
       BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
@@ -926,14 +926,14 @@ export function resolveBuilderMutationTypesFromInput(input = "") {
     ];
   }
 
-  if (includesAny(input, ["app", "saas", "dashboard", "aplicacion", "aplicaciÃ³n"])) {
+  if (includesAny(input, ["app", "saas", "dashboard", "aplicacion", "aplicación"])) {
     return [
       BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
       BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
     ];
   }
 
-  if (includesAny(input, ["login", "registro", "auth", "autenticacion", "autenticaciÃ³n"])) {
+  if (includesAny(input, ["login", "registro", "auth", "autenticacion", "autenticación"])) {
     return [
       BUILDER_MUTATION_TYPES.ADD_AUTH_FLOW,
       BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS,
@@ -947,7 +947,7 @@ export function resolveBuilderMutationTypesFromInput(input = "") {
     ];
   }
 
-  if (includesAny(input, ["landing", "web", "pagina", "pÃ¡gina", "servicio", "negocio", "cliente", "clientes"])) {
+  if (includesAny(input, ["landing", "web", "pagina", "página", "servicio", "negocio", "cliente", "clientes"])) {
     return [
       BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
       BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
