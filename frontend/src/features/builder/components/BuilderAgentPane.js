@@ -279,49 +279,65 @@ const AgentCapsule = ({
   );
 };
 
-const InlineSuggestionRows = ({
+const DecisionPanel = ({
   actions = [],
   onSelectAction,
+  compact = false,
 }) => {
-  if (!actions.length) return null;
+  const visibleActions = actions.slice(0, 3);
+
+  if (!visibleActions.length) return null;
 
   return (
-    <div className="mt-5 border-t border-white/[0.08] pt-4">
-      <div className="grid grid-cols-[38px_1fr] gap-3">
-        <span className="select-none text-right text-zinc-700">
-          //
-        </span>
+    <div className={`${compact ? 'mt-5 border-t border-white/[0.08] pt-4' : 'mb-3 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.035] p-3'}`}>
+      <div className={compact ? 'grid grid-cols-[38px_1fr] gap-3' : 'mb-2 flex items-center justify-between gap-3'}>
+        {compact && (
+          <span className="select-none text-right text-zinc-700">
+            //
+          </span>
+        )}
 
         <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-100">
-          Siguientes mejoras
+          Decisiones accionables
         </span>
+
+        {!compact && (
+          <span className="shrink-0 text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+            máximo 3
+          </span>
+        )}
       </div>
 
-      {actions.slice(0, 3).map((action, index) => (
-        <button
-          key={action.id || `${action.label}-${index}`}
-          type="button"
-          onClick={() => onSelectAction?.(action)}
-          className="group mt-1 grid w-full grid-cols-[38px_1fr] gap-3 rounded-lg py-0.5 text-left transition hover:bg-cyan-300/[0.045]"
-        >
-          <span className="select-none text-right text-zinc-700">
-            {index + 1}.
-          </span>
-
-          <span className="min-w-0">
-            <span className="block truncate text-[13px] leading-7 text-cyan-100 transition group-hover:text-white">
-              {action.label}
+      <div className={compact ? '' : 'grid gap-2'}>
+        {visibleActions.map((action, index) => (
+          <button
+            key={action.id || `${action.label}-${index}`}
+            type="button"
+            onClick={() => onSelectAction?.(action)}
+            className={`${compact ? 'mt-1 grid grid-cols-[38px_1fr] py-0.5' : 'grid grid-cols-[24px_1fr_auto] rounded-xl border border-white/[0.07] bg-black/25 px-3 py-2'} group w-full gap-3 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]`}
+          >
+            <span className="select-none text-right text-zinc-700">
+              {index + 1}.
             </span>
 
-            {(action.description || action.phase || action.creditTier) && (
-              <span className="block truncate text-[10px] uppercase tracking-[0.14em] text-zinc-600">
-                {action.description || action.phase || `Coste ${formatCreditTier(action.creditTier)}`}
-                {action.scoreGain ? ` · +${action.scoreGain} madurez` : ''}
+            <span className="min-w-0">
+              <span className="block truncate text-[13px] font-semibold leading-6 text-cyan-100 transition group-hover:text-white">
+                {action.label}
+              </span>
+
+              <span className="block truncate text-[11px] text-zinc-500">
+                {action.description || action.prompt || action.phase || `Coste ${formatCreditTier(action.creditTier)}`}
+              </span>
+            </span>
+
+            {!compact && (
+              <span className="self-center rounded-full border border-white/[0.08] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-zinc-400">
+                {action.phase || action.mutationAction || action.type || 'mutación'}
               </span>
             )}
-          </span>
-        </button>
-      ))}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
@@ -455,9 +471,10 @@ const CodeWorkbench = ({
         )}
 
         {showSuggestions && (
-          <InlineSuggestionRows
+          <DecisionPanel
             actions={suggestedActions}
             onSelectAction={onSelectAction}
+            compact
           />
         )}
       </div>
@@ -474,9 +491,15 @@ const ControlDock = ({
   canSubmit,
   canStartBuild,
   progress,
+  suggestedActions = [],
+  onSelectAction,
 }) => (
   <div className="shrink-0 border-t border-white/[0.08] bg-black/45 p-3">
     <div className="rounded-[20px] border border-white/10 bg-[#020405] p-3 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+      <DecisionPanel
+        actions={suggestedActions}
+        onSelectAction={onSelectAction}
+      />
       <div className="flex items-end gap-2">
         <textarea
           rows={2}
@@ -627,6 +650,8 @@ export default function BuilderAgentPane({
         canSubmit={canSubmit}
         canStartBuild={canStartBuild}
         progress={progress}
+        suggestedActions={suggestedActions}
+        onSelectAction={submitSuggestedAction}
       />
     </div>
   );
