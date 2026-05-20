@@ -3,6 +3,16 @@ import {
   buildLifecycleDecisionMessage,
 } from '../lifecycle/builderLifecycleResolver';
 
+import {
+  applyBuildMutation,
+  normalizeBuildState,
+  getBuildStateSummary,
+} from '../state/builderBuildState';
+
+import {
+  createBuilderOutputMap,
+} from '../state/builderOutputMap';
+
 const asObject = (value) =>
   value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 
@@ -296,39 +306,98 @@ const buildSummary = ({
   };
 };
 
-const buildBuilderAIState = ({
-  currentBuildState = null,
+const mapSectionsToBlocks = (sections = []) =>
+  asArray(sections).map((section, index) => {
+    const title = pickFirstString(section.title, section.headline, section.label, section.type, `Sección ${index + 1}`);
+    const subtitle = pickFirstString(section.subtitle, section.description);
+    const ctaLabel = pickFirstString(section.cta, section.primaryCTA, section.buttonLabel);
+
+    return {
+      id: pickFirstString(section.id, `builder-ai-section-${index + 1}`),
+      type: pickFirstString(section.type, 'section'),
+      label: title,
+      order: Number.isFinite(section.order) ? section.order : 10 + index * 10,
+      source: 'builder_ai_openai',
+      props: {
+        ...asObject(section.props),
+        title,
+        subtitle,
+        description: subtitle,
+        ...(ctaLabel ? { cta: ctaLabel, buttonLabel: ctaLabel } : {}),
+        items: asArray(section.items),
+      },
+    };
+  });
+
+const mapCodePatchToFiles = (codePatch = {}) =>
+  asArray(codePatch.files)
+    .map((file) => ({
+      path: asString(file?.path),
+      type: asString(file?.type) || 'file',
+      language: asString(file?.language) || asString(codePatch.language) || 'javascript',
+      description: asString(file?.description),
+      content: typeof file?.content === 'string' ? file.content : '',
+    }))
+    .filter((file) => file.path);
+
+const mapStructureNodes = (structurePatch = {}, targetType = '') =>
+  asArray(structurePatch.nodes)
+    .filter((node) => asString(node?.type) === targetType)
+    .map((node) => ({ path: pickFirstString(node.path, node.label, node.id) }))
+    .filter((item) => item.path);
+
+const buildBuilderAIMutation = ({
   builderAIOutput = {},
-  lifecycle = null,
+  preview = {},
+  copy = {},
   userInput = '',
 } = {}) => {
-  const previousState = asObject(currentBuildState);
+  const previewPatch = asObject(builderAIOutput.previewModelPatch);
+  const codePatch = asObject(builderAIOutput.codeModelPatch);
+  const structurePatch = asObject(builderAIOutput.structureModelPatch);
+  const sections = asArray(preview.sections).length ? preview.sections : previewPatch.sections;
+  const files = mapCodePatchToFiles(codePatch);
+  const folders = [
+    ...asArray(structurePatch.folders).map((folder) => (typeof folder === 'string' ? { path: folder } : folder)),
+    ...mapStructureNodes(structurePatch, 'folder'),
+  ].filter((folder) => asString(folder?.path));
+  const structureFiles = [
+    ...asArray(structurePatch.files).map((file) => (typeof file === 'string' ? { path: file } : file)),
+    ...mapStructureNodes(structurePatch, 'file'),
+  ].filter((file) => asString(file?.path));
+  const primaryCTA = pickFirstString(copy.primaryCTA, copy.cta, preview.primaryCTA, preview.cta);
 
   return {
-    ...previousState,
+    id: 'builder-ai-output',
+    type: 'builder_ai_output',
+    label: builderAIOutput.intent || builderAIOutput.assistantMessage || 'Builder AI output',
     source: 'builder_ai_openai',
-    lastInput: userInput,
-    builderAI: {
-      ok: true,
-      projectKind: builderAIOutput.projectKind || '',
-      sector: builderAIOutput.sector || '',
-      objective: builderAIOutput.objective || '',
-      tone: builderAIOutput.tone || '',
-      nextAction: builderAIOutput.nextAction || '',
+    projectKind: builderAIOutput.projectKind || undefined,
+    sector: builderAIOutput.sector || undefined,
+    objective: builderAIOutput.objective || undefined,
+    blocks: mapSectionsToBlocks(sections),
+    files,
+    folders,
+    ctas: primaryCTA ? [{ id: 'builder-ai-primary-cta', label: primaryCTA, href: '#', intent: 'primary' }] : [],
+    previewModel: {
+      ...previewPatch,
+      layout: preview.layout || previewPatch.layout || builderAIOutput.projectKind || 'landing',
+      activeSectionId: preview.activeSectionId || asArray(sections).at(-1)?.id || null,
     },
-    lifecycle: {
-      readinessScore: lifecycle?.readinessScore || 0,
-      currentStageId: lifecycle?.currentStage?.id || '',
-      nextStageId: lifecycle?.nextStage?.id || '',
-      targetStageId: lifecycle?.targetStageId || '',
-      appliedActions:
-        previousState.lifecycle?.appliedActions ||
-        previousState.appliedLifecycleActions ||
-        [],
-      projectType: lifecycle?.projectType || '',
-      sectorProfileId: lifecycle?.sectorProfileId || '',
-      businessName: lifecycle?.businessName || '',
+    codeModel: {
+      ...codePatch,
+      files: files.map((file) => file.path),
+      entryFile: codePatch.entryFile || files[0]?.path || 'src/App.jsx',
+      language: codePatch.language || 'javascript',
     },
+    structureModel: {
+      ...structurePatch,
+      folders: folders.map((folder) => folder.path),
+      files: [...structureFiles.map((file) => file.path), ...files.map((file) => file.path)].filter(Boolean),
+      routes: asArray(structurePatch.routes),
+      apiRoutes: asArray(structurePatch.apiRoutes),
+    },
+    meta: { userInput },
   };
 };
 
@@ -396,24 +465,50 @@ export const adaptBuilderAIOutputToKernelResult = ({
     },
   });
 
-  const summary = buildSummary({
+  const mutation = buildBuilderAIMutation({
     builderAIOutput: safeOutput,
-    output: baseOutput,
-    lifecycle,
+    preview,
+    copy,
+    userInput,
   });
 
+  const state = applyBuildMutation(
+    currentBuildState ? normalizeBuildState(currentBuildState) : {},
+    mutation
+  );
+
+  const outputMap = createBuilderOutputMap(state, {
+    knowledge: {
+      hubSummary: baseOutput.builderAI,
+      iterationSummary: {
+        primaryIntent: safeOutput.intent || '',
+        cta: copy.primaryCTA || copy.cta || '',
+      },
+    },
+  });
+
+  const summary = {
+    ...buildSummary({
+      builderAIOutput: safeOutput,
+      output: outputMap,
+      lifecycle,
+    }),
+    ...getBuildStateSummary(state),
+    source: 'builder_ai_openai',
+  };
+
   const output = {
-    ...baseOutput,
+    ...outputMap,
+    builderAI: baseOutput.builderAI,
+    legacy: {
+      copy,
+      preview,
+      code,
+      structure,
+    },
     summary,
     lifecycle,
   };
-
-  const state = buildBuilderAIState({
-    currentBuildState,
-    builderAIOutput: safeOutput,
-    lifecycle,
-    userInput,
-  });
 
   const lifecycleDecisionMessage = buildLifecycleDecisionMessage({
     lifecycle,
