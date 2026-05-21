@@ -283,6 +283,7 @@ const DecisionPanel = ({
   actions = [],
   onSelectAction,
   compact = false,
+  feedback = '',
 }) => {
   const visibleActions = actions.slice(0, 3);
 
@@ -298,7 +299,7 @@ const DecisionPanel = ({
         )}
 
         <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-100">
-          Decision Center
+          Siguiente paso recomendado
         </span>
 
         {!compact && (
@@ -307,6 +308,12 @@ const DecisionPanel = ({
           </span>
         )}
       </div>
+
+      {feedback && (
+        <div className="mb-2 rounded-xl border border-emerald-200/20 bg-emerald-200/[0.06] px-3 py-2 text-[11px] font-semibold text-emerald-100">
+          {feedback}
+        </div>
+      )}
 
       <div className={compact ? '' : 'grid gap-2'}>
         {visibleActions.map((action, index) => (
@@ -317,12 +324,12 @@ const DecisionPanel = ({
             className={`${compact ? 'mt-1 grid grid-cols-[38px_1fr] py-0.5' : 'grid grid-cols-[24px_1fr_auto] rounded-xl border border-white/[0.07] bg-black/25 px-3 py-2'} group w-full gap-3 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]`}
           >
             <span className="select-none text-right text-zinc-700">
-              {index + 1}.
+              {['A', 'B', 'C'][index]}
             </span>
 
             <span className="min-w-0">
               <span className="block truncate text-[13px] font-semibold leading-6 text-cyan-100 transition group-hover:text-white">
-                {action.label}
+                {action.title || action.label}
               </span>
 
               <span className="block truncate text-[11px] text-zinc-500">
@@ -497,12 +504,14 @@ const ControlDock = ({
   progress,
   suggestedActions = [],
   onSelectAction,
+  decisionFeedback = '',
 }) => (
   <div className="shrink-0 border-t border-white/[0.08] bg-black/45 p-3">
     <div className="rounded-[20px] border border-white/10 bg-[#020405] p-3 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
+        feedback={decisionFeedback}
       />
       <div className="flex items-end gap-2">
         <textarea
@@ -578,6 +587,14 @@ export default function BuilderAgentPane({
       messages,
     ]
   );
+
+  const decisionFeedback = useMemo(() => {
+    const appliedMessage = [...messages]
+      .reverse()
+      .find((message) => String(message?.text || '').startsWith('Cambio aplicado:'));
+
+    return appliedMessage ? 'Cambio aplicado' : '';
+  }, [messages]);
 
   const canSubmit =
     draft.trim().length > 0 &&
@@ -656,6 +673,7 @@ export default function BuilderAgentPane({
         progress={progress}
         suggestedActions={suggestedActions}
         onSelectAction={submitSuggestedAction}
+        decisionFeedback={decisionFeedback}
       />
     </div>
   );
