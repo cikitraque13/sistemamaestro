@@ -28,6 +28,10 @@ import {
   adaptBuilderAIOutputToKernelResult,
 } from '../../api/builderAiAdapter';
 
+import {
+  BUILDER_MUTATION_TYPES,
+} from '../../state/builderMutationRegistry';
+
 const DEFAULT_PROGRESS_STEP = 2;
 const DEFAULT_PROGRESS_INTERVAL = 950;
 
@@ -79,15 +83,26 @@ const createAgentMessage = (text, meta = {}) => ({
 const createDecisionOption = ({
   id,
   label,
+  title,
+  description = '',
+  impact = 'Mejora directa del Builder',
   prompt,
   source = 'runtime_context',
   creditTier = 'medium',
+  mutationType = BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
+  mutationAction = '',
 } = {}) => ({
   id,
-  label,
-  prompt,
+  label: label || title,
+  title: title || label,
+  description,
+  impact,
+  prompt: prompt || description || label || title,
   source,
   creditTier,
+  type: mutationType || mutationAction,
+  mutationType: mutationType || mutationAction,
+  mutationAction: mutationAction || mutationType,
 });
 
 const createDecisionMessage = ({
@@ -146,6 +161,58 @@ const getRuntimeContextText = ({
       .filter(Boolean)
       .join(' ')
   );
+
+
+const buildSafeFallbackDecisionOptions = () => [
+  createDecisionOption({
+    id: 'fallback-add-trust',
+    label: 'Añadir confianza',
+    description: 'Incorpora prueba social, autoridad y objeciones resueltas.',
+    impact: 'Aumenta credibilidad y reduce fricción',
+    mutationType: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
+    creditTier: 'low',
+  }),
+  createDecisionOption({
+    id: 'fallback-improve-conversion',
+    label: 'Mejorar conversión',
+    description: 'Refuerza CTA, jerarquía visual y continuidad comercial.',
+    impact: 'Mejora claridad y acción principal',
+    mutationType: BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
+    creditTier: 'medium',
+  }),
+  createDecisionOption({
+    id: 'fallback-prepare-followup',
+    label: 'Preparar seguimiento',
+    description: 'Añade captura de leads para continuar la relación.',
+    impact: 'Activa seguimiento y oportunidad comercial',
+    mutationType: BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
+    creditTier: 'low',
+  }),
+];
+
+const getDecisionMutationKey = (option = {}) =>
+  option?.mutationType || option?.mutationAction || option?.type || option?.id || '';
+
+const resolveVisibleDecisionOptions = ({ options = [], appliedDecisionTypes = [] } = {}) => {
+  const applied = new Set(appliedDecisionTypes.filter(Boolean));
+  const seen = new Set();
+  const candidates = [
+    ...(options || []),
+    ...buildSafeFallbackDecisionOptions(),
+  ];
+
+  return candidates
+    .filter(Boolean)
+    .filter((option) => {
+      const key = getDecisionMutationKey(option);
+
+      if (!key || applied.has(key) || seen.has(key)) return false;
+
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3);
+};
 
 const buildSistemaMaestroDecisionOptions = () => [
   createDecisionOption({
@@ -255,12 +322,14 @@ const buildGenericDecisionOptions = ({
 } = {}) => [
   createDecisionOption({
     id: 'generic-promise',
+    mutationType: BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
     label: 'Reforzar promesa principal',
     prompt:
       'Refuerza la promesa principal con resultado concreto, especificidad y motivo claro para actuar ahora.',
   }),
   createDecisionOption({
     id: 'generic-cta',
+    mutationType: BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
     label: primaryCTA ? `Ajustar CTA: ${primaryCTA}` : 'Ajustar CTA principal',
     prompt: primaryCTA
       ? `Ajusta el CTA principal hacia Ã¢â‚¬Å“${primaryCTA}Ã¢â‚¬Â y mejora su continuidad en hero, bloques y cierre.`
@@ -268,12 +337,14 @@ const buildGenericDecisionOptions = ({
   }),
   createDecisionOption({
     id: 'generic-trust',
+    mutationType: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
     label: 'AÃƒÂ±adir confianza',
     prompt:
       'AÃƒÂ±ade seÃƒÂ±ales de confianza, autoridad, prueba social y objeciones resueltas sin recargar la interfaz.',
   }),
   createDecisionOption({
     id: 'generic-structure',
+    mutationType: BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
     label: 'Ordenar estructura',
     prompt:
       'Ordena la estructura para que hero, beneficios, prueba social, CTA y cierre trabajen juntos.',
@@ -363,17 +434,19 @@ const buildRuntimeDecisionMessage = ({
   copy = {},
   hubSummary = {},
   onDecision,
+  appliedDecisionTypes = [],
 } = {}) => {
   if (progress < 96) return null;
 
-  const options = buildRuntimeDecisionOptions({
-    project,
-    initialPrompt,
-    copy,
-    hubSummary,
-  }).slice(0, 5);
-
-  if (!options.length) return null;
+  const options = resolveVisibleDecisionOptions({
+    options: buildRuntimeDecisionOptions({
+      project,
+      initialPrompt,
+      copy,
+      hubSummary,
+    }),
+    appliedDecisionTypes,
+  });
 
   return createDecisionMessage({
     projectId: project?.project_id || project?.id || '',
@@ -458,6 +531,7 @@ export default function useBuilderWorkspaceRuntime({
   const [builderKernelOutput, setBuilderKernelOutput] = useState(null);
   const [builderDecisionMessage, setBuilderDecisionMessage] = useState(null);
   const [builderBuildSummary, setBuilderBuildSummary] = useState(null);
+  const [appliedDecisionTypes, setAppliedDecisionTypes] = useState([]);
 
   const projectId = project?.project_id || '';
   const fallbackId = project?.id || '';
@@ -715,9 +789,13 @@ export default function useBuilderWorkspaceRuntime({
         });
 
         applyKernelResult(kernelResult);
+        setAppliedDecisionTypes((current) => [
+          getDecisionMutationKey(option),
+          ...current.filter((item) => item !== getDecisionMutationKey(option)),
+        ].filter(Boolean).slice(0, 3));
         setManualMessages((current) => [
           ...current,
-          createAgentMessage(`Aplicado: ${option.label || option.type}`, {
+          createAgentMessage(`Cambio aplicado: ${option.label || option.type}`, {
             source: 'builder_decision_loop_v1',
             builderKernel: {
               ok: kernelResult?.ok,
@@ -776,11 +854,21 @@ export default function useBuilderWorkspaceRuntime({
         copy,
         progress,
         onDecision: handleDecision,
+        appliedDecisionTypes,
       });
 
       const kernelDecision =
         progress >= 96 && builderDecisionMessage
-          ? attachDecisionHandler(builderDecisionMessage, handleDecision)
+          ? attachDecisionHandler(
+              {
+                ...builderDecisionMessage,
+                options: resolveVisibleDecisionOptions({
+                  options: builderDecisionMessage.options || [],
+                  appliedDecisionTypes,
+                }),
+              },
+              handleDecision
+            )
           : null;
 
       const fallbackRuntimeDecision = buildRuntimeDecisionMessage({
@@ -790,6 +878,7 @@ export default function useBuilderWorkspaceRuntime({
         copy,
         hubSummary,
         onDecision: handleDecision,
+        appliedDecisionTypes,
       });
 
       const runtimeDecision = kernelDecision || fallbackRuntimeDecision;
@@ -810,6 +899,7 @@ export default function useBuilderWorkspaceRuntime({
       projectSnapshot,
       initialPrompt,
       hubSummary,
+      appliedDecisionTypes,
     ]
   );
 
@@ -858,6 +948,7 @@ export default function useBuilderWorkspaceRuntime({
     setCurrentSelection(initialAgent.hub?.selection || null);
     setLastDelta(null);
     setLastOperation(null);
+    setAppliedDecisionTypes([]);
 
     applyKernelResult(initialKernelResult);
   }, [
