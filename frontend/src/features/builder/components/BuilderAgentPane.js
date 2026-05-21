@@ -29,17 +29,6 @@ const normalizeActionLabel = (value = '') =>
     .replace(/^\s*[A-D][).:-]\s*/i, '')
     .trim();
 
-const isLifecycleDecisionMessage = (message = {}) =>
-  message?.role === 'decision' &&
-  Array.isArray(message.options) &&
-  (
-    message?.meta?.source === 'builder_lifecycle' ||
-    message.options.some((option) =>
-      option?.source === 'builder_lifecycle' ||
-      option?.lifecycleActionId
-    )
-  );
-
 const normalizeDecisionOption = (option, index, decisionMessage = {}) => {
   if (!option) return null;
 
@@ -130,12 +119,17 @@ const getStatusTone = (status = '') => {
   return 'active';
 };
 
+const isBuilderDecisionMessage = (message = {}) =>
+  message?.role === 'decision' &&
+  Array.isArray(message.options) &&
+  message.options.length > 0;
+
 const buildSuggestedActions = ({
   messages = [],
 } = {}) => {
   const decisionMessage = [...messages]
     .reverse()
-    .find(isLifecycleDecisionMessage);
+    .find(isBuilderDecisionMessage);
 
   if (!decisionMessage?.options?.length) {
     return [];
@@ -146,11 +140,7 @@ const buildSuggestedActions = ({
     .map((option, index) =>
       normalizeDecisionOption(option, index, decisionMessage)
     )
-    .filter(Boolean)
-    .filter((item) =>
-      item.source === 'builder_lifecycle' ||
-      item.lifecycleActionId
-    );
+    .filter(Boolean);
 };
 
 const formatCreditTier = (creditTier = 'none') => {
