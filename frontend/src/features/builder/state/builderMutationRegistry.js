@@ -331,7 +331,7 @@ export const BUILDER_MUTATION_REGISTRY = {
   [BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
     label: "Añadir confianza",
-    description: "Añade prueba, autoridad, seguridad y objeciones resueltas para mejorar conversión."
+    description: "Añade prueba, autoridad, seguridad y objeciones resueltas para mejorar conversión.",
     matchers: ["confianza", "reseÃ±as", "resenas", "testimonios", "autoridad", "garantia", "garantÃ­a", "seguridad", "medica", "mÃ©dica", "experiencia"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
