@@ -296,33 +296,23 @@ const DecisionPanel = ({
         </div>
       )}
 
-      <div className="grid gap-1.5">
+      <div className="grid gap-1">
         {visibleActions.map((action, index) => (
           <button
             key={action.id || `${action.label}-${index}`}
             type="button"
             onClick={() => onSelectAction?.(action)}
-            className="group grid w-full grid-cols-[22px_1fr_auto] gap-2 rounded-xl border border-white/[0.06] bg-black/20 px-2.5 py-1.5 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]"
+            className="group grid w-full grid-cols-[22px_1fr_64px] items-center gap-2 rounded-xl border border-white/[0.06] bg-black/20 px-2.5 py-1.5 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]"
           >
             <span className="select-none text-center text-[11px] font-bold text-cyan-200/70">
               {['A', 'B', 'C'][index]}
             </span>
 
-            <span className="min-w-0">
-              <span className="block truncate text-[12px] font-semibold leading-5 text-cyan-100 transition group-hover:text-white">
-                {action.title || action.label}
-              </span>
-
-              <span className="block truncate text-[10px] leading-4 text-zinc-500">
-                {action.description || action.prompt || `Coste ${formatCreditTier(action.creditTier)}`}
-              </span>
-
-              <span className="block truncate text-[9px] uppercase tracking-[0.12em] text-zinc-600">
-                {action.impact || 'Construcción'} · {action.phase || 'decisión'} · {action.mutationAction || action.type || 'mutación'}
-              </span>
+            <span className="truncate text-[12px] font-semibold leading-5 text-cyan-100 transition group-hover:text-white">
+              {action.title || action.label}
             </span>
 
-            <span className="self-center rounded-full border border-emerald-200/15 bg-emerald-200/[0.045] px-2 py-0.5 text-[9px] uppercase tracking-[0.1em] text-emerald-100">
+            <span className="justify-self-end rounded-full border border-emerald-200/15 bg-emerald-200/[0.045] px-2 py-0.5 text-[9px] uppercase tracking-[0.1em] text-emerald-100">
               Aplicar
             </span>
           </button>
@@ -487,37 +477,37 @@ const ControlDock = ({
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Alternativa: escribe un cambio libre..."
-          className="min-h-[38px] flex-1 resize-none rounded-xl border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
+          placeholder="Escribe aquí para seguir hablando con el agente..."
+          className="min-h-[36px] flex-1 resize-none rounded-full border border-white/[0.08] bg-white/[0.035] px-3.5 py-2 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
         />
 
         <button
           type="button"
           disabled={!canSubmit}
           onClick={onSubmit}
-          className={`inline-flex h-[38px] min-w-[104px] shrink-0 items-center justify-center rounded-2xl border px-3 text-xs font-semibold transition ${
+          className={`inline-flex h-9 min-w-[68px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
             canSubmit
-              ? 'border-emerald-200/70 bg-gradient-to-r from-emerald-200 via-cyan-100 to-amber-100 text-black shadow-[0_0_28px_rgba(52,211,153,0.12)] hover:scale-[1.01]'
-              : 'border-emerald-200/15 bg-emerald-200/[0.045] text-emerald-100/45'
+              ? 'border-cyan-200/50 bg-cyan-200/[0.12] text-cyan-50 hover:bg-cyan-200/[0.18]'
+              : 'border-white/10 bg-white/[0.025] text-zinc-600'
           }`}
         >
-          Aplicar cambio
+          Enviar
         </button>
       </div>
 
-      <div className="mt-2 flex items-center justify-between gap-3 border-t border-white/[0.08] pt-2">
-        <p className="min-w-0 truncate text-[11px] text-zinc-500">
-          Iteracion estimada <span className="font-semibold text-zinc-300">8-18 creditos</span>
+      <div className="mt-1.5 flex items-center justify-between gap-3 px-1">
+        <p className="min-w-0 truncate text-[10px] text-zinc-600">
+          Iteración estimada: 8-18 créditos
         </p>
 
         <button
           type="button"
           disabled={!canStartBuild}
           onClick={() => onStartBuild?.()}
-          className={`inline-flex h-8 shrink-0 items-center justify-center rounded-full border px-3 text-xs font-semibold transition ${
+          className={`inline-flex h-7 shrink-0 items-center justify-center rounded-full border px-2.5 text-[10px] font-semibold transition ${
             canStartBuild
-              ? 'border-white/12 bg-white/[0.045] text-zinc-200 hover:bg-white/[0.08]'
-              : 'cursor-not-allowed border-white/10 bg-white/[0.02] text-zinc-600'
+              ? 'border-white/10 bg-white/[0.025] text-zinc-500 hover:text-zinc-300'
+              : 'cursor-not-allowed border-white/10 bg-white/[0.015] text-zinc-700'
           }`}
         >
           {progress >= 100 ? 'Regenerar' : 'Construir'}
