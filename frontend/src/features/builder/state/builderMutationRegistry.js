@@ -34,6 +34,9 @@ export const BUILDER_MUTATION_TYPES = {
   GENERATE_FOLDER_STRUCTURE: "generate_folder_structure",
   PREPARE_EXPORT_PLAN: "prepare_export_plan",
   IMPROVE_PREMIUM_CONVERSION: "improve_premium_conversion",
+  IMPROVE_COPY: "improve_copy",
+  APPLY_VISUAL_HIERARCHY: "apply_visual_hierarchy",
+  VALIDATE_READY_FOR_EXPORT: "validate_ready_for_export",
 };
 
 const creditValues = {
@@ -53,6 +56,8 @@ const INTERNAL_MUTATION_TYPES = [
 ];
 
 const CLIENT_LANDING_MUTATION_TYPES = [
+  BUILDER_MUTATION_TYPES.IMPROVE_COPY,
+  BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
   BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
   BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
   BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
@@ -814,6 +819,110 @@ export const BUILDER_MUTATION_REGISTRY = {
         BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
         BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
         BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX,
+      ]),
+    }),
+  }),
+
+  [BUILDER_MUTATION_TYPES.IMPROVE_COPY]: defineMutation({
+    type: BUILDER_MUTATION_TYPES.IMPROVE_COPY,
+    label: "Mejorar copy",
+    description: "Mejora titulares, microcopy, CTAs y claridad sin cambiar el runtime.",
+    matchers: ["copy", "texto", "titular", "microcopy", "cta", "claridad", "promesa"],
+    creditTier: CREDIT_TIERS.MEDIUM,
+    build: ({ source = "user" } = {}) => ({
+      type: BUILDER_MUTATION_TYPES.IMPROVE_COPY,
+      label: "Mejorar copy",
+      source,
+      creditTier: CREDIT_TIERS.MEDIUM,
+      nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+      blocks: [
+        block("copy-clarity", "copy", "Copy claro y accionable", 12, {
+          headline: "Una propuesta clara en segundos",
+          subheadline: "Explica el valor, reduce dudas y guía al usuario hacia la acción principal.",
+          primaryCta: "Empezar ahora",
+          microcopy: "Sin fricción innecesaria. Próximo paso visible y comprensible.",
+        }),
+      ],
+      previewModel: { activeSectionId: "copy-clarity" },
+      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "Mejorar titulares, microcopy y CTAs."),
+      availableActions: nextActions([
+        BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
+        BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
+        BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
+      ]),
+    }),
+  }),
+
+  [BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY]: defineMutation({
+    type: BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
+    label: "Aplicar jerarquía visual",
+    description: "Mejora jerarquía visual, escaneabilidad y orden de secciones sin tocar router ni backend.",
+    matchers: ["visual", "diseño", "diseno", "jerarquia", "jerarquía", "escaneable", "orden", "secciones"],
+    creditTier: CREDIT_TIERS.MEDIUM,
+    build: ({ source = "user" } = {}) => ({
+      type: BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
+      label: "Aplicar jerarquía visual",
+      source,
+      creditTier: CREDIT_TIERS.MEDIUM,
+      nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+      blocks: [
+        block("visual-hierarchy", "layout", "Jerarquía visual aplicada", 14, {
+          density: "balanced",
+          sectionOrder: ["hero", "value", "proof", "conversion"],
+          emphasis: "CTA principal visible, bloques escaneables y contraste reforzado.",
+        }),
+      ],
+      theme: {
+        hierarchy: "strong",
+        spacing: "comfortable",
+        contrast: "high",
+      },
+      previewModel: { activeSectionId: "visual-hierarchy" },
+      creditEstimate: creditEstimate(CREDIT_TIERS.MEDIUM, "Aplicar jerarquía visual y escaneabilidad."),
+      availableActions: nextActions([
+        BUILDER_MUTATION_TYPES.IMPROVE_COPY,
+        BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
+        BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
+      ]),
+    }),
+  }),
+
+  [BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT]: defineMutation({
+    type: BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
+    label: "Validar listo para exportar",
+    description: "Valida si el proyecto está listo para salida técnica sin exportar, desplegar ni crear endpoints.",
+    matchers: ["validar", "listo", "exportar", "export", "salida", "preparado", "ready"],
+    creditTier: CREDIT_TIERS.LOW,
+    build: ({ source = "user" } = {}) => ({
+      type: BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
+      label: "Validar listo para exportar",
+      source,
+      creditTier: CREDIT_TIERS.LOW,
+      nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+      blocks: [
+        block("export-readiness", "validation", "Validación de salida técnica", 90, {
+          status: "pending_review",
+          ready: false,
+          checks: [
+            "Copy principal definido",
+            "Jerarquía visual revisada",
+            "Estructura técnica preparada",
+            "Sin despliegue ejecutado",
+          ],
+          message: "Proyecto revisable, pero no exportado ni desplegado desde esta mutación.",
+        }),
+      ],
+      structureModel: {
+        folders: ["src", "src/components"],
+        files: ["src/App.jsx"],
+        routes: ["/"],
+      },
+      previewModel: { activeSectionId: "export-readiness" },
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Validar preparación para salida técnica sin exportar."),
+      availableActions: nextActions([
+        BUILDER_MUTATION_TYPES.IMPROVE_COPY,
+        BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
+        BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
       ]),
     }),
   }),
