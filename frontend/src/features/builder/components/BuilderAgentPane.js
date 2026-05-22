@@ -284,8 +284,8 @@ const DecisionPanel = ({
   if (!visibleActions.length) return null;
 
   return (
-    <div className="mb-2 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.03] p-2.5">
-      <div className="mb-1.5 flex items-center justify-between gap-3">
+    <div className="mb-1.5 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.03] p-2">
+      <div className="mb-1 flex items-center justify-between gap-3">
         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100">
           Siguiente paso recomendado
         </span>
@@ -296,7 +296,7 @@ const DecisionPanel = ({
       </div>
 
       {feedback && (
-        <div className="mb-1.5 truncate rounded-lg border border-emerald-200/15 bg-emerald-200/[0.045] px-2.5 py-1.5 text-[10px] font-semibold text-emerald-100">
+        <div className="mb-1 truncate rounded-lg border border-emerald-200/15 bg-emerald-200/[0.045] px-2 py-1 text-[10px] font-semibold text-emerald-100">
           Qué cambió: {feedback}
         </div>
       )}
@@ -307,7 +307,7 @@ const DecisionPanel = ({
             key={action.id || `${action.label}-${index}`}
             type="button"
             onClick={() => onSelectAction?.(action)}
-            className="group grid w-full grid-cols-[22px_1fr_64px] items-center gap-2 rounded-xl border border-white/[0.06] bg-black/20 px-2.5 py-1.5 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]"
+            className="group grid w-full grid-cols-[22px_1fr_58px] items-center gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-2 py-1 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]"
           >
             <span className="select-none text-center text-[11px] font-bold text-cyan-200/70">
               {['A', 'B', 'C'][index]}
@@ -324,21 +324,21 @@ const DecisionPanel = ({
         ))}
       </div>
 
-      <div className="mt-1.5 flex items-end gap-2">
+      <div className="mt-1 flex items-end gap-2">
         <textarea
           rows={1}
           value={draft}
           onChange={(event) => setDraft?.(event.target.value)}
           onKeyDown={onKeyDown}
           placeholder="Escribe aquí para seguir hablando con el agente..."
-          className="min-h-[34px] flex-1 resize-none rounded-full border border-white/[0.08] bg-black/25 px-3.5 py-2 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
+          className="min-h-[32px] flex-1 resize-none rounded-full border border-white/[0.08] bg-black/25 px-3 py-1.5 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
         />
 
         <button
           type="button"
           disabled={!canSubmit}
           onClick={onSubmit}
-          className={`inline-flex h-[34px] min-w-[64px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
+          className={`inline-flex h-8 min-w-[60px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
             canSubmit
               ? 'border-cyan-200/50 bg-cyan-200/[0.12] text-cyan-50 hover:bg-cyan-200/[0.18]'
               : 'border-white/10 bg-white/[0.025] text-zinc-600'
@@ -415,7 +415,7 @@ const CodeWorkbench = ({
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#020405] font-mono">
+    <div className="flex h-full min-h-[320px] flex-col overflow-hidden bg-[#020405] font-mono">
       <CodeTopBar
         activeCodeTab={activeCodeTab}
         onCodeTabChange={onCodeTabChange}
@@ -493,8 +493,8 @@ const ControlDock = ({
   onSelectAction,
   decisionFeedback = '',
 }) => (
-  <div className="shrink-0 border-t border-white/[0.08] bg-black/45 p-3">
-    <div className="rounded-[20px] border border-white/10 bg-[#020405] p-2.5 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+  <div className="max-h-[46%] shrink-0 overflow-hidden border-t border-white/[0.08] bg-black/45 p-2.5">
+    <div className="rounded-[18px] border border-white/10 bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
@@ -506,8 +506,8 @@ const ControlDock = ({
         canSubmit={canSubmit}
       />
 
-      <div className="mt-1 flex items-center justify-between gap-3 px-1">
-        <p className="min-w-0 truncate text-[10px] text-zinc-600">
+      <div className="mt-0.5 flex items-center justify-between gap-3 px-1">
+        <p className="min-w-0 truncate text-[10px] text-zinc-700">
           Iteración estimada: 8-18 créditos
         </p>
 
@@ -515,13 +515,13 @@ const ControlDock = ({
           type="button"
           disabled={!canStartBuild}
           onClick={() => onStartBuild?.()}
-          className={`inline-flex h-7 shrink-0 items-center justify-center rounded-full border px-2.5 text-[10px] font-semibold transition ${
+          className={`shrink-0 text-[10px] font-semibold underline-offset-4 transition ${
             canStartBuild
-              ? 'border-white/10 bg-white/[0.025] text-zinc-500 hover:text-zinc-300'
-              : 'cursor-not-allowed border-white/10 bg-white/[0.015] text-zinc-700'
+              ? 'text-zinc-600 hover:text-zinc-300 hover:underline'
+              : 'cursor-not-allowed text-zinc-800'
           }`}
         >
-          {progress >= 100 ? 'Regenerar' : 'Construir'}
+          {progress >= 100 ? 'regenerar' : 'construir'}
         </button>
       </div>
     </div>
@@ -612,7 +612,7 @@ export default function BuilderAgentPane({
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#050709]">
       <AgentRail onSelectPrompt={submitPrompt} />
 
-      <div className="min-h-0 flex-1 pl-8">
+      <div className="min-h-[52%] flex-1 pl-8">
         <CodeWorkbench
           copy={copy}
           project={project}
