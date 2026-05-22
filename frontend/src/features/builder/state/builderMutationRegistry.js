@@ -833,8 +833,17 @@ export const BUILDER_MUTATION_REGISTRY = {
       type: BUILDER_MUTATION_TYPES.IMPROVE_COPY,
       label: "Mejorar copy",
       source,
+      agentSpecId: "copy_agent",
       creditTier: CREDIT_TIERS.MEDIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+      statusMessage: "Copy mejorado: titulares, CTA y microcopy revisados.",
+      userFeedback: {
+        message: "Copy mejorado: titulares, CTA y microcopy revisados.",
+        tone: "success",
+        details: ["Promesa más clara", "CTA principal reforzado", "Microcopy accionable"],
+      },
+      warnings: [],
+      blockers: [],
       blocks: [
         block("copy-clarity", "copy", "Copy claro y accionable", 12, {
           headline: "Una propuesta clara en segundos",
@@ -863,8 +872,17 @@ export const BUILDER_MUTATION_REGISTRY = {
       type: BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
       label: "Aplicar jerarquía visual",
       source,
+      agentSpecId: "visual_agent",
       creditTier: CREDIT_TIERS.MEDIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+      statusMessage: "Jerarquía visual aplicada: secciones más claras y escaneables.",
+      userFeedback: {
+        message: "Jerarquía visual aplicada: secciones más claras y escaneables.",
+        tone: "success",
+        details: ["Orden de secciones reforzado", "CTA más visible", "Contraste y espaciado mejorados"],
+      },
+      warnings: [],
+      blockers: [],
       blocks: [
         block("visual-hierarchy", "layout", "Jerarquía visual aplicada", 14, {
           density: "balanced",
@@ -897,8 +915,53 @@ export const BUILDER_MUTATION_REGISTRY = {
       type: BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
       label: "Validar listo para exportar",
       source,
+      agentSpecId: "trust_agent",
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+      statusMessage: "Validación completada: revisión lista/no lista para salida técnica.",
+      userFeedback: {
+        message: "Validación completada: revisión lista/no lista para salida técnica.",
+        tone: "warning",
+        details: ["No se exportó código", "No se desplegó", "No se activó backend runtime"],
+      },
+      warnings: [
+        { code: "backend_runtime_not_enabled", message: "Backend runtime nuevo no activado.", severity: "info" },
+        { code: "export_not_executed", message: "Export real no ejecutado desde esta validación.", severity: "warning" },
+        { code: "deploy_not_executed", message: "Deploy real no ejecutado desde esta validación.", severity: "warning" },
+      ],
+      blockers: [
+        { code: "missing_structure_model", message: "Confirmar estructura final antes de exportar.", severity: "blocker" },
+      ],
+      readiness: {
+        ready: false,
+        status: "not_ready",
+        checks: [
+          "copy_reviewed",
+          "visual_hierarchy_reviewed",
+          "structure_model_present",
+          "export_not_executed",
+          "deploy_not_executed",
+        ],
+        warnings: [
+          { code: "backend_runtime_not_enabled", message: "Backend runtime nuevo no activado.", severity: "info" },
+          { code: "export_not_executed", message: "Export real no ejecutado.", severity: "warning" },
+          { code: "deploy_not_executed", message: "Deploy real no ejecutado.", severity: "warning" },
+        ],
+        blockers: [
+          { code: "missing_structure_model", message: "Confirmar estructura final antes de exportar.", severity: "blocker" },
+        ],
+        exportExecuted: false,
+        deployExecuted: false,
+      },
+      exportValidation: {
+        ready: false,
+        status: "not_ready",
+        checks: ["copy_reviewed", "visual_hierarchy_reviewed", "structure_model_present"],
+        warnings: ["backend_runtime_not_enabled", "export_not_executed", "deploy_not_executed"],
+        blockers: ["missing_structure_model"],
+        exportExecuted: false,
+        deployExecuted: false,
+      },
       blocks: [
         block("export-readiness", "validation", "Validación de salida técnica", 90, {
           status: "pending_review",

@@ -14,6 +14,19 @@ const sortByOrder = (items = []) =>
 
 const unique = (items = []) => Array.from(new Set(items.filter(Boolean)));
 
+const createExportValidationSnapshot = (state) =>
+  state.exportValidation ||
+  state.readiness || {
+    ready: false,
+    status: "not_checked",
+    checks: [],
+    warnings: state.warnings || [],
+    blockers: state.blockers || [],
+    exportExecuted: false,
+    deployExecuted: false,
+    updatedAt: state.updatedAt,
+  };
+
 const createFallbackAppFile = (state) => {
   const sections = sortByOrder(state.blocks);
 
@@ -59,6 +72,11 @@ export function createBuilderPreviewSnapshot(buildState = {}) {
     ctas: state.ctas,
     theme: state.theme,
     status: state.status,
+    feedback: state.userFeedback,
+    statusMessage: state.statusMessage,
+    warnings: state.warnings,
+    blockers: state.blockers,
+    exportValidation: createExportValidationSnapshot(state),
     updatedAt: state.updatedAt,
   };
 }
@@ -108,6 +126,9 @@ export function createBuilderStructureSnapshot(buildState = {}) {
     components: state.components,
     routes,
     apiRoutes,
+    warnings: state.warnings,
+    blockers: state.blockers,
+    exportValidation: createExportValidationSnapshot(state),
     updatedAt: state.updatedAt,
   };
 }
@@ -119,6 +140,13 @@ export function createBuilderAgentSnapshot(buildState = {}, context = {}) {
   return {
     version: BUILDER_OUTPUT_MAP_VERSION,
     status: state.status,
+    agentSpecId: state.agentSpecId,
+    feedback: state.userFeedback,
+    statusMessage: state.statusMessage,
+    warnings: state.warnings,
+    blockers: state.blockers,
+    readiness: state.readiness,
+    exportValidation: createExportValidationSnapshot(state),
     lastAction: lastTrace,
     appliedActions: state.appliedActions,
     availableActions: state.availableActions,
@@ -135,7 +163,14 @@ export function createBuilderOutputMap(buildState = {}, context = {}) {
   return {
     version: BUILDER_OUTPUT_MAP_VERSION,
     buildState: state,
-    summary: getBuildStateSummary(state),
+    summary: {
+      ...getBuildStateSummary(state),
+      feedback: state.userFeedback,
+      statusMessage: state.statusMessage,
+      warnings: state.warnings,
+      blockers: state.blockers,
+      exportValidation: createExportValidationSnapshot(state),
+    },
     preview: createBuilderPreviewSnapshot(state),
     code: createBuilderCodeSnapshot(state),
     structure: createBuilderStructureSnapshot(state),

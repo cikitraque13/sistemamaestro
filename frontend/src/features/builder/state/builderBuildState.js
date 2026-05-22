@@ -208,6 +208,62 @@ function normalizeCta(cta) {
   };
 }
 
+function normalizeIssue(issue) {
+  if (typeof issue === "string") {
+    return {
+      code: text(issue, "unknown_issue"),
+      message: text(issue, "unknown_issue"),
+      createdAt: nowIso(),
+    };
+  }
+
+  if (!isObject(issue)) return null;
+
+  const code = text(issue.code || issue.type || issue.id, "unknown_issue");
+
+  return {
+    code,
+    message: text(issue.message || issue.label, code),
+    severity: text(issue.severity, "warning"),
+    meta: isObject(issue.meta) ? issue.meta : {},
+    createdAt: issue.createdAt || issue.created_at || nowIso(),
+  };
+}
+
+function normalizeReadiness(readiness) {
+  if (!isObject(readiness)) return null;
+
+  return {
+    ready: Boolean(readiness.ready),
+    status: text(readiness.status, readiness.ready ? "ready" : "not_ready"),
+    checks: toArray(readiness.checks),
+    warnings: toArray(readiness.warnings).map(normalizeIssue).filter(Boolean),
+    blockers: toArray(readiness.blockers).map(normalizeIssue).filter(Boolean),
+    exportExecuted: Boolean(readiness.exportExecuted || readiness.export_executed),
+    deployExecuted: Boolean(readiness.deployExecuted || readiness.deploy_executed),
+    updatedAt: readiness.updatedAt || readiness.updated_at || nowIso(),
+  };
+}
+
+function normalizeFeedback(feedback) {
+  if (typeof feedback === "string") {
+    return {
+      message: text(feedback),
+      createdAt: nowIso(),
+    };
+  }
+
+  if (!isObject(feedback)) return null;
+
+  return {
+    message: text(feedback.message || feedback.statusMessage || feedback.status_message, ""),
+    statusMessage: text(feedback.statusMessage || feedback.status_message || feedback.message, ""),
+    tone: text(feedback.tone, "info"),
+    details: toArray(feedback.details),
+    createdAt: feedback.createdAt || feedback.created_at || nowIso(),
+  };
+}
+
 function normalizeAction(action) {
   if (!isObject(action)) return null;
 
@@ -219,6 +275,7 @@ function normalizeAction(action) {
     type,
     label: text(action.label, type),
     source: text(action.source, "user"),
+    agentSpecId: text(action.agentSpecId || action.agent_spec_id, ""),
     creditTier: text(action.creditTier || action.credit_tier, "none"),
     priority: Number.isFinite(action.priority) ? action.priority : 50,
     meta: isObject(action.meta) ? action.meta : {},
@@ -261,6 +318,13 @@ export function createInitialBuildState(input = {}) {
       credits: 0,
       reason: "initial_state",
     },
+    agentSpecId: "",
+    userFeedback: null,
+    statusMessage: "",
+    warnings: [],
+    blockers: [],
+    readiness: null,
+    exportValidation: null,
     trace: [],
     errors: [],
     ...DEFAULT_MODELS,
@@ -313,6 +377,13 @@ export function normalizeBuildState(state = {}) {
     creditEstimate: isObject(state.creditEstimate || state.credit_estimate)
       ? state.creditEstimate || state.credit_estimate
       : base.creditEstimate,
+    agentSpecId: text(state.agentSpecId || state.agent_spec_id, base.agentSpecId),
+    userFeedback: normalizeFeedback(state.userFeedback || state.user_feedback),
+    statusMessage: text(state.statusMessage || state.status_message, base.statusMessage),
+    warnings: toArray(state.warnings).map(normalizeIssue).filter(Boolean),
+    blockers: toArray(state.blockers).map(normalizeIssue).filter(Boolean),
+    readiness: normalizeReadiness(state.readiness),
+    exportValidation: normalizeReadiness(state.exportValidation || state.export_validation),
     trace: toArray(state.trace),
     errors: toArray(state.errors),
     createdAt: state.createdAt || state.created_at || base.createdAt,
@@ -341,11 +412,26 @@ export function applyBuildMutation(currentState, mutation = {}) {
   }
 
   const mutationType = text(mutation.type || mutation.mutationType || mutation.id, "");
+  const agentSpecId = text(mutation.agentSpecId || mutation.agent_spec_id, state.agentSpecId);
+  const mutationFeedback = normalizeFeedback(
+    mutation.userFeedback ||
+      mutation.user_feedback ||
+      mutation.feedback ||
+      mutation.statusMessage ||
+      mutation.status_message
+  );
+  const mutationWarnings = toArray(mutation.warnings).map(normalizeIssue).filter(Boolean);
+  const mutationBlockers = toArray(mutation.blockers).map(normalizeIssue).filter(Boolean);
+  const mutationReadiness = normalizeReadiness(mutation.readiness);
+  const mutationExportValidation = normalizeReadiness(
+    mutation.exportValidation || mutation.export_validation || mutationReadiness
+  );
   const appliedAction = normalizeAction({
     id: mutation.id,
     type: mutationType,
     label: mutation.label,
     source: mutation.source || "user",
+    agentSpecId,
     creditTier: mutation.creditTier || mutation.credit_tier,
     meta: mutation.meta,
   });
@@ -410,12 +496,33 @@ export function applyBuildMutation(currentState, mutation = {}) {
     creditEstimate: isObject(mutation.creditEstimate || mutation.credit_estimate)
       ? mutation.creditEstimate || mutation.credit_estimate
       : state.creditEstimate,
+    agentSpecId,
+    userFeedback: mutationFeedback || state.userFeedback,
+    statusMessage: text(
+      mutation.statusMessage || mutation.status_message || mutationFeedback?.statusMessage,
+      state.statusMessage
+    ),
+    warnings: mutationWarnings.length
+      ? mergeByKey(state.warnings, mutationWarnings, "code")
+      : state.warnings,
+    blockers: mutationBlockers.length
+      ? mergeByKey(state.blockers, mutationBlockers, "code")
+      : state.blockers,
+    readiness: mutationReadiness || state.readiness,
+    exportValidation: mutationExportValidation || state.exportValidation,
     trace: [
       ...state.trace,
       {
         type: mutationType || "unknown_mutation",
         label: text(mutation.label, mutationType || "Mutation"),
         source: text(mutation.source, "user"),
+        agentSpecId,
+        statusMessage: text(
+          mutation.statusMessage || mutation.status_message || mutationFeedback?.statusMessage,
+          ""
+        ),
+        warnings: mutationWarnings.map((warning) => warning.code),
+        blockers: mutationBlockers.map((blocker) => blocker.code),
         affectedBlocks: nextBlocks.map((block) => block.id),
         affectedComponents: nextComponents.map((component) => component.id),
         affectedFiles: nextFiles.map((file) => file.path),
@@ -462,6 +569,13 @@ export function getBuildStateSummary(state = {}) {
     filesCount: normalizedState.files.length,
     foldersCount: normalizedState.folders.length,
     routesCount: normalizedState.routes.length,
+    agentSpecId: normalizedState.agentSpecId,
+    statusMessage: normalizedState.statusMessage,
+    userFeedback: normalizedState.userFeedback,
+    warnings: normalizedState.warnings,
+    blockers: normalizedState.blockers,
+    readiness: normalizedState.readiness,
+    exportValidation: normalizedState.exportValidation,
     appliedActionsCount: normalizedState.appliedActions.length,
     availableActionsCount: normalizedState.availableActions.length,
     updatedAt: normalizedState.updatedAt,
