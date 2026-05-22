@@ -192,7 +192,7 @@ const AGENT_ACTIONS = [
     id: 'visual',
     label: 'VISUAL',
     title: 'Atajo experto: elevar diseno',
-    agentSpecId: 'builder_agent',
+    agentSpecId: 'visual_agent',
     mutationType: 'apply_visual_hierarchy',
     mutationAction: 'apply_visual_hierarchy',
     creditTier: 'medium',
