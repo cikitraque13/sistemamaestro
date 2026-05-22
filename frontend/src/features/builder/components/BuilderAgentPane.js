@@ -272,7 +272,6 @@ const AgentCapsule = ({
 const DecisionPanel = ({
   actions = [],
   onSelectAction,
-  compact = false,
   feedback = '',
 }) => {
   const visibleActions = actions.slice(0, 3);
@@ -280,62 +279,52 @@ const DecisionPanel = ({
   if (!visibleActions.length) return null;
 
   return (
-    <div className={`${compact ? 'mt-5 border-t border-white/[0.08] pt-4' : 'mb-3 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.035] p-3'}`}>
-      <div className={compact ? 'grid grid-cols-[38px_1fr] gap-3' : 'mb-2 flex items-center justify-between gap-3'}>
-        {compact && (
-          <span className="select-none text-right text-zinc-700">
-            //
-          </span>
-        )}
-
-        <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-100">
+    <div className="mb-2 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.03] p-2.5">
+      <div className="mb-1.5 flex items-center justify-between gap-3">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100">
           Siguiente paso recomendado
         </span>
 
-        {!compact && (
-          <span className="shrink-0 text-[10px] uppercase tracking-[0.14em] text-zinc-500">
-            máximo 3
-          </span>
-        )}
+        <span className="shrink-0 text-[9px] uppercase tracking-[0.12em] text-zinc-600">
+          landing v1
+        </span>
       </div>
 
       {feedback && (
-        <div className="mb-2 rounded-xl border border-emerald-200/20 bg-emerald-200/[0.06] px-3 py-2 text-[11px] font-semibold text-emerald-100">
-          {feedback}
+        <div className="mb-1.5 truncate rounded-lg border border-emerald-200/15 bg-emerald-200/[0.045] px-2.5 py-1.5 text-[10px] font-semibold text-emerald-100">
+          Qué cambió: {feedback}
         </div>
       )}
 
-      <div className={compact ? '' : 'grid gap-2'}>
+      <div className="grid gap-1.5">
         {visibleActions.map((action, index) => (
           <button
             key={action.id || `${action.label}-${index}`}
             type="button"
             onClick={() => onSelectAction?.(action)}
-            className={`${compact ? 'mt-1 grid grid-cols-[38px_1fr] py-0.5' : 'grid grid-cols-[24px_1fr_auto] rounded-xl border border-white/[0.07] bg-black/25 px-3 py-2'} group w-full gap-3 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]`}
+            className="group grid w-full grid-cols-[22px_1fr_auto] gap-2 rounded-xl border border-white/[0.06] bg-black/20 px-2.5 py-1.5 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]"
           >
-            <span className="select-none text-right text-zinc-700">
+            <span className="select-none text-center text-[11px] font-bold text-cyan-200/70">
               {['A', 'B', 'C'][index]}
             </span>
 
             <span className="min-w-0">
-              <span className="block truncate text-[13px] font-semibold leading-6 text-cyan-100 transition group-hover:text-white">
+              <span className="block truncate text-[12px] font-semibold leading-5 text-cyan-100 transition group-hover:text-white">
                 {action.title || action.label}
               </span>
 
-              <span className="block truncate text-[11px] text-zinc-500">
+              <span className="block truncate text-[10px] leading-4 text-zinc-500">
                 {action.description || action.prompt || `Coste ${formatCreditTier(action.creditTier)}`}
               </span>
 
-              <span className="mt-1 block truncate text-[10px] uppercase tracking-[0.14em] text-zinc-600">
+              <span className="block truncate text-[9px] uppercase tracking-[0.12em] text-zinc-600">
                 {action.impact || 'Construcción'} · {action.phase || 'decisión'} · {action.mutationAction || action.type || 'mutación'}
               </span>
             </span>
 
-            {!compact && (
-              <span className="self-center rounded-full border border-emerald-200/20 bg-emerald-200/[0.06] px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-emerald-100">
-                Aplicar
-              </span>
-            )}
+            <span className="self-center rounded-full border border-emerald-200/15 bg-emerald-200/[0.045] px-2 py-0.5 text-[9px] uppercase tracking-[0.1em] text-emerald-100">
+              Aplicar
+            </span>
           </button>
         ))}
       </div>
@@ -379,8 +368,6 @@ const CodeWorkbench = ({
   onCodeTabChange,
   intent = {},
   visualState = {},
-  suggestedActions = [],
-  onSelectAction,
 }) => {
   const lines = useMemo(
     () =>
@@ -407,8 +394,6 @@ const CodeWorkbench = ({
       progress,
     ]
   );
-
-  const showSuggestions = progress >= 96 && suggestedActions.length > 0;
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#020405] font-mono">
@@ -471,13 +456,6 @@ const CodeWorkbench = ({
           </div>
         )}
 
-        {showSuggestions && (
-          <DecisionPanel
-            actions={suggestedActions}
-            onSelectAction={onSelectAction}
-            compact
-          />
-        )}
       </div>
     </div>
   );
@@ -503,21 +481,21 @@ const ControlDock = ({
         onSelectAction={onSelectAction}
         feedback={decisionFeedback}
       />
-      <div className="flex items-end gap-2">
+      <div className="mt-2 flex items-end gap-2 border-t border-white/[0.06] pt-2">
         <textarea
-          rows={2}
+          rows={1}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Escribe un cambio: CTA, color, seccion, fotos, tono, version..."
-          className="min-h-[52px] flex-1 resize-none rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-sm leading-5 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
+          placeholder="Alternativa: escribe un cambio libre..."
+          className="min-h-[38px] flex-1 resize-none rounded-xl border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
         />
 
         <button
           type="button"
           disabled={!canSubmit}
           onClick={onSubmit}
-          className={`inline-flex h-[52px] min-w-[132px] shrink-0 items-center justify-center rounded-2xl border px-4 text-sm font-semibold transition ${
+          className={`inline-flex h-[38px] min-w-[104px] shrink-0 items-center justify-center rounded-2xl border px-3 text-xs font-semibold transition ${
             canSubmit
               ? 'border-emerald-200/70 bg-gradient-to-r from-emerald-200 via-cyan-100 to-amber-100 text-black shadow-[0_0_28px_rgba(52,211,153,0.12)] hover:scale-[1.01]'
               : 'border-emerald-200/15 bg-emerald-200/[0.045] text-emerald-100/45'
@@ -642,8 +620,6 @@ export default function BuilderAgentPane({
           onCodeTabChange={onCodeTabChange}
           intent={hubSummary}
           visualState={lastDelta?.visual || {}}
-          suggestedActions={suggestedActions}
-          onSelectAction={submitSuggestedAction}
         />
       </div>
 

@@ -85,6 +85,112 @@ const createOptionFromMutation = (type, index = 0) => ({
   priority: 10 + index,
 });
 
+
+const LANDING_CAPTURE_PHASES = [
+  {
+    id: "promesa_hero",
+    label: "Promesa / hero",
+    types: [
+      BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
+      BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS,
+      BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
+    ],
+  },
+  {
+    id: "conversion_formulario",
+    label: "Conversión / formulario",
+    types: [
+      BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
+      BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW,
+      BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX,
+    ],
+  },
+  {
+    id: "confianza_objeciones",
+    label: "Confianza / objeciones",
+    types: [
+      BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION,
+      BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS,
+      BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
+    ],
+  },
+  {
+    id: "seguimiento_export_ready",
+    label: "Seguimiento / export-ready",
+    types: [
+      BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
+      BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
+      BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
+    ],
+  },
+];
+
+const landingActionMeta = {
+  [BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION]: {
+    label: "Afinar promesa",
+    description: "Hero, CTA y mensaje principal más claros.",
+    impact: "Promesa",
+  },
+  [BUILDER_MUTATION_TYPES.ADD_HOW_IT_WORKS]: {
+    label: "Explicar pasos",
+    description: "Tres pasos para entender la oferta rápido.",
+    impact: "Claridad",
+  },
+  [BUILDER_MUTATION_TYPES.ADD_TRUST_SECTION]: {
+    label: "Resolver objeciones",
+    description: "Prueba, autoridad y seguridad visibles.",
+    impact: "Confianza",
+  },
+  [BUILDER_MUTATION_TYPES.ADD_LEADS_FORM]: {
+    label: "Capturar lead",
+    description: "Formulario simple para convertir visitas.",
+    impact: "Captación",
+  },
+  [BUILDER_MUTATION_TYPES.ADD_BOOKING_FLOW]: {
+    label: "Activar reserva",
+    description: "CTA y flujo directo de solicitud.",
+    impact: "Conversión",
+  },
+  [BUILDER_MUTATION_TYPES.ADD_SUBSCRIPTION_BOX]: {
+    label: "Preparar seguimiento",
+    description: "Email y continuidad comercial básica.",
+    impact: "Seguimiento",
+  },
+  [BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE]: {
+    label: "Ordenar estructura",
+    description: "Carpetas y archivos listos para salida.",
+    impact: "Estructura",
+  },
+  [BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN]: {
+    label: "Preparar export",
+    description: "Plan técnico sin desbloquear deploy.",
+    impact: "Export-ready",
+  },
+};
+
+const resolveLandingCapturePhase = (state) =>
+  LANDING_CAPTURE_PHASES.find((phase) =>
+    phase.types.some((type) => !hasAppliedAction(state, type))
+  ) || LANDING_CAPTURE_PHASES[LANDING_CAPTURE_PHASES.length - 1];
+
+const createLandingCaptureOption = (type, phase, index = 0) => ({
+  ...createOptionFromMutation(type, index),
+  ...(landingActionMeta[type] || {}),
+  id: `landing-${phase.id}-${type}`,
+  phase: phase.label,
+  source: "builder_question_flow",
+  priority: 10 + index,
+});
+
+const resolveLandingCaptureActions = (state) => {
+  const phase = resolveLandingCapturePhase(state);
+
+  return phase.types
+    .filter((type) => !hasAppliedAction(state, type))
+    .map((type, index) => createLandingCaptureOption(type, phase, index))
+    .slice(0, 3);
+};
+
 const uniqueByType = (items = []) => {
   const map = new Map();
 
@@ -98,6 +204,11 @@ const uniqueByType = (items = []) => {
 
 export function resolveBuilderNextActions(buildState = {}, context = {}) {
   const state = normalizeBuildState(buildState);
+  const landingCaptureActions = resolveLandingCaptureActions(state);
+
+  if (landingCaptureActions.length) {
+    return landingCaptureActions;
+  }
 
   const availableFromState = state.availableActions
     .filter((action) => !hasAppliedAction(state, action.type))
@@ -163,11 +274,11 @@ export function createBuilderDecisionMessage(buildState = {}, context = {}) {
   return {
     id: `builder-decision-${state.buildStateId}-${state.appliedActions.length}`,
     role: "decision",
-    label: preset?.label || "Siguiente mejora",
+    label: preset?.label || "Landing captación V1",
     text:
       preset?.text ||
       preset?.question ||
-      "¿Qué quieres construir ahora sobre esta base?",
+      "Elige el siguiente paso para terminar esta landing de captación.",
     options,
     meta: {
       source: "builder_question_flow",
