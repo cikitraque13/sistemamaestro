@@ -231,7 +231,7 @@ const AgentCapsule = ({
   status,
   progress,
 }) => {
-  const safeStatus = status || 'Agente preparado';
+  const safeStatus = progress >= 100 ? 'Agente listo' : (status || 'Agente preparado');
   const tone = getStatusTone(safeStatus);
   const progressLabel =
     typeof progress === 'number'
@@ -253,16 +253,16 @@ const AgentCapsule = ({
   };
 
   return (
-    <div className={`flex h-[40px] shrink-0 items-center justify-between gap-3 border-t border-white/[0.08] px-4 ${toneClasses[tone]}`}>
+    <div className={`flex h-9 shrink-0 items-center justify-between gap-3 border-t border-white/[0.08] px-3.5 ${toneClasses[tone]}`}>
       <div className="flex min-w-0 items-center gap-2">
         <span className={`h-2 w-2 shrink-0 rounded-full animate-pulse ${dotClasses[tone]}`} />
 
-        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.16em]">
+        <p className="truncate text-[10px] font-semibold uppercase tracking-[0.15em]">
           {safeStatus}
         </p>
       </div>
 
-      <span className="shrink-0 rounded-full border border-white/[0.08] bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-300">
+      <span className="shrink-0 rounded-full border border-white/[0.08] bg-black/30 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-zinc-400">
         {progressLabel}
       </span>
     </div>
@@ -284,13 +284,13 @@ const DecisionPanel = ({
   if (!visibleActions.length) return null;
 
   return (
-    <div className="mb-1.5 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.03] p-2">
+    <div className="mb-1.5 rounded-2xl border border-cyan-300/12 bg-gradient-to-b from-cyan-300/[0.04] to-white/[0.018] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
       <div className="mb-1 flex items-center justify-between gap-3">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">
           Siguiente paso recomendado
         </span>
 
-        <span className="shrink-0 text-[9px] uppercase tracking-[0.12em] text-zinc-600">
+        <span className="shrink-0 rounded-full border border-white/[0.06] bg-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.12em] text-zinc-500">
           landing v1
         </span>
       </div>
@@ -307,17 +307,17 @@ const DecisionPanel = ({
             key={action.id || `${action.label}-${index}`}
             type="button"
             onClick={() => onSelectAction?.(action)}
-            className="group grid w-full grid-cols-[22px_1fr_58px] items-center gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-2 py-1 text-left transition hover:border-cyan-300/25 hover:bg-cyan-300/[0.055]"
+            className="group grid w-full grid-cols-[24px_1fr_58px] items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] px-2 py-1.5 text-left transition hover:border-cyan-300/30 hover:bg-cyan-300/[0.055]"
           >
-            <span className="select-none text-center text-[11px] font-bold text-cyan-200/70">
+            <span className="grid h-5 w-5 select-none place-items-center rounded-full border border-cyan-200/15 bg-cyan-200/[0.06] text-[10px] font-bold text-cyan-100/80">
               {['A', 'B', 'C'][index]}
             </span>
 
-            <span className="truncate text-[12px] font-semibold leading-5 text-cyan-100 transition group-hover:text-white">
+            <span className="truncate text-[12px] font-semibold leading-5 text-zinc-100 transition group-hover:text-white">
               {action.title || action.label}
             </span>
 
-            <span className="justify-self-end rounded-full border border-emerald-200/15 bg-emerald-200/[0.045] px-2 py-0.5 text-[9px] uppercase tracking-[0.1em] text-emerald-100">
+            <span className="justify-self-end rounded-full border border-emerald-200/20 bg-emerald-200/[0.055] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
               Aplicar
             </span>
           </button>
@@ -331,7 +331,7 @@ const DecisionPanel = ({
           onChange={(event) => setDraft?.(event.target.value)}
           onKeyDown={onKeyDown}
           placeholder="Escribe aquí para seguir hablando con el agente..."
-          className="min-h-[32px] flex-1 resize-none rounded-full border border-white/[0.08] bg-black/25 px-3 py-1.5 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
+          className="min-h-[32px] flex-1 resize-none rounded-full border border-white/[0.08] bg-black/35 px-3 py-1.5 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/35 focus:bg-cyan-300/[0.04]"
         />
 
         <button
@@ -340,7 +340,7 @@ const DecisionPanel = ({
           onClick={onSubmit}
           className={`inline-flex h-8 min-w-[60px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
             canSubmit
-              ? 'border-cyan-200/50 bg-cyan-200/[0.12] text-cyan-50 hover:bg-cyan-200/[0.18]'
+              ? 'border-cyan-200/55 bg-cyan-200/[0.14] text-cyan-50 shadow-[0_0_18px_rgba(34,211,238,0.08)] hover:bg-cyan-200/[0.20]'
               : 'border-white/10 bg-white/[0.025] text-zinc-600'
           }`}
         >
@@ -494,7 +494,7 @@ const ControlDock = ({
   decisionFeedback = '',
 }) => (
   <div className="max-h-[46%] shrink-0 overflow-hidden border-t border-white/[0.08] bg-black/45 p-2.5">
-    <div className="rounded-[18px] border border-white/10 bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+    <div className="rounded-[18px] border border-white/[0.09] bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
