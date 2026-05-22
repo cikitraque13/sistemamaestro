@@ -161,7 +161,12 @@ const AGENT_ACTIONS = [
   {
     id: 'cro',
     label: 'CRO',
-    title: 'Optimizar conversion',
+    title: 'Atajo experto: optimizar conversion',
+    agentSpecId: 'cro_agent',
+    mutationType: 'improve_premium_conversion',
+    mutationAction: 'improve_premium_conversion',
+    creditTier: 'medium',
+    source: 'agentrail_shortcut_v1',
     prompt:
       'Mejora la conversion visible del proyecto manteniendo el recorrido actual del Builder.',
     dotClassName: 'bg-emerald-300 shadow-[0_0_14px_rgba(52,211,153,0.65)]',
@@ -171,7 +176,12 @@ const AGENT_ACTIONS = [
   {
     id: 'copy',
     label: 'COPY',
-    title: 'Mejorar copy',
+    title: 'Atajo experto: mejorar copy',
+    agentSpecId: 'cro_agent',
+    mutationType: 'improve_premium_conversion',
+    mutationAction: 'improve_premium_conversion',
+    creditTier: 'medium',
+    source: 'agentrail_shortcut_v1',
     prompt:
       'Mejora promesa, claridad, tono y textos accionables dentro del recorrido actual del Builder.',
     dotClassName: 'bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.65)]',
@@ -181,7 +191,12 @@ const AGENT_ACTIONS = [
   {
     id: 'visual',
     label: 'VISUAL',
-    title: 'Elevar diseno',
+    title: 'Atajo experto: elevar diseno',
+    agentSpecId: 'builder_agent',
+    mutationType: 'improve_premium_conversion',
+    mutationAction: 'improve_premium_conversion',
+    creditTier: 'medium',
+    source: 'agentrail_shortcut_v1',
     prompt:
       'Eleva la interfaz con mas jerarquia, contraste, aire y sensacion premium sin romper el recorrido actual.',
     dotClassName: 'bg-fuchsia-300 shadow-[0_0_14px_rgba(240,171,252,0.65)]',
@@ -191,7 +206,12 @@ const AGENT_ACTIONS = [
   {
     id: 'trust',
     label: 'TRUST',
-    title: 'Reforzar confianza',
+    title: 'Atajo experto: reforzar confianza',
+    agentSpecId: 'trust_agent',
+    mutationType: 'add_trust_section',
+    mutationAction: 'add_trust_section',
+    creditTier: 'low',
+    source: 'agentrail_shortcut_v1',
     prompt:
       'Refuerza confianza, autoridad, prueba social y objeciones resueltas dentro del recorrido actual.',
     dotClassName: 'bg-orange-300 shadow-[0_0_14px_rgba(253,186,116,0.65)]',
@@ -201,7 +221,12 @@ const AGENT_ACTIONS = [
   {
     id: 'seo',
     label: 'SEO',
-    title: 'Mejorar SEO',
+    title: 'Atajo experto: mejorar estructura SEO',
+    agentSpecId: 'builder_agent',
+    mutationType: 'generate_folder_structure',
+    mutationAction: 'generate_folder_structure',
+    creditTier: 'medium',
+    source: 'agentrail_shortcut_v1',
     prompt:
       'Mejora estructura, titulos, semantica y texto para busqueda organica sin salir del recorrido actual.',
     dotClassName: 'bg-sky-300 shadow-[0_0_14px_rgba(125,211,252,0.65)]',
@@ -210,13 +235,13 @@ const AGENT_ACTIONS = [
   },
 ];
 
-const AgentRail = ({ onSelectPrompt }) => (
-  <div className="pointer-events-auto absolute left-2 top-[58px] z-20 flex flex-col items-center gap-2">
+const AgentRail = ({ onSelectShortcut }) => (
+  <div className="pointer-events-auto absolute left-2 top-[58px] z-20 flex flex-col items-center gap-2" aria-label="Atajos expertos del Builder">
     {AGENT_ACTIONS.map((agent) => (
       <button
         key={agent.id}
         type="button"
-        onClick={() => onSelectPrompt?.(agent.prompt)}
+        onClick={() => onSelectShortcut?.(agent)}
         className={`group grid h-7 w-7 place-items-center rounded-full border bg-black/60 backdrop-blur transition ${agent.ringClassName}`}
         title={`${agent.label} - ${agent.title}`}
         aria-label={`${agent.label} - ${agent.title}`}
@@ -565,6 +590,14 @@ export default function BuilderAgentPane({
     return appliedMessage ? 'Cambio aplicado' : '';
   }, [messages]);
 
+  const latestDecisionHandler = useMemo(() => {
+    const decisionMessage = [...messages]
+      .reverse()
+      .find((message) => typeof message?.onDecision === 'function');
+
+    return decisionMessage?.onDecision || null;
+  }, [messages]);
+
   const canSubmit =
     draft.trim().length > 0 &&
     typeof onSubmitMessage === 'function';
@@ -601,6 +634,25 @@ export default function BuilderAgentPane({
     submitPrompt(prompt);
   };
 
+  const submitAgentShortcut = (agent) => {
+    if (!agent) return;
+
+    const action = {
+      ...agent,
+      label: agent.label,
+      description: agent.prompt,
+      impact: agent.title,
+      type: agent.mutationType,
+    };
+
+    if (typeof latestDecisionHandler === 'function' && agent.mutationType) {
+      latestDecisionHandler(action);
+      return;
+    }
+
+    submitPrompt(agent.prompt);
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -610,7 +662,7 @@ export default function BuilderAgentPane({
 
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#050709]">
-      <AgentRail onSelectPrompt={submitPrompt} />
+      <AgentRail onSelectShortcut={submitAgentShortcut} />
 
       <div className="min-h-[52%] flex-1 pl-8">
         <CodeWorkbench
