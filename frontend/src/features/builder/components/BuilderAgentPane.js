@@ -273,6 +273,11 @@ const DecisionPanel = ({
   actions = [],
   onSelectAction,
   feedback = '',
+  draft = '',
+  setDraft,
+  onSubmit,
+  onKeyDown,
+  canSubmit = false,
 }) => {
   const visibleActions = actions.slice(0, 3);
 
@@ -317,6 +322,30 @@ const DecisionPanel = ({
             </span>
           </button>
         ))}
+      </div>
+
+      <div className="mt-1.5 flex items-end gap-2">
+        <textarea
+          rows={1}
+          value={draft}
+          onChange={(event) => setDraft?.(event.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Escribe aquí para seguir hablando con el agente..."
+          className="min-h-[34px] flex-1 resize-none rounded-full border border-white/[0.08] bg-black/25 px-3.5 py-2 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
+        />
+
+        <button
+          type="button"
+          disabled={!canSubmit}
+          onClick={onSubmit}
+          className={`inline-flex h-[34px] min-w-[64px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
+            canSubmit
+              ? 'border-cyan-200/50 bg-cyan-200/[0.12] text-cyan-50 hover:bg-cyan-200/[0.18]'
+              : 'border-white/10 bg-white/[0.025] text-zinc-600'
+          }`}
+        >
+          Enviar
+        </button>
       </div>
     </div>
   );
@@ -465,37 +494,19 @@ const ControlDock = ({
   decisionFeedback = '',
 }) => (
   <div className="shrink-0 border-t border-white/[0.08] bg-black/45 p-3">
-    <div className="rounded-[20px] border border-white/10 bg-[#020405] p-3 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+    <div className="rounded-[20px] border border-white/10 bg-[#020405] p-2.5 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
         feedback={decisionFeedback}
+        draft={draft}
+        setDraft={setDraft}
+        onSubmit={onSubmit}
+        onKeyDown={onKeyDown}
+        canSubmit={canSubmit}
       />
-      <div className="mt-2 flex items-end gap-2 border-t border-white/[0.06] pt-2">
-        <textarea
-          rows={1}
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder="Escribe aquí para seguir hablando con el agente..."
-          className="min-h-[36px] flex-1 resize-none rounded-full border border-white/[0.08] bg-white/[0.035] px-3.5 py-2 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/30 focus:bg-cyan-300/[0.035]"
-        />
 
-        <button
-          type="button"
-          disabled={!canSubmit}
-          onClick={onSubmit}
-          className={`inline-flex h-9 min-w-[68px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
-            canSubmit
-              ? 'border-cyan-200/50 bg-cyan-200/[0.12] text-cyan-50 hover:bg-cyan-200/[0.18]'
-              : 'border-white/10 bg-white/[0.025] text-zinc-600'
-          }`}
-        >
-          Enviar
-        </button>
-      </div>
-
-      <div className="mt-1.5 flex items-center justify-between gap-3 px-1">
+      <div className="mt-1 flex items-center justify-between gap-3 px-1">
         <p className="min-w-0 truncate text-[10px] text-zinc-600">
           Iteración estimada: 8-18 créditos
         </p>
