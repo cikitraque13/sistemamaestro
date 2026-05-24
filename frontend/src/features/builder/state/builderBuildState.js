@@ -302,6 +302,12 @@ export function createInitialBuildState(input = {}) {
     sector: text(input.sector, "generic"),
     objective: text(input.objective, "conversion"),
     userLevel: text(input.userLevel || input.user_level, "mixed"),
+    primaryCTA: text(input.primaryCTA || input.primary_cta, ""),
+    visualAccent: text(input.visualAccent || input.visual_accent, ""),
+    templateId: text(input.templateId || input.template_id, ""),
+    revision: Number.isFinite(input.revision) ? input.revision : 0,
+    traceId: text(input.traceId || input.trace_id, ""),
+    lastCommandId: text(input.lastCommandId || input.last_command_id, ""),
     theme: isObject(input.theme) ? input.theme : {},
     blocks: [],
     components: [],
@@ -350,6 +356,12 @@ export function normalizeBuildState(state = {}) {
     sector: text(state.sector, base.sector),
     objective: text(state.objective, base.objective),
     userLevel: text(state.userLevel || state.user_level, base.userLevel),
+    primaryCTA: text(state.primaryCTA || state.primary_cta, base.primaryCTA),
+    visualAccent: text(state.visualAccent || state.visual_accent, base.visualAccent),
+    templateId: text(state.templateId || state.template_id, base.templateId),
+    revision: Number.isFinite(state.revision) ? state.revision : base.revision,
+    traceId: text(state.traceId || state.trace_id, base.traceId),
+    lastCommandId: text(state.lastCommandId || state.last_command_id, base.lastCommandId),
     theme: isObject(state.theme) ? state.theme : base.theme,
     blocks: toArray(state.blocks).map(normalizeBlock).filter(Boolean),
     components: toArray(state.components).map(normalizeComponent).filter(Boolean),
@@ -449,6 +461,12 @@ export function applyBuildMutation(currentState, mutation = {}) {
   const nextAvailableActions = toArray(mutation.availableActions || mutation.available_actions)
     .map(normalizeAction)
     .filter(Boolean);
+  const nextPrimaryCTA = text(mutation.primaryCTA || mutation.primary_cta, state.primaryCTA);
+  const nextVisualAccent = text(mutation.visualAccent || mutation.visual_accent, state.visualAccent);
+  const nextTemplateId = text(mutation.templateId || mutation.template_id, state.templateId);
+  const nextTraceId = text(mutation.traceId || mutation.trace_id, state.traceId);
+  const nextCommandId = text(mutation.commandId || mutation.command_id, state.lastCommandId);
+  const hasCanonicalDelta = Boolean(nextPrimaryCTA !== state.primaryCTA || nextVisualAccent !== state.visualAccent);
 
   return {
     ...state,
@@ -457,7 +475,15 @@ export function applyBuildMutation(currentState, mutation = {}) {
     mode: text(mutation.mode, state.mode),
     sector: text(mutation.sector, state.sector),
     objective: text(mutation.objective, state.objective),
-    theme: isObject(mutation.theme) ? { ...state.theme, ...mutation.theme } : state.theme,
+    primaryCTA: nextPrimaryCTA,
+    visualAccent: nextVisualAccent,
+    templateId: nextTemplateId,
+    revision: hasCanonicalDelta ? state.revision + 1 : state.revision,
+    traceId: nextTraceId,
+    lastCommandId: nextCommandId,
+    theme: isObject(mutation.theme) || nextVisualAccent
+      ? { ...state.theme, ...(isObject(mutation.theme) ? mutation.theme : {}), ...(nextVisualAccent ? { visualAccent: nextVisualAccent, accent: nextVisualAccent } : {}) }
+      : state.theme,
     blocks: mergeByKey(state.blocks, nextBlocks, "id"),
     components: mergeByKey(state.components, nextComponents, "id"),
     pages: mergeByKey(state.pages, nextPages, "path"),
@@ -521,6 +547,10 @@ export function applyBuildMutation(currentState, mutation = {}) {
           mutation.statusMessage || mutation.status_message || mutationFeedback?.statusMessage,
           ""
         ),
+        commandId: nextCommandId,
+        traceId: nextTraceId,
+        primaryCTA: nextPrimaryCTA,
+        visualAccent: nextVisualAccent,
         warnings: mutationWarnings.map((warning) => warning.code),
         blockers: mutationBlockers.map((blocker) => blocker.code),
         affectedBlocks: nextBlocks.map((block) => block.id),
@@ -564,6 +594,12 @@ export function getBuildStateSummary(state = {}) {
     status: normalizedState.status,
     sector: normalizedState.sector,
     objective: normalizedState.objective,
+    primaryCTA: normalizedState.primaryCTA,
+    visualAccent: normalizedState.visualAccent,
+    templateId: normalizedState.templateId,
+    revision: normalizedState.revision,
+    traceId: normalizedState.traceId,
+    lastCommandId: normalizedState.lastCommandId,
     blocksCount: normalizedState.blocks.length,
     componentsCount: normalizedState.components.length,
     filesCount: normalizedState.files.length,
