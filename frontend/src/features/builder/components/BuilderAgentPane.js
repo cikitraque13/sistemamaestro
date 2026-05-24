@@ -298,10 +298,13 @@ const DecisionPanel = ({
   actions = [],
   onSelectAction,
   feedback = '',
+  draft = '',
+  setDraft,
+  onSubmit,
+  onKeyDown,
+  canSubmit = false,
 }) => {
   const visibleActions = actions.slice(0, 3);
-
-  if (!visibleActions.length) return null;
 
   return (
     <div className="mb-1.5 rounded-2xl border border-cyan-300/12 bg-gradient-to-b from-cyan-300/[0.04] to-white/[0.018] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
@@ -321,29 +324,56 @@ const DecisionPanel = ({
         </div>
       )}
 
-      <div className="grid gap-1">
-        {visibleActions.map((action, index) => (
-          <button
-            key={action.id || `${action.label}-${index}`}
-            type="button"
-            onClick={() => onSelectAction?.(action)}
-            className="group grid w-full grid-cols-[24px_1fr_58px] items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] px-2 py-1.5 text-left transition hover:border-cyan-300/30 hover:bg-cyan-300/[0.055]"
-          >
-            <span className="grid h-5 w-5 select-none place-items-center rounded-full border border-cyan-200/15 bg-cyan-200/[0.06] text-[10px] font-bold text-cyan-100/80">
-              {['A', 'B', 'C'][index]}
-            </span>
+      {visibleActions.length > 0 && (
+        <div className="grid gap-1">
+          {visibleActions.map((action, index) => (
+            <button
+              key={action.id || `${action.label}-${index}`}
+              type="button"
+              onClick={() => onSelectAction?.(action)}
+              className="group grid w-full grid-cols-[24px_1fr_58px] items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.025] px-2 py-1.5 text-left transition hover:border-cyan-300/30 hover:bg-cyan-300/[0.055]"
+            >
+              <span className="grid h-5 w-5 select-none place-items-center rounded-full border border-cyan-200/15 bg-cyan-200/[0.06] text-[10px] font-bold text-cyan-100/80">
+                {['A', 'B', 'C'][index]}
+              </span>
 
-            <span className="truncate text-[12px] font-semibold leading-5 text-zinc-100 transition group-hover:text-white">
-              {action.title || action.label}
-            </span>
+              <span className="truncate text-[12px] font-semibold leading-5 text-zinc-100 transition group-hover:text-white">
+                {action.title || action.label}
+              </span>
 
-            <span className="justify-self-end rounded-full border border-emerald-200/20 bg-emerald-200/[0.055] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
-              Aplicar
-            </span>
-          </button>
-        ))}
+              <span className="justify-self-end rounded-full border border-emerald-200/20 bg-emerald-200/[0.055] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
+                Aplicar
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-2 flex items-center gap-2 border-t border-white/[0.06] pt-2">
+        <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-300 animate-pulse" />
+
+        <textarea
+          rows={1}
+          value={draft}
+          onChange={(event) => setDraft?.(event.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={'Cambiar CTA principal a "Reservar consulta" y acento naranja'}
+          className="min-h-[28px] flex-1 resize-none border-0 bg-transparent px-0 py-1 text-xs leading-5 text-white placeholder:text-zinc-600 outline-none"
+        />
+
+        <button
+          type="button"
+          disabled={!canSubmit}
+          onClick={onSubmit}
+          className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+            canSubmit
+              ? 'bg-cyan-200/[0.14] text-cyan-50 hover:bg-cyan-200/[0.20]'
+              : 'text-zinc-700'
+          }`}
+        >
+          Aplicar
+        </button>
       </div>
-
     </div>
   );
 };
@@ -490,37 +520,18 @@ const ControlDock = ({
   onSelectAction,
   decisionFeedback = '',
 }) => (
-  <div className="shrink-0 overflow-visible border-t border-white/[0.08] bg-black/45 p-2.5">
-    <div className="rounded-[18px] border border-white/[0.09] bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+  <div className="flex min-h-0 flex-1 flex-col bg-black/45 p-2.5">
+    <div className="flex min-h-0 flex-1 flex-col justify-between rounded-[18px] border border-white/[0.09] bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
         feedback={decisionFeedback}
+        draft={draft}
+        setDraft={setDraft}
+        onSubmit={onSubmit}
+        onKeyDown={onKeyDown}
+        canSubmit={canSubmit}
       />
-
-      <div className="mt-1.5 flex items-end gap-2">
-        <textarea
-          rows={2}
-          value={draft}
-          onChange={(event) => setDraft?.(event.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={'Escribe una instrucción: Cambiar CTA principal a "Reservar consulta" y acento naranja'}
-          className="min-h-[46px] flex-1 resize-none rounded-2xl border border-white/[0.08] bg-black/35 px-3 py-2 text-xs leading-5 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/35 focus:bg-cyan-300/[0.04]"
-        />
-
-        <button
-          type="button"
-          disabled={!canSubmit}
-          onClick={onSubmit}
-          className={`inline-flex h-[46px] min-w-[104px] shrink-0 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold transition ${
-            canSubmit
-              ? 'border-cyan-200/55 bg-cyan-200/[0.14] text-cyan-50 shadow-[0_0_18px_rgba(34,211,238,0.08)] hover:bg-cyan-200/[0.20]'
-              : 'border-white/10 bg-white/[0.025] text-zinc-600'
-          }`}
-        >
-          Aplicar cambio
-        </button>
-      </div>
 
       <div className="mt-1.5 flex items-center justify-between gap-3 px-1">
         <p className="min-w-0 truncate text-[10px] text-zinc-700">
@@ -655,7 +666,7 @@ export default function BuilderAgentPane({
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#050709]">
       <AgentRail onSelectShortcut={submitAgentShortcut} />
 
-      <div className="min-h-[52%] flex-1 pl-8">
+      <div className="min-h-0 flex-[1_1_50%] pl-8">
         <CodeWorkbench
           copy={copy}
           project={project}
@@ -667,24 +678,26 @@ export default function BuilderAgentPane({
         />
       </div>
 
-      <AgentCapsule
-        status={agentStatus}
-        progress={progress}
-      />
+      <div className="flex min-h-0 flex-[1_1_50%] flex-col border-t border-white/[0.08]">
+        <AgentCapsule
+          status={agentStatus}
+          progress={progress}
+        />
 
-      <ControlDock
-        draft={draft}
-        setDraft={setDraft}
-        onSubmit={submit}
-        onStartBuild={onStartBuild}
-        onKeyDown={handleKeyDown}
-        canSubmit={canSubmit}
-        canStartBuild={canStartBuild}
-        progress={progress}
-        suggestedActions={suggestedActions}
-        onSelectAction={submitSuggestedAction}
-        decisionFeedback={decisionFeedback}
-      />
+        <ControlDock
+          draft={draft}
+          setDraft={setDraft}
+          onSubmit={submit}
+          onStartBuild={onStartBuild}
+          onKeyDown={handleKeyDown}
+          canSubmit={canSubmit}
+          canStartBuild={canStartBuild}
+          progress={progress}
+          suggestedActions={suggestedActions}
+          onSelectAction={submitSuggestedAction}
+          decisionFeedback={decisionFeedback}
+        />
+      </div>
     </div>
   );
 }
