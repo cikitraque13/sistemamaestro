@@ -29,6 +29,10 @@ import {
 } from '../../state/builderOutputMap';
 
 import {
+  getBuilderCodeLines,
+} from '../../utils/builderCodeTemplates';
+
+import {
   BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
   persistBuilderBuildState,
   restoreBuilderBuildState,
@@ -50,6 +54,12 @@ import {
   BUILDER_COMMAND_V2_ENABLED,
   parseAtomicBuilderCommand,
 } from '../../command/parseAtomicBuilderCommand.mjs';
+
+import {
+  applyAtomicBuilderCommandToState,
+  isAtomicBuilderCommandAllowed,
+  verifyAtomicBuilderCommandDelta,
+} from '../../command/applyAtomicBuilderCommand.mjs';
 
 const DEFAULT_PROGRESS_STEP = 2;
 const DEFAULT_PROGRESS_INTERVAL = 950;
@@ -83,6 +93,75 @@ const normalizeRuntimeText = (value = '') =>
 
 const includesAny = (text = '', terms = []) =>
   terms.some((term) => text.includes(normalizeRuntimeText(term)));
+
+
+const buildAtomicCommandKernelResult = ({
+  command = null,
+  currentState = null,
+  previousKernelOutput = null,
+  project = null,
+  input = '',
+} = {}) => {
+  const state = applyAtomicBuilderCommandToState(command, currentState || previousKernelOutput?.buildState || {});
+  const output = createBuilderOutputMap(state, {
+    knowledge: {
+      iterationSummary: {
+        primaryIntent: 'atomic_mutation',
+        cta: command?.expectedDelta?.primaryCTA || '',
+      },
+    },
+  });
+  const codeLines = getBuilderCodeLines({
+    tab: 'json',
+    copy: {
+      primaryCTA: state.primaryCTA,
+      primaryCta: state.primaryCTA,
+      visualAccent: state.visualAccent,
+    },
+    project,
+    visualState: {
+      visualAccent: state.visualAccent,
+      ctaState: {
+        primaryCta: state.primaryCTA,
+        visualAccent: state.visualAccent,
+      },
+    },
+  });
+  const deltaVerified = verifyAtomicBuilderCommandDelta({
+    command,
+    output,
+    codeLines,
+  });
+
+  return {
+    version: 'builder-build-kernel-v1',
+    ok: deltaVerified,
+    input,
+    previousState: currentState,
+    state: {
+      ...state,
+      commandStatus: deltaVerified ? 'delta_verified' : 'blocked_delta_not_verified',
+    },
+    mutations: command ? [command] : [],
+    mutationTypes: [
+      command?.mutation?.type,
+      command?.visual?.accent ? 'update_visual_accent' : '',
+    ].filter(Boolean),
+    command,
+    output: deltaVerified
+      ? output
+      : createBuilderOutputMap({
+          ...state,
+          commandStatus: 'blocked_delta_not_verified',
+        }),
+    structure: output.structure,
+    decisionMessage: null,
+    summary: getBuildStateSummary(state),
+    deltaVerified,
+    builderAISkipped: true,
+    creditConsumed: false,
+  };
+};
 
 const createUserMessage = (text) => ({
   id: `user-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -687,16 +766,37 @@ export default function useBuilderWorkspaceRuntime({
       let builderAiResult = null;
       let builderAiError = null;
       let kernelResult = null;
-      const atomicCommand = BUILDER_COMMAND_V2_ENABLED
+      const candidateAtomicCommand = BUILDER_COMMAND_V2_ENABLED
         ? parseAtomicBuilderCommand(value, { enabled: BUILDER_COMMAND_V2_ENABLED })
         : null;
+      const projectIdForAtomicCommand =
+        projectSnapshot?.project_id ||
+        projectSnapshot?.id ||
+        project?.project_id ||
+        project?.id ||
+        '';
+      const atomicCommand = isAtomicBuilderCommandAllowed({
+        command: candidateAtomicCommand,
+        projectId: projectIdForAtomicCommand,
+        input: value,
+        enabled: BUILDER_COMMAND_V2_ENABLED,
+      })
+        ? candidateAtomicCommand
+        : null;
+
+      if (atomicCommand) {
+        kernelResult = buildAtomicCommandKernelResult({
+          command: atomicCommand,
+          currentState: builderBuildState,
+          previousKernelOutput: builderKernelOutput,
+          project: projectSnapshot || project,
+          input: value,
+        });
+      }
 
       try {
-        if (atomicCommand) {
-          throw new Error('Command Contract V2 no activo para aplicación real.');
-        }
-
-        builderAiResult = await buildWithBuilderAI({
+        if (!atomicCommand) {
+          builderAiResult = await buildWithBuilderAI({
           userInput: value,
           currentBuildState: {
             builderBuildState,
@@ -716,17 +816,27 @@ export default function useBuilderWorkspaceRuntime({
           mode: builderBuildState ? 'iterate' : 'build',
         });
 
-        kernelResult = adaptBuilderAIOutputToKernelResult({
-          builderAIOutput: builderAiResult,
-          currentBuildState: builderBuildState,
-          previousKernelOutput: builderKernelOutput,
-          project: projectSnapshot || project,
-          userInput: value,
-        });
+          kernelResult = adaptBuilderAIOutputToKernelResult({
+            builderAIOutput: builderAiResult,
+            currentBuildState: builderBuildState,
+            previousKernelOutput: builderKernelOutput,
+            project: projectSnapshot || project,
+            userInput: value,
+          });
+        }
       } catch (error) {
         builderAiError = error;
 
-        kernelResult = runBuilderBuildKernel({
+        if (atomicCommand) {
+          kernelResult = kernelResult || buildAtomicCommandKernelResult({
+            command: atomicCommand,
+            currentState: builderBuildState,
+            previousKernelOutput: builderKernelOutput,
+            project: projectSnapshot || project,
+            input: value,
+          });
+        } else {
+          kernelResult = runBuilderBuildKernel({
           input: value,
           message: value,
           project: projectSnapshot || project,
@@ -735,6 +845,7 @@ export default function useBuilderWorkspaceRuntime({
           currentSelection: response.hub?.selection || currentSelection || null,
           source: 'user_fallback',
         });
+        }
       }
 
       setDirection(nextDirection);
@@ -751,11 +862,15 @@ export default function useBuilderWorkspaceRuntime({
         const nextMessages = [
           ...current,
           createUserMessage(value),
-          createAgentMessage(builderAiResult?.assistantMessage || response.text, {
+          createAgentMessage(
+            atomicCommand
+              ? (kernelResult?.deltaVerified ? 'Cambio aplicado.' : 'No aplicado: delta no verificable.')
+              : builderAiResult?.assistantMessage || response.text,
+            {
             confidence: response.confidence,
             shouldAsk: response.shouldAsk,
             summary: response.summary,
-            source: builderAiResult ? 'builder_ai_openai' : response.source,
+            source: atomicCommand ? 'builder_command_contract_v2' : builderAiResult ? 'builder_ai_openai' : response.source,
             hubSummary: response.hubSummary || null,
             delta: response.delta || null,
             operation: response.operation || null,
