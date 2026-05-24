@@ -19,39 +19,6 @@ const includesAny = (text = '', terms = []) => {
 
 const getArray = (value) => (Array.isArray(value) ? value : []);
 
-const pickFirst = (...values) =>
-  values.find((value) => typeof value === 'string' && value.trim())?.trim() || '';
-
-const resolveCanonicalBuilderOverrides = (builderIntelligence = {}) => {
-  const builderKernelOutput =
-    builderIntelligence?.builderKernelOutput ||
-    builderIntelligence?.builderKernelResult?.output ||
-    {};
-  const buildState =
-    builderKernelOutput?.buildState ||
-    builderIntelligence?.builderBuildState ||
-    {};
-  const preview = builderKernelOutput?.preview || {};
-  const lastDelta = builderIntelligence?.lastDelta || {};
-  const primaryCtaFromList = getArray(preview?.ctas).find((item) => item?.intent === 'primary')?.label;
-
-  return {
-    primaryCTA: pickFirst(
-      preview?.primaryCTA,
-      buildState?.primaryCTA,
-      primaryCtaFromList,
-      lastDelta?.cta?.primaryCTA
-    ),
-    visualAccent: pickFirst(
-      preview?.visualAccent,
-      buildState?.visualAccent,
-      buildState?.theme?.visualAccent,
-      buildState?.theme?.accent,
-      getArray(lastDelta?.visual?.palette)[0]
-    ),
-  };
-};
-
 export const collectBuilderSectorContext = ({
   copy = {},
   project = null,
@@ -232,21 +199,17 @@ export const buildSectorLandingModel = ({
     city,
   } = resolved;
 
-  const overrides = resolveCanonicalBuilderOverrides(builderIntelligence);
-  const accentTone = overrides.visualAccent === 'orange' || overrides.visualAccent === 'naranja' ? 'direct' : profile.tone;
-
   return {
     ...profile,
     city,
     businessName,
     resolvedProfileId: profile.id,
 
-    tone: accentTone || 'contextual',
+    tone: profile.tone || 'contextual',
     eyebrow: profile.heroEyebrow,
     headline: profile.headline,
     subheadline: profile.subheadline,
-    primaryCTA: overrides.primaryCTA || profile.primaryCTA,
-    visualAccent: overrides.visualAccent,
+    primaryCTA: profile.primaryCTA,
     secondaryCTA: profile.secondaryCTA,
 
     sectionTitle: profile.servicesTitle,
@@ -271,7 +234,7 @@ export const buildSectorLandingModel = ({
       title: profile.formTitle,
       text: profile.formText,
       fields: profile.formFields || ['Nombre', 'Email', 'Teléfono', 'Mensaje'],
-      buttonLabel: overrides.primaryCTA || profile.formButtonLabel || profile.primaryCTA,
+      buttonLabel: profile.formButtonLabel || profile.primaryCTA,
     },
 
     automationLabel: 'Seguimiento',
@@ -281,6 +244,6 @@ export const buildSectorLandingModel = ({
       items: profile.automationItems || [],
     },
 
-    finalCTA: overrides.primaryCTA || profile.finalCTA || profile.primaryCTA,
+    finalCTA: profile.finalCTA || profile.primaryCTA,
   };
 };
