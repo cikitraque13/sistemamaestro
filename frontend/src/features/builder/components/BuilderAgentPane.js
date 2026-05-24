@@ -298,11 +298,6 @@ const DecisionPanel = ({
   actions = [],
   onSelectAction,
   feedback = '',
-  draft = '',
-  setDraft,
-  onSubmit,
-  onKeyDown,
-  canSubmit = false,
 }) => {
   const visibleActions = actions.slice(0, 3);
 
@@ -349,29 +344,6 @@ const DecisionPanel = ({
         ))}
       </div>
 
-      <div className="mt-1 flex items-end gap-2">
-        <textarea
-          rows={1}
-          value={draft}
-          onChange={(event) => setDraft?.(event.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder="Escribe aquí para seguir hablando con el agente..."
-          className="min-h-[32px] flex-1 resize-none rounded-full border border-white/[0.08] bg-black/35 px-3 py-1.5 text-xs leading-4 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/35 focus:bg-cyan-300/[0.04]"
-        />
-
-        <button
-          type="button"
-          disabled={!canSubmit}
-          onClick={onSubmit}
-          className={`inline-flex h-8 min-w-[60px] shrink-0 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition ${
-            canSubmit
-              ? 'border-cyan-200/55 bg-cyan-200/[0.14] text-cyan-50 shadow-[0_0_18px_rgba(34,211,238,0.08)] hover:bg-cyan-200/[0.20]'
-              : 'border-white/10 bg-white/[0.025] text-zinc-600'
-          }`}
-        >
-          Enviar
-        </button>
-      </div>
     </div>
   );
 };
@@ -518,20 +490,39 @@ const ControlDock = ({
   onSelectAction,
   decisionFeedback = '',
 }) => (
-  <div className="max-h-[46%] shrink-0 overflow-hidden border-t border-white/[0.08] bg-black/45 p-2.5">
+  <div className="shrink-0 overflow-visible border-t border-white/[0.08] bg-black/45 p-2.5">
     <div className="rounded-[18px] border border-white/[0.09] bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
         feedback={decisionFeedback}
-        draft={draft}
-        setDraft={setDraft}
-        onSubmit={onSubmit}
-        onKeyDown={onKeyDown}
-        canSubmit={canSubmit}
       />
 
-      <div className="mt-0.5 flex items-center justify-between gap-3 px-1">
+      <div className="mt-1.5 flex items-end gap-2">
+        <textarea
+          rows={2}
+          value={draft}
+          onChange={(event) => setDraft?.(event.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={'Escribe una instrucción: Cambiar CTA principal a "Reservar consulta" y acento naranja'}
+          className="min-h-[46px] flex-1 resize-none rounded-2xl border border-white/[0.08] bg-black/35 px-3 py-2 text-xs leading-5 text-white placeholder:text-zinc-600 outline-none transition focus:border-cyan-300/35 focus:bg-cyan-300/[0.04]"
+        />
+
+        <button
+          type="button"
+          disabled={!canSubmit}
+          onClick={onSubmit}
+          className={`inline-flex h-[46px] min-w-[104px] shrink-0 items-center justify-center rounded-2xl border px-3 text-[11px] font-semibold transition ${
+            canSubmit
+              ? 'border-cyan-200/55 bg-cyan-200/[0.14] text-cyan-50 shadow-[0_0_18px_rgba(34,211,238,0.08)] hover:bg-cyan-200/[0.20]'
+              : 'border-white/10 bg-white/[0.025] text-zinc-600'
+          }`}
+        >
+          Aplicar cambio
+        </button>
+      </div>
+
+      <div className="mt-1.5 flex items-center justify-between gap-3 px-1">
         <p className="min-w-0 truncate text-[10px] text-zinc-700">
           Iteración estimada: 8-18 créditos
         </p>
