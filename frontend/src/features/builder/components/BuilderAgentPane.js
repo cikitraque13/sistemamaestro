@@ -236,17 +236,17 @@ const AGENT_ACTIONS = [
 ];
 
 const AgentRail = ({ onSelectShortcut }) => (
-  <div className="pointer-events-auto absolute left-2 top-14 z-10 flex flex-col items-center gap-2" aria-label="Atajos expertos del Builder">
+  <div className="pointer-events-none absolute left-1.5 top-12 z-[6] flex flex-col items-center gap-1.5" aria-label="Atajos expertos del Builder">
     {AGENT_ACTIONS.map((agent) => (
       <button
         key={agent.id}
         type="button"
         onClick={() => onSelectShortcut?.(agent)}
-        className={`group grid h-7 w-7 place-items-center rounded-full border bg-black/60 backdrop-blur transition ${agent.ringClassName}`}
+        className={`group pointer-events-auto grid h-5 w-5 place-items-center rounded-full border bg-black/45 backdrop-blur-sm transition ${agent.ringClassName}`}
         title={`${agent.label} - ${agent.title}`}
         aria-label={`${agent.label} - ${agent.title}`}
       >
-        <span className={`h-2.5 w-2.5 rounded-full ${agent.dotClassName}`} />
+        <span className={`h-1.5 w-1.5 rounded-full ${agent.dotClassName}`} />
       </button>
     ))}
   </div>
