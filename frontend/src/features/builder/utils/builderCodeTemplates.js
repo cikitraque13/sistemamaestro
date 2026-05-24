@@ -139,8 +139,6 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
   const projectId = getProjectId(project);
   const mode = copy.mode || 'create';
   const templateType = copy.templateType || visualState.templateType || 'generic_landing';
-  const primaryCTA = copy.primaryCTA || copy.primaryCta || visualState.primaryCTA || 'Crear mi primer proyecto';
-  const visualAccent = copy.visualAccent || visualState.visualAccent || visualState?.ctaState?.visualAccent || '';
 
   if (templateType === 'gpt_hub_landing') {
     return [
@@ -180,7 +178,7 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
       'export default function WebsiteTransformation() {',
       `  const projectId = "${safeString(projectId)}";`,
       `  const originalWebsite = "${safeString(copy.originalLabel || 'web actual')}";`,
-      `  const primaryCTA = "${safeString(copy.primaryCTA || copy.primaryCta || 'Aplicar rediseño')}";`,
+      `  const primaryCTA = "${safeString(copy.primaryCta || 'Aplicar rediseño')}";`,
       '',
       '  return (',
       '    <main className="sm-transformation-runtime">',
@@ -201,7 +199,7 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
   return [
     'export default function LandingRuntime() {',
     `  const projectId = "${safeString(projectId)}";`,
-    `  const primaryCTA = "${safeString(primaryCTA)}";`,
+    `  const primaryCTA = "${safeString(copy.primaryCta || 'Crear mi primer proyecto')}";`,
     '',
     '  return (',
     '    <main className="sm-premium-landing">',
@@ -210,7 +208,6 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
     `        headline="${safeString(copy.headline || 'Convierte una idea en un sistema digital')}"`,
     '        primaryCTA={primaryCTA}',
     `        secondaryCTA="${safeString(copy.secondaryCta || 'Analizar una URL')}"`,
-    `        visualAccent="${safeString(visualAccent)}"`,
     '      />',
     '      <ValueSystem />',
     '      <PlanLayer />',
@@ -259,7 +256,7 @@ const buildHtmlTemplate = ({ copy = {}, visualState = {} }) => {
       `      <p>${copy.eyebrow || 'Rediseño asistido'}</p>`,
       `      <h1>${copy.headline || 'Nueva versión optimizada'}</h1>`,
       `      <p>${copy.subheadline || 'Estructura más clara y orientada a conversión.'}</p>`,
-      `      <button>${copy.primaryCTA || copy.primaryCta || 'Aplicar rediseño'}</button>`,
+      `      <button>${copy.primaryCta || 'Aplicar rediseño'}</button>`,
       '    </article>',
       '  </section>',
       '</main>',
@@ -273,7 +270,7 @@ const buildHtmlTemplate = ({ copy = {}, visualState = {} }) => {
     `    <h1>${copy.headline || 'Convierte una idea en un sistema digital'}</h1>`,
     `    <p>${copy.subheadline || 'Crea, analiza y mejora proyectos digitales con IA.'}</p>`,
     '    <div class="actions">',
-    `      <button>${copy.primaryCTA || copy.primaryCta || 'Crear mi primer proyecto'}</button>`,
+    `      <button>${copy.primaryCta || 'Crear mi primer proyecto'}</button>`,
     `      <button>${copy.secondaryCta || 'Analizar una URL'}</button>`,
     '    </div>',
     '  </section>',
@@ -336,10 +333,8 @@ const buildCssTemplate = ({ visualState = {} }) => {
   ];
 };
 
-const buildPythonTemplate = ({ copy = {}, project = {}, intent = {}, visualState = {} }) => {
+const buildPythonTemplate = ({ copy = {}, project = {}, intent = {} }) => {
   const projectId = getProjectId(project);
-  const primaryCTA = copy.primaryCTA || copy.primaryCta || visualState?.primaryCTA || visualState?.ctaState?.primaryCta || '';
-  const visualAccent = copy.visualAccent || visualState?.visualAccent || visualState?.ctaState?.visualAccent || '';
 
   return [
     'from dataclasses import dataclass',
@@ -378,8 +373,7 @@ const buildJsonTemplate = ({ copy = {}, project = {}, intent = {}, visualState =
     `  "template_type": "${copy.templateType || intent.templateType || 'generic_landing'}",`,
     `  "visual_direction": "${visualState.visualPresetId || intent.visualDirection || 'premium_dark'}",`,
     `  "headline": "${safeString(copy.headline || '')}",`,
-    `  "primary_cta": "${safeString(primaryCTA)}",`,
-    `  "visual_accent": "${safeString(visualAccent)}",`,
+    `  "primary_cta": "${safeString(copy.primaryCta || visualState?.ctaState?.primaryCta || '')}",`,
     `  "secondary_cta": "${safeString(copy.secondaryCta || visualState?.ctaState?.secondaryCta || '')}",`,
     '  "estimated_credits": {',
     '    "min": 8,',
