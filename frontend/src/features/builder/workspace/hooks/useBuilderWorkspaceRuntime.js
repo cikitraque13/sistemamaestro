@@ -21,6 +21,7 @@ import {
 } from '../../state/builderBuildKernel';
 
 import {
+  applyBuildMutation,
   getBuildStateSummary,
 } from '../../state/builderBuildState';
 
@@ -44,6 +45,7 @@ import {
 
 import {
   BUILDER_MUTATION_TYPES,
+  buildMutationFromType,
 } from '../../state/builderMutationRegistry';
 
 const DEFAULT_PROGRESS_STEP = 2;
@@ -78,6 +80,136 @@ const normalizeRuntimeText = (value = '') =>
 
 const includesAny = (text = '', terms = []) =>
   terms.some((term) => text.includes(normalizeRuntimeText(term)));
+
+
+const extractQuotedOrTrailingValue = (text = '', patterns = []) => {
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+
+    if (match?.[1]) {
+      return match[1].replace(/[.,;]+$/g, '').trim();
+    }
+  }
+
+  return '';
+};
+
+const normalizeAccent = (text = '') => {
+  const normalized = normalizeRuntimeText(text);
+
+  if (normalized.includes('naranja') || normalized.includes('orange')) return 'orange';
+
+  return '';
+};
+
+const createAtomicBuilderCommand = (input = '') => {
+  const value = String(input || '').trim();
+  const normalized = normalizeRuntimeText(value);
+  const primaryCTA = extractQuotedOrTrailingValue(value, [
+    /(?:cambiar\s+)?cta\s+principal\s+a\s+["“”']?([^"“”']+)["“”']?/i,
+    /(?:cambiar\s+)?bot[oó]n\s+principal\s+a\s+["“”']?([^"“”']+)["“”']?/i,
+  ]);
+  const visualAccent = normalizeAccent(normalized);
+
+  if (!primaryCTA && !visualAccent) return null;
+
+  const stamp = Date.now();
+  const commandId = `cmd_${stamp}`;
+
+  return {
+    type: 'builder.command.v1.atomic_mutation',
+    commandId,
+    traceId: `trace_${stamp}`,
+    templateId: 'opp_001',
+    mutation: primaryCTA
+      ? {
+          type: BUILDER_MUTATION_TYPES.UPDATE_CTA,
+          target: 'hero.primaryCTA',
+          label: primaryCTA,
+        }
+      : null,
+    visual: visualAccent ? { accent: visualAccent } : null,
+    expectedDelta: {
+      ...(primaryCTA ? { primaryCTA } : {}),
+      ...(visualAccent ? { visualAccent } : {}),
+    },
+  };
+};
+
+const commandDeltaMatches = (output = {}, expectedDelta = {}) => {
+  const preview = output?.preview || {};
+
+  if (expectedDelta.primaryCTA && preview.primaryCTA !== expectedDelta.primaryCTA) return false;
+  if (expectedDelta.visualAccent && preview.visualAccent !== expectedDelta.visualAccent) return false;
+
+  return true;
+};
+
+const buildAtomicCommandKernelResult = ({
+  command,
+  currentState,
+  previousKernelOutput,
+  project,
+  initialPrompt,
+  input,
+} = {}) => {
+  const baseResult = runBuilderBuildKernel({
+    input,
+    message: '',
+    project,
+    initialPrompt,
+    currentState,
+    source: 'atomic_command_base',
+  });
+  const startingState = currentState || baseResult.previousState || baseResult.state;
+  const mutations = [
+    command?.mutation?.type
+      ? buildMutationFromType(command.mutation.type, {
+          source: 'builder_command_contract_v1',
+          command,
+          primaryCTA: command.mutation.label,
+        })
+      : null,
+    command?.visual?.accent
+      ? buildMutationFromType(BUILDER_MUTATION_TYPES.UPDATE_VISUAL_ACCENT, {
+          source: 'builder_command_contract_v1',
+          command,
+          visualAccent: command.visual.accent,
+        })
+      : null,
+  ].filter(Boolean);
+
+  const state = mutations.reduce(
+    (nextState, mutation) => applyBuildMutation(nextState, mutation),
+    startingState
+  );
+  const output = createBuilderOutputMap(state, {
+    knowledge: {
+      iterationSummary: {
+        primaryIntent: 'atomic_mutation',
+        cta: command?.expectedDelta?.primaryCTA || '',
+      },
+    },
+  });
+  const deltaVerified = commandDeltaMatches(output, command?.expectedDelta || {});
+
+  return {
+    version: 'builder-build-kernel-v1',
+    ok: deltaVerified,
+    input,
+    previousState: startingState,
+    state,
+    mutations,
+    mutationTypes: mutations.map((mutation) => mutation.type),
+    command,
+    output,
+    structure: output.structure,
+    decisionMessage: null,
+    summary: getBuildStateSummary(state),
+    deltaVerified,
+    previousKernelOutput,
+  };
+};
 
 const createUserMessage = (text) => ({
   id: `user-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -682,8 +814,23 @@ export default function useBuilderWorkspaceRuntime({
       let builderAiResult = null;
       let builderAiError = null;
       let kernelResult = null;
+      const atomicCommand = createAtomicBuilderCommand(value);
+
+      if (atomicCommand) {
+        kernelResult = buildAtomicCommandKernelResult({
+          command: atomicCommand,
+          currentState: builderBuildState,
+          previousKernelOutput: builderKernelOutput,
+          project: projectSnapshot || project,
+          initialPrompt,
+          input: value,
+        });
+      }
 
       try {
+        if (atomicCommand) {
+          throw new Error('Builder AI omitido: comando atómico local verificado.');
+        }
         builderAiResult = await buildWithBuilderAI({
           userInput: value,
           currentBuildState: {
@@ -714,7 +861,10 @@ export default function useBuilderWorkspaceRuntime({
       } catch (error) {
         builderAiError = error;
 
-        kernelResult = runBuilderBuildKernel({
+        if (atomicCommand) {
+          builderAiError = null;
+        } else {
+          kernelResult = runBuilderBuildKernel({
           input: value,
           message: value,
           project: projectSnapshot || project,
@@ -723,6 +873,7 @@ export default function useBuilderWorkspaceRuntime({
           currentSelection: response.hub?.selection || currentSelection || null,
           source: 'user_fallback',
         });
+        }
       }
 
       setDirection(nextDirection);
@@ -739,11 +890,15 @@ export default function useBuilderWorkspaceRuntime({
         const nextMessages = [
           ...current,
           createUserMessage(value),
-          createAgentMessage(builderAiResult?.assistantMessage || response.text, {
+          createAgentMessage(
+            atomicCommand
+              ? (kernelResult?.deltaVerified ? 'Cambio aplicado.' : 'No apliqué el cambio: delta no verificable.')
+              : builderAiResult?.assistantMessage || response.text,
+            {
             confidence: response.confidence,
             shouldAsk: response.shouldAsk,
             summary: response.summary,
-            source: builderAiResult ? 'builder_ai_openai' : response.source,
+            source: atomicCommand ? 'builder_command_contract_v1' : builderAiResult ? 'builder_ai_openai' : response.source,
             hubSummary: response.hubSummary || null,
             delta: response.delta || null,
             operation: response.operation || null,

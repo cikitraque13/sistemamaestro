@@ -37,6 +37,8 @@ export const BUILDER_MUTATION_TYPES = {
   IMPROVE_COPY: "improve_copy",
   APPLY_VISUAL_HIERARCHY: "apply_visual_hierarchy",
   VALIDATE_READY_FOR_EXPORT: "validate_ready_for_export",
+  UPDATE_CTA: "update_cta",
+  UPDATE_VISUAL_ACCENT: "update_visual_accent",
 };
 
 const creditValues = {
@@ -56,6 +58,8 @@ const INTERNAL_MUTATION_TYPES = [
 ];
 
 const CLIENT_LANDING_MUTATION_TYPES = [
+  BUILDER_MUTATION_TYPES.UPDATE_CTA,
+  BUILDER_MUTATION_TYPES.UPDATE_VISUAL_ACCENT,
   BUILDER_MUTATION_TYPES.IMPROVE_COPY,
   BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,
   BUILDER_MUTATION_TYPES.IMPROVE_PREMIUM_CONVERSION,
@@ -160,6 +164,72 @@ const defineMutation = ({
 });
 
 export const BUILDER_MUTATION_REGISTRY = {
+
+  [BUILDER_MUTATION_TYPES.UPDATE_CTA]: defineMutation({
+    type: BUILDER_MUTATION_TYPES.UPDATE_CTA,
+    label: "Actualizar CTA principal",
+    description: "Cambia de forma determinista el CTA principal visible del hero.",
+    matchers: ["cta principal", "boton principal", "botón principal", "cambiar cta", "reservar consulta"],
+    creditTier: CREDIT_TIERS.NONE,
+    build: ({ source = "user", command = null, primaryCTA = "" } = {}) => {
+      const label = primaryCTA || command?.mutation?.label || command?.expectedDelta?.primaryCTA || "Reservar consulta";
+
+      return {
+        id: command?.commandId || "update-cta",
+        type: BUILDER_MUTATION_TYPES.UPDATE_CTA,
+        label: "Actualizar CTA principal",
+        source,
+        creditTier: CREDIT_TIERS.NONE,
+        primaryCTA: label,
+        templateId: command?.templateId || "opp_001",
+        commandId: command?.commandId || "",
+        traceId: command?.traceId || "",
+        expectedDelta: command?.expectedDelta || { primaryCTA: label },
+        nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+        ctas: [cta("hero-primary-cta", label, "#", "primary")],
+        blocks: [
+          block("hero", "hero", "Hero", 10, {
+            primaryCTA: label,
+            buttonLabel: label,
+          }),
+        ],
+        previewModel: { primaryCTA: label, activeSectionId: "hero" },
+        codeModel: { primaryCTA: label },
+        structureModel: { primaryCTA: label },
+        creditEstimate: creditEstimate(CREDIT_TIERS.NONE, "Mutación CTA local verificable."),
+      };
+    },
+  }),
+
+  [BUILDER_MUTATION_TYPES.UPDATE_VISUAL_ACCENT]: defineMutation({
+    type: BUILDER_MUTATION_TYPES.UPDATE_VISUAL_ACCENT,
+    label: "Actualizar acento visual",
+    description: "Cambia de forma determinista el acento visual principal.",
+    matchers: ["acento naranja", "acento orange", "color naranja", "orange"],
+    creditTier: CREDIT_TIERS.NONE,
+    build: ({ source = "user", command = null, visualAccent = "" } = {}) => {
+      const accent = visualAccent || command?.visual?.accent || command?.expectedDelta?.visualAccent || "orange";
+
+      return {
+        id: command?.commandId ? `${command.commandId}-accent` : "update-visual-accent",
+        type: BUILDER_MUTATION_TYPES.UPDATE_VISUAL_ACCENT,
+        label: "Actualizar acento visual",
+        source,
+        creditTier: CREDIT_TIERS.NONE,
+        visualAccent: accent,
+        templateId: command?.templateId || "opp_001",
+        commandId: command?.commandId || "",
+        traceId: command?.traceId || "",
+        expectedDelta: command?.expectedDelta || { visualAccent: accent },
+        nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
+        theme: { visualAccent: accent, accent },
+        previewModel: { visualAccent: accent },
+        codeModel: { visualAccent: accent },
+        structureModel: { visualAccent: accent },
+        creditEstimate: creditEstimate(CREDIT_TIERS.NONE, "Mutación visual local verificable."),
+      };
+    },
+  }),
   [BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS]: defineMutation({
     type: BUILDER_MUTATION_TYPES.ADD_GOOGLE_ACCESS,
     label: "Preparar acceso con Google",

@@ -29,6 +29,8 @@ const createExportValidationSnapshot = (state) =>
 
 const createFallbackAppFile = (state) => {
   const sections = sortByOrder(state.blocks);
+  const primaryCTA = state.primaryCTA || state.ctas.find((item) => item.intent === "primary")?.label || "Crear";
+  const visualAccent = state.visualAccent || state.theme?.visualAccent || state.theme?.accent || "";
 
   const sectionLines = sections.length
     ? sections.map((section) => `      <section data-block="${section.id}"><h2>${section.label}</h2></section>`)
@@ -43,6 +45,7 @@ const createFallbackAppFile = (state) => {
       "export default function App() {",
       "  return (",
       "    <main>",
+      `      <button data-accent="${visualAccent}">${primaryCTA}</button>`,
       ...sectionLines,
       "    </main>",
       "  );",
@@ -69,6 +72,11 @@ export function createBuilderPreviewSnapshot(buildState = {}) {
       sections[sections.length - 1]?.id ||
       null,
     sections,
+    primaryCTA: state.primaryCTA || state.previewModel?.primaryCTA || state.ctas.find((item) => item.intent === "primary")?.label || "",
+    visualAccent: state.visualAccent || state.previewModel?.visualAccent || state.theme?.visualAccent || state.theme?.accent || "",
+    templateId: state.templateId,
+    revision: state.revision,
+    lastCommandId: state.lastCommandId,
     ctas: state.ctas,
     theme: state.theme,
     status: state.status,
@@ -90,6 +98,8 @@ export function createBuilderCodeSnapshot(buildState = {}) {
     framework: state.codeModel?.framework || "react",
     language: state.codeModel?.language || "javascript",
     entryFile: state.codeModel?.entryFile || files[0]?.path || "src/App.jsx",
+    primaryCTA: state.primaryCTA || state.codeModel?.primaryCTA || "",
+    visualAccent: state.visualAccent || state.codeModel?.visualAccent || "",
     files,
     visibleFiles: files.map((file) => file.path),
     updatedAt: state.updatedAt,
@@ -124,6 +134,10 @@ export function createBuilderStructureSnapshot(buildState = {}) {
     folders,
     files,
     components: state.components,
+    primaryCTA: state.primaryCTA || state.structureModel?.primaryCTA || "",
+    visualAccent: state.visualAccent || state.structureModel?.visualAccent || "",
+    templateId: state.templateId,
+    revision: state.revision,
     routes,
     apiRoutes,
     warnings: state.warnings,
@@ -151,6 +165,11 @@ export function createBuilderAgentSnapshot(buildState = {}, context = {}) {
     appliedActions: state.appliedActions,
     availableActions: state.availableActions,
     creditEstimate: state.creditEstimate,
+    primaryCTA: state.primaryCTA,
+    visualAccent: state.visualAccent,
+    templateId: state.templateId,
+    revision: state.revision,
+    lastCommandId: state.lastCommandId,
     hubSummary: context.knowledge?.hubSummary || null,
     iterationSummary: context.knowledge?.iterationSummary || null,
     summary: getBuildStateSummary(state),
