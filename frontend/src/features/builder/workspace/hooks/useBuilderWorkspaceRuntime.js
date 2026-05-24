@@ -46,6 +46,11 @@ import {
   BUILDER_MUTATION_TYPES,
 } from '../../state/builderMutationRegistry';
 
+import {
+  BUILDER_COMMAND_V2_ENABLED,
+  parseAtomicBuilderCommand,
+} from '../../command/parseAtomicBuilderCommand.mjs';
+
 const DEFAULT_PROGRESS_STEP = 2;
 const DEFAULT_PROGRESS_INTERVAL = 950;
 
@@ -682,8 +687,15 @@ export default function useBuilderWorkspaceRuntime({
       let builderAiResult = null;
       let builderAiError = null;
       let kernelResult = null;
+      const atomicCommand = BUILDER_COMMAND_V2_ENABLED
+        ? parseAtomicBuilderCommand(value, { enabled: BUILDER_COMMAND_V2_ENABLED })
+        : null;
 
       try {
+        if (atomicCommand) {
+          throw new Error('Command Contract V2 no activo para aplicación real.');
+        }
+
         builderAiResult = await buildWithBuilderAI({
           userInput: value,
           currentBuildState: {
