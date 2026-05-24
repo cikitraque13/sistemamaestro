@@ -64,17 +64,27 @@ const buildLandingModel = ({
     builderIntelligence,
   });
 
-const resolvePreviewTone = (builderIntelligence = {}, modelTone = 'contextual') => {
+const resolveVisualAccentTone = (visualAccent = '') => {
+  const accent = String(visualAccent || '').trim().toLowerCase();
+
+  if (accent === 'orange') return 'direct';
+
+  return '';
+};
+
+const resolvePreviewTone = (builderIntelligence = {}, modelTone = 'contextual', visualAccent = '') => {
   const {
     hubSummary,
     lastDelta,
   } = getBuilderIntelligenceParts(builderIntelligence);
 
+  const accentTone = resolveVisualAccentTone(visualAccent);
   const visualTone = lastDelta?.visual?.tone;
   const projectType = hubSummary?.projectType;
   const businessModel = hubSummary?.businessModel;
   const intent = hubSummary?.iterationIntent;
 
+  if (accentTone) return accentTone;
   if (modelTone) return modelTone;
   if (visualTone) return visualTone;
 
@@ -492,7 +502,7 @@ const ClientLandingPreview = ({
     ]
   );
 
-  const tone = resolvePreviewTone(builderIntelligence, model.tone);
+  const tone = resolvePreviewTone(builderIntelligence, model.tone, model.visualAccent);
 
   return (
     <div className={`h-full overflow-y-auto ${getPreviewSurfaceClass(tone)}`}>
