@@ -336,10 +336,10 @@ const buildCssTemplate = ({ visualState = {} }) => {
   ];
 };
 
-const buildPythonTemplate = ({ copy = {}, project = {}, intent = {} }) => {
+const buildPythonTemplate = ({ copy = {}, project = {}, intent = {}, visualState = {} }) => {
   const projectId = getProjectId(project);
-  const primaryCTA = copy.primaryCTA || copy.primaryCta || visualState?.ctaState?.primaryCta || '';
-  const visualAccent = copy.visualAccent || visualState.visualAccent || visualState?.ctaState?.visualAccent || '';
+  const primaryCTA = copy.primaryCTA || copy.primaryCta || visualState?.primaryCTA || visualState?.ctaState?.primaryCta || '';
+  const visualAccent = copy.visualAccent || visualState?.visualAccent || visualState?.ctaState?.visualAccent || '';
 
   return [
     'from dataclasses import dataclass',
