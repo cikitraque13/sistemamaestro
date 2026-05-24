@@ -19,7 +19,7 @@ assert.equal(command.mutation.type, 'update_cta');
 assert.equal(command.mutation.target, 'hero.primaryCTA');
 assert.equal(command.mutation.label, 'Reservar consulta');
 assert.equal(command.visual.accent, 'orange');
-assert.equal(BUILDER_COMMAND_V2_ENABLED, false);
+assert.equal(BUILDER_COMMAND_V2_ENABLED, true);
 assert.equal(BUILDER_COMMAND_V2_ALLOWED_PROJECT_ID, 'proj_b55e1dff05a7');
 
 assert.equal(isAtomicBuilderCommandAllowed({ command, projectId: BUILDER_COMMAND_V2_ALLOWED_PROJECT_ID, input, enabled: false }), false);
@@ -101,6 +101,8 @@ try {
   assert.ok(builderAiIndex > flagOffIndex);
   const flagOffBlock = runtimeSource.slice(flagOffIndex, builderAiIndex);
   assert.match(flagOffBlock, /:\s*null/);
+  assert.match(runtimeSource, /isAtomicBuilderCommandAllowed/);
+  assert.match(runtimeSource, /projectIdForAtomicCommand/);
   assert.doesNotMatch(flagOffBlock, /applyKernelResult/);
   assert.doesNotMatch(flagOffBlock, /setManualMessages/);
   assert.match(runtimeSource, /if \(!atomicCommand\)/);

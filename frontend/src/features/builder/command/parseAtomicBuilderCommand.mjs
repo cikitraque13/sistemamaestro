@@ -1,5 +1,5 @@
 export const BUILDER_COMMAND_V2_TYPE = 'builder.command.v2.atomic_mutation';
-export const BUILDER_COMMAND_V2_ENABLED = false;
+export const BUILDER_COMMAND_V2_ENABLED = true;
 
 const normalizeText = (value = '') =>
   String(value || '')
