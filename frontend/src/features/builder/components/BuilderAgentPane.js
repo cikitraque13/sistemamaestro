@@ -307,41 +307,41 @@ const DecisionPanel = ({
   const visibleActions = actions.slice(0, 3);
 
   return (
-    <div className="mb-1 rounded-xl border border-cyan-300/12 bg-gradient-to-b from-cyan-300/[0.04] to-white/[0.018] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-      <div className="mb-1 flex items-center justify-between gap-3">
-        <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-cyan-100">
+    <div className="mb-0.5 rounded-xl border border-cyan-300/12 bg-gradient-to-b from-cyan-300/[0.04] to-white/[0.018] px-1.5 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+      <div className="mb-0.5 flex items-center justify-between gap-2">
+        <span className="text-[8px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
           Siguiente paso recomendado
         </span>
 
-        <span className="shrink-0 rounded-full border border-white/[0.06] bg-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.1em] text-zinc-500">
+        <span className="shrink-0 rounded-full border border-white/[0.06] bg-black/20 px-1 py-0 text-[7px] uppercase tracking-[0.08em] text-zinc-500">
           landing v1
         </span>
       </div>
 
       {feedback && (
-        <div className="mb-1 truncate rounded-lg border border-emerald-200/15 bg-emerald-200/[0.045] px-2 py-0.5 text-[9px] font-semibold text-emerald-100">
+        <div className="mb-0.5 truncate rounded-lg border border-emerald-200/15 bg-emerald-200/[0.045] px-1.5 py-0 text-[8px] font-semibold text-emerald-100">
           Qué cambió: {feedback}
         </div>
       )}
 
       {visibleActions.length > 0 && (
-        <div className="grid gap-1">
+        <div className="grid gap-0.5">
           {visibleActions.map((action, index) => (
             <button
               key={action.id || `${action.label}-${index}`}
               type="button"
               onClick={() => onSelectAction?.(action)}
-              className="group grid w-full grid-cols-[22px_1fr_52px] items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.025] px-2 py-1 text-left transition hover:border-cyan-300/30 hover:bg-cyan-300/[0.055]"
+              className="group grid w-full grid-cols-[20px_1fr_48px] items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.025] px-1.5 py-0.5 text-left transition hover:border-cyan-300/30 hover:bg-cyan-300/[0.055]"
             >
-              <span className="grid h-5 w-5 select-none place-items-center rounded-full border border-cyan-200/15 bg-cyan-200/[0.06] text-[9px] font-bold text-cyan-100/80">
+              <span className="grid h-4 w-4 select-none place-items-center rounded-full border border-cyan-200/15 bg-cyan-200/[0.06] text-[8px] font-bold text-cyan-100/80">
                 {['A', 'B', 'C'][index]}
               </span>
 
-              <span className="truncate text-[11px] font-semibold leading-4 text-zinc-100 transition group-hover:text-white">
+              <span className="truncate text-[10px] font-semibold leading-4 text-zinc-100 transition group-hover:text-white">
                 {action.title || action.label}
               </span>
 
-              <span className="justify-self-end rounded-full border border-emerald-200/20 bg-emerald-200/[0.055] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-emerald-100">
+              <span className="justify-self-end rounded-full border border-emerald-200/20 bg-emerald-200/[0.055] px-1.5 py-0 text-[7px] font-semibold uppercase tracking-[0.06em] text-emerald-100">
                 Aplicar
               </span>
             </button>
@@ -349,7 +349,7 @@ const DecisionPanel = ({
         </div>
       )}
 
-      <div className="mt-1.5 flex items-center gap-2 border-t border-white/[0.06] pt-1.5">
+      <div className="mt-1 flex items-center gap-1.5 border-t border-white/[0.06] pt-1">
         <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-300 animate-pulse" />
 
         <textarea
@@ -358,14 +358,14 @@ const DecisionPanel = ({
           onChange={(event) => setDraft?.(event.target.value)}
           onKeyDown={onKeyDown}
           placeholder={'Cambiar CTA principal a "Reservar consulta" y acento naranja'}
-          className="min-h-[24px] flex-1 resize-none border-0 bg-transparent px-0 py-0.5 text-[11px] leading-5 text-white placeholder:text-zinc-600 outline-none"
+          className="min-h-[22px] flex-1 resize-none border-0 bg-transparent px-0 py-0 text-[10px] leading-5 text-white placeholder:text-zinc-600 outline-none"
         />
 
         <button
           type="button"
           disabled={!canSubmit}
           onClick={onSubmit}
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-semibold transition ${
             canSubmit
               ? 'bg-cyan-200/[0.14] text-cyan-50 hover:bg-cyan-200/[0.20]'
               : 'text-zinc-700'
@@ -530,8 +530,8 @@ const ControlDock = ({
   onSelectAction,
   decisionFeedback = '',
 }) => (
-  <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-black/45 p-2">
-    <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden rounded-[16px] border border-white/[0.09] bg-[#020405] p-1.5 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+  <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-black/45 px-2 pb-2 pt-1.5">
+    <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden rounded-[16px] border border-white/[0.09] bg-[#020405] px-1.5 py-1 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
@@ -543,8 +543,8 @@ const ControlDock = ({
         canSubmit={canSubmit}
       />
 
-      <div className="mt-1 flex items-center justify-between gap-3 px-1">
-        <p className="min-w-0 truncate text-[10px] text-zinc-700">
+      <div className="mt-0.5 flex items-center justify-between gap-3 px-1">
+        <p className="min-w-0 truncate text-[9px] text-zinc-700">
           Iteración estimada: 8-18 créditos
         </p>
 
@@ -552,7 +552,7 @@ const ControlDock = ({
           type="button"
           disabled={!canStartBuild}
           onClick={() => onStartBuild?.()}
-          className={`shrink-0 text-[10px] font-semibold underline-offset-4 transition ${
+          className={`shrink-0 text-[9px] font-semibold underline-offset-4 transition ${
             canStartBuild
               ? 'text-zinc-600 hover:text-zinc-300 hover:underline'
               : 'cursor-not-allowed text-zinc-800'
