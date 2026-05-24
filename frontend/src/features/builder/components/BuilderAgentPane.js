@@ -236,7 +236,7 @@ const AGENT_ACTIONS = [
 ];
 
 const AgentRail = ({ onSelectShortcut }) => (
-  <div className="pointer-events-auto absolute left-2 top-[58px] z-20 flex flex-col items-center gap-2" aria-label="Atajos expertos del Builder">
+  <div className="pointer-events-auto absolute left-2 top-14 z-10 flex flex-col items-center gap-2" aria-label="Atajos expertos del Builder">
     {AGENT_ACTIONS.map((agent) => (
       <button
         key={agent.id}
@@ -442,7 +442,7 @@ const CodeWorkbench = ({
   );
 
   return (
-    <div className="flex h-full min-h-[320px] flex-col overflow-hidden bg-[#020405] font-mono">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#020405] font-mono">
       <CodeTopBar
         activeCodeTab={activeCodeTab}
         onCodeTabChange={onCodeTabChange}
@@ -520,8 +520,8 @@ const ControlDock = ({
   onSelectAction,
   decisionFeedback = '',
 }) => (
-  <div className="flex min-h-0 flex-1 flex-col bg-black/45 p-2.5">
-    <div className="flex min-h-0 flex-1 flex-col justify-between rounded-[18px] border border-white/[0.09] bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
+  <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-black/45 p-2.5">
+    <div className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto rounded-[18px] border border-white/[0.09] bg-[#020405] p-2 shadow-[0_-18px_45px_rgba(0,0,0,0.20)]">
       <DecisionPanel
         actions={suggestedActions}
         onSelectAction={onSelectAction}
@@ -663,10 +663,10 @@ export default function BuilderAgentPane({
   };
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#050709]">
+    <div className="relative grid h-full min-h-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden bg-[#050709]">
       <AgentRail onSelectShortcut={submitAgentShortcut} />
 
-      <div className="min-h-0 flex-[1_1_50%] pl-8">
+      <section className="min-h-0 overflow-hidden pl-8" aria-label="Código en construcción">
         <CodeWorkbench
           copy={copy}
           project={project}
@@ -676,9 +676,9 @@ export default function BuilderAgentPane({
           intent={hubSummary}
           visualState={lastDelta?.visual || {}}
         />
-      </div>
+      </section>
 
-      <div className="flex min-h-0 flex-[1_1_50%] flex-col border-t border-white/[0.08]">
+      <section className="flex min-h-0 flex-col overflow-hidden border-t border-white/[0.08]" aria-label="Chat del agente">
         <AgentCapsule
           status={agentStatus}
           progress={progress}
@@ -697,7 +697,7 @@ export default function BuilderAgentPane({
           onSelectAction={submitSuggestedAction}
           decisionFeedback={decisionFeedback}
         />
-      </div>
+      </section>
     </div>
   );
 }
