@@ -19,6 +19,38 @@ const includesAny = (text = '', terms = []) => {
 
 const getArray = (value) => (Array.isArray(value) ? value : []);
 
+const pickFirstString = (...values) =>
+  values.find((value) => typeof value === 'string' && value.trim())?.trim() || '';
+
+const resolveBuilderOutputOverrides = (builderIntelligence = {}) => {
+  const builderKernelOutput =
+    builderIntelligence?.builderKernelOutput ||
+    builderIntelligence?.builderKernelResult?.output ||
+    {};
+  const preview = builderKernelOutput?.preview || {};
+  const buildState =
+    builderKernelOutput?.buildState ||
+    builderIntelligence?.builderBuildState ||
+    {};
+  const primaryCtaFromList = getArray(preview.ctas)
+    .find((item) => item?.intent === 'primary')
+    ?.label;
+
+  return {
+    primaryCTA: pickFirstString(
+      preview.primaryCTA,
+      buildState.primaryCTA,
+      primaryCtaFromList
+    ),
+    visualAccent: pickFirstString(
+      preview.visualAccent,
+      buildState.visualAccent,
+      buildState.theme?.visualAccent,
+      buildState.theme?.accent
+    ),
+  };
+};
+
 export const collectBuilderSectorContext = ({
   copy = {},
   project = null,
@@ -198,6 +230,8 @@ export const buildSectorLandingModel = ({
     businessName,
     city,
   } = resolved;
+  const outputOverrides = resolveBuilderOutputOverrides(builderIntelligence);
+  const primaryCTA = outputOverrides.primaryCTA || profile.primaryCTA;
 
   return {
     ...profile,
@@ -209,7 +243,8 @@ export const buildSectorLandingModel = ({
     eyebrow: profile.heroEyebrow,
     headline: profile.headline,
     subheadline: profile.subheadline,
-    primaryCTA: profile.primaryCTA,
+    primaryCTA,
+    visualAccent: outputOverrides.visualAccent,
     secondaryCTA: profile.secondaryCTA,
 
     sectionTitle: profile.servicesTitle,
@@ -234,7 +269,7 @@ export const buildSectorLandingModel = ({
       title: profile.formTitle,
       text: profile.formText,
       fields: profile.formFields || ['Nombre', 'Email', 'Teléfono', 'Mensaje'],
-      buttonLabel: profile.formButtonLabel || profile.primaryCTA,
+      buttonLabel: primaryCTA || profile.formButtonLabel || profile.primaryCTA,
     },
 
     automationLabel: 'Seguimiento',
@@ -244,6 +279,6 @@ export const buildSectorLandingModel = ({
       items: profile.automationItems || [],
     },
 
-    finalCTA: profile.finalCTA || profile.primaryCTA,
+    finalCTA: primaryCTA || profile.finalCTA || profile.primaryCTA,
   };
 };

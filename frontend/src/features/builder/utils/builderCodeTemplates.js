@@ -139,6 +139,8 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
   const projectId = getProjectId(project);
   const mode = copy.mode || 'create';
   const templateType = copy.templateType || visualState.templateType || 'generic_landing';
+  const primaryCTA = copy.primaryCTA || copy.primaryCta || visualState?.ctaState?.primaryCta || 'Crear mi primer proyecto';
+  const visualAccent = copy.visualAccent || visualState?.visualAccent || visualState?.ctaState?.visualAccent || '';
 
   if (templateType === 'gpt_hub_landing') {
     return [
@@ -178,7 +180,7 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
       'export default function WebsiteTransformation() {',
       `  const projectId = "${safeString(projectId)}";`,
       `  const originalWebsite = "${safeString(copy.originalLabel || 'web actual')}";`,
-      `  const primaryCTA = "${safeString(copy.primaryCta || 'Aplicar rediseño')}";`,
+      `  const primaryCTA = "${safeString(primaryCTA || 'Aplicar rediseño')}";`,
       '',
       '  return (',
       '    <main className="sm-transformation-runtime">',
@@ -199,7 +201,7 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
   return [
     'export default function LandingRuntime() {',
     `  const projectId = "${safeString(projectId)}";`,
-    `  const primaryCTA = "${safeString(copy.primaryCta || 'Crear mi primer proyecto')}";`,
+    `  const primaryCTA = "${safeString(primaryCTA)}";`,
     '',
     '  return (',
     '    <main className="sm-premium-landing">',
@@ -208,6 +210,7 @@ const buildTsxTemplate = ({ copy = {}, project = {}, visualState = {} }) => {
     `        headline="${safeString(copy.headline || 'Convierte una idea en un sistema digital')}"`,
     '        primaryCTA={primaryCTA}',
     `        secondaryCTA="${safeString(copy.secondaryCta || 'Analizar una URL')}"`,
+    `        visualAccent="${safeString(visualAccent)}"`,
     '      />',
     '      <ValueSystem />',
     '      <PlanLayer />',
@@ -365,6 +368,8 @@ const buildPythonTemplate = ({ copy = {}, project = {}, intent = {} }) => {
 
 const buildJsonTemplate = ({ copy = {}, project = {}, intent = {}, visualState = {} }) => {
   const projectId = getProjectId(project);
+  const primaryCTA = copy.primaryCTA || copy.primaryCta || visualState?.ctaState?.primaryCta || '';
+  const visualAccent = copy.visualAccent || visualState?.visualAccent || visualState?.ctaState?.visualAccent || '';
 
   return [
     '{',
@@ -373,7 +378,8 @@ const buildJsonTemplate = ({ copy = {}, project = {}, intent = {}, visualState =
     `  "template_type": "${copy.templateType || intent.templateType || 'generic_landing'}",`,
     `  "visual_direction": "${visualState.visualPresetId || intent.visualDirection || 'premium_dark'}",`,
     `  "headline": "${safeString(copy.headline || '')}",`,
-    `  "primary_cta": "${safeString(copy.primaryCta || visualState?.ctaState?.primaryCta || '')}",`,
+    `  "primary_cta": "${safeString(primaryCTA)}",`,
+    `  "visual_accent": "${safeString(visualAccent)}",`,
     `  "secondary_cta": "${safeString(copy.secondaryCta || visualState?.ctaState?.secondaryCta || '')}",`,
     '  "estimated_credits": {',
     '    "min": 8,',
