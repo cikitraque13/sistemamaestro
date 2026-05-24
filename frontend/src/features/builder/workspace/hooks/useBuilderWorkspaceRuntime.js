@@ -21,6 +21,20 @@ import {
 } from '../../state/builderBuildKernel';
 
 import {
+  getBuildStateSummary,
+} from '../../state/builderBuildState';
+
+import {
+  createBuilderOutputMap,
+} from '../../state/builderOutputMap';
+
+import {
+  BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
+  persistBuilderBuildState,
+  restoreBuilderBuildState,
+} from '../../state/builderBuildStateStorage';
+
+import {
   buildWithBuilderAI,
 } from '../../api/builderAiClient';
 
@@ -609,12 +623,22 @@ export default function useBuilderWorkspaceRuntime({
   );
 
   const applyKernelResult = useCallback((kernelResult) => {
+    const nextState = kernelResult?.state || null;
+
     setBuilderKernelResult(kernelResult || null);
-    setBuilderBuildState(kernelResult?.state || null);
+    setBuilderBuildState(nextState);
     setBuilderKernelOutput(kernelResult?.output || null);
     setBuilderDecisionMessage(kernelResult?.decisionMessage || null);
     setBuilderBuildSummary(kernelResult?.summary || null);
-  }, []);
+
+    if (nextState && projectId) {
+      persistBuilderBuildState({
+        projectId,
+        templateId: BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
+        state: nextState,
+      });
+    }
+  }, [projectId]);
 
   const startBuild = useCallback(() => {
     setProgress(4);
@@ -927,15 +951,36 @@ export default function useBuilderWorkspaceRuntime({
       initialPrompt,
     });
 
-    const initialKernelResult = runBuilderBuildKernel({
-      input: projectInputContent || initialPrompt,
-      message: '',
-      project: projectSnapshot,
-      initialPrompt,
-      currentState: null,
-      currentSelection: initialAgent.hub?.selection || null,
-      source: 'initial_runtime',
+    const restoredBuildState = restoreBuilderBuildState({
+      projectId,
+      templateId: BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
     });
+
+    const initialKernelResult = restoredBuildState
+      ? {
+          version: 'builder-build-kernel-v1',
+          ok: true,
+          input: projectInputContent || initialPrompt,
+          previousState: null,
+          state: restoredBuildState,
+          mutations: [],
+          mutationTypes: [],
+          knowledge: null,
+          knowledgeSummary: null,
+          output: createBuilderOutputMap(restoredBuildState),
+          structure: null,
+          decisionMessage: null,
+          summary: getBuildStateSummary(restoredBuildState),
+        }
+      : runBuilderBuildKernel({
+          input: projectInputContent || initialPrompt,
+          message: '',
+          project: projectSnapshot,
+          initialPrompt,
+          currentState: null,
+          currentSelection: initialAgent.hub?.selection || null,
+          source: 'initial_runtime',
+        });
 
     setProgress(4);
     setIsRunning(true);
