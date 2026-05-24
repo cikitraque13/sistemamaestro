@@ -56,6 +56,27 @@ try {
   assert.doesNotMatch(parserSource, /fetch\s*\(/);
   assert.doesNotMatch(parserSource, /buildWithBuilderAI/);
 
+  const runtimeSource = await readFile('src/features/builder/workspace/hooks/useBuilderWorkspaceRuntime.js', 'utf8');
+  assert.match(runtimeSource, /BUILDER_COMMAND_V2_ENABLED\s*\?\s*parseAtomicBuilderCommand/);
+  assert.match(runtimeSource, /:\s*null/);
+
+  const flagOffIndex = runtimeSource.indexOf('const atomicCommand = BUILDER_COMMAND_V2_ENABLED');
+  const builderAiIndex = runtimeSource.indexOf('builderAiResult = await buildWithBuilderAI');
+  assert.ok(flagOffIndex > -1);
+  assert.ok(builderAiIndex > flagOffIndex);
+
+  const flagOffBlock = runtimeSource.slice(flagOffIndex, builderAiIndex);
+  assert.match(flagOffBlock, /BUILDER_COMMAND_V2_ENABLED/);
+  assert.match(flagOffBlock, /parseAtomicBuilderCommand/);
+  assert.match(flagOffBlock, /:\s*null/);
+  assert.doesNotMatch(flagOffBlock, /applyKernelResult/);
+  assert.doesNotMatch(flagOffBlock, /setManualMessages/);
+
+  const simulatedFlagOnBlock = runtimeSource.slice(flagOffIndex, builderAiIndex + 80);
+  assert.match(simulatedFlagOnBlock, /if \(atomicCommand\)/);
+  assert.match(simulatedFlagOnBlock, /throw new Error\('Command Contract V2 no activo para aplicación real\.'\)/);
+
+
   const changedSources = [templatesSource, resolverSource, parserSource].join('\n');
   assert.doesNotMatch(changedSources, /\bvisualState\b(?!\s*[=,}:.)?])/);
 } finally {
