@@ -12,12 +12,15 @@ from backend.app.schemas.consumption import (
     ConsumptionGates,
     ConsumptionRequest,
     ConsumptionResponse,
-    ConsumptionResponse,
     ConsumptionUX,
     TraceSnapshot,
 )
 from backend.app.services.credits import (
-    apply_manual_credit_adjustment,
+    CreditLedgerPersistenceError,
+    CreditOperationBusyError,
+    InsufficientCreditsError,
+    consume_standard_credits,
+    get_credit_operation,
     get_user_credit_summary,
 )
 
@@ -355,10 +358,38 @@ def _build_blocked_special_from_response(
 async def execute_consumption_for_user(
     runtime_user: Dict[str, Any],
     payload: ConsumptionRequest,
+    *,
+    defer_finalization: bool = False,
 ) -> ConsumptionResponse:
     runtime_user_id = runtime_user.get("user_id")
     if not runtime_user_id:
         raise ValueError("Authenticated user is missing user_id")
+
+    if not payload.meta.trace_id:
+        raise ValueError("Execute requires a stable trace_id")
+    logical_request = _clone_request(payload)
+    logical_request.pop("user_context", None)
+    prior = await get_credit_operation(runtime_user_id, payload.meta.trace_id)
+    if prior:
+        if prior.get("meta", {}).get("engine_request") != logical_request:
+            raise ValueError("Credit operation identity was reused with different inputs")
+        if prior.get("operation_status") == "completed":
+            data = dict(prior["meta"]["decision_snapshot"])
+            data["trace"] = {
+                **data["trace"], "executed": True, "operation_status": "completed",
+                "ledger_reason_code": "consumption_execute",
+                "balance_after": prior["credits_balance_after"],
+                "operation_id": prior["operation_id"], "ledger_entry_id": prior["entry_id"],
+                "idempotent_replay": True,
+            }
+            data["ux"] = {**data["ux"], "message": "Consumo ejecutado correctamente.", "next_step_hint": "continue_project"}
+            return ConsumptionResponse(**data)
+        if prior.get("meta", {}).get("decision_snapshot"):
+            decision = ConsumptionResponse(**prior["meta"]["decision_snapshot"])
+            return _operation_blocked(
+                decision, prior["operation_status"], payload.meta.trace_id,
+                "La operacion previa no esta completada; consulta su estado antes de continuar.",
+            )
 
     runtime_credit_summary = await get_user_credit_summary(runtime_user_id)
     runtime_request = _force_runtime_user_context(
@@ -386,10 +417,16 @@ async def execute_consumption_for_user(
         return decision
 
     try:
-        adjustment_result = await apply_manual_credit_adjustment(
+        operation_id = runtime_request.meta.trace_id
+        if not operation_id:
+            raise ValueError("Execute requires a stable trace_id")
+        adjustment_result = await consume_standard_credits(
             user_id=runtime_user_id,
-            credits_delta=-consumption_amount,
+            credits_amount=consumption_amount,
+            operation_id=operation_id,
             reason_code="consumption_execute",
+            project_id=project_id,
+            defer_finalization=defer_finalization,
             meta={
                 "project_id": project_id,
                 "action_key": runtime_request.action_key,
@@ -402,12 +439,29 @@ async def execute_consumption_for_user(
                 "final_tier": decision.decision.final_tier,
                 "consumption_type": decision.decision.consumption_type,
                 "scale_reason": decision.decision.scale_reason,
+                "request_fingerprint": runtime_request.meta.request_fingerprint,
+                "engine_request": logical_request,
+                "decision_snapshot": _model_to_dict(decision),
             },
         )
-    except ValueError:
+    except InsufficientCreditsError:
         return _build_blocked_balance_from_response(
             decision,
             message="El saldo ya no es suficiente para ejecutar esta accion.",
+        )
+    except CreditOperationBusyError as exc:
+        return _operation_blocked(
+            decision, exc.operation_status, operation_id,
+            "Hay otro consumo en curso; la operacion no se ha completado.",
+        )
+    except CreditLedgerPersistenceError as exc:
+        message = (
+            "El consumo no pudo registrarse y el saldo fue restaurado. Puedes reintentarlo."
+            if exc.compensated
+            else "El consumo requiere reconciliacion y no puede continuar."
+        )
+        return _operation_blocked(
+            decision, "compensated" if exc.compensated else "reconciliation_required", operation_id, message,
         )
 
     balance_after = int(
@@ -417,10 +471,27 @@ async def execute_consumption_for_user(
     )
 
     data = _model_to_dict(decision)
-    data["ux"]["message"] = "Consumo ejecutado correctamente."
+    data["ux"]["message"] = "Saldo reservado; resultado pendiente." if defer_finalization else "Consumo ejecutado correctamente."
     data["ux"]["next_step_hint"] = "continue_project"
-    data["trace"]["executed"] = True
+    data["trace"]["executed"] = not defer_finalization
+    data["trace"]["operation_status"] = adjustment_result.get("operation_status")
     data["trace"]["ledger_reason_code"] = "consumption_execute"
     data["trace"]["balance_after"] = balance_after
+    data["trace"]["operation_id"] = adjustment_result.get("operation_id")
+    data["trace"]["ledger_entry_id"] = adjustment_result.get("entry_id")
+    data["trace"]["idempotent_replay"] = bool(
+        adjustment_result.get("idempotent_replay", False)
+    )
 
     return ConsumptionResponse(**data)
+
+
+def _operation_blocked(response, operation_status, operation_id, message):
+    result = _build_blocked_balance_from_response(response, message=message)
+    result.trace.operation_id = operation_id
+    result.trace.operation_status = operation_status
+    result.ux.next_step_hint = (
+        "start_new_operation" if operation_status in {"compensated", "blocked_busy", "blocked_insufficient"}
+        else "reconcile_operation"
+    )
+    return result
