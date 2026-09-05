@@ -12,6 +12,7 @@ import {
   Stop
 } from '@phosphor-icons/react';
 import axios from 'axios';
+import { economicPost } from '../../lib/economicRequest';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'sonner';
 import Logo from '../../components/Logo';
@@ -136,7 +137,7 @@ const FlowPage = () => {
       });
 
       try {
-        const response = await axios.post(
+        const response = await economicPost(axios,
           `${API_BASE}/projects`,
           {
             input_type: location.state.inputType || 'text',
@@ -268,7 +269,7 @@ const FlowPage = () => {
     });
 
     try {
-      const response = await axios.post(
+      const response = await economicPost(axios,
         `${API_BASE}/projects`,
         {
           input_type: inputType,
@@ -401,7 +402,7 @@ const FlowPage = () => {
     });
 
     try {
-      const response = await axios.post(
+      const response = await economicPost(axios,
         `${API_BASE}/projects/${project.project_id}/blueprint`,
         {},
         { withCredentials: true }
