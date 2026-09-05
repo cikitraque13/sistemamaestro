@@ -1,15 +1,12 @@
 from datetime import datetime, timezone
-import logging
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
-from pymongo.errors import DuplicateKeyError
 
 from backend.app.core.config import get_google_client_id
 from backend.app.db.mongodb import db
 
 router = APIRouter(prefix="/api", tags=["public"])
-logger = logging.getLogger(__name__)
 
 
 class NewsletterSubscribe(BaseModel):
@@ -39,11 +36,8 @@ async def subscribe_newsletter(data: NewsletterSubscribe):
             "email": email,
             "created_at": datetime.now(timezone.utc).isoformat()
         })
-    except DuplicateKeyError:
-        return {"ok": True, "message": "Email ya suscrito"}
-    except Exception:
-        logger.exception("newsletter_subscribe_failed")
-        raise HTTPException(status_code=500, detail="No se pudo completar la suscripción")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Newsletter subscribe failed: {str(e)}")
 
     return {
         "ok": True,

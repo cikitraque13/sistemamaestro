@@ -39,9 +39,6 @@ ALLOWED_ORIGINS = [
     if origin.strip()
 ]
 
-if not ALLOWED_ORIGINS or "*" in ALLOWED_ORIGINS:
-    raise RuntimeError("ALLOWED_ORIGINS must contain explicit origins when credentials are enabled")
-
 COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "false").lower() == "true"
 
 FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"

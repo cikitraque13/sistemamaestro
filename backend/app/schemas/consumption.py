@@ -55,7 +55,6 @@ class ConsumptionMeta(BaseModel):
     surface: Optional[str] = None
     entry_point: Optional[str] = None
     trace_id: Optional[str] = None
-    request_fingerprint: Optional[str] = None
 
 
 class ConsumptionRequest(BaseModel):
@@ -94,13 +93,6 @@ class TraceSnapshot(BaseModel):
     catalog_version: str = "credits_v1"
     scores_snapshot: Dict[str, int] = Field(default_factory=dict)
     repetition_snapshot: Dict[str, int] = Field(default_factory=dict)
-    executed: bool = False
-    ledger_reason_code: Optional[str] = None
-    balance_after: Optional[int] = Field(None, ge=0)
-    operation_id: Optional[str] = None
-    ledger_entry_id: Optional[str] = None
-    idempotent_replay: bool = False
-    operation_status: Optional[str] = None
 
 
 class ConsumptionResponse(BaseModel):

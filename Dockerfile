@@ -28,11 +28,6 @@ RUN python -m pip install --upgrade pip \
 COPY backend/ /app/backend/
 COPY --from=frontend-build /app/frontend/build /app/frontend/build
 
-RUN addgroup --system app && adduser --system --ingroup app app \
-    && chown -R app:app /app
-
-USER app
-
 EXPOSE 8080
 
 CMD ["sh", "-c", "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

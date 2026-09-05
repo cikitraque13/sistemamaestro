@@ -33,7 +33,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS if ALLOWED_ORIGINS != ["*"] else ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -82,9 +82,8 @@ async def serve_react(full_path: str):
     if full_path.startswith("api") or full_path in {"docs", "redoc", "openapi.json", "health"}:
         raise HTTPException(status_code=404, detail="Not Found")
 
-    build_root = FRONTEND_BUILD_DIR.resolve()
-    requested_file = (build_root / full_path).resolve()
-    if requested_file.is_relative_to(build_root) and requested_file.exists() and requested_file.is_file():
+    requested_file = FRONTEND_BUILD_DIR / full_path
+    if requested_file.exists() and requested_file.is_file():
         return FileResponse(str(requested_file))
 
     index_file = FRONTEND_BUILD_DIR / "index.html"
