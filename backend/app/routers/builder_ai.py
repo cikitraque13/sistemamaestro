@@ -1,4 +1,6 @@
-﻿from __future__ import annotations
+from __future__ import annotations
+
+import logging
 
 from typing import Any, Dict, Optional
 
@@ -20,6 +22,7 @@ from backend.app.services.economic_operation import (
 
 
 router = APIRouter(prefix="/api/builder", tags=["builder-ai"])
+logger = logging.getLogger(__name__)
 
 
 def _model_to_dict(model: Any) -> Dict[str, Any]:
@@ -288,11 +291,12 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
     except HTTPException:
         raise
 
-    except Exception as exc:
+    except Exception:
+        logger.exception("builder_ai_failed")
         raise HTTPException(
             status_code=500,
             detail={
                 "message": "Error construyendo con Builder AI.",
-                "reason": str(exc),
+                "reason": "internal_error",
             },
         )
