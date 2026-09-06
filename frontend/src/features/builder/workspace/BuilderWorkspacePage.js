@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../lib/apiClient';
-import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
 
@@ -313,7 +312,7 @@ export default function BuilderWorkspacePage() {
     setGeneratingBlueprint(true);
 
     try {
-      const response = await economicPost(api,
+      const response = await api.post(
         `/projects/${project.project_id}/blueprint`,
         {}
       );

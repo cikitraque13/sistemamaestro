@@ -1,12 +1,12 @@
-from typing import Dict, Literal
+from typing import Dict
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class ProjectCreate(BaseModel):
-    input_type: Literal["text", "url"] = "text"
-    input_content: str = Field(min_length=1, max_length=50_000)
+    input_type: str = "text"
+    input_content: str
 
 
 class RefineInput(BaseModel):
-    answers: Dict[str, str] = Field(max_length=100)
+    answers: Dict[str, str]

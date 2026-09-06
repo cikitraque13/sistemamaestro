@@ -1,7 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-import logging
-
+import uuid
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
@@ -16,13 +15,10 @@ from backend.app.ai.telemetry.agent_trace import build_trace
 from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
-from backend.app.services.economic_operation import (
-    request_fingerprint, request_operation_id, run_economic_operation,
-)
+from backend.app.services.consumption_engine import execute_consumption_for_user
 
 
 router = APIRouter(prefix="/api/builder", tags=["builder-ai"])
-logger = logging.getLogger(__name__)
 
 
 def _model_to_dict(model: Any) -> Dict[str, Any]:
@@ -85,14 +81,11 @@ def build_builder_consumption_request(
     user: Dict[str, Any],
     project: Optional[Dict[str, Any]],
     payload: BuilderAIInput,
-    operation_id: str,
 ) -> ConsumptionRequest:
     project_id = (
         project.get("project_id")
         if project
-        else payload.projectId or "virtual_builder_" + request_fingerprint({
-            "user_id": user["user_id"], "operation_id": operation_id,
-        })[:24]
+        else payload.projectId or f"virtual_builder_{uuid.uuid4().hex[:12]}"
     )
 
     return ConsumptionRequest(
@@ -116,7 +109,7 @@ def build_builder_consumption_request(
             "surface": "builder",
             "entry_point": "builder_ai_build",
             "builder_mode": payload.mode,
-            "trace_id": operation_id,
+            "trace_id": f"trace_{uuid.uuid4().hex[:12]}",
         },
     )
 
@@ -148,7 +141,7 @@ def build_builder_ai_guard_context(
         "user_id": user.get("user_id"),
         "builder_mode": payload.mode,
         "estimated_units": estimated_units,
-        "trace_id": consumption_payload.meta.trace_id,
+        "trace_id": consumption_payload.meta.get("trace_id") if consumption_payload.meta else None,
         "touches_auth": False,
         "touches_payments": target_domain == "pricing_strategy",
         "touches_tokens": False,
@@ -205,7 +198,6 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 @router.post("/build")
 async def build_with_ai(payload: BuilderAIInput, request: Request):
     user = await get_current_user(request)
-    operation_id = request_operation_id(request, "builder_build")
 
     project = None
 
@@ -228,8 +220,18 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
         user=user,
         project=project,
         payload=payload,
-        operation_id=operation_id,
     )
+
+    consumption_result = await execute_consumption_for_user(
+        runtime_user=user,
+        payload=consumption_payload,
+    )
+
+    if consumption_result.status != "allowed":
+        raise HTTPException(
+            status_code=402,
+            detail=_model_to_dict(consumption_result),
+        )
 
     guard_context = build_builder_ai_guard_context(
         payload=payload,
@@ -237,9 +239,10 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
         project=project,
         consumption_payload=consumption_payload,
     )
-    async def work(consumption_result):
-        guards = run_builder_ai_guards(guard_context)
-        enforce_builder_ai_guards(guards)
+    guards = run_builder_ai_guards(guard_context)
+    enforce_builder_ai_guards(guards)
+
+    try:
         safe_payload = payload.model_copy(
             update={
                 "userId": user["user_id"],
@@ -279,24 +282,18 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
         ]
         result_data["trace"] = trace
         result_data["guards"] = guards
-        result_data["consumption"] = consumption_result
+        result_data["consumption"] = _model_to_dict(consumption_result)
 
         return result_data
 
-    try:
-        inputs = payload.model_dump(exclude={"userId"})
-        return await run_economic_operation(
-            user=user, consumption_payload=consumption_payload, inputs=inputs, work=work,
-        )
     except HTTPException:
         raise
 
-    except Exception:
-        logger.exception("builder_ai_failed")
+    except Exception as exc:
         raise HTTPException(
             status_code=500,
             detail={
                 "message": "Error construyendo con Builder AI.",
-                "reason": "internal_error",
+                "reason": str(exc),
             },
         )
