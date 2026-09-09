@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { api } from '../../../lib/apiClient';
+import { economicPost } from '../../../lib/economicRequest';
 
 const MODES = [
   {
@@ -457,7 +458,7 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
     setCreating(true);
 
     try {
-      const response = await api.post('/projects', {
+      const response = await economicPost(api, '/projects', {
         input_type: selectedMode.inputType,
         input_content: launchPrompt,
       });

@@ -1,6 +1,6 @@
+import asyncio
 import logging
 import os
-import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
@@ -12,7 +12,9 @@ from backend.app.schemas.consumption import ConsumptionRequest
 from backend.app.schemas.projects import ProjectCreate, RefineInput
 from backend.app.services.ai_analysis import analyze_with_ai
 from backend.app.services.blueprint import generate_blueprint
-from backend.app.services.consumption_engine import execute_consumption_for_user
+from backend.app.services.economic_operation import (
+    EconomicPersistenceUncertain, request_fingerprint, request_operation_id, run_economic_operation,
+)
 from backend.app.services.plan_recommendation import build_plan_recommendation
 from backend.app.services.semantic_admission import run_semantic_admission
 from backend.app.services.semantic_admission_trace import (
@@ -82,6 +84,7 @@ def build_project_consumption_request(
     action_key: str,
     surface: str,
     entry_point: str,
+    operation_id: str,
     project: Optional[Dict[str, Any]] = None,
 ) -> ConsumptionRequest:
     return ConsumptionRequest(
@@ -104,41 +107,9 @@ def build_project_consumption_request(
         meta={
             "surface": surface,
             "entry_point": entry_point,
-            "trace_id": f"trace_{uuid.uuid4().hex[:12]}",
+            "trace_id": operation_id,
         },
     )
-
-
-async def execute_project_consumption(
-    *,
-    user: Dict[str, Any],
-    project_id: str,
-    action_key: str,
-    surface: str,
-    entry_point: str,
-    project: Optional[Dict[str, Any]] = None,
-):
-    consumption_payload = build_project_consumption_request(
-        user=user,
-        project_id=project_id,
-        action_key=action_key,
-        surface=surface,
-        entry_point=entry_point,
-        project=project,
-    )
-
-    consumption_result = await execute_consumption_for_user(
-        runtime_user=user,
-        payload=consumption_payload,
-    )
-
-    if consumption_result.status != "allowed":
-        raise HTTPException(
-            status_code=402,
-            detail=_model_to_dict(consumption_result),
-        )
-
-    return consumption_result
 
 
 def resolve_project_analysis_action_key(project_data: ProjectCreate) -> str:
@@ -271,6 +242,7 @@ def _run_semantic_admission_shadow(
 @router.post("")
 async def create_project(project_data: ProjectCreate, request: Request):
     user = await get_current_user(request)
+    operation_id = request_operation_id(request, "create_project")
 
     semantic_admission_shadow: Optional[Dict[str, Any]] = None
 
@@ -284,66 +256,66 @@ async def create_project(project_data: ProjectCreate, request: Request):
             "reason": "semantic_admission_exception",
         }
 
-    project_id = f"proj_{uuid.uuid4().hex[:12]}"
-
-    url_analysis = None
-
-    if project_data.input_type == "url":
-        url_analysis = await fetch_and_analyze_url(project_data.input_content)
-
-        if not url_analysis.get("success"):
-            raise HTTPException(
-                status_code=400,
-                detail=url_analysis.get(
-                    "error",
-                    "No se pudo analizar la URL",
-                ),
-            )
-
-    consumption_result = await execute_project_consumption(
+    project_id = "proj_" + request_fingerprint({
+        "user_id": user["user_id"], "operation_id": operation_id,
+    })[:24]
+    consumption_payload = build_project_consumption_request(
         user=user,
         project_id=project_id,
         action_key=resolve_project_analysis_action_key(project_data),
         surface="projects",
         entry_point="create_project",
+        operation_id=operation_id,
     )
 
-    analysis = await analyze_with_ai(
-        project_data.input_type,
-        project_data.input_content,
-        url_analysis,
+    async def work(consumption_result):
+        url_analysis = None
+        if project_data.input_type == "url":
+            url_analysis = await fetch_and_analyze_url(project_data.input_content)
+            if not url_analysis.get("success"):
+                raise HTTPException(400, detail=url_analysis.get("error", "No se pudo analizar la URL"))
+
+        analysis = await analyze_with_ai(
+            project_data.input_type, project_data.input_content, url_analysis,
+        )
+        plan_recommendation = build_plan_recommendation(
+            input_type=project_data.input_type, input_content=project_data.input_content,
+            analysis=analysis, url_analysis=url_analysis,
+        )
+        project_doc = {
+            "project_id": project_id,
+            "user_id": user["user_id"],
+            "input_type": project_data.input_type,
+            "input_content": project_data.input_content,
+            "route": analysis.get("route", "idea"),
+            "diagnosis": analysis.get("diagnosis", {}),
+            "refine_questions": analysis.get("refine_questions", []),
+            "plan_recommendation": plan_recommendation,
+            "url_analysis": url_analysis.get("content") if url_analysis and url_analysis.get("success") else None,
+            "analysis_consumption": consumption_result,
+            "status": "analyzed",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        try:
+            await db.projects.insert_one(project_doc)
+        except (Exception, asyncio.CancelledError) as exc:
+            try:
+                persisted = await db.projects.find_one(
+                    {"project_id": project_id, "user_id": user["user_id"]}, {"_id": 0},
+                )
+            except Exception as read_error:
+                raise EconomicPersistenceUncertain("Project write outcome unknown") from read_error
+            if not persisted or persisted.get("analysis_consumption", {}).get("trace", {}).get("operation_id") != operation_id:
+                raise EconomicPersistenceUncertain("Project write outcome unknown") from exc
+            return persisted
+        project_doc.pop("_id", None)
+        return project_doc
+
+    project_doc = await run_economic_operation(
+        user=user, consumption_payload=consumption_payload,
+        inputs=_model_to_dict(project_data), work=work,
     )
-
-    plan_recommendation = build_plan_recommendation(
-        input_type=project_data.input_type,
-        input_content=project_data.input_content,
-        analysis=analysis,
-        url_analysis=url_analysis,
-    )
-
-    project_doc = {
-        "project_id": project_id,
-        "user_id": user["user_id"],
-        "input_type": project_data.input_type,
-        "input_content": project_data.input_content,
-        "route": analysis.get("route", "idea"),
-        "diagnosis": analysis.get("diagnosis", {}),
-        "refine_questions": analysis.get("refine_questions", []),
-        "plan_recommendation": plan_recommendation,
-        "url_analysis": (
-            url_analysis.get("content")
-            if url_analysis and url_analysis.get("success")
-            else None
-        ),
-        "analysis_consumption": _model_to_dict(consumption_result),
-        "status": "analyzed",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "updated_at": datetime.now(timezone.utc).isoformat(),
-    }
-
-    await db.projects.insert_one(project_doc)
-
-    project_doc.pop("_id", None)
 
     logger.info(
         "project_created=%s",
@@ -461,6 +433,7 @@ async def refine_project(
 @router.post("/{project_id}/blueprint")
 async def create_blueprint(project_id: str, request: Request):
     user = await get_current_user(request)
+    operation_id = request_operation_id(request, "create_blueprint")
 
     project = await db.projects.find_one(
         {
@@ -475,35 +448,46 @@ async def create_blueprint(project_id: str, request: Request):
             detail="Project not found",
         )
 
-    consumption_result = await execute_project_consumption(
+    consumption_payload = build_project_consumption_request(
         user=user,
         project_id=project_id,
         action_key="blueprint_generation",
         surface="projects",
         entry_point="create_blueprint",
+        operation_id=operation_id,
         project=project,
     )
 
-    blueprint = await generate_blueprint(project)
+    async def work(consumption_result):
+        blueprint = await generate_blueprint(project)
+        try:
+            updated = await db.projects.find_one_and_update(
+                {"project_id": project_id, "user_id": user["user_id"]},
+                {"$set": {
+                    "blueprint": blueprint,
+                    "blueprint_consumption": consumption_result,
+                    "status": "blueprint_generated",
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }},
+                projection={"_id": 0}, return_document=True,
+            )
+        except (Exception, asyncio.CancelledError) as exc:
+            try:
+                updated = await db.projects.find_one(
+                    {"project_id": project_id, "user_id": user["user_id"]}, {"_id": 0},
+                )
+            except Exception as read_error:
+                raise EconomicPersistenceUncertain("Blueprint write outcome unknown") from read_error
+            if not updated or updated.get("blueprint_consumption", {}).get("trace", {}).get("operation_id") != operation_id:
+                raise EconomicPersistenceUncertain("Blueprint write outcome unknown") from exc
+        if updated is None:
+            raise HTTPException(404, detail="Project not found")
+        return updated
 
-    await db.projects.update_one(
-        {"project_id": project_id},
-        {
-            "$set": {
-                "blueprint": blueprint,
-                "blueprint_consumption": _model_to_dict(consumption_result),
-                "status": "blueprint_generated",
-                "updated_at": datetime.now(timezone.utc).isoformat(),
-            }
-        },
+    return await run_economic_operation(
+        user=user, consumption_payload=consumption_payload,
+        inputs={"project_id": project_id}, work=work,
     )
-
-    updated = await db.projects.find_one(
-        {"project_id": project_id},
-        {"_id": 0},
-    )
-
-    return updated
 
 
 @router.delete("/{project_id}")

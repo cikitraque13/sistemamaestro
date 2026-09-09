@@ -143,6 +143,8 @@ async def execute_consumption(
     payload: ConsumptionRequest,
     request: Request,
 ) -> ConsumptionExecutionEnvelope:
+    if not payload.meta.trace_id or not payload.meta.trace_id.strip():
+        raise HTTPException(400, detail={"code": "stable_trace_id_required"})
     if payload.mode != "execute":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -165,6 +167,11 @@ async def execute_consumption(
             runtime_user=user,
             payload=payload,
         )
+        if result.trace.operation_status and result.status != "allowed":
+            raise HTTPException(
+                503 if result.trace.operation_status == "reconciliation_required" else 409,
+                detail=_model_to_dict(result),
+            )
 
         return ConsumptionExecutionEnvelope(
             ok=True,
@@ -173,6 +180,9 @@ async def execute_consumption(
 
     except HTTPException:
         raise
+
+    except ValueError as exc:
+        raise HTTPException(409, detail={"code": "credit_operation_conflict", "message": str(exc)}) from exc
 
     except Exception as exc:
         raise HTTPException(

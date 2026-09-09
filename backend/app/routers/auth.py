@@ -54,37 +54,14 @@ async def register(user_data: UserCreate, request: Request, response: Response):
     name = user_data.name.strip() if user_data.name else "User"
     password = user_data.password
 
+    if not 10 <= len(password) <= 128:
+        raise HTTPException(status_code=422, detail="Password must contain 10-128 characters")
+    if not 1 <= len(name) <= 120:
+        raise HTTPException(status_code=422, detail="Name must contain 1-120 characters")
+
     existing = await db.users.find_one({"email": email}, {"_id": 0})
 
     if existing:
-        if not existing.get("password_hash"):
-            await db.users.update_one(
-                {"user_id": existing["user_id"]},
-                {
-                    "$set": {
-                        "password_hash": hash_password(password),
-                        "name": name or existing.get("name", "User"),
-                        "updated_at": datetime.now(timezone.utc).isoformat(),
-                    }
-                },
-            )
-
-            updated_user = await db.users.find_one(
-                {"user_id": existing["user_id"]},
-                {"_id": 0},
-            )
-
-            access_token = create_access_token(
-                updated_user["user_id"],
-                updated_user["email"],
-            )
-            refresh_token = create_refresh_token(updated_user["user_id"])
-
-            set_auth_cookies(response, access_token, refresh_token, request)
-
-            updated_user.pop("password_hash", None)
-            return updated_user
-
         raise HTTPException(status_code=400, detail="Email already registered")
 
     user_id = f"user_{uuid.uuid4().hex[:12]}"
@@ -240,10 +217,13 @@ async def google_session(request: Request, response: Response):
 
     if google_token:
         expected_client_id = get_google_client_id()
+        if not expected_client_id:
+            raise HTTPException(status_code=503, detail="Google authentication is not configured")
 
         async with httpx.AsyncClient() as http_client:
             resp = await http_client.get(
-                f"https://oauth2.googleapis.com/tokeninfo?id_token={google_token}"
+                "https://oauth2.googleapis.com/tokeninfo",
+                params={"id_token": google_token},
             )
 
             if resp.status_code != 200:
@@ -251,8 +231,10 @@ async def google_session(request: Request, response: Response):
 
             google_data = resp.json()
 
-        if expected_client_id and google_data.get("aud") != expected_client_id:
+        if google_data.get("aud") != expected_client_id:
             raise HTTPException(status_code=401, detail="Invalid Google token")
+        if google_data.get("email_verified") not in {True, "true"}:
+            raise HTTPException(status_code=401, detail="Google email is not verified")
 
         google_data["name"] = google_data.get(
             "name",
