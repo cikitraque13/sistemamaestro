@@ -1125,6 +1125,7 @@ export default function useBuilderWorkspaceRuntime({
     applyKernelResult(initialKernelResult);
   }, [
     applyKernelResult,
+    projectId,
     projectKey,
     projectReady,
     projectSnapshot,

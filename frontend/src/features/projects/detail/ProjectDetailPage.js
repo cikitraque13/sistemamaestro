@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { economicPost } from '../../../lib/economicRequest';
 import { toast } from 'sonner';
 
 import DashboardLayout from '../../../components/DashboardLayout';
@@ -59,7 +60,7 @@ const ProjectDetailPage = () => {
     setGeneratingBlueprint(true);
 
     try {
-      const response = await axios.post(
+      const response = await economicPost(axios,
         `${API_BASE}/projects/${id}/blueprint`,
         {},
         { withCredentials: true }

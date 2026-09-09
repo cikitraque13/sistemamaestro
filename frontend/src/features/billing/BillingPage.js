@@ -15,6 +15,7 @@ import { useAuth } from '../../context/AuthContext';
 import { entryOffer, pricingPlans } from '../../content/pricingContent';
 
 import { API_BASE } from './billing.constants';
+import { isPaymentProvisionComplete } from './paymentCompletion.mjs';
 import { getErrorMessage, isValidCheckoutUrl } from './billing.utils';
 
 import SuggestedPlanBanner from './components/SuggestedPlanBanner';
@@ -268,9 +269,9 @@ const BillingPage = () => {
         withCredentials: true
       });
 
-      const { payment_status, item_type, item_id, status } = response.data || {};
+      const { item_type, item_id, status } = response.data || {};
 
-      if (payment_status === 'paid') {
+      if (isPaymentProvisionComplete(response.data)) {
         const checkoutContext = readCheckoutContext();
 
         if (item_type === 'one_time_offer' && item_id === 'single_report') {
