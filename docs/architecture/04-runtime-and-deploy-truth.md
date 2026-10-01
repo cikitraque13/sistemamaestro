@@ -1,5 +1,30 @@
 # 04 — Runtime and Deploy Truth
 
+## Identidad acreditada y separación PRE-S14 — 2026-10-01
+
+| Plano | Identidad y estado |
+|---|---|
+| GitHub main / Railway production | ee65c324bf6780aeb6a25f6e97851cd3b2d7b0a3 |
+| Tree de producción | 4447f531d62157fc3e469e1b9fb56d87087e9916 |
+| Resultado de producción acreditado | SUCCESS |
+| Ingeniería PRE-S14 | Base anterior más delta local S1–S13/C1 validado; NO desplegado |
+
+La identidad de producción procede del checkpoint autorizado, no de una consulta
+remota efectuada en esta tarea documental. No se inventan IDs de deployment.
+El SHA base no identifica los bytes completos del workspace reconciliado.
+No existe aquí un commit acreditado del delta local.
+
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
+gobierna los cierres locales y S14 NOT_STARTED.
+[Inventario](../control/03-INVENTARIO-TECNICO.md) registra el freeze previo.
+Ninguno de esos cierres acredita una promoción posterior a producción.
+
+Este documento y los archivos Dockerfile/railway.json prevalecen sobre ejemplos
+incompatibles del procedimiento DEPLOY_RAILWAY.md: su ejemplo startCommand
+no representa la configuración actual. La regla vigente es usar CMD del Dockerfile,
+sin deploy.startCommand. La guía queda sin modificar por estar fuera del alcance.
+
+
 ## Estado del documento
 
 - Estado: activo
@@ -95,7 +120,7 @@ El Dockerfile debe:
 - usar Python 3.11 para runtime;
 - instalar dependencias desde `backend/requirements.txt`;
 - copiar backend;
-- copiar frontend build;
+- copiar frontend build, sin node_modules en la etapa final;
 - arrancar `backend.app.main:app`.
 
 ---

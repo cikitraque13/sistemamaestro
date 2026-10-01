@@ -1,4 +1,4 @@
-﻿# 07-GIT-DEPLOY-HIGIENE
+# 07-GIT-DEPLOY-HIGIENE
 
 ## Estado del documento
 
@@ -95,9 +95,9 @@ Debe entrar en Git todo lo que defina el producto real o su gobierno técnico.
 - código fuente de módulos reales del producto;
 - rutas residuales legales aún aprobadas.
 
-### Cuando se cree
+### Subcapa de fuente ya existente
 
-También debe entrar en Git:
+Debe preservarse como fuente revisable:
 
 ```text
 frontend/src/features/builder/state/
@@ -424,19 +424,12 @@ Un deploy solo puede salir de:
 
 ## 10.3 Estado actual del proyecto respecto a deploy
 
-En el momento actual:
-
-**deploy final no procede todavía.**
-
-### Motivos
-
-- el sistema está en reconducción estructural;
-- la capa documental canónica está siendo alineada;
-- Builder necesita `BuilderBuildKernel` y `BuilderBuildState`;
-- preview, código y estructura aún deben sincronizarse;
-- créditos, exportación y deploy deben apoyarse sobre salida real;
-- backend, IA y persistencia avanzada deben activarse por fases;
-- el proyecto no debe pasar a producción mientras siga en fase de afinado quirúrgico.
+La producción acreditada y su identidad se registran en
+[Runtime](../architecture/04-runtime-and-deploy-truth.md).
+El delta [Journey 03 PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) está validado localmente y no desplegado.
+BuilderBuildKernel y BuilderBuildState existen; no se exige volver a crearlos.
+La validación local no autoriza commit, push ni producción. Una futura promoción
+requiere alcance revisado, autorización específica, verificación de identidad y rollback.
 
 ---
 
@@ -732,7 +725,7 @@ La política de higiene de Sistema Maestro queda fijada así:
 - configuración segura;
 - manifiestos canónicos;
 - lockfile único aprobado;
-- subcapa `builder/state/` cuando se cree.
+- subcapa `builder/state/` ya materializada.
 
 ### No entra en Git
 
@@ -768,16 +761,11 @@ La política de higiene de Sistema Maestro queda fijada así:
 - backups;
 - dumps temporales.
 
-### No procede deploy final todavía
+### Promoción del delta local
 
-Hasta que el sistema complete:
-
-- BuilderBuildKernel;
-- BuilderBuildState;
-- runtime conectado;
-- preview/código/estructura sincronizados;
-- validación técnica;
-- economía y exportación conectadas sobre salida real.
+El delta PRE-S14 requiere su propio gate de promoción. Las reglas de validación,
+secretos y rollback siguen vigentes; la producción ya acreditada no se reescribe
+como pendiente. El cierre local no declara completada la economía ni todo el runtime IA.
 
 ---
 
@@ -790,7 +778,7 @@ A partir de este documento:
 - los regenerables dejan de confundirse con sistema;
 - ZIP y deploy quedan sometidos a criterio estructural;
 - las carpetas canónicas deben mantenerse limpias;
-- no se aprueba producción mientras el proyecto siga en fase de reconducción y afinado;
+- ninguna actualización de producción se autoriza por este documento;
 - no se despliega Builder si no construye de forma verificable;
 - no se monetiza una simulación;
 - no se exporta sin estructura;

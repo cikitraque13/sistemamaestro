@@ -68,6 +68,7 @@ const resolveVisualAccentTone = (visualAccent = '') => {
   const accent = String(visualAccent || '').trim().toLowerCase();
 
   if (accent === 'orange') return 'direct';
+  if (accent === 'amber') return 'premium';
 
   return '';
 };

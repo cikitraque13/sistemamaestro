@@ -1,4 +1,9 @@
-﻿# 08-QA-BUILDER-10-PLANTILLAS
+# 08-QA-BUILDER-10-PLANTILLAS
+
+La validación local S1–S13/C1 pertenece a [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
+Esta matriz es QA comercial de plantillas: no acredita 10/10 PASS ni se ejecuta en
+esta reconciliación. Su eventual ejecución necesita alcance propio; no es otro frente
+activo de Journey 03, cuyo único pendiente actual es S14.
 
 ## Estado del documento
 
@@ -25,9 +30,9 @@ plantilla
 → proyecto terminado o listo para presentar
 ```
 
-No sustituye al inventario técnico.  
-No sustituye al roadmap.  
-No define pricing.  
+No sustituye al inventario técnico.
+No sustituye al roadmap.
+No define pricing.
 No define arquitectura backend.
 
 Su función es probar si el producto realmente construye valor.
@@ -145,10 +150,7 @@ Decisión:
 ## 7. Archivos candidatos a revisar si falla
 
 ```text
-frontend/src/features/opportunities/data/opportunityTemplates.js
 frontend/src/features/opportunities/OpportunitiesPage.js
-frontend/src/features/opportunities/components/OpportunityTemplateCard.js
-frontend/src/features/opportunities/components/OpportunityTemplateGrid.js
 frontend/src/features/builder/workspace/BuilderWorkspacePage.js
 frontend/src/features/builder/workspace/hooks/useBuilderWorkspaceRuntime.js
 frontend/src/features/builder/api/builderAiClient.js
@@ -276,13 +278,13 @@ Una plantilla se aprueba si:
 
 ---
 
-## 12. Próxima acción
+## 12. Preparación cuando se autorice esta QA
 
-Antes de iniciar QA, identificar los nombres reales de las 10 plantillas desde:
-
-```text
-frontend/src/features/opportunities/data/opportunityTemplates.js
-```
+Cuando se autorice esta QA, identificar los nombres e IDs de las oportunidades
+en el catálogo servido por /api/opportunities. Su consumidor es
+[OpportunitiesPage](../../frontend/src/features/opportunities/OpportunitiesPage.js)
+y su router es [opportunities.py](../../backend/app/routers/opportunities.py).
+No hay que buscar un archivo opportunityTemplates.js inexistente.
 
 Después, sustituir los valores `Pendiente` de la columna `Plantilla` por los nombres reales.
 
@@ -294,5 +296,5 @@ Este documento no se cierra por intención.
 
 Se cierra solo cuando las 10 plantillas hayan pasado de oportunidad a Builder con construcción, iteraciones reales y persistencia comprobada.
 
-El Builder no se valida porque “abre”.  
+El Builder no se valida porque “abre”.
 El Builder se valida porque **construye**.

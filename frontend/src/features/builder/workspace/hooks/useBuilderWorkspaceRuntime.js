@@ -1,3 +1,11 @@
+import {
+  BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
+  persistBuilderBuildState,
+  restoreBuilderBuildState,
+} from '../../state/builderBuildStateStorage';
+import { staticTrustDecision } from '../../state/staticSectionMutation.mjs';
+import useDurableLandingTransaction from './useDurableLandingTransaction';
+import { parseLandingChange } from '../../command/parseLandingChange.mjs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
@@ -32,11 +40,7 @@ import {
   getBuilderCodeLines,
 } from '../../utils/builderCodeTemplates';
 
-import {
-  BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
-  persistBuilderBuildState,
-  restoreBuilderBuildState,
-} from '../../state/builderBuildStateStorage';
+
 
 import {
   buildWithBuilderAI,
@@ -607,6 +611,7 @@ const mergeMessagesWithPhases = ({
 };
 
 export default function useBuilderWorkspaceRuntime({
+  ownerId = null,
   project = null,
   initialPrompt = '',
   loadingProject = false,
@@ -715,14 +720,21 @@ export default function useBuilderWorkspaceRuntime({
     setBuilderDecisionMessage(kernelResult?.decisionMessage || null);
     setBuilderBuildSummary(kernelResult?.summary || null);
 
-    if (nextState && projectId) {
+    // Keep the legacy project cache for non-landing projects; landings use the durable transaction store.
+    if (nextState && projectId && nextState.projectKind !== 'landing') {
       persistBuilderBuildState({
         projectId,
         templateId: BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
         state: nextState,
       });
     }
+
   }, [projectId]);
+
+  const commitLanding = useCallback((state) => {
+    applyKernelResult({ ok: true, state, output: createBuilderOutputMap(state), summary: getBuildStateSummary(state) });
+  }, [applyKernelResult]);
+  const landingTransaction = useDurableLandingTransaction(builderBuildState, commitLanding, ownerId);
 
   const startBuild = useCallback(() => {
     setProgress(4);
@@ -734,6 +746,18 @@ export default function useBuilderWorkspaceRuntime({
       const value = String(text || '').trim();
 
       if (!value) return;
+      if (builderBuildState?.projectKind === 'landing') {
+        if (!ownerId || landingTransaction.status !== 'ready') {
+          landingTransaction.reject('Workspace no disponible. Espera a la recuperación o recarga.');
+          return;
+        }
+        try {
+          const operations = parseLandingChange(value);
+          if (operations) { await landingTransaction.propose(operations); return; }
+        } catch (error) { landingTransaction.reject(error.message); return; }
+        landingTransaction.reject('Este workspace admite cambios locales de CTA y acento. Otros cambios requieren un contrato validado.');
+        return;
+      }
 
       const nextDirection = resolveDirection(value);
 
@@ -911,6 +935,8 @@ export default function useBuilderWorkspaceRuntime({
     },
     [
       applyKernelResult,
+      landingTransaction,
+      ownerId,
       builderBuildState,
       builderBuildSummary,
       builderKernelOutput,
@@ -931,6 +957,8 @@ export default function useBuilderWorkspaceRuntime({
 
   const handleDecision = useCallback(
     (option) => {
+      if (option?.type === 'add_trust_section' && builderBuildState?.projectKind === 'landing') return landingTransaction.propose(staticTrustDecision(builderBuildState));
+      if (builderBuildState?.projectKind === 'landing') { landingTransaction.reject('Esta decisión requiere una propuesta validada antes de aplicar.'); return; }
       if (option && typeof option === 'object' && (option.type || option.mutationType || option.mutationAction)) {
         const kernelResult = runBuilderDecisionMutation({
           action: option,
@@ -969,6 +997,7 @@ export default function useBuilderWorkspaceRuntime({
     },
     [
       applyKernelResult,
+      landingTransaction,
       builderBuildState,
       initialPrompt,
       project,
@@ -1078,12 +1107,20 @@ export default function useBuilderWorkspaceRuntime({
       initialPrompt,
     });
 
+    const seededKernelResult = runBuilderBuildKernel({
+      input: projectInputContent || initialPrompt,
+      message: '',
+      project: projectSnapshot,
+      initialPrompt,
+      currentState: null,
+      currentSelection: initialAgent.hub?.selection || null,
+      source: 'initial_runtime',
+    });
     const restoredBuildState = restoreBuilderBuildState({
       projectId,
       templateId: BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
     });
-
-    const initialKernelResult = restoredBuildState
+    const initialKernelResult = restoredBuildState && restoredBuildState.projectKind !== 'landing'
       ? {
           version: 'builder-build-kernel-v1',
           ok: true,
@@ -1099,15 +1136,7 @@ export default function useBuilderWorkspaceRuntime({
           decisionMessage: null,
           summary: getBuildStateSummary(restoredBuildState),
         }
-      : runBuilderBuildKernel({
-          input: projectInputContent || initialPrompt,
-          message: '',
-          project: projectSnapshot,
-          initialPrompt,
-          currentState: null,
-          currentSelection: initialAgent.hub?.selection || null,
-          source: 'initial_runtime',
-        });
+      : seededKernelResult;
 
     setProgress(4);
     setIsRunning(true);
@@ -1155,6 +1184,7 @@ export default function useBuilderWorkspaceRuntime({
   ]);
 
   return {
+    landingTransaction,
     copy,
     progress,
     isRunning,

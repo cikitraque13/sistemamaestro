@@ -1,5 +1,9 @@
 # 05 — Contratos Técnicos V1
 
+Lectura PRE-S14: las recomendaciones V1 no son prueba de implementación universal.
+La extensión 19 delimita el contrato local validado; el estado y sus pruebas pertenecen
+al [propietario Journey 03](07-JOURNEY-03-ESTADO-PRE-S14.md). No activa backend ni economía nuevos.
+
 ## 1. Función de esta pieza
 
 Este documento traduce la doctrina de producto a contratos técnicos iniciales.
@@ -1116,3 +1120,67 @@ input
 → estructura
 → decisión siguiente
 ```
+
+
+## 19. Contrato local validado PRE-S14
+
+Alcance: circuito local acotado sobre landings compatibles, S1–S13/C1 completados
+en ingeniería local, no desplegados. No amplía generación IA libre ni asegura todos
+los caminos legacy. S14 está NOT_STARTED; no se define su política de capacidad/retención.
+
+### Propuesta, review y transformación
+
+- Proponer calcula un delta y candidate separados del estado activo.
+- Validación vincula revisión/base, operaciones ordenadas, candidate y artefacto.
+  Una propuesta compuesta tiene un único candidate final; no aplica operaciones parciales.
+- Preview y entrega local utilizan el artefacto validado; apply rechaza identidades
+  alteradas u obsoletas. Validación funcional fallida bloquea apply.
+- Review incluye destino CTA explícito, evaluación semántica y lineage de reparación.
+  Coherencia semántica y navegación funcional son contratos distintos.
+- Una decisión humana con rationale responde a la review; no equivale a permiso de apply.
+- Apply transforma exactamente la revisión validada y produce un after identificable.
+  Revert restaura contenido y artefacto before, con una nueva revisión monótona:
+  no retrocede el contador ni borra el historial.
+
+### Persistencia y recuperación
+
+El workspace se identifica por ownerId/projectId y mantiene revisión condicional.
+El almacenamiento local coordina pestañas participantes con Web Locks; si falta
+capacidad atómica falla cerrado. No es autorización de servidor ni aislamiento
+frente a código hostil que comparta origen.
+
+Guardar trabajo pendiente no modifica el estado activo. La persistencia conserva
+propuesta/review, operaciones, artefacto e identidades comprobables.
+Recuperar valida integridad, ownership y base; reconstruye la propuesta/repair
+y exige los mismos hashes de candidate y artefacto. Crea nueva identidad de
+propuesta/review y avanza decisionEpoch/draftVersion. No restaura una decisión
+humana ejecutable ni autorización. Corrupción y stale writes se rechazan.
+La recuperación es local; no garantiza supervivencia al borrado del navegador.
+
+### Frontera explícita de autorización
+
+authorize no realiza una escritura durable: emite una capacidad efímera para
+APPLY ligada a ownerId, projectId, sesión, revisión base, propuesta, candidate,
+artefacto, review, evaluación semántica, decisión, decisionEpoch, draftVersion
+y envelopeHash. No basta conservar etiquetas o copiar un token.
+
+apply exige la capacidad emitida y vigente, la consume antes de intentar la operación
+y vuelve a verificar las identidades. Reintentar el mismo permiso, incluso tras
+un intento fallido, exige nueva autorización. El historial puede registrar
+CONSUMED; ese registro no es un permiso reutilizable.
+
+Nueva propuesta, repair, save, recovery, decisión o revert revocan capacidades
+anteriores. Reload/cambio de sesión no recupera permisos. Una revisión concurrente
+invalida la autorización obsoleta. Proponer, revisar, guardar o recuperar nunca aplica
+automáticamente. Revert tiene comprobación de revisión; no se describe como replay
+del permiso APPLY.
+
+### Referencias de implementación y pruebas
+
+- [Transacción](../../../frontend/src/features/builder/state/builderChangeTransaction.mjs).
+- [Workspace durable](../../../frontend/src/features/builder/state/durableLandingWorkspace.mjs).
+- [Recovery](../../../frontend/src/features/builder/state/pendingWorkRecovery.test.mjs).
+- [Autorización](../../../frontend/src/features/builder/state/authorizationBoundary.test.mjs).
+- [Estado y evidencia PRE-S14](07-JOURNEY-03-ESTADO-PRE-S14.md).
+
+Esta reconciliación documenta el contrato existente; no ejecuta suites ni amplía permisos.
