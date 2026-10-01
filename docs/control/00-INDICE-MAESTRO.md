@@ -49,8 +49,8 @@ ARCHIVE_CANDIDATE es clasificación, no autorización para mover o eliminar.
 
 ## Fuentes de Preservation y reconciliación
 
-[Decisiones preservadas](../../../SM-PRESERVACION-e083f112-01/documentos/docs/control/01-DECISIONES-CERRADAS.md)
-y [pendientes preservados](../../../SM-PRESERVACION-e083f112-01/documentos/docs/control/02-PENDIENTES-PRIORIZADOS.md)
+[Decisiones preservadas](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/01-DECISIONES-CERRADAS.md)
+y [pendientes preservados](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/02-PENDIENTES-PRIORIZADOS.md)
 son HISTORICAL_REFERENCE. Se consultan como procedencia, sin modificarlas.
 Las series numéricas repetidas de mayo se distinguen por fecha/sección en el registro
 de decisiones; no otorgan autoridad sobre el estado S1–S13/C1.

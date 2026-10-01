@@ -2036,7 +2036,7 @@ Solo fija el marco de ejecución para demostrar la primera prueba de vida del Bu
 
 ## Reconciliación de Preservation: procedencia y numeración
 
-Fuente inmutable: [01-DECISIONES-CERRADAS preservado](../../../SM-PRESERVACION-e083f112-01/documentos/docs/control/01-DECISIONES-CERRADAS.md).
+Fuente inmutable: [01-DECISIONES-CERRADAS preservado](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/01-DECISIONES-CERRADAS.md).
 SHA-256 de origen: 928a1ad2382203c0f7fdb8d02d3599f02d181ce1f8f17e21a014dbd30c75c375.
 
 La fuente contiene dos series 54–60. La tabla integra las aportaciones anteriores

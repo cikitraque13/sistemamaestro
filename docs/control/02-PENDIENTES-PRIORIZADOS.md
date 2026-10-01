@@ -42,7 +42,7 @@ S1–S13/C1 no están desplegados.
 ## Reconciliación de Preservation
 
 Fuente histórica consultada:
-[02-PENDIENTES-PRIORIZADOS de Preservation](../../../SM-PRESERVACION-e083f112-01/documentos/docs/control/02-PENDIENTES-PRIORIZADOS.md).
+[02-PENDIENTES-PRIORIZADOS de Preservation](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/02-PENDIENTES-PRIORIZADOS.md).
 Sus actualizaciones de 2026-05-20, 2026-05-22 y 2026-05-24 ordenaban trabajo
 anterior al checkpoint Journey 03. La versión original permanece intacta.
 
