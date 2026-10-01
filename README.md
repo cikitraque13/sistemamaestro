@@ -317,7 +317,7 @@ La economía del sistema ya no es solo una idea comercial. Existe una base técn
 - Tailwind CSS
 - Framer Motion
 - React Router
-- CRACO
+- Vite
 - Radix UI
 - Recharts
 - Sonner
@@ -405,7 +405,8 @@ ALLOWED_ORIGINS=http://localhost:3000,https://tu-dominio.com
 Y el frontend:
 
 ```env
-REACT_APP_BACKEND_URL=http://localhost:8001
+VITE_BACKEND_URL=http://localhost:8001
+VITE_GOOGLE_CLIENT_ID=
 ```
 
 No deben subirse secretos reales al repositorio.

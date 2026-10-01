@@ -26,7 +26,7 @@ RUN python -m pip install --upgrade pip \
     && pip install --no-cache-dir -r /app/backend/requirements.txt
 
 COPY backend/ /app/backend/
-COPY --from=frontend-build /app/frontend/build /app/frontend/build
+COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 
 RUN addgroup --system app && adduser --system --ingroup app app \
     && chown -R app:app /app

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { webcrypto } from 'crypto';
 import { TextEncoder } from 'util';
+import { vi } from 'vitest';
 import BuilderChangeReview from './BuilderChangeReview';
 import { DestinationChoice } from './CTADestinationSelector';
 import { createChangeReview } from '../state/builderChangeReview.mjs';
@@ -12,7 +13,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 test('repair destination renders plain text options without invalid nesting', () => {
   const errors = [];
   const originalError = console.error;
-  const spy = jest.spyOn(console, 'error').mockImplementation((...args) => {
+  const spy = vi.spyOn(console, 'error').mockImplementation((...args) => {
     if (String(args[0]).includes('validateDOMNesting')) errors.push(args);
     else originalError(...args);
   });

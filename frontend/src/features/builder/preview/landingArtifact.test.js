@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { webcrypto } from 'crypto';
 import { TextEncoder } from 'util';
+import { vi } from 'vitest';
 import { renderLandingArtifact, validateLandingArtifact } from './landingArtifact.mjs';
 import { newWorkspace, prepareChange, applyChange, revertChange } from '../state/builderChangeTransaction.mjs';
 import LandingArtifactPreview from '../panels/LandingArtifactPreview';
@@ -41,13 +42,13 @@ test('apply rejects tampered artifact and valid revert restores original artifac
   expect(renderLandingArtifact(reverted.committed).html).toBe(renderLandingArtifact(state).html);
 });
 test('real preview iframe and download use identical validated bytes; invalid input exposes neither',()=>{
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   const artifact=renderLandingArtifact(state);const node=document.createElement('div');document.body.appendChild(node);const root=createRoot(node);
   let downloaded;
   const originalBlob=global.Blob;
   global.Blob=class {constructor(parts){downloaded=parts[0];}};
-  URL.createObjectURL=jest.fn(()=> 'blob:fixture');URL.revokeObjectURL=jest.fn();
-  jest.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
+  URL.createObjectURL=vi.fn(()=> 'blob:fixture');URL.revokeObjectURL=vi.fn();
+  vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
   try {
     act(()=>root.render(<LandingArtifactPreview state={state} artifact={artifact}/>));
     expect(node.querySelector('iframe').getAttribute('sandbox')).toBe('allow-same-origin');
@@ -58,6 +59,6 @@ test('real preview iframe and download use identical validated bytes; invalid in
     act(()=>root.render(<LandingArtifactPreview state={state} artifact={{...artifact,html:'invalid'}}/>));
     expect(node.querySelector('iframe')).toBe(null);expect(node.querySelector('button')).toBe(null);
     expect(node.querySelector('[role=alert]')).not.toBe(null);
-    jest.runAllTimers();expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fixture');
-  } finally {act(()=>root.unmount());node.remove();global.Blob=originalBlob;jest.restoreAllMocks();jest.useRealTimers();}
+    vi.runAllTimers();expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fixture');
+  } finally {act(()=>root.unmount());node.remove();global.Blob=originalBlob;vi.restoreAllMocks();vi.useRealTimers();}
 });

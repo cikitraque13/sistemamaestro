@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { act, Simulate } from 'react-dom/test-utils';
 import { webcrypto } from 'crypto';
 import { TextEncoder } from 'util';
+import { vi } from 'vitest';
 import useBuilderWorkspaceRuntime from './useBuilderWorkspaceRuntime';
 import { createInitialBuildState } from '../../state/builderBuildState';
 import { BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID, persistBuilderBuildState, restoreBuilderBuildState } from '../../state/builderBuildStateStorage';
@@ -32,17 +33,17 @@ async function mount(owner = 'alice', slot = 0, activeProject = project) {
 beforeEach(() => {
   roots = []; clients = []; hold = null; localStorage.clear(); previewBodies.clear();
   global.Blob = class extends NativeBlob { constructor(parts,options){super(parts,options);this.testHTML=parts.join('');} };
-  URL.createObjectURL = jest.fn(blob => {const url='blob:test-'+previewBodies.size;previewBodies.set(url,blob.testHTML);return url;});
-  URL.revokeObjectURL = jest.fn();
+  URL.createObjectURL = vi.fn(blob => {const url='blob:test-'+previewBodies.size;previewBodies.set(url,blob.testHTML);return url;});
+  URL.revokeObjectURL = vi.fn();
   let tail = Promise.resolve();
   Object.defineProperty(navigator, 'locks', { configurable: true, value: { request: (_key, _options, fn) => {
     const waiting = hold;
     const result = tail.then(async () => { if (waiting) await waiting; return fn(); });
     tail = result.catch(() => {}); return result;
   } } });
-  global.fetch = jest.fn(() => { throw new Error('NO_EXTERNAL_AI'); });
+  global.fetch = vi.fn(() => { throw new Error('NO_EXTERNAL_AI'); });
 });
-afterEach(() => { act(() => roots.forEach((root) => root?.unmount())); jest.restoreAllMocks(); });
+afterEach(() => { act(() => roots.forEach((root) => root?.unmount())); vi.restoreAllMocks(); });
 test('owner recovery, exact artifact, account switch and unclaimed legacy', async () => {
   const legacyKey = transactionStorageKey(project.project_id);
   localStorage.setItem(legacyKey, '{legacy bytes without owner}');
@@ -115,7 +116,7 @@ test('account switch while apply waits cannot commit into either account', async
 test('quota and corrupt data fail closed; reload drops a proposal', async () => {
   await mount(); const key = durableWorkspaceKey('alice', project.project_id); const before = localStorage.getItem(key);
   await act(async () => { await clients[0].submitMessage('CTA principal a "Pendiente"'); });
-  const spy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('QUOTA'); });
+  const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('QUOTA'); });
   await act(async () => { await clients[0].landingTransaction.apply(); });
   expect(clients[0].landingTransaction.error).toBe('QUOTA'); expect(localStorage.getItem(key)).toBe(before); spy.mockRestore();
   act(() => roots[0].unmount()); roots[0] = null; await mount();
@@ -187,7 +188,7 @@ test('S4 structural writes retain concurrent, owner, quota and duplicate protect
   await mount('alice', 0); await mount('alice', 1);
   await act(async () => { await clients[0].handleDecision({ type: 'add_trust_section' }); await clients[1].handleDecision({ type: 'add_trust_section' }); });
   const key = durableWorkspaceKey('alice', project.project_id); const before = localStorage.getItem(key);
-  const fail = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('QUOTA'); });
+  const fail = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('QUOTA'); });
   await act(async () => { await clients[0].landingTransaction.apply(); });
   expect(localStorage.getItem(key)).toBe(before); fail.mockRestore();
   await act(async () => { await Promise.all(clients.map((c) => c.landingTransaction.apply())); });
@@ -256,7 +257,7 @@ test('S6 visible EDIT+MOVE is one review, final preview, one durable revision; r
   const p = product.landingTransaction.pending; expect(p.operationCount).toBe(2);
   expect(node.textContent).toContain('Operación 1: Editar'); expect(node.textContent).toContain('Operación 2: Mover');
   expect(product.builderBuildState).toEqual(before); expect(previewHtml(node)).toBe(p.artifact.html);
-  const writes = jest.spyOn(Storage.prototype, 'setItem');
+  const writes = vi.spyOn(Storage.prototype, 'setItem');
   act(() => node.querySelector('#composite-apply').click()); await settle();
   expect(product.builderBuildState).toEqual(p.candidate); expect(product.landingTransaction.revision).toBe(1);
   expect(writes.mock.calls.filter(([key]) => key === durableWorkspaceKey('alice', project.project_id))).toHaveLength(1);

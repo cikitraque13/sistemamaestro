@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
 import { webcrypto } from 'crypto';
 import { TextEncoder } from 'util';
+import { vi } from 'vitest';
 import useLandingTransaction from './useLandingTransaction';
 import { parseLandingChange } from '../../command/parseLandingChange.mjs';
 
@@ -18,9 +19,9 @@ function Harness() {
 }
 let root, node;
 beforeEach(()=>{ localStorage.clear(); node=document.createElement('div'); document.body.appendChild(node); root=createRoot(node); act(()=>root.render(<Harness/>)); });
-afterEach(()=>{ act(()=>root.unmount()); node.remove(); jest.restoreAllMocks(); });
+afterEach(()=>{ act(()=>root.unmount()); node.remove(); vi.restoreAllMocks(); });
 test('actual hook separates candidate and active then applies and reverts through rendered controls', async()=>{
-  global.fetch = jest.fn(()=>{ throw new Error('External calls forbidden'); });
+  global.fetch = vi.fn(()=>{ throw new Error('External calls forbidden'); });
   await act(async()=>{await api.propose(parseLandingChange('CTA principal a "Reservar" y acento naranja'));});
   expect(active).toEqual(initial); expect(node.querySelector('output').textContent).toBe('Reservar');
   await act(async()=>{ node.querySelectorAll("button")[0].click(); await eventPromise; });
@@ -30,7 +31,7 @@ test('actual hook separates candidate and active then applies and reverts throug
 });
 test('storage failure does not commit and base change invalidates pending', async()=>{
   await act(async()=>{await api.propose(parseLandingChange('acento naranja'));});
-  jest.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('QUOTA');});
+  vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('QUOTA');});
   await act(async()=>{await api.apply();});
   expect(active).toEqual(initial); expect(api.error).toBe('QUOTA');
   act(()=>replace({...initial,primaryCTA:'New base'}));

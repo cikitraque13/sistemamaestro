@@ -44,7 +44,7 @@ if not ALLOWED_ORIGINS or "*" in ALLOWED_ORIGINS:
 
 COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "false").lower() == "true"
 
-FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "build"
+FRONTEND_BUILD_DIR = PROJECT_ROOT / "frontend" / "dist"
 FRONTEND_STATIC_DIR = FRONTEND_BUILD_DIR / "static"
 
 CREDIT_LEDGER_COLLECTION = os.environ.get("CREDIT_LEDGER_COLLECTION", "credit_ledger")

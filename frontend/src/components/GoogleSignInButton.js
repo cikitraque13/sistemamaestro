@@ -66,7 +66,7 @@ const loadGoogleScriptOnce = () => {
 
 
 const getGoogleClientId = async () => {
-  const envClientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
+  const envClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
 
   if (envClientId) {
     return envClientId;
