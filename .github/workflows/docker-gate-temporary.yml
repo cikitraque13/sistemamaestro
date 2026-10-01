@@ -161,8 +161,21 @@ jobs:
           const browser = await chromium.launch({headless:true});
           const page = await browser.newPage();
           const errors=[];
+          const expectedAnonymous401=[];
           page.on("pageerror", e => errors.push(e.message));
-          page.on("console", m => { if(m.type()==="error") errors.push(m.text().replace(/https?:\/\/\S+/g,"[URL]")); });
+          page.on("response", response => {
+            if(response.status()<400) return;
+            const path=new URL(response.url()).pathname;
+            const expected=response.status()===401 && response.request().method()==="GET" && path==="/api/auth/me";
+            if(expected) expectedAnonymous401.push(path);
+            else errors.push(`HTTP ${response.status()} ${path}`);
+          });
+          page.on("console", m => {
+            if(m.type()!=="error") return;
+            const text=m.text();
+            if(text.includes("Failed to load resource: the server responded with a status of 401")) return;
+            errors.push(text.replace(/https?:\/\/\S+/g,"[URL]"));
+          });
           const root=await page.goto(process.env.BASE_URL+"/",{waitUntil:"networkidle",timeout:45000});
           if(!root || root.status()!==200) throw new Error("root browser navigation did not return HTTP 200");
           if(!(await page.locator("#root").count())) throw new Error("React root missing");
@@ -172,6 +185,7 @@ jobs:
           if(errors.length) throw new Error("browser runtime errors: "+errors.join(" | "));
           console.log("BROWSER_ROOT=PASS");
           console.log("BROWSER_DEEP_ROUTE=PASS");
+          console.log(`EXPECTED_ANONYMOUS_401=${expectedAnonymous401.length}`);
           console.log("RUNTIME_ERRORS=NONE");
           await browser.close();
           NODE

@@ -6,12 +6,10 @@ import {
   CheckCircle,
   Warning
 } from '@phosphor-icons/react';
-import axios from 'axios';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../lib/apiClient';
 import { toast } from 'sonner';
-
-const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SettingsPage = () => {
   const { user, checkAuth } = useAuth();
@@ -23,11 +21,7 @@ const SettingsPage = () => {
     setSaving(true);
 
     try {
-      await axios.put(
-        `${API_URL}/api/user/profile`,
-        { name },
-        { withCredentials: true }
-      );
+      await api.put('/user/profile', { name });
       await checkAuth();
       toast.success('Perfil actualizado');
     } catch (error) {
