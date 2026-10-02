@@ -2,7 +2,7 @@
 
 ## Estado operativo vigente — 2026-10-02
 
-Propietario del backlog actual. El release PRE-S14 quedó cerrado, desplegado y verificado.
+Propietario del backlog actual. El release PRE-S14 quedó cerrado, desplegado y verificado. El checkpoint de entrada formal a S14 queda pendiente del Gold independiente descrito en Journey 03.
 El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
 es propietario de sus cierres y evidencias. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md)
 registra la identidad de `main` y su deployment de Railway.
@@ -39,10 +39,7 @@ todos los recorridos legacy, la cadena IA general, QA10 ni el producto comercial
 
 ## Reconciliación de Preservation
 
-Fuente histórica consultada:
-[02-PENDIENTES-PRIORIZADOS de Preservation](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/02-PENDIENTES-PRIORIZADOS.md).
-Sus actualizaciones de 2026-05-20, 2026-05-22 y 2026-05-24 ordenaban trabajo
-anterior al checkpoint Journey 03. La versión original permanece intacta.
+Fuente histórica consultada durante la reconciliación documental: las actualizaciones de Preservation de 2026-05-20, 2026-05-22 y 2026-05-24 ordenaban trabajo anterior al checkpoint Journey 03. El archivo fuente se retiró durante la higiene final del workspace; la disposición vigente está en la tabla siguiente.
 
 | Tema preservado | Disposición PRE-S14 |
 |---|---|

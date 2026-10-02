@@ -28,9 +28,9 @@ La autoridad para la identidad y runtime de producción es
 |---|---|
 | Rama candidata | `codex/vite-migration` |
 | Candidato validado | `a370f219fbcc569a0cee853a609ef4fa311063b0` |
-| GitHub main / merge commit | `36eb6c112478685e417ce8c054e61d77f539212e` |
-| Tree desplegado | `447cea61b0e41a0711cd3d2d132fddfcda045d03` |
-| Railway production deployment | `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0` — `SUCCESS` |
+| GitHub main / merge documental final | `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7` |
+| Tree desplegado | `f8d53f0636a474eb7928dbd860649a48a37eab3` |
+| Railway production deployment | `7630d6f0-b3bd-4451-9050-af287b4a3b34` — `SUCCESS` |
 | Main ↔ Railway | `MATCH` |
 
 El candidato incorpora la migración CRA/CRACO a Vite/Vitest y el saneamiento de dependencias críticas/high. El merge commit exacto de `main` fue desplegado por el auto-deploy normal de Railway; no se ejecutó un deploy manual.
@@ -75,7 +75,7 @@ Esta intervención documental no vuelve a ejecutar Node, Jest, build ni smoke.
 Los archivos enlazados permiten localizar los contratos y pruebas; su presencia por sí sola
 no constituye un nuevo resultado de ejecución. No se inventan logs ni IDs de deployment.
 
-El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra el Gold Freeze previo de 409 archivos y `RESTORE_PROOF=PASS`. Ese freeze permanece intacto y no representa el snapshot final posterior al release.
+El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra el Gold Freeze PRE-S14 vigente y su identidad verificable.
 
 ## Validación del release en producción
 
@@ -95,7 +95,18 @@ El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra el Gol
 
 La limitación residual es de observabilidad: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La autenticación quedó verificada funcionalmente mediante OAuth E2E, sesión autenticada y acceso a superficies privadas. No se afirma haber observado directamente la respuesta de ese endpoint.
 
-El Evidence Pack/freeze final post-release todavía no se ha creado.
+## Cierre de higiene y checkpoint de entrada a S14
+
+| Comprobación | Estado |
+|---|---|
+| Workspace hygiene | PASS; la raíz contiene solo `sistemamaestro/` y `Backups/`; dentro de Backups solo queda `GOLD/` |
+| Eliminación de andamios | `EVIDENCE`, `EXPERIMENTS`, `HISTORICAL` y el ZIP histórico retirados |
+| Preflight del checkout local | `main` = `origin/main` = `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7`; estado limpio antes de esta reconciliación documental |
+| Gold Freeze PRE-S14 | `GOLD_FREEZE_FINAL_PRE_S14_2026-10-02`; válido, `RESTORE_TEST=PASS` |
+| Digest global / manifiesto | `53700a34f371786cb679006ac1612c4ed9ef42c184afcac1c5a57feb8dff46eb` / `a1d35091f85f2e8248cbea33d0caea2129f6d2018fc9c966861488df5a869bbe` |
+| Entrada formal a S14 | Pendiente de crear y verificar el Gold independiente `GOLD_FREEZE_S14_ENTRY_2026-10-02` tras publicar esta reconciliación documental |
+
+El Gold existente es un checkpoint válido del release PRE-S14, pero precede a la higiene final del workspace y a esta reconciliación documental; no se declara checkpoint definitivo de entrada a S14. La preparación técnica para S14 está lista, pero su apertura formal queda pendiente del nuevo Gold de entrada.
 
 ## Límites conservados
 
