@@ -427,7 +427,7 @@ Un deploy solo puede salir de:
 La producción acreditada y su identidad se registran en
 [Runtime](../architecture/04-runtime-and-deploy-truth.md).
 El release [Journey 03 PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
-está cerrado, desplegado y verificado en `main=36eb6c112478685e417ce8c054e61d77f539212e`.
+está cerrado, desplegado y verificado. La identidad actual de main y Railway pertenece al propietario [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
 BuilderBuildKernel y BuilderBuildState existen; no se exige volver a crearlos.
 Este cierre no autoriza una nueva promoción: cualquier release futuro requiere alcance
 revisado, autorización específica, verificación de identidad y rollback.

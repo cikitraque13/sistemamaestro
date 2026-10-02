@@ -4,7 +4,7 @@
 
 - Estado: activo, reconciliado tras el release PRE-S14 el 2026-10-02.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
-- Release: GitHub main `36eb6c112478685e417ce8c054e61d77f539212e`; Railway SUCCESS y alineado.
+- Release PRE-S14 desplegado: GitHub main `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7`; Railway SUCCESS y alineado.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
   release Journey 03, S14 y registros históricos.
 
@@ -49,14 +49,9 @@ ARCHIVE_CANDIDATE es clasificación, no autorización para mover o eliminar.
 
 ## Fuentes de Preservation y reconciliación
 
-[Decisiones preservadas](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/01-DECISIONES-CERRADAS.md)
-y [pendientes preservados](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/02-PENDIENTES-PRIORIZADOS.md)
-son HISTORICAL_REFERENCE. Se consultan como procedencia, sin modificarlas.
-Las series numéricas repetidas de mayo se distinguen por fecha/sección en el registro
-de decisiones; no otorgan autoridad sobre el estado S1–S13/C1.
+Las fuentes de Preservation se consultaron durante la reconciliación documental. Sus aportaciones válidas quedaron integradas en este registro de decisiones y en el backlog vigente; los archivos de Preservation se retiraron durante la higiene final del workspace. Las series numéricas repetidas de mayo se distinguen por fecha/sección y no otorgan autoridad sobre el estado S1–S13/C1.
 
-REQUIRES_MERGE: las aportaciones válidas de Preservation se han reconciliado
-semánticamente en decisiones y pendientes, conservando sus límites temporales.
+PRESERVATION_RECONCILIATION=COMPLETED: las aportaciones válidas se integraron en decisiones y pendientes, conservando sus límites temporales.
 REQUIRES_UPDATE: cualquier futura variación de producción, del checkpoint local o
 de S14 deberá actualizar su propietario canónico; no se presume realizada.
 
@@ -70,7 +65,7 @@ de S14 deberá actualizar su propietario canónico; no se presume realizada.
 Los fundamentos Builder state/kernel y el circuito local S1–S13/C1 están implementados
 y validados en ingeniería local; su creación no es una prioridad pendiente.
 S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION es el único frente abierto de Journey 03,
-NOT_STARTED y sin diseño de implementación aprobado aquí.
+NOT_STARTED y sin diseño de implementación aprobado aquí. Su apertura formal espera la creación y verificación del Gold independiente de entrada a S14 descrito en Journey 03.
 
 ## Reglas duraderas de gobierno
 

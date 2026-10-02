@@ -5,9 +5,9 @@
 | Plano | Identidad y estado |
 |---|---|
 | Candidato validado | `codex/vite-migration` @ `a370f219fbcc569a0cee853a609ef4fa311063b0` |
-| GitHub main | `36eb6c112478685e417ce8c054e61d77f539212e` |
-| Tree de main / contenido desplegado | `447cea61b0e41a0711cd3d2d132fddfcda045d03` |
-| Railway production deployment | `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0` — `SUCCESS` |
+| GitHub main | `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7` |
+| Tree de main / contenido desplegado | `f8d53f0636a474eb7928dbd860649a48a37eab3` |
+| Railway production deployment | `7630d6f0-b3bd-4451-9050-af287b4a3b34` — `SUCCESS` |
 | Correspondencia main ↔ Railway | `MATCH` |
 | Release PRE-S14 | `CLOSED / DEPLOYED / VERIFIED` |
 | S14 | `NOT_STARTED` |
@@ -16,7 +16,7 @@ El merge de release une el candidato validado con la base previa; Railway desple
 
 La limitación de evidencia restante se registra literalmente: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La sesión OAuth y el acceso autenticado a las superficies privadas quedaron funcionalmente verificados; QA y Security aprobaron con riesgos. La respuesta del endpoint no se declara observada.
 
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el estado, la cadena de validación y los límites del release. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold Freeze previo; no lo confunde con el freeze final post-release.
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el estado, la cadena de validación y los límites del release. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold PRE-S14 vigente y distingue el checkpoint de release del futuro Gold de entrada a S14.
 
 Este documento y los archivos Dockerfile/railway.json prevalecen sobre ejemplos
 incompatibles del procedimiento DEPLOY_RAILWAY.md: su ejemplo startCommand
