@@ -1,16 +1,10 @@
 # Sistema Maestro
 
-## Checkpoint local PRE-S14 — 2026-10-01
+## Release PRE-S14 — 2026-10-02
 
-Este workspace integra S1–S13/C1 de Journey 03 como **ingeniería local validada**.
-S14 (capacidad y retención del almacenamiento local) está NOT_STARTED.
-S1–S13/C1 no están desplegados. La identidad exacta de producción, alineada entre
-GitHub main y Railway según el checkpoint acreditado, y su separación del estado local
-se consultan en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md).
+El release PRE-S14 de Journey 03 está **CLOSED / DEPLOYED / VERIFIED**. Incluye S1–S13/C1 y la migración Vite/Vitest. S14 permanece NOT_STARTED.
 
-[Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
-es el propietario de los cierres y la validación local.
-El [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
+La identidad de `main`, el deployment de Railway, las validaciones y la limitación de evidencia residual están en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md) y [Journey 03](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md). El [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
 
 Sistema Maestro es una plataforma guiada de transformación digital diseñada para convertir una necesidad, una idea o un activo existente en una solución digital estructurada, monetizable y operable.
 

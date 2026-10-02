@@ -1,9 +1,9 @@
 # 08-QA-BUILDER-10-PLANTILLAS
 
-La validación local S1–S13/C1 pertenece a [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
-Esta matriz es QA comercial de plantillas: no acredita 10/10 PASS ni se ejecuta en
-esta reconciliación. Su eventual ejecución necesita alcance propio; no es otro frente
-activo de Journey 03, cuyo único pendiente actual es S14.
+El release PRE-S14 y sus validaciones acreditadas pertenecen a [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
+Esta matriz es QA comercial de plantillas: el release no acredita 10/10 PASS ni ejecuta
+esta matriz. Su eventual ejecución necesita alcance propio; no es otro frente activo
+de Journey 03, cuyo único pendiente actual es S14.
 
 ## Estado del documento
 

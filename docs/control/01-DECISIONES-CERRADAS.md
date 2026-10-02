@@ -1,12 +1,8 @@
 # 01-DECISIONES-CERRADAS
 
-## Lectura vigente PRE-S14 — 2026-10-01
+## Lectura vigente PRE-S14 — 2026-10-02
 
-Las decisiones fechadas conservan su contexto histórico. Sus frases «siguiente fase»
-o «pendiente» no constituyen el backlog actual. El estado local acreditado pertenece a
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md), el frente vigente a [Pendientes](02-PENDIENTES-PRIORIZADOS.md)
-y la identidad de producción a [Runtime](../architecture/04-runtime-and-deploy-truth.md).
-S1–S13/C1 están completados localmente y no están desplegados.
+Las decisiones fechadas conservan su contexto histórico; las restricciones de release registradas antes del Gate 2 no sustituyen el resultado de la promoción autorizada. El estado del release Journey 03 pertenece a [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md), el frente vigente a [Pendientes](02-PENDIENTES-PRIORIZADOS.md) y la identidad de producción a [Runtime](../architecture/04-runtime-and-deploy-truth.md). El release PRE-S14 está cerrado, desplegado y verificado; S14 permanece NOT_STARTED.
 
 
 ## Estado del documento
@@ -2606,3 +2602,10 @@ El cierre, sus pruebas y límites están en [Journey 03](../product/sistema-maes
 S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION es el único frente abierto de Journey 03,
 NOT_STARTED. Este acuerdo documental no autoriza implementarlo, publicar ni desplegar.
 Preservation aporta historia; no es la fuente del cierre S1–S13/C1.
+
+## 68. Release PRE-S14 — 2026-10-02
+
+HUMAN-LUCAS autorizó HUMAN_GATE_2. El candidato validado `a370f219fbcc569a0cee853a609ef4fa311063b0` se integró mediante el merge commit `36eb6c112478685e417ce8c054e61d77f539212e`; su tree es `447cea61b0e41a0711cd3d2d132fddfcda045d03`.
+Railway production deployment `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0` terminó `SUCCESS` sobre ese mismo SHA. QA y Security reconciliaron la evidencia como `APPROVED_WITH_RISKS`.
+La autenticación OAuth E2E y las superficies privadas fueron verificadas funcionalmente. La respuesta directa de `/api/auth/me` no se observó por `ERR_BLOCKED_BY_CLIENT`; esta limitación se conserva como riesgo de observabilidad, no como fallo demostrado del producto.
+El release PRE-S14 queda `CLOSED / DEPLOYED / VERIFIED`. S14 permanece `NOT_STARTED`. Las restricciones de no despliegue de decisiones anteriores se conservan como registro histórico y quedan supersedidas para este release por HUMAN_GATE_2.
