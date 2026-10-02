@@ -1124,9 +1124,10 @@ input
 
 ## 19. Contrato local validado PRE-S14
 
-Alcance: circuito local acotado sobre landings compatibles, S1–S13/C1 completados
-en ingeniería local, no desplegados. No amplía generación IA libre ni asegura todos
-los caminos legacy. S14 está NOT_STARTED; no se define su política de capacidad/retención.
+Alcance: circuito acotado sobre landings compatibles, S1–S13/C1 completados y incluidos
+en el release PRE-S14 desplegado. La validación productiva acreditada se limita a las
+comprobaciones registradas en Journey 03; no certifica todos los caminos legacy ni amplía
+generación IA libre. S14 está NOT_STARTED; no se define su política de capacidad/retención.
 
 ### Propuesta, review y transformación
 

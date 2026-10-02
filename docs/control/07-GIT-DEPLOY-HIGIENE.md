@@ -426,10 +426,11 @@ Un deploy solo puede salir de:
 
 La producción acreditada y su identidad se registran en
 [Runtime](../architecture/04-runtime-and-deploy-truth.md).
-El delta [Journey 03 PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) está validado localmente y no desplegado.
+El release [Journey 03 PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
+está cerrado, desplegado y verificado en `main=36eb6c112478685e417ce8c054e61d77f539212e`.
 BuilderBuildKernel y BuilderBuildState existen; no se exige volver a crearlos.
-La validación local no autoriza commit, push ni producción. Una futura promoción
-requiere alcance revisado, autorización específica, verificación de identidad y rollback.
+Este cierre no autoriza una nueva promoción: cualquier release futuro requiere alcance
+revisado, autorización específica, verificación de identidad y rollback.
 
 ---
 
@@ -763,9 +764,9 @@ La política de higiene de Sistema Maestro queda fijada así:
 
 ### Promoción del delta local
 
-El delta PRE-S14 requiere su propio gate de promoción. Las reglas de validación,
-secretos y rollback siguen vigentes; la producción ya acreditada no se reescribe
-como pendiente. El cierre local no declara completada la economía ni todo el runtime IA.
+El release PRE-S14 ya fue promovido mediante su gate autorizado y quedó desplegado.
+Las reglas de validación, secretos y rollback siguen vigentes para cualquier release futuro;
+este cierre no declara completada toda la economía, los recorridos legacy ni el runtime IA general.
 
 ---
 

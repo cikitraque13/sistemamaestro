@@ -1,33 +1,39 @@
 # Journey 03 — Estado canónico PRE-S14
 
-## Estado y autoridad — 2026-10-01
+## Estado de release y autoridad — 2026-10-02
 
-Este documento es el propietario canónico del estado de Journey 03, sus cierres locales,
-la validación PRE-S14 y su siguiente frente. La autorización
-SM_PRE_S14_DOCUMENT_RECONCILIATION_EXECUTION de HUMAN-LUCAS acredita este checkpoint.
+Este documento es el propietario canónico del estado de Journey 03, el cierre del release PRE-S14,
+sus validaciones y el siguiente frente. La preparación técnica local se integró mediante el release
+autorizado por HUMAN-LUCAS.
 
 | Estado | Valor |
 |---|---|
 | S1, S2, S3A, S3B, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13 | COMPLETED |
 | C1 | COMPLETED |
+| PRE-S14 release | CLOSED / DEPLOYED / VERIFIED |
+| HUMAN_GATE_2 | PASS |
 | S14 | NOT_STARTED |
 | Único frente abierto de Journey 03 | S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION |
-| Alcance de los cierres | Ingeniería local validada; S1–S13/C1 no están desplegados |
+| Alcance | El release contiene el alcance acotado S1–S13/C1; no certifica todos los flujos legacy ni el producto completo |
 
 C1 se registra como cierre acreditado por el checkpoint; no se inventa una denominación,
 un commit propio ni una funcionalidad adicional para ese identificador.
 
-## Producción y estado local
+## Identidad de producción y release
 
-La autoridad para separar producción de ingeniería local es
+La autoridad para la identidad y runtime de producción es
 [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md).
 
-La base de producción es GitHub main/Railway
-ee65c324bf6780aeb6a25f6e97851cd3b2d7b0a3, tree
-4447f531d62157fc3e469e1b9fb56d87087e9916, estado SUCCESS según el checkpoint autorizado.
-El workspace PRE-S14 integra sobre esa base el delta local validado de S1–S13/C1.
-El SHA de la base no identifica el contenido completo de ese árbol de trabajo.
-No hay aquí un SHA de commit acreditado para el delta reconciliado.
+| Elemento | Identidad / resultado |
+|---|---|
+| Rama candidata | `codex/vite-migration` |
+| Candidato validado | `a370f219fbcc569a0cee853a609ef4fa311063b0` |
+| GitHub main / merge commit | `36eb6c112478685e417ce8c054e61d77f539212e` |
+| Tree desplegado | `447cea61b0e41a0711cd3d2d132fddfcda045d03` |
+| Railway production deployment | `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0` — `SUCCESS` |
+| Main ↔ Railway | `MATCH` |
+
+El candidato incorpora la migración CRA/CRACO a Vite/Vitest y el saneamiento de dependencias críticas/high. El merge commit exacto de `main` fue desplegado por el auto-deploy normal de Railway; no se ejecutó un deploy manual.
 
 ## Capacidad local acreditada y referencias verificables
 
@@ -52,7 +58,9 @@ El contrato vigente de estas capacidades se delimita en
 Navegación correcta y coherencia semántica son evaluaciones distintas. Una decisión
 humana sobre un warning no sustituye la autorización explícita de apply.
 
-## Validación PRE-S14 acreditada
+## Validación técnica local del checkpoint PRE-S14
+
+Esta tabla conserva la validación técnica local acreditada antes de la promoción. La evidencia del release productivo se registra por separado debajo.
 
 | Comprobación | Resultado del checkpoint |
 |---|---|
@@ -67,9 +75,27 @@ Esta intervención documental no vuelve a ejecutar Node, Jest, build ni smoke.
 Los archivos enlazados permiten localizar los contratos y pruebas; su presencia por sí sola
 no constituye un nuevo resultado de ejecución. No se inventan logs ni IDs de deployment.
 
-El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra la identidad
-del Gold Freeze de 409 archivos y RESTORE_PROOF=PASS. Ese freeze precede a esta
-reconciliación documental y permanece intacto; no contiene estas modificaciones documentales.
+El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra el Gold Freeze previo de 409 archivos y `RESTORE_PROOF=PASS`. Ese freeze permanece intacto y no representa el snapshot final posterior al release.
+
+## Validación del release en producción
+
+| Comprobación | Resultado acreditado |
+|---|---|
+| `npm ls` | PASS |
+| npm audit | 0 CRITICAL / 0 HIGH; `--omit=dev` HIGH=0 |
+| MJS | 69/69 PASS |
+| Vitest | 36/36 PASS |
+| Build / Docker / runtime | PASS |
+| Health / home / assets | PASS |
+| Login con Google / OAuth E2E | PASS; sesión creada, callback correcto, sin redirect loop |
+| Dashboard / Builder / deep route | Render PASS |
+| Browser runtime errors / material visible errors | NONE_OBSERVED |
+| Regresión detectada | NO |
+| SM-QA / SM-SEC | APPROVED_WITH_RISKS / APPROVED_WITH_RISKS |
+
+La limitación residual es de observabilidad: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La autenticación quedó verificada funcionalmente mediante OAuth E2E, sesión autenticada y acceso a superficies privadas. No se afirma haber observado directamente la respuesta de ese endpoint.
+
+El Evidence Pack/freeze final post-release todavía no se ha creado.
 
 ## Límites conservados
 
@@ -81,7 +107,7 @@ reconciliación documental y permanece intacto; no contiene estas modificaciones
 - La persistencia es local al navegador; no acredita sincronización remota ni conservación
   frente a borrado de datos del navegador.
 - La ruta local acotada evita IA externa; esto no describe todas las rutas del Builder.
-- Los cierres no autorizan producción, agentes nuevos, economía ni generación libre.
+- El gate de release autorizó únicamente la promoción PRE-S14 descrita aquí; este documento no autoriza promociones futuras, agentes nuevos, cambios de economía ni generación libre.
 
 ## Frente abierto único: S14
 

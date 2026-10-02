@@ -2,18 +2,18 @@
 
 ## Estado del documento
 
-- Estado: activo, reconciliado PRE-S14 el 2026-10-01.
+- Estado: activo, reconciliado tras el release PRE-S14 el 2026-10-02.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
-- Autorización: SM_PRE_S14_DOCUMENT_RECONCILIATION_EXECUTION, HUMAN-LUCAS.
-- Regla de autoridad: distinguir producción acreditada, ingeniería local validada,
-  doctrina de producto y registros históricos.
+- Release: GitHub main `36eb6c112478685e417ce8c054e61d77f539212e`; Railway SUCCESS y alineado.
+- Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
+  release Journey 03, S14 y registros históricos.
 
 ## Mapa canónico y propietarios
 
 | Tema | Propietario | Papel |
 |---|---|---|
-| Producción frente a ingeniería local PRE-S14 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para SHA/tree de producción y separación local |
-| Journey 03, S1–S13/C1, validación y S14 | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del checkpoint local |
+| Producción y runtime del release PRE-S14 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para SHA/tree/deployment y riesgos de observabilidad |
+| Journey 03, S1–S13/C1, validación y S14 | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, release, evidencia y frente S14 |
 | Decisiones aprobadas | [Decisiones cerradas](01-DECISIONES-CERRADAS.md) | SOURCE_OF_TRUTH; conserva procedencia y alcance temporal |
 | Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del único frente abierto de Journey 03 |
 | Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración |
@@ -62,8 +62,8 @@ de S14 deberá actualizar su propietario canónico; no se presume realizada.
 
 ## Orden de lectura y ejecución vigente
 
-1. Runtime and Deploy Truth: identificar producción y delta local.
-2. Estado Journey 03 PRE-S14: conocer cierres, evidencia y límites.
+1. Runtime and Deploy Truth: identificar `main`, deployment de Railway y riesgos residuales.
+2. Estado Journey 03 PRE-S14: consultar el cierre desplegado, su evidencia y S14.
 3. Decisiones, pendientes y contratos: respetar lo cerrado y el frente abierto.
 4. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 

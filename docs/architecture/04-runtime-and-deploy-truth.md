@@ -1,23 +1,22 @@
 # 04 — Runtime and Deploy Truth
 
-## Identidad acreditada y separación PRE-S14 — 2026-10-01
+## Estado del release PRE-S14 — 2026-10-02
 
 | Plano | Identidad y estado |
 |---|---|
-| GitHub main / Railway production | ee65c324bf6780aeb6a25f6e97851cd3b2d7b0a3 |
-| Tree de producción | 4447f531d62157fc3e469e1b9fb56d87087e9916 |
-| Resultado de producción acreditado | SUCCESS |
-| Ingeniería PRE-S14 | Base anterior más delta local S1–S13/C1 validado; NO desplegado |
+| Candidato validado | `codex/vite-migration` @ `a370f219fbcc569a0cee853a609ef4fa311063b0` |
+| GitHub main | `36eb6c112478685e417ce8c054e61d77f539212e` |
+| Tree de main / contenido desplegado | `447cea61b0e41a0711cd3d2d132fddfcda045d03` |
+| Railway production deployment | `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0` — `SUCCESS` |
+| Correspondencia main ↔ Railway | `MATCH` |
+| Release PRE-S14 | `CLOSED / DEPLOYED / VERIFIED` |
+| S14 | `NOT_STARTED` |
 
-La identidad de producción procede del checkpoint autorizado, no de una consulta
-remota efectuada en esta tarea documental. No se inventan IDs de deployment.
-El SHA base no identifica los bytes completos del workspace reconciliado.
-No existe aquí un commit acreditado del delta local.
+El merge de release une el candidato validado con la base previa; Railway desplegó el merge commit exacto de `main`. La verificación productiva incluyó health, home, assets y OAuth E2E con Dashboard, Builder y ruta profunda renderizados.
 
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
-gobierna los cierres locales y S14 NOT_STARTED.
-[Inventario](../control/03-INVENTARIO-TECNICO.md) registra el freeze previo.
-Ninguno de esos cierres acredita una promoción posterior a producción.
+La limitación de evidencia restante se registra literalmente: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La sesión OAuth y el acceso autenticado a las superficies privadas quedaron funcionalmente verificados; QA y Security aprobaron con riesgos. La respuesta del endpoint no se declara observada.
+
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el estado, la cadena de validación y los límites del release. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold Freeze previo; no lo confunde con el freeze final post-release.
 
 Este documento y los archivos Dockerfile/railway.json prevalecen sobre ejemplos
 incompatibles del procedimiento DEPLOY_RAILWAY.md: su ejemplo startCommand
@@ -116,7 +115,7 @@ El Dockerfile debe:
 
 - construir frontend con Node 22;
 - usar `npm ci`;
-- compilar `frontend/build`;
+- compilar `frontend/dist`;
 - usar Python 3.11 para runtime;
 - instalar dependencias desde `backend/requirements.txt`;
 - copiar backend;
@@ -152,7 +151,7 @@ No existe un dev server de React en producción.
 Ruta esperada:
 
 ```text
-/app/frontend/build
+/app/frontend/dist
 ```
 
 FastAPI debe servir:

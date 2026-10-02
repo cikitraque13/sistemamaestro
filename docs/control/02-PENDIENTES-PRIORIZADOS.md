@@ -1,12 +1,11 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-01
+## Estado operativo vigente — 2026-10-02
 
-Propietario del backlog actual. Este reemplazo del orden de trabajo anterior se apoya
-en el checkpoint autorizado SM_PRE_S14_DOCUMENT_RECONCILIATION_EXECUTION.
+Propietario del backlog actual. El release PRE-S14 quedó cerrado, desplegado y verificado.
 El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
 es propietario de sus cierres y evidencias. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md)
-separa producción del delta de ingeniería local.
+registra la identidad de `main` y su deployment de Railway.
 
 ## Único frente abierto de Journey 03
 
@@ -24,7 +23,7 @@ interfaz ni un mecanismo de implementación. Este documento no inicia S14.
 
 ## Cierres que se retiran del backlog activo
 
-S1–S13 y C1 están COMPLETED como ingeniería local validada. No se reabren sin
+S1–S13 y C1 están COMPLETED y forman parte del release PRE-S14 desplegado. No se reabren sin
 evidencia de regresión material:
 
 - creación de Builder state/kernel y conexión del circuito local validado;
@@ -35,9 +34,8 @@ evidencia de regresión material:
 - destino CTA explícito, coherencia semántica y decisión humana;
 - recuperación durable de trabajo pendiente y frontera explícita de autorización.
 
-Los cierres son acotados a la capacidad descrita en Journey 03. No declaran cerrados
+Los cierres son acotados a la capacidad descrita en Journey 03. El despliegue PRE-S14 no declara cerrados
 todos los recorridos legacy, la cadena IA general, QA10 ni el producto comercial completo.
-S1–S13/C1 no están desplegados.
 
 ## Reconciliación de Preservation
 

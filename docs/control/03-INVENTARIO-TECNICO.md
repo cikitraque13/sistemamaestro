@@ -1,12 +1,13 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — PRE-S14, 2026-10-01
+## Estado vigente — release PRE-S14, 2026-10-02
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
-[Runtime](../architecture/04-runtime-and-deploy-truth.md) separa producción de ingeniería.
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es el propietario de cierres y validaciones S1–S13/C1.
-El workspace completo se basa en main ee65c324bf6780aeb6a25f6e97851cd3b2d7b0a3
-y conserva un delta local validado, no desplegado y sin SHA de commit propio acreditado.
+[Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del release, sus validaciones y S14.
+`main=36eb6c112478685e417ce8c054e61d77f539212e`; tree `447cea61b0e41a0711cd3d2d132fddfcda045d03`.
+Railway production deployment `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0=SUCCESS` sobre el mismo SHA.
+El candidato `a370f219fbcc569a0cee853a609ef4fa311063b0` fue validado y mergeado como release PRE-S14.
 
 ## Fuente y estructura material
 
@@ -18,7 +19,7 @@ y conserva un delta local validado, no desplegado y sin SHA de commit propio acr
 | IA | [backend/app/ai](../../backend/app/ai/): contratos, generador conectado y componentes preparados; no certifica orquestación multiagente completa |
 | Economía | [config/credits](../../backend/config/credits/): capa existente, no modificada por Journey 03 local |
 | Manifiestos | [package.json](../../frontend/package.json), [package-lock.json](../../frontend/package-lock.json), [requirements](../../backend/requirements.txt) |
-| Runtime | [Dockerfile](../../Dockerfile), [railway.json](../../railway.json): Node 22 para build; Python sirve frontend/build |
+| Runtime | [Dockerfile](../../Dockerfile), [railway.json](../../railway.json): Vite genera `frontend/dist`; Python sirve el build estático |
 | Pruebas | [tests](../../tests/), [backend/tests](../../backend/tests/), pruebas junto al código frontend; material de validación que debe conservarse |
 | Gobierno | [Índice maestro](00-INDICE-MAESTRO.md), [contratos](../product/sistema-maestro/05-CONTRATOS-TECNICOS-V1.md), [pendientes](02-PENDIENTES-PRIORIZADOS.md) |
 
@@ -28,11 +29,11 @@ y conserva un delta local validado, no desplegado y sin SHA de commit propio acr
 Incluye kernel, estado, registry, output y contratos de transacción.
 [builder/workspace](../../frontend/src/features/builder/workspace/) integra el circuito visible.
 
-La ingeniería local validada contiene propuesta/validación/review, candidate y artefacto
+El release PRE-S14 incluye el circuito S1–S13/C1: propuesta/validación/review, candidate y artefacto
 comunes a preview/apply/entrega, revert exacto, mutaciones estructurales y compuestas,
 validación funcional y reparación, intención CTA, coherencia semántica acotada,
 decisión humana, workspace durable owner/project, concurrencia, recuperación pendiente
-y autorización explícita. Código y pruebas concretos están enlazados en Journey 03.
+y autorización explícita. La validación técnica y los límites de cobertura están enlazados en Journey 03.
 
 La persistencia de este circuito es local al navegador; no equivale a persistencia
 remota ni a autorización de servidor. Capacidad/retención siguen pendientes de S14;
@@ -52,14 +53,14 @@ se verificó con el orden y la serialización del manifiesto; la orden recibida
 transcribía solo 63 caracteres, omitiendo el 2 final. Se registra el SHA-256 completo,
 sin alterar el freeze ni su manifiesto.
 
-El freeze conserva la fuente PRE-S14 anterior a esta reconciliación documental.
+Este freeze conserva una fuente PRE-S14 anterior a la reconciliación documental y al release `36eb6c112478685e417ce8c054e61d77f539212e`.
 No incluye las modificaciones documentales de esta tarea y no se regenera.
-No identifica un nuevo commit ni una publicación remota.
+El Gold Freeze final post-release todavía no se ha creado.
 
 ## Material regenerable y límites
 
-frontend/node_modules y frontend/build fueron retirados en el saneamiento acreditado.
-Dependencias instaladas, build, cachés y temporales no son fuente del producto.
+En el saneamiento previo se retiraron `frontend/node_modules` y `frontend/build`; con Vite, el output regenerable actual es `frontend/dist`.
+Dependencias instaladas, builds, cachés y temporales no son fuente del producto.
 El manifiesto y lockfile se conservan. No se leen ni copian secretos.
 
 El checkout Desktop histórico y Preservation permanecen como referencias externas;
