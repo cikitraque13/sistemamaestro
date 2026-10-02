@@ -4,19 +4,20 @@
 
 | Plano | Identidad y estado |
 |---|---|
-| Candidato validado | `codex/vite-migration` @ `a370f219fbcc569a0cee853a609ef4fa311063b0` |
-| GitHub main | `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7` |
-| Tree de main / contenido desplegado | `f8d53f0636a474eb7928dbd860649a48a37eab3` |
-| Railway production deployment | `7630d6f0-b3bd-4451-9050-af287b4a3b34` — `SUCCESS` |
-| Correspondencia main ↔ Railway | `MATCH` |
+| GitHub main (checkpoint S14 Entry) | `3b0a23a96711a7be9d2fa42ccce101882c328295` |
+| Tree de main | `3c1d8e2b2b2b3de88bcc994bdd5482340e0cc57c` |
+| Railway production deployment reportado | `7e4e39d8-a1ea-495e-866c-c0d09efb7ec6` — `SUCCESS` |
+| Correspondencia main ↔ Railway | `MATCH` reportado; el SHA exacto del deployment no consta en esta evidencia |
+| `/health` / home | `200` reportado |
 | Release PRE-S14 | `CLOSED / DEPLOYED / VERIFIED` |
-| S14 | `NOT_STARTED` |
+| Gold S14 Entry | `GOLD_FREEZE_S14_ENTRY_2026-10-02` |
+| S14 | `NOT_STARTED` (estado canónico en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)) |
 
-El merge de release une el candidato validado con la base previa; Railway desplegó el merge commit exacto de `main`. La verificación productiva incluyó health, home, assets y OAuth E2E con Dashboard, Builder y ruta profunda renderizados.
+La identidad de `main` y tree corresponde al checkpoint canónico indicado. El deployment ID, estado, coincidencia main/Railway y verificaciones HTTP se registran según el gate productivo reportado; no se afirma aquí una observación directa del SHA de Railway.
 
 La limitación de evidencia restante se registra literalmente: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La sesión OAuth y el acceso autenticado a las superficies privadas quedaron funcionalmente verificados; QA y Security aprobaron con riesgos. La respuesta del endpoint no se declara observada.
 
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el estado, la cadena de validación y los límites del release. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold PRE-S14 vigente y distingue el checkpoint de release del futuro Gold de entrada a S14.
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el estado, la cadena de validación y los límites del release. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold PRE-S14 anterior y el Gold S14 Entry vigente. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es owner de los estados S14–S18/J04–J16; las reglas transversales están en [Journey Gate Operating Rules](../control/09-JOURNEY-GATE-OPERATING-RULES.md).
 
 Este documento y los archivos Dockerfile/railway.json prevalecen sobre ejemplos
 incompatibles del procedimiento DEPLOY_RAILWAY.md: su ejemplo startCommand

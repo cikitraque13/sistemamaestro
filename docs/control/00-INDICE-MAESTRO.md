@@ -4,7 +4,7 @@
 
 - Estado: activo, reconciliado tras el release PRE-S14 el 2026-10-02.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
-- Release PRE-S14 desplegado: GitHub main `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7`; Railway SUCCESS y alineado.
+- Release PRE-S14 y checkpoint S14 Entry: consultar los documentos propietarios de Journey 03, producción/runtime e inventario Gold; este índice no duplica sus identidades.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
   release Journey 03, S14 y registros históricos.
 
@@ -13,13 +13,15 @@
 | Tema | Propietario | Papel |
 |---|---|---|
 | Producción y runtime del release PRE-S14 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para SHA/tree/deployment y riesgos de observabilidad |
-| Journey 03, S1–S13/C1, validación y S14 | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, release, evidencia y frente S14 |
+| Journey 03, S1–S13/C1 y validación PRE-S14 | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, release y evidencia PRE-S14 |
 | Decisiones aprobadas | [Decisiones cerradas](01-DECISIONES-CERRADAS.md) | SOURCE_OF_TRUTH; conserva procedencia y alcance temporal |
-| Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del único frente abierto de Journey 03 |
+| Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del frente activo de Journey 03 |
 | Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración |
 | Rutas de producto y sistema | [Rutas canónicas](04-RUTAS-CANONICAS.md) | SUPPORTING_CANONICAL; inventario vigente completa las incorporaciones PRE-S14 |
 | Procedimientos operativos | [Procedimientos](06-PROCEDIMIENTOS-OPERATIVOS.md) | SUPPORTING_CANONICAL; no autoriza acciones por sí mismo |
-| Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Reglas duraderas de operación |
+| Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
+| Roadmap y estado de madurez | [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) | SOURCE_OF_TRUTH de S14–S18 y J04–J16 |
+| Reglas de gates | [Journey Gate Operating Rules](09-JOURNEY-GATE-OPERATING-RULES.md) | SOURCE_OF_TRUTH de proceso, evidencia y checkpoints; no duplica estados de gates |
 | QA comercial de plantillas | [QA Builder 10 plantillas](08-QA-BUILDER-10-PLANTILLAS.md) | QA específica; no duplica el cierre de Journey 03 |
 | Contrato actual de la transacción local | [Contratos Técnicos V1](../product/sistema-maestro/05-CONTRATOS-TECNICOS-V1.md) | Extensión PRE-S14 validada y límites de aplicación |
 | Visión de producto | [Producto Maestro V2](../product/sistema-maestro/01-PRODUCTO-MAESTRO-V2.md) | Doctrina de producto |
@@ -64,8 +66,7 @@ de S14 deberá actualizar su propietario canónico; no se presume realizada.
 
 Los fundamentos Builder state/kernel y el circuito local S1–S13/C1 están implementados
 y validados en ingeniería local; su creación no es una prioridad pendiente.
-S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION es el único frente abierto de Journey 03,
-NOT_STARTED y sin diseño de implementación aprobado aquí. Su apertura formal espera la creación y verificación del Gold independiente de entrada a S14 descrito en Journey 03.
+El frente activo se describe en [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md); el estado S14 y los criterios de apertura pertenecen al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md). La identidad del Gold S14 Entry está en [Inventario técnico](03-INVENTARIO-TECNICO.md). Este índice no abre S14.
 
 ## Reglas duraderas de gobierno
 

@@ -2,15 +2,13 @@
 
 ## Estado operativo vigente — 2026-10-02
 
-Propietario del backlog actual. El release PRE-S14 quedó cerrado, desplegado y verificado. El checkpoint de entrada formal a S14 queda pendiente del Gold independiente descrito en Journey 03.
-El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
-es propietario de sus cierres y evidencias. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md)
-registra la identidad de `main` y su deployment de Railway.
+Propietario del backlog actual. El release PRE-S14 quedó cerrado, desplegado y verificado. El Gold independiente S14 Entry está creado y registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md). Su existencia no abre S14.
+El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario de sus cierres y evidencias. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad productiva.
 
 ## Único frente abierto de Journey 03
 
 CURRENT_PENDING_FRONT=S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION
-S14=NOT_STARTED
+S14=NOT_STARTED (estado canónico en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md))
 
 Clasificación: crítica estructural.
 
