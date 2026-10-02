@@ -1,4 +1,13 @@
-﻿# 01-DECISIONES-CERRADAS
+# 01-DECISIONES-CERRADAS
+
+## Lectura vigente PRE-S14 — 2026-10-01
+
+Las decisiones fechadas conservan su contexto histórico. Sus frases «siguiente fase»
+o «pendiente» no constituyen el backlog actual. El estado local acreditado pertenece a
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md), el frente vigente a [Pendientes](02-PENDIENTES-PRIORIZADOS.md)
+y la identidad de producción a [Runtime](../architecture/04-runtime-and-deploy-truth.md).
+S1–S13/C1 están completados localmente y no están desplegados.
+
 
 ## Estado del documento
 
@@ -1617,7 +1626,7 @@ El backend no debe confiar en payloads del frontend para identidad, saldo, plan,
 
 ### Motivo
 
-La identidad, el saldo, el plan y los pagos son autoridad del servidor.  
+La identidad, el saldo, el plan y los pagos son autoridad del servidor.
 El frontend solo expresa intención.
 
 ---
@@ -1640,7 +1649,7 @@ Toda acción que pueda generar coste IA debe cobrar/verificar créditos antes de
 
 ### Motivo
 
-Primero se valida acceso, plan y créditos.  
+Primero se valida acceso, plan y créditos.
 Después se ejecuta IA.
 
 ---
@@ -2022,3 +2031,578 @@ A partir de esta decisión:
 Esta decisión no cierra Builder comercialmente.
 
 Solo fija el marco de ejecución para demostrar la primera prueba de vida del Builder.
+
+---
+
+## Reconciliación de Preservation: procedencia y numeración
+
+Fuente inmutable: [01-DECISIONES-CERRADAS preservado](../../../Backups/HISTORICAL/SM-PRESERVACION-e083f112-01/documentos/docs/control/01-DECISIONES-CERRADAS.md).
+SHA-256 de origen: 928a1ad2382203c0f7fdb8d02d3599f02d181ce1f8f17e21a014dbd30c75c375.
+
+La fuente contiene dos series 54–60. La tabla integra las aportaciones anteriores
+sin duplicar las decisiones existentes ni confundir números de distinta fecha.
+Las secciones 57–66 siguientes corresponden a la serie de 2026-05-22/24.
+No existe material posterior al cierre 66 en la fuente consultada.
+
+| Procedencia | Aportación preservada y alcance |
+|---|---|
+| 2026-05-20, 54 | Luki: ejecución operativa controlada, HUMAN-LUCAS como autoridad; sin cambios de main, secretos, workflows o producción fuera de autorización. No concede permisos nuevos. |
+| 2026-05-20, 55 | Saneamiento GitHub registrado: main protegido, PR antiguos cerrados/preservados, tags congelados; rama residual fix/frontend-package-lock como estado de aquella fecha. Rama → PR → deploy observado → rollback. No es inspección remota actual. |
+| 2026-05-20, 56 | PR #30: adaptador prioriza previewModelPatch, codeModelPatch.files y structureModelPatch manteniendo fallback legacy; éxito de producción registrado entonces, separado del delta local Journey 03. |
+| 2026-05-20, 57 | PR #31: corrección de mojibake visible en registry sin alterar matchers internos; deploy exitoso registrado en la fuente, no comprobación nueva. |
+| 2026-05-20, 58 | Diagnóstico histórico: /api/builder/build → BuilderAIOutput → adaptador → salidas legacy; faltaban mutaciones verificables. El circuito local acotado posterior tiene su cierre en Journey 03; no acredita toda la generación IA. |
+| 2026-05-20, 59 | Confirma deploy por microfase ya recogido en la decisión 40 del destino. Se conserva esta procedencia, sin duplicar la regla. |
+| 2026-05-20, 60 | Veredicto y pendientes de esa fecha: recapitulación histórica; no reactiva ramas ni tareas frente al backlog vigente. |
+| 2026-05-22, 54 | Cadena contractual IA V1: AgentSpecV1 → AgentRail tipado → agentSpecId → mutationType → applyBuildMutation → BuildState → OutputMap → feedback/readiness. No activa multiagente, endpoints nuevos, repo_writer, GitHub ni costes por agente. |
+| 2026-05-22, 55 | AgentSpec V1: id, visibleName, mission, description, internalInstructions, triggerWhen, inputSchema, outputSchema, allowedMutationTypes, allowedTools, forbiddenDomains, userFeedback, gemCostTier, currentState, supportingFiles, activationMissing. Builder, CRO, Trust, Copy, Visual, System Architect y Security Architect son contratos; su existencia no prueba agentes vivos. |
+| 2026-05-22, 56 | AgentRail: atajos tipados asociados a agentSpecId, tipos permitidos y feedback; UX guiada A/B/C primaria, rail experto secundario. No agentes autónomos. |
+
+### Contexto de lectura de las decisiones incorporadas
+
+Se preservan los acuerdos y las evidencias históricas con su alcance original.
+La matriz de agentes de la decisión 62 es una foto de mayo, no una auditoría actual.
+La secuencia temporal de la decisión 65 no reabre ni bloquea los slices ya autorizados.
+La prueba de producción de la decisión 66 es anterior y acotada; no significa que
+S1–S13/C1 estén desplegados. La validación de exportación de la decisión 59 no
+prohíbe ni sustituye la entrega HTML local validada posteriormente.
+
+## 57. MutationTypes de prioridad 1 para IA interna
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-57
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Quedan aprobados como mutationTypes de prioridad 1 para la capa IA interna:
+
+```text
+IMPROVE_COPY
+APPLY_VISUAL_HIERARCHY
+VALIDATE_READY_FOR_EXPORT
+```
+
+### Función aprobada
+
+- `IMPROVE_COPY`: mejora titulares, promesa, CTA, microcopy y claridad.
+- `APPLY_VISUAL_HIERARCHY`: mejora jerarquía visual, escaneabilidad y orden de secciones.
+- `VALIDATE_READY_FOR_EXPORT`: valida preparación técnica sin exportar, sin GitHub interno y sin deploy.
+
+### Efecto operativo
+
+Estos mutationTypes deben pasar por:
+
+```text
+AgentSpec
+→ allowedMutationTypes
+→ BuilderMutationRegistry
+→ applyBuildMutation
+→ BuilderBuildState
+→ BuilderOutputMap
+```
+
+---
+
+## 58. Feedback, warnings, blockers y readiness como salida obligatoria de mutaciones IA
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-58
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Las mutaciones asociadas a agentes internos deben preservar y exponer:
+
+- `agentSpecId`
+- `userFeedback`
+- `statusMessage`
+- `warnings`
+- `blockers`
+- `appliedActions`
+- `trace`
+- `readiness/exportValidation` cuando proceda
+
+### Archivos implicados
+
+```text
+frontend/src/features/builder/state/builderBuildState.js
+frontend/src/features/builder/state/builderOutputMap.js
+frontend/src/features/builder/state/builderMutationRegistry.js
+```
+
+### Efecto operativo
+
+Una acción IA no se considera válida si no deja rastro verificable en estado y salida.
+
+El sistema debe poder explicar:
+
+```text
+qué agente actuó
+qué mutación recomendó/aplicó
+qué cambió
+qué falta
+qué bloquea
+qué readiness existe
+```
+
+---
+
+## 59. VALIDATE_READY_FOR_EXPORT como validación segura, no ejecución
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-59
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+`VALIDATE_READY_FOR_EXPORT` queda aprobado como validación de preparación técnica, no como acción de exportación.
+
+### Regla aprobada
+
+Debe mantener:
+
+```text
+exportExecuted=false
+deployExecuted=false
+```
+
+### Prohibición
+
+No puede ejecutar:
+
+- export real
+- GitHub interno
+- commit automático
+- deploy
+- Railway
+- repo_writer
+- endpoints nuevos
+
+### Efecto operativo
+
+Sirve para mostrar readiness, checks, warnings y blockers.
+
+No sirve para entregar salida técnica final.
+
+---
+
+## 60. QA aislado de cadena IA base
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-60
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Queda aprobado un QA aislado para validar la cadena IA base.
+
+### Archivo principal
+
+```text
+tests/ai_base_chain_qa.py
+```
+
+### Valida
+
+- AgentSpec serializable.
+- AgentRail alineado con AgentSpec.
+- mutationTypes existentes y permitidos.
+- `buildMutationFromType`.
+- `applyBuildMutation`.
+- `BuilderBuildState`.
+- `BuilderOutputMap`.
+- feedback/warnings/blockers.
+- readiness/exportValidation.
+- seguridad de `VALIDATE_READY_FOR_EXPORT`.
+
+### Efecto operativo
+
+Antes de activar runtime IA nuevo, la cadena base debe pasar este QA.
+
+---
+
+## 61. QA de alineación backend IA
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-61
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado.
+
+### Decisión
+
+Queda aprobado un QA estático de alineación de `backend/app/ai`.
+
+### Archivo principal
+
+```text
+tests/ai_backend_alignment_qa.py
+```
+
+### Valida
+
+- AgentSpec frente a registry.
+- AgentSpec frente a archivos reales de agentes.
+- tools declaradas frente a tool registry.
+- guards declarados frente a guards reales.
+- matriz de estado real de agentes.
+
+### Estados reconocidos
+
+```text
+live_partial
+live_pure
+bridge
+manifest_only
+spec_only
+empty
+```
+
+### Efecto operativo
+
+No se aprueba volver al Builder como siguiente fase seria sin conocer el estado real de la capa IA.
+
+La capa IA debe ser tratada como sistema auditable, no como carpeta decorativa.
+
+---
+
+## 62. Clasificación real de agentes backend IA
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-62
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado como clasificación actual.
+
+### Decisión
+
+Queda reconocida la siguiente matriz de estado de agentes:
+
+```text
+builder_agent = live_partial
+report_agent = live_pure
+system_architect_agent = live_pure
+security_architect_agent = live_pure
+red_team_agent = manifest_only
+copy_agent = spec_only hasta cierre de PR 1O
+visual_agent = spec_only hasta cierre de PR 1O
+trust_agent = spec_only hasta cierre de PR 1O
+discovery_agent = empty
+audit_agent = empty
+cro_agent = empty
+seo_architect_agent = empty
+growth_agent = empty
+deploy_agent = empty
+rescue_sre_agent = empty
+algorithmic_auditor_agent = empty
+```
+
+### Efecto operativo
+
+No se debe vender ningún agente vacío, spec-only o manifest-only como agente vivo.
+
+Todo agente debe avanzar de estado mediante:
+
+```text
+contrato
+→ lógica pura
+→ QA
+→ auditoría de calidad
+→ PR
+→ deploy iterativo
+```
+
+---
+
+## 63. Runtime multiagente sigue bloqueado
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-63
+
+Fecha: 2026-05-22
+
+### Estado
+
+Bloqueo vigente.
+
+### Decisión
+
+No se activa runtime multiagente todavía.
+
+### Motivo
+
+La capa IA aún contiene:
+
+- tools manifest-only
+- agentes empty
+- agentes spec-only
+- memory sin persistencia
+- telemetry sin persistencia
+- orchestrator bridge
+- guards no centralizados por completo
+- builder runtime concentrado en `builder_agent`
+
+### Criterio futuro para activación
+
+Runtime multiagente solo podrá estudiarse cuando existan:
+
+1. agentes puros suficientes
+2. tools mínimas registradas y coherentes
+3. guards comunes aplicables
+4. QA estático actualizado
+5. QA de simulación sin OpenAI real
+6. decisión explícita de activación
+
+---
+
+## 64. Regla de calidad antes de PR para agentes internos
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-64
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado como regla de gobierno.
+
+### Decisión
+
+No se abre Pull Request de agentes internos solo porque el código compile y el QA pase.
+
+### Regla aprobada
+
+```text
+live_pure + QA verde + auditoría de calidad senior = PR
+```
+
+### Efecto operativo
+
+Antes de mergear agentes internos nuevos, debe validarse:
+
+- misión clara
+- entrada definida
+- salida estructurada
+- `agentSpecId` correcto
+- `recommendedMutationType` correcto
+- feedback útil
+- uso correcto de warnings/blockers
+- no solape grave con otros agentes
+- no stub
+- nivel senior suficiente
+
+### Aplicación inmediata
+
+La rama:
+
+```text
+luki/pure-agents-copy-visual-trust-v1
+```
+
+queda bloqueada para PR hasta que Luki complete la auditoría de calidad del Paso 1O.
+
+---
+
+## 65. Builder visual queda congelado hasta cerrar capa IA
+
+Registro histórico de 2026-05-22, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-65
+
+Fecha: 2026-05-22
+
+### Estado
+
+Cerrado como regla temporal.
+
+### Decisión
+
+No se continúa con diseño visual, plantillas ni pruebas de Builder hasta cerrar la fase actual de capa IA.
+
+### Regla aprobada
+
+El orden correcto es:
+
+```text
+capa IA interna
+→ contratos
+→ agentes
+→ QA
+→ auditoría de calidad
+→ runtime controlado
+→ Builder funcional
+→ visual/polish final
+```
+
+### Efecto operativo
+
+No se aprueban cambios de:
+
+- layout del Builder
+- colores
+- polish visual
+- plantillas
+- oportunidades
+- deploy/export
+- GitHub interno
+
+mientras esté pendiente cerrar la calidad de agentes internos expuestos.
+
+---
+
+## 66. Command Contract V2.2 scoped validado como primera vía local de mutación atómica
+
+Registro histórico de 2026-05-24, preservado semánticamente. Su alcance temporal
+no sustituye el estado local ni el backlog PRE-S14 descritos al inicio.
+
+### Acuerdo preservado P-66
+
+Fecha: 2026-05-24
+
+### Estado
+
+Cerrado como validación parcial de mutación local scoped.
+
+No cierra todavía la Mutación Atómica completa ni QA10.
+
+### Decisión
+
+Queda aprobado `Command Contract V2.2 scoped` como primera vía controlada para ejecutar micro-mutaciones locales del Builder sin depender de Builder AI/backend cuando el comando entra dentro de un scope estricto.
+
+### Scope validado
+
+```text
+projectId = proj_b55e1dff05a7
+input exacto = Cambiar CTA principal a "Reservar consulta" y acento naranja
+mutation = update_cta + update_visual_accent
+primaryCTA = Reservar consulta
+visualAccent = orange
+```
+
+### Resultado validado en producción
+
+- Railway desplegó correctamente.
+- Builder carga sin pantalla negra.
+- Consola sin errores rojos.
+- Solo permanece warning amarillo no bloqueante de `feature_collector.js`.
+- Créditos antes de la prueba: 588.
+- Créditos después de la prueba: 588.
+- No hubo consumo de créditos.
+- El CTA principal cambió a “Reservar consulta”.
+- El botón del formulario cambió a “Reservar consulta”.
+- El acento naranja se refleja visualmente en el CTA principal.
+- El acento naranja se refleja visualmente en el botón del formulario.
+- El layout del Builder se mantiene estable.
+
+### Regla aprobada
+
+La mutación local scoped debe cumplir:
+
+```text
+input permitido
+→ parser local
+→ command contract
+→ apply local mutation
+→ BuilderBuildState / OutputMap
+→ Preview
+→ delta visual verificable
+→ sin Builder AI
+→ sin backend
+→ sin consumo de créditos
+```
+
+Si el proyecto, input o comando no coinciden con el scope permitido, no debe interceptar el flujo.
+
+### Efecto operativo
+
+El Builder demuestra por primera vez una mutación visible real y controlada en producción sin consumir Gemas.
+
+Esta vía no se considera todavía generalizable.
+
+### Límite
+
+Esta decisión no cierra todavía:
+
+- Mutación Atómica completa.
+- Código.
+- Estructura.
+- Persistencia tras refresco/retoma.
+- Cambio de siguiente decisión contextual.
+- QA10.
+- Builder lifecycle completo.
+- Activación global de Command Contract V2.
+
+### Criterio pendiente para cerrar Mutación Atómica completa
+
+Antes de declarar superada la Mutación Atómica, debe verificarse:
+
+```text
+BuilderBuildState muta: sí
+preview cambia: sí
+código cambia: sí
+estructura cambia: sí
+siguiente decisión cambia: sí
+persistencia tras refresco/retoma: sí
+sin consumo accidental de Gemas: sí
+```
+
+### Prohibición
+
+No se permite activar Command Contract V2 de forma global.
+
+No se permite repetir pruebas reales sin necesidad.
+
+No se permite avanzar a QA10 hasta cerrar la validación completa de Mutación Atómica.
+
+
+## 67. Cierre local Journey 03 PRE-S14 — 2026-10-01
+
+HUMAN-LUCAS acredita S1–S13/C1 COMPLETED en el workspace reconciliado basado en
+main ee65c324bf6780aeb6a25f6e97851cd3b2d7b0a3. No se atribuye un SHA propio al delta local.
+El cierre, sus pruebas y límites están en [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
+S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION es el único frente abierto de Journey 03,
+NOT_STARTED. Este acuerdo documental no autoriza implementarlo, publicar ni desplegar.
+Preservation aporta historia; no es la fuente del cierre S1–S13/C1.

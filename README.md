@@ -1,5 +1,17 @@
 # Sistema Maestro
 
+## Checkpoint local PRE-S14 — 2026-10-01
+
+Este workspace integra S1–S13/C1 de Journey 03 como **ingeniería local validada**.
+S14 (capacidad y retención del almacenamiento local) está NOT_STARTED.
+S1–S13/C1 no están desplegados. La identidad exacta de producción, alineada entre
+GitHub main y Railway según el checkpoint acreditado, y su separación del estado local
+se consultan en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md).
+
+[Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md)
+es el propietario de los cierres y la validación local.
+El [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
+
 Sistema Maestro es una plataforma guiada de transformación digital diseñada para convertir una necesidad, una idea o un activo existente en una solución digital estructurada, monetizable y operable.
 
 El sistema no se limita a dar una respuesta superficial. Analiza, ordena, propone una ruta y prepara continuidad para que el proyecto pueda avanzar con más claridad, menos fricción y mejor base de crecimiento.
@@ -56,7 +68,6 @@ La lectura correcta del sistema hoy es esta:
 - el sistema ya contiene auth, dashboard, billing, opportunities, projects y flow;
 - existe una capa de créditos y consumo con contratos, catálogos y reglas;
 - existe una capa de IA y orquestación en consolidación;
-- y el proyecto sigue en saneo estructural controlado.
 
 ---
 
@@ -113,7 +124,6 @@ La carpeta `frontend/src/pages/` queda como capa residual temporal y no debe tra
 
 Actualmente el frontend contiene, al menos, estas features reales:
 
-- `activation-flow`
 - `app-shell`
 - `auth`
 - `billing`
@@ -307,7 +317,7 @@ La economía del sistema ya no es solo una idea comercial. Existe una base técn
 - Tailwind CSS
 - Framer Motion
 - React Router
-- CRACO
+- Vite
 - Radix UI
 - Recharts
 - Sonner
@@ -375,7 +385,7 @@ npm start
 - mantener una sola verdad de arranque;
 - no reactivar legacy runtime;
 - no ampliar legado;
-- no abrir despliegue final mientras siga el saneo estructural.
+- consultar [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md) para la relación vigente entre estado local y producción.
 
 ---
 
@@ -395,28 +405,17 @@ ALLOWED_ORIGINS=http://localhost:3000,https://tu-dominio.com
 Y el frontend:
 
 ```env
-REACT_APP_BACKEND_URL=http://localhost:8001
+VITE_BACKEND_URL=http://localhost:8001
+VITE_GOOGLE_CLIENT_ID=
 ```
 
 No deben subirse secretos reales al repositorio.
 
 ---
 
-## Estado del saneo
+## Estado de Journey 03
 
-Este proyecto está en fase de saneo estructural controlado.
-
-### Objetivos del saneo
-
-1. separar fuente real de entorno regenerable;
-2. reducir ruido técnico y arrastres heredados;
-3. cerrar referencias canónicas de runtime;
-4. limpiar legado ya retirado;
-5. preparar una base seria para evolución y despliegue futuro.
-
-### Regla crítica
-
-No borrar, mover o reclasificar rutas a ciegas.
+Consultar [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) para el estado vigente.
 
 ---
 

@@ -189,11 +189,6 @@ h1, h2, h3, h4, h5, h6 {
   @apply w-6 h-6 border-2 border-white/20 border-t-[#0F5257] rounded-full animate-spin;
 }
 
-/* Hide Emergent platform badge */
-#emergent-badge {
-  display: none !important;
-}
-
 /* Shadcn overrides for dark theme */
 @layer base {
   :root {

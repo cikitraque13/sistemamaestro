@@ -71,12 +71,12 @@ El `Dockerfile` actual debe:
 
 - usar Node 22 para compilar frontend;
 - ejecutar `npm ci`, no `npm install`;
-- no hardcodear `REACT_APP_BACKEND_URL`;
-- compilar `frontend/build`;
+- no hardcodear `VITE_BACKEND_URL`;
+- compilar `frontend/dist` con Vite (`npm run build`);
 - usar Python 3.11 para runtime;
 - instalar dependencias desde `backend/requirements.txt`;
 - copiar `backend/`;
-- copiar el build del frontend a `/app/frontend/build`;
+- copiar el build del frontend a `/app/frontend/dist`;
 - arrancar con `python -m uvicorn backend.app.main:app`.
 
 Dockerfile esperado:
@@ -110,7 +110,7 @@ RUN python -m pip install --upgrade pip \
     && pip install --no-cache-dir -r /app/backend/requirements.txt
 
 COPY backend/ /app/backend/
-COPY --from=frontend-build /app/frontend/build /app/frontend/build
+COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
 
 EXPOSE 8080
 
@@ -158,7 +158,7 @@ Debe responder algo equivalente a:
 El frontend se sirve como build estático desde FastAPI:
 
 ```text
-/app/frontend/build
+/app/frontend/dist
 ```
 
 No hay dev server de React en Railway. Si alguien intenta desplegar con `npm start` como runtime principal, está lanzando el cohete desde el aparcamiento.
@@ -332,14 +332,14 @@ frontend/src/lib/apiClient.js
 
 La regla actual:
 
-- si existe `REACT_APP_API_BASE_URL`, se usa;
-- si existe `REACT_APP_BACKEND_URL`, se usa;
+- si existe `VITE_API_BASE_URL`, se usa;
+- si existe `VITE_BACKEND_URL`, se usa como alternativa;
 - si no, se usa `window.location.origin`.
 
 En Railway, como frontend y backend viven en el mismo contenedor/origen, normalmente no hace falta hardcodear:
 
 ```env
-REACT_APP_BACKEND_URL=https://sistemamaestro.com
+VITE_BACKEND_URL=https://sistemamaestro.com
 ```
 
 El Dockerfile no debe quemar un dominio fijo dentro del build.
@@ -365,7 +365,7 @@ npm run build
 Resultado:
 
 ```text
-/app/frontend/build
+/app/frontend/dist
 ```
 
 ### Etapa backend
@@ -629,7 +629,7 @@ En Railway con HTTPS:
 COOKIE_SECURE=true
 ```
 
-### Error 5 — Hardcodear `REACT_APP_BACKEND_URL` en Dockerfile
+### Error 5 — Hardcodear `VITE_BACKEND_URL` en Dockerfile
 
 No quemar dominio fijo dentro del build.
 
@@ -678,11 +678,11 @@ Si no pasa local, no lo mandes a producción esperando que Railway tenga magia. 
 [ ] npm.cmd run build pasa en frontend
 [ ] railway.json apunta a Dockerfile
 [ ] Dockerfile usa npm ci
-[ ] Dockerfile no hardcodea REACT_APP_BACKEND_URL
+[ ] Dockerfile no hardcodea VITE_BACKEND_URL
 [ ] Dockerfile usa backend/requirements.txt
 [ ] Dockerfile arranca python -m uvicorn backend.app.main:app
 [ ] /health existe
-[ ] FRONTEND_BUILD_DIR apunta a frontend/build
+[ ] FRONTEND_BUILD_DIR apunta a frontend/dist
 [ ] ALLOWED_ORIGINS configurado
 [ ] COOKIE_SECURE=true en producción
 [ ] JWT_SECRET configurado

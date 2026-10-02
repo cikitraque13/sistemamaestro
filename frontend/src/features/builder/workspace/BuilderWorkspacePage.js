@@ -154,6 +154,13 @@ const getErrorMessage = (error) => {
 };
 
 export default function BuilderWorkspacePage() {
+  const { user } = useAuth();
+  const ownerId = typeof user?.user_id === 'string' ? user.user_id : null;
+  if (!ownerId) return <div role="status">Se requiere una sesión autenticada.</div>;
+  return <OwnedBuilderWorkspacePage key={ownerId} ownerId={ownerId} />;
+}
+
+function OwnedBuilderWorkspacePage({ ownerId }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -355,11 +362,13 @@ export default function BuilderWorkspacePage() {
       contextBody={contextBody}
     >
       <BuilderWorkspaceLayout
+        key={JSON.stringify([ownerId, project?.project_id || null])}
+        ownerId={ownerId}
         activeIntent={activeIntent}
         activeType={activeType}
         activeWorkspaceTab={activeWorkspaceTab}
         projectLabel={projectLabel}
-        initialPrompt={initialPrompt || project?.input_content || ''}
+        initialPrompt={project?.input_content || initialPrompt || ''}
         project={project}
         loadingProject={loadingProject}
         projectError={projectError}
