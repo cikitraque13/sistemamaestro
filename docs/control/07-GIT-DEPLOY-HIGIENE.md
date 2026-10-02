@@ -23,6 +23,8 @@ Este documento existe para responder con claridad a estas preguntas:
 No inventa el sistema.
 No fija qué ruta manda.
 No prioriza tareas de producto.
+
+Las reglas transversales de gates, delta audit, reutilización/invalidez de evidencia, QA/SEC y Gold Freeze pertenecen a [Journey Gate Operating Rules](09-JOURNEY-GATE-OPERATING-RULES.md). Este documento las aplica a higiene Git/ZIP/deploy sin duplicar sus detalles.
 No sustituye al inventario ni a las rutas canónicas.
 No decide el roadmap.
 No sustituye los contratos técnicos.
@@ -66,8 +68,9 @@ Esta política se apoya en estas decisiones previas:
 - `frontend/src/pages/` queda solo como residual legal temporal;
 - `frontend/node_modules/`, `.cache/`, `build/` y `dist/` no son canónicos;
 - npm queda como gestor único del frontend;
-- `docs/control/` y `docs/product/sistema-maestro/` deben permanecer limpios;
-- deploy final no procede mientras Builder no produzca salida verificable.
+- `docs/control/` y `docs/product/sistema-maestro/` deben permanecer limpios.
+
+Las condiciones de entrega de una salida generada por Builder se aplican a esa salida; no describen ni reabren el release de la plataforma Sistema Maestro. El release PRE-S14 está cerrado según [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md). Cualquier release futuro requiere autorización específica.
 
 ---
 
@@ -434,9 +437,9 @@ revisado, autorización específica, verificación de identidad y rollback.
 
 ---
 
-## 10.4 Regla específica para Builder y deploy
+## 10.4 Entregas desplegables generadas por Builder
 
-No se autoriza deploy final mientras no se cumpla:
+Para autorizar el despliegue de un artefacto generado por Builder, debe acreditarse:
 
 ```text
 BuilderBuildState
@@ -444,11 +447,10 @@ BuilderBuildState
 → código coherente
 → estructura coherente
 → validación técnica
+→ autorización específica del destino
 ```
 
-### Regla
-
-No deploy sin coherencia técnica.
+Esta condición se aplica a las salidas generadas por Builder; no es un bloqueo general del runtime ni reabre el release PRE-S14 de Sistema Maestro.
 
 ---
 
@@ -590,7 +592,8 @@ No es contenedor de basura operativa.
 - `03-CREDITOS-Y-ECONOMIA.md`;
 - `04-EXPERIENCIA-CONSTRUCTOR-VISIBLE.md`;
 - `05-CONTRATOS-TECNICOS-V1.md`;
-- `06-ROADMAP-DE-IMPLEMENTACION-V1.md`;
+- `06-ROADMAP-DE-IMPLEMENTACION-V1.md` (referencia histórica/superada, preservada sin cambios);
+- `08-MASTER-MATURITY-ROADMAP.md` como owner de madurez y gates futuros;
 - documentos expresamente aprobados en el futuro.
 
 ## 14.2 Qué no debe vivir ahí
@@ -780,6 +783,7 @@ A partir de este documento:
 - ZIP y deploy quedan sometidos a criterio estructural;
 - las carpetas canónicas deben mantenerse limpias;
 - ninguna actualización de producción se autoriza por este documento;
+- las reglas transversales se mantienen en [Journey Gate Operating Rules](09-JOURNEY-GATE-OPERATING-RULES.md);
 - no se despliega Builder si no construye de forma verificable;
 - no se monetiza una simulación;
 - no se exporta sin estructura;

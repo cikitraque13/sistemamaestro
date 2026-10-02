@@ -4,10 +4,11 @@
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del release, sus validaciones y S14.
-`main=0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7`; tree `f8d53f0636a474eb7928dbd860649a48a37eab3`.
-Railway production deployment `7630d6f0-b3bd-4451-9050-af287b4a3b34=SUCCESS`; main y Railway coinciden.
-El candidato de producto `a370f219fbcc569a0cee853a609ef4fa311063b0` se integró y desplegó. El SHA actual corresponde a la publicación documental post-release previa; esta actualización de higiene y preparación de entrada a S14 aún está pendiente de publicar.
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del release y sus validaciones PRE-S14; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
+
+El detalle del checkpoint canónico de entrada a S14 se conserva en la sección [Gold S14 Entry vigente](#gold-s14-entry-vigente), que es su autoridad dentro de este inventario.
+
+El checkout canónico fue observado en `main`, igual a `origin/main`, con estado limpio en el preflight de este checkpoint. La identidad productiva y el deployment pertenecen exclusivamente a Runtime and Deploy Truth.
 
 ## Fuente y estructura material
 
@@ -40,7 +41,7 @@ remota ni a autorización de servidor. Capacidad/retención siguen pendientes de
 no hay aquí TTL, cuotas o borrado aprobados. Los flujos legacy y generación IA
 general no quedan certificados por el cierre del circuito local.
 
-## Gold Freeze PRE-S14 vigente
+## Gold PRE-S14 anterior
 
 - PATH: `Backups/GOLD/GOLD_FREEZE_FINAL_PRE_S14_2026-10-02`
 - SOURCE_COMMIT: `0574e0c01f2a4abdf2dcf3ddc6fd03d17d3774d7`
@@ -49,7 +50,19 @@ general no quedan certificados por el cierre del circuito local.
 - MANIFEST_SHA256: `a1d35091f85f2e8248cbea33d0caea2129f6d2018fc9c966861488df5a869bbe`
 - GLOBAL_DIGEST: `53700a34f371786cb679006ac1612c4ed9ef42c184afcac1c5a57feb8dff46eb`
 
-Este checkpoint representa el release PRE-S14 y conserva su restauración verificada. Se creó antes del cierre de higiene final del workspace y de esta reconciliación documental; por ello no se trata como checkpoint definitivo de entrada a S14. Tras publicar y verificar estos documentos se creará, en un gate separado, `GOLD_FREEZE_S14_ENTRY_2026-10-02`.
+Se conserva como checkpoint válido del release PRE-S14 y antecedente del checkpoint de entrada; no se sobrescribe ni se reclasifica como el Gold S14 Entry.
+
+## Gold S14 Entry vigente
+
+- PATH: `Backups/GOLD/GOLD_FREEZE_S14_ENTRY_2026-10-02`
+- SOURCE_COMMIT: `3b0a23a96711a7be9d2fa42ccce101882c328295`
+- SOURCE_TREE: `3c1d8e2b2b2b3de88bcc994bdd5482340e0cc57c`
+- FILES_EXPECTED / FILES_COPIED: `407 / 407`
+- GLOBAL_DIGEST: `f9d4c9be1eca11cb84eca66e32b59f047a1c274b8bedb70b77a488a800b90f47`
+- MANIFEST_SHA256: `b7759af339715907e073c0d3cb8ba0b2385fd7af47c56f7237bf4002130daff1`
+- RESTORE_TEST: PASS como evidencia externa previa; el manifiesto no prueba la restauración.
+
+Este checkpoint es la evidencia primaria de identidad/integridad de entrada a S14. Su existencia no sustituye el gate formal de apertura; el estado vigente consta en el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
 
 ## Material regenerable y límites
 
@@ -57,4 +70,4 @@ En el saneamiento previo se retiraron `frontend/node_modules` y `frontend/build`
 Dependencias instaladas, builds, cachés y temporales no son fuente del producto.
 El manifiesto y lockfile se conservan. No se leen ni copian secretos.
 
-En el preflight previo a esta reconciliación documental, el workspace local canónico estaba en `main`, alineado con `origin/main` y limpio. La raíz `S.Maestro` contiene solo `sistemamaestro/` y `Backups/GOLD/GOLD_FREEZE_FINAL_PRE_S14_2026-10-02/`; `EVIDENCE`, `EXPERIMENTS`, `HISTORICAL` y el ZIP histórico se retiraron durante la higiene final. S1–S13/C1 están desplegados como parte del release PRE-S14; S14 sigue NOT_STARTED y requiere el checkpoint independiente de entrada descrito en Journey 03.
+En el preflight de entrada, el checkout canónico estaba en `main`, alineado con `origin/main` y limpio; la identidad del checkpoint se conserva en la sección Gold S14 Entry vigente. La raíz `S.Maestro` quedó limitada a `sistemamaestro/` y `Backups/`; los andamios EVIDENCE, EXPERIMENTS, HISTORICAL y el ZIP histórico se retiraron. S1–S13/C1 forman parte del release PRE-S14 desplegado. El estado de S14 pertenece al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
