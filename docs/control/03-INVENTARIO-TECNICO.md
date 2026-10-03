@@ -1,10 +1,10 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — release PRE-S14, 2026-10-02
+## Estado vigente — S14 cerrado, 2026-10-03
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del release y sus validaciones PRE-S14; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del cierre y validaciones de Journey 03; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
 
 El detalle del checkpoint canónico de entrada a S14 se conserva en la sección [Gold S14 Entry vigente](#gold-s14-entry-vigente), que es su autoridad dentro de este inventario.
 
@@ -37,8 +37,9 @@ decisión humana, workspace durable owner/project, concurrencia, recuperación p
 y autorización explícita. La validación técnica y los límites de cobertura están enlazados en Journey 03.
 
 La persistencia de este circuito es local al navegador; no equivale a persistencia
-remota ni a autorización de servidor. Capacidad/retención siguen pendientes de S14;
-no hay aquí TTL, cuotas o borrado aprobados. Los flujos legacy y generación IA
+remota ni a autorización de servidor. S14 implementa capacidad, retención/compactación,
+history/revert y fallo cerrado ante cuota únicamente en `sistemamaestro:durable:v1`;
+la evidencia del cierre y los límites están en Journey 03. Los flujos legacy y generación IA
 general no quedan certificados por el cierre del circuito local.
 
 ## Gold PRE-S14 anterior
@@ -62,7 +63,19 @@ Se conserva como checkpoint válido del release PRE-S14 y antecedente del checkp
 - MANIFEST_SHA256: `b7759af339715907e073c0d3cb8ba0b2385fd7af47c56f7237bf4002130daff1`
 - RESTORE_TEST: PASS como evidencia externa previa; el manifiesto no prueba la restauración.
 
-Este checkpoint es la evidencia primaria de identidad/integridad de entrada a S14. Su existencia no sustituye el gate formal de apertura; el estado vigente consta en el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+Este checkpoint conserva la evidencia primaria de identidad/integridad de entrada a S14; no es el Gold del estado implementado. El estado de S14 consta en el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
+## Implementación S14 cerrada
+
+- NAMESPACE_MUTABLE: `sistemamaestro:durable:v1`
+- POLICY: límite 384 KiB; umbral soft 288 KiB; margen 96 KiB; horizonte 90 días; historial máximo 64; profundidad mínima de revert 24; compactación oldest-history-first.
+- FAILURE_SAFETY: construir y validar el reemplazo antes de persistir; ante fallo de cuota/setItem, rechazo fail-closed y bytes durable anteriores preservados.
+- PRESERVATION: current state, pending work, provenance/decisions, anti-replay y aislamiento owner/project.
+- IMPLEMENTATION_FILES: [durableLandingWorkspace.mjs](../../frontend/src/features/builder/state/durableLandingWorkspace.mjs), [durableLandingWorkspace.test.mjs](../../frontend/src/features/builder/state/durableLandingWorkspace.test.mjs), [pendingWorkRecovery.test.mjs](../../frontend/src/features/builder/state/pendingWorkRecovery.test.mjs).
+- VALIDATION: 79/79 tests PASS; SM-SEC PASS; QA independiente PASS; diff limitado a los tres archivos autorizados.
+- RELEASE_IDENTITY: commit y verificación de producción en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md); cierre Journey 03 en [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
+
+Alcance cerrado: no se modificaron otros namespaces, UI, MongoDB ni Railway como superficie de cambio. La persistencia permanece local al navegador.
 
 ## Material regenerable y límites
 

@@ -1,37 +1,26 @@
-# Journey 03 — Estado canónico PRE-S14
+# Journey 03 — Estado canónico tras el cierre de S14
 
-## Estado de release y autoridad — 2026-10-02
+## Estado de release y autoridad — 2026-10-03
 
-Este documento es el propietario canónico del estado de Journey 03, el cierre del release PRE-S14
-y sus validaciones. El frente pendiente se conserva en el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md).
-La preparación técnica local se integró mediante el release autorizado por HUMAN-LUCAS.
+Este documento es el propietario canónico de los cierres y validaciones de Journey 03. El frente siguiente se conserva en el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md).
+El [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) es propietario del estado S14–S18/J04–J16; [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad productiva.
 
 | Estado | Valor |
 |---|---|
 | S1, S2, S3A, S3B, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13 | COMPLETED |
 | C1 | COMPLETED |
-| PRE-S14 release | CLOSED / DEPLOYED / VERIFIED |
+| PRE-S14 release | CLOSED / DEPLOYED / VERIFIED (checkpoint histórico) |
+| S14 | COMPLETED; evidencia de cierre en esta página y estado canónico en el Roadmap |
 | HUMAN_GATE_2 | PASS |
-| Estado S14 | Consultar el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) |
-| Frente pendiente | Consultar el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) |
-| Alcance | El release contiene el alcance acotado S1–S13/C1; no certifica todos los flujos legacy ni el producto completo |
+| Frente siguiente | Consultar el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) |
+| Alcance | Journey 03 local gobernado, incluidos los límites S14; no certifica todos los flujos legacy ni el producto completo |
 
 C1 se registra como cierre acreditado por el checkpoint; no se inventa una denominación,
 un commit propio ni una funcionalidad adicional para ese identificador.
 
 ## Identidad de producción y release
 
-La autoridad para la identidad y runtime de producción es
-[Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md).
-
-| Elemento | Identidad / resultado |
-|---|---|
-| Rama candidata | `codex/vite-migration` |
-| Candidato validado | `a370f219fbcc569a0cee853a609ef4fa311063b0` |
-| Merge de producto PRE-S14 | `36eb6c112478685e417ce8c054e61d77f539212e` |
-| Identidad de main, tree, deployment, match y health/home | Consultar [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md) |
-
-El candidato incorpora la migración CRA/CRACO a Vite/Vitest y el saneamiento de dependencias críticas/high. El release se verificó con el auto-deploy normal y sin deploy manual. La evidencia de este checkpoint registra el deployment ID y la coincidencia main/Railway reportada, pero no contiene una observación directa del SHA del deployment.
+La fuente única para commit, tree, deployment, correspondencia main/Railway y verificaciones productivas del cierre S14 es [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md). El estado del release y la cadena de validación S14 se conserva aquí; este documento no duplica la identidad productiva.
 
 ## Capacidad local acreditada y referencias verificables
 
@@ -75,7 +64,7 @@ no constituye un nuevo resultado de ejecución. No se inventan logs ni IDs de de
 
 El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra los Gold PRE-S14 y S14 Entry. El [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) posee el estado y evidencia de S14–S18/J04–J16; [Journey Gate Operating Rules](../../control/09-JOURNEY-GATE-OPERATING-RULES.md) posee las reglas transversales.
 
-## Validación del release en producción
+## Validación histórica del release PRE-S14
 
 | Comprobación | Resultado acreditado |
 |---|---|
@@ -91,19 +80,19 @@ El [inventario técnico](../../control/03-INVENTARIO-TECNICO.md) registra los Go
 | Regresión detectada | NO |
 | SM-QA / SM-SEC | APPROVED_WITH_RISKS / APPROVED_WITH_RISKS |
 
-La limitación residual es de observabilidad: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La autenticación quedó verificada funcionalmente mediante OAuth E2E, sesión autenticada y acceso a superficies privadas. No se afirma haber observado directamente la respuesta de ese endpoint.
+En aquel release, la limitación residual de observabilidad fue que `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La autenticación quedó verificada funcionalmente mediante OAuth E2E, sesión autenticada y acceso a superficies privadas. Este resultado y la aprobación con riesgos son antecedentes PRE-S14, no la validación S14.
 
-## Cierre de higiene y checkpoint de entrada a S14
+## Cierre de S14
 
-| Comprobación | Estado |
+| Criterio de cierre | Evidencia acreditada |
 |---|---|
-| Workspace hygiene | PASS; la raíz contiene solo `sistemamaestro/` y `Backups/`; dentro de Backups solo queda `GOLD/` |
-| Eliminación de andamios | `EVIDENCE`, `EXPERIMENTS`, `HISTORICAL` y el ZIP histórico retirados |
-| Preflight del checkout local | `main` = `origin/main`; la identidad del commit consta en [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md); estado limpio antes de esta reconciliación documental |
-| Gold S14 Entry y sus datos de integridad | Consultar [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-s14-entry-vigente) |
-| Apertura formal de S14 | Pendiente de su gate/decisión de apertura; consultar el estado canónico en [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) |
+| Implementación dentro del scope autorizado | Tres archivos autorizados; ningún archivo adicional |
+| Validación | 79/79 pruebas PASS; diff check PASS; SM-SEC PASS; QA independiente PASS |
+| Publicación | Commit `180fdfc887ce9f83b0c269f1daeea8fdfc11abe7`; GitHub main y Railway production SHA coincidentes |
+| Producción | Railway SUCCESS; health y home HTTP 200; production smoke PASS |
+| Estado | S14 COMPLETED en el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) |
 
-El Gold PRE-S14 anterior se conserva como checkpoint válido de su release. El Gold S14 Entry y su alcance de identidad/integridad se describen en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-s14-entry-vigente). La existencia del checkpoint no acredita diseño, implementación ni cierre del gate; el estado de S14 pertenece al [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md).
+El detalle de identidad de producción pertenece a [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md). El [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md) conserva el Gold S14 Entry como checkpoint de entrada; no se reclasifica como Gold del estado implementado. La verificación y el cierre se limitan al scope S14 autorizado: no certifican el producto completo ni abren el gate siguiente.
 
 ## Límites conservados
 
@@ -117,12 +106,11 @@ El Gold PRE-S14 anterior se conserva como checkpoint válido de su release. El G
 - La ruta local acotada evita IA externa; esto no describe todas las rutas del Builder.
 - El gate de release autorizó únicamente la promoción PRE-S14 descrita aquí; este documento no autoriza promociones futuras, agentes nuevos, cambios de economía ni generación libre.
 
-## Límites conservados para S14
+## Límites del cierre S14
 
-El frente pendiente y su estado se mantienen en el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) y en el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md), respectivamente.
-No están aprobados aquí límites numéricos, cuotas, TTL, eviction, compactación,
-migraciones ni una política automática de eliminación.
-No se implementa S14 mediante este documento.
+El cierre cubre únicamente `sistemamaestro:durable:v1` y la política aprobada de capacidad/margen, retención/compactación, history/revert, continuidad de revisión, recuperación y fallo cerrado ante cuota. Se preservan pending work, provenance, anti-replay y aislamiento owner/project.
+
+Quedan fuera: mutación de `builderBuildState:v1`, `landingTransaction:v1`, `active_builder_project_id`, otros namespaces preserve-only/legacy, MongoDB, Railway como superficie de cambio y UI. La persistencia sigue siendo local al navegador; no acredita sincronización remota ni protección frente a borrado de datos del navegador. El siguiente gate secuencial es S15 — Canonical Project Identity; su estado y alcance están en el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) y el backlog lo referencia sin abrirlo.
 
 El [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) conserva el único frente abierto sin duplicar su estado. S14–S18 y J04–J16 se rigen por el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md). La [política de Git y deploy](../../control/07-GIT-DEPLOY-HIGIENE.md)
 rige cualquier promoción futura, que exige su propia autorización.
