@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createDurableLandingWorkspace,createLocalWorkspaceStore} from './authorizedRegressionFixture.mjs';
-import {contentHash} from './builderChangeTransaction.mjs';
+import {contentHash, newWorkspace, prepareChange, applyChange} from './builderChangeTransaction.mjs';
+import {renderLandingArtifact} from '../preview/landingArtifact.mjs';
 const base={projectId:'s12',projectKind:'landing',primaryCTA:'Consultar',visualAccent:'amber',blocks:[{id:'hero',type:'hero',props:{title:'Inicio'}},{id:'info',type:'trust',canonicalStatic:1,props:{title:'Info'}},{id:'tail',type:'trust',canonicalStatic:1,props:{title:'Final'}}]};
 function fixture(){const data=new Map();let tail=Promise.resolve(),quota=false;const store=createLocalWorkspaceStore({getItem:k=>data.get(k)||null,setItem:(k,v)=>{if(quota)throw Error('QUOTA');data.set(k,v);}},{request:(k,o,fn)=>{const p=tail.then(fn);tail=p.catch(()=>{});return p;}});return {data,quota:v=>quota=v,open:(owner='alice',check)=>createDurableLandingWorkspace(store,owner,'s12',check)};}
 async function setup(){const f=fixture(),a=f.open();await a.initialize(base);const p=await a.propose([{type:'set_primary_destination',value:'info'}]);return {f,a,p};}
@@ -37,4 +38,74 @@ test('saving a newer draft prevents an older tab from applying and erasing it',a
 
 test('saving/recovering never rerenders a legacy active artifact',async()=>{
  const f=fixture(),a=f.open();await a.initialize({...base,ctas:[{intent:'primary',href:'#info'}]});const p=await a.propose([{type:'set_accent',value:'orange'}]);const record=JSON.parse(f.data.get(a.key));const {renderLandingArtifact}=await import('../preview/landingArtifact.mjs');record.artifact=renderLandingArtifact(record.workspace.committed,true);const {digest,...body}=record;record.digest=await contentHash(body);f.data.set(a.key,JSON.stringify(record));await a.savePending(p);assert.deepEqual((await a.read()).artifact,record.artifact);await f.open().recoverPending();assert.deepEqual((await a.read()).artifact,record.artifact);
+});
+
+test('S14 compaction preserves pending candidate, decisions, provenance, recovery and exact revert', async (t) => {
+ const f=fixture(), a=f.open();
+ let workspace=newWorkspace(base);
+ for(let i=0;i<70;i++) {
+  const proposal=await prepareChange(workspace,[{type:'set_accent',value:i%2?'amber':'orange'}],`old-${i}`,'alice');
+  workspace=await applyChange(workspace,proposal);
+ }
+ const body={version:1,ownerId:'alice',projectId:'s12',workspace,artifact:renderLandingArtifact(workspace.committed),decisions:[],decisionEpoch:0,pendingDraft:null,draftVersion:0};
+ f.data.set(a.key,JSON.stringify({...body,digest:await contentHash(body)}));
+ const proposed=await a.propose([{type:'set_primary_destination',value:'info'}]);
+ const accepted=await a.decide(proposed,'ACCEPT_WARNING','Destino revisado');
+ await a.savePending(accepted);
+ const saved=await a.read();
+ assert.equal(saved.workspace.history.length,64);
+ assert.equal(saved.workspace.historyBaseRevision,6);
+ assert.deepEqual(saved.decisions,[accepted.decision]);
+ assert.deepEqual(saved.pendingDraft.proposal,proposed.proposal);
+ assert.deepEqual(saved.pendingDraft.review,proposed.review);
+ assert.deepEqual(saved.workspace.compactedProvenance.map(e=>e.operationId),Array.from({length:6},(_,i)=>`old-${i}`));
+ const original=f.data.get(a.key);
+ f.quota(true); await assert.rejects(f.open().recoverPending(),/QUOTA/); assert.equal(f.data.get(a.key),original); f.quota(false);
+ const b=f.open(), recovered=await b.recoverPending();
+ assert.deepEqual(recovered.proposal.candidate,proposed.proposal.candidate);
+ assert.deepEqual(recovered.proposal.artifact,proposed.proposal.artifact);
+ assert.equal(recovered.decision,undefined);
+ assert.deepEqual((await b.read()).decisions,saved.decisions);
+ await assert.rejects(a.apply(accepted),/STALE_DECISION|STALE_DRAFT/);
+ const decision=await b.decide(recovered,'ACCEPT_WARNING','Revalidado tras recuperación');
+ await b.apply(decision);
+ const restored=await b.revert(71);
+ assert.deepEqual(restored.workspace.committed,saved.workspace.committed);
+ assert.deepEqual(restored.artifact,saved.artifact);
+ assert.deepEqual(restored.decisions,[accepted.decision,decision.decision]);
+ // Prune the applied event by age; its decision and consumed authorization stay auditable.
+ t.mock.method(Date,'now',()=>Date.parse('2199-01-01T00:00:00Z'));
+ const next=await b.propose([{type:'set_accent',value:'orange'}]); await b.savePending(next);
+ const final=await b.read();
+ assert.ok(final.workspace.consumedOperationIds.includes(recovered.proposal.operationId));
+ const applied=[...final.workspace.history,...final.workspace.compactedProvenance].find(e=>e.operationId===recovered.proposal.operationId);
+ assert.equal(applied.authorization.validity,'CONSUMED');
+ assert.equal(applied.humanDecision.decisionId,decision.decision.decisionId);
+});
+
+test('S14 failed hard-cap pending write does not erase an existing draft or human decisions', async () => {
+ const f=fixture(),a=f.open();
+ await a.initialize({...base,fixturePayload:'x'.repeat(110000)});
+ const p=await a.propose([{type:'set_primary_destination',value:'info'}]);
+ const accepted=await a.decide(p,'ACCEPT_WARNING','Conservar el trabajo previo');
+ // A valid oversized legacy draft remains readable, never silently deleted to fit.
+ const raw=JSON.parse(f.data.get(a.key));
+ raw.pendingDraft={version:1,ownerId:'alice',projectId:'s12',proposal:accepted.proposal,review:accepted.review};
+ const {digest,...body}=raw; raw.digest=await contentHash(body); f.data.set(a.key,JSON.stringify(raw));
+ const previous=f.data.get(a.key);
+ await assert.rejects(a.savePending(accepted),/DURABLE_CAPACITY_EXCEEDED/);
+ assert.equal(f.data.get(a.key),previous);
+});
+
+test('S14 compacted IDs cannot be resurrected through a forged pending envelope', async () => {
+ const {f,a,p}=await setup();
+ const accepted=await a.decide(p,'ACCEPT_WARNING','Destino aceptado');await a.apply(accepted);
+ const candidate=await a.propose([{type:'set_accent',value:'orange'}]);
+ candidate.proposal.operationId=p.proposal.operationId;
+ const previous=f.data.get(a.key);
+ await assert.rejects(a.savePending(candidate),/DUPLICATE_APPLY/);
+ assert.equal(f.data.get(a.key),previous);
+ const wrong=await a.propose([{type:'set_accent',value:'orange'}]);wrong.proposal.ownerId='bob';
+ await assert.rejects(a.savePending(wrong),/OWNER_OR_PROJECT_MISMATCH/);
+ assert.equal(f.data.get(a.key),previous);
 });
