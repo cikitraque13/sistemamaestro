@@ -1,23 +1,29 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado del release PRE-S14 — 2026-10-02
+## Estado del release S14 — 2026-10-03
 
 | Plano | Identidad y estado |
 |---|---|
-| GitHub main (checkpoint S14 Entry) | `3b0a23a96711a7be9d2fa42ccce101882c328295` |
-| Tree de main | `3c1d8e2b2b2b3de88bcc994bdd5482340e0cc57c` |
-| Railway production deployment reportado | `7e4e39d8-a1ea-495e-866c-c0d09efb7ec6` — `SUCCESS` |
-| Correspondencia main ↔ Railway | `MATCH` reportado; el SHA exacto del deployment no consta en esta evidencia |
-| `/health` / home | `200` reportado |
-| Release PRE-S14 | `CLOSED / DEPLOYED / VERIFIED` |
-| Gold S14 Entry | `GOLD_FREEZE_S14_ENTRY_2026-10-02` |
-| S14 | `NOT_STARTED` (estado canónico en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)) |
+| GitHub main | `180fdfc887ce9f83b0c269f1daeea8fdfc11abe7` |
+| Tree de main observado en checkout canónico | `10c77fdeca90f7c52cc8ca1b02c33c6560517968` |
+| Railway deployment | `9f7ce141-ed03-49d7-880c-ea961766aec4` |
+| Railway production SHA | `180fdfc887ce9f83b0c269f1daeea8fdfc11abe7` |
+| Correspondencia GitHub main ↔ Railway | `YES` |
+| Railway | `SUCCESS` |
+| `/health` / home | `200 / 200` |
+| Production smoke | `PASS` |
+| Alcance de publicación | Exacto: tres archivos S14 autorizados; archivos extra: ninguno |
+| Estado del release S14 | `CLOSED / DEPLOYED / VERIFIED` |
+| Gold S14 Entry | `GOLD_FREEZE_S14_ENTRY_2026-10-02` (checkpoint de entrada) |
+| Estado S14 | `COMPLETED` (estado canónico en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)) |
 
-La identidad de `main` y tree corresponde al checkpoint canónico indicado. El deployment ID, estado, coincidencia main/Railway y verificaciones HTTP se registran según el gate productivo reportado; no se afirma aquí una observación directa del SHA de Railway.
+El gate de publicación acredita el commit de GitHub main y el mismo SHA en Railway production; el deployment indicado terminó SUCCESS. La verificación acredita health/home HTTP 200 y production smoke PASS. El tree indicado corresponde al checkout canónico observado en ese commit.
 
-La limitación de evidencia restante se registra literalmente: `/api/auth/me` no se observó directamente porque el navegador devolvió `ERR_BLOCKED_BY_CLIENT`. La sesión OAuth y el acceso autenticado a las superficies privadas quedaron funcionalmente verificados; QA y Security aprobaron con riesgos. La respuesta del endpoint no se declara observada.
+### Antecedente histórico PRE-S14
 
-[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el estado, la cadena de validación y los límites del release. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold PRE-S14 anterior y el Gold S14 Entry vigente. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es owner de los estados S14–S18/J04–J16; las reglas transversales están en [Journey Gate Operating Rules](../control/09-JOURNEY-GATE-OPERATING-RULES.md).
+El release PRE-S14 usó el checkpoint de main `3b0a23a96711a7be9d2fa42ccce101882c328295`, tree `3c1d8e2b2b2b3de88bcc994bdd5482340e0cc57c` y deployment reportado `7e4e39d8-a1ea-495e-866c-c0d09efb7ec6`. La limitación de observabilidad de `/api/auth/me` (`ERR_BLOCKED_BY_CLIENT`) y la aprobación con riesgos corresponden a ese release histórico; no describen la verificación del release S14.
+
+[Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el cierre y la cadena de validación S14. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold PRE-S14 anterior, el Gold S14 Entry y el alcance técnico implementado. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es owner de los estados S14–S18/J04–J16; las reglas transversales están en [Journey Gate Operating Rules](../control/09-JOURNEY-GATE-OPERATING-RULES.md).
 
 Este documento y los archivos Dockerfile/railway.json prevalecen sobre ejemplos
 incompatibles del procedimiento DEPLOY_RAILWAY.md: su ejemplo startCommand

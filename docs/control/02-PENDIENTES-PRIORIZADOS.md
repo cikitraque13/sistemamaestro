@@ -1,23 +1,20 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-02
+## Estado operativo vigente — 2026-10-03
 
-Propietario del backlog actual. El release PRE-S14 quedó cerrado, desplegado y verificado. El Gold independiente S14 Entry está creado y registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md). Su existencia no abre S14.
-El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario de sus cierres y evidencias. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad productiva.
+Propietario del backlog actual. S14 quedó cerrado y su publicación/producción están verificadas; la identidad del release consta en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El Gold S14 Entry permanece registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md) como checkpoint de entrada, no como evidencia del cierre posterior.
+El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario de sus cierres y validaciones. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad productiva.
 
-## Único frente abierto de Journey 03
+## Siguiente frente canónico de Journey 03
 
-CURRENT_PENDING_FRONT=S14_LOCAL_STORAGE_CAPACITY_AND_RETENTION
-S14=NOT_STARTED (estado canónico en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md))
+CURRENT_PENDING_FRONT=S15_CANONICAL_PROJECT_IDENTITY
+S14=COMPLETED; S15=NOT_STARTED; gate no abierto (estados canónicos en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)).
 
-Clasificación: crítica estructural.
+Clasificación: frente estructural siguiente; no abierto por este registro.
 
-Objetivo pendiente: delimitar capacidad y retención del almacenamiento local del Builder.
-El cierre PRE-S14 no acredita una política de crecimiento/retención a largo plazo.
+WHAT_REMAINS: probar identidad canónica transversal, selección/cambio de proyecto, recuperación y propagación por todas las superficies pertinentes, según el [Master Maturity Roadmap — S15](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
 
-La siguiente decisión requiere concretar alcance y criterios de aceptación para S14.
-No se fijan cuotas, TTL, tamaños máximos, compactación, migraciones, eliminación automática,
-interfaz ni un mecanismo de implementación. Este documento no inicia S14.
+Este backlog registra el orden del frente pendiente, pero no abre ni autoriza el gate S15.
 
 ## Cierres que se retiran del backlog activo
 

@@ -24,17 +24,17 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 ### S14 — Local Storage Capacity and Retention
 
 - ORIGINAL_PURPOSE: definir capacidad, retención, compactación y respuesta segura ante presión de cuota para el estado durable local, preservando trabajo pendiente, trazabilidad, decisiones, anti-replay y revert.
-- CURRENT_STATUS: NOT_STARTED.
-- ACCREDITED_EVIDENCE: baseline PRE-S14 describe localStorage, Web Locks, crecimiento append de history/decisions, fail-closed y dependencia del snapshot del último apply. Es contexto previo sujeto a revalidación contra el Gold.
-- WHAT_REMAINS: decidir alcance y criterios; no hay política de retención/eviction acreditada como diseñada o implementada.
-- EVIDENCE_REUSABLE_IF: los blobs de persistencia y pruebas del Gold coinciden con la evidencia baseline.
+- CURRENT_STATUS: COMPLETED.
+- ACCREDITED_EVIDENCE: implementación S14 conforme a la política y al design lock aprobados; revisión SM-SEC=PASS; QA independiente=PASS; 79/79 pruebas; publicación en el commit `180fdfc887ce9f83b0c269f1daeea8fdfc11abe7`; Railway SUCCESS, SHA de producción coincidente, health/home HTTP 200 y production smoke PASS. La identidad productiva es propiedad de [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md); el cierre y sus validaciones están en [Journey 03](07-JOURNEY-03-ESTADO-PRE-S14.md).
+- WHAT_REMAINS: ninguno dentro del scope S14 acreditado. El siguiente gate secuencial es S15 — Canonical Project Identity; su estado sigue NOT_STARTED y esta entrada no lo abre.
+- EVIDENCE_REUSABLE_IF: las rutas de persistencia, política, pruebas y límites de S14 permanecen idénticos al artefacto publicado.
 - REVALIDATE_IF: cambia esquema, clave, locking, revisionado, recuperación, decisiones, pending work, snapshot/revert o criterio de capacidad.
-- DEPENDENCIES: baseline de almacenamiento S1–S13; decisión explícita de alcance antes de diseño/implementación.
+- DEPENDENCIES: baseline de almacenamiento S1–S13 y decisión de alcance S14, cerrados con evidencia referenciada en Journey 03.
 
 ### S15 — Canonical Project Identity
 
 - ORIGINAL_PURPOSE: establecer identidad canónica de proyecto/workspace y vincularla a owner, revisión y artefactos en todas las operaciones.
-- CURRENT_STATUS: NOT_DEMONSTRATED; no está cerrado.
+- CURRENT_STATUS: NOT_STARTED; gate no abierto.
 - ACCREDITED_EVIDENCE: Journey 03 acredita aislamiento owner/project y protecciones de revisión dentro del circuito local delimitado.
 - WHAT_REMAINS: probar identidad canónica transversal, selección/cambio de proyecto, recuperación y propagación por todas las superficies pertinentes.
 - EVIDENCE_REUSABLE_IF: los contratos y bytes de identidad/ownership permanecen iguales y el nuevo gate mantiene el mismo alcance.
