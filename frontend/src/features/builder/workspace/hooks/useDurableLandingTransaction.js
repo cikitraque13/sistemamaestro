@@ -3,21 +3,21 @@ import { useEffect, useRef, useState } from 'react';
 import { createDurableLandingWorkspace, createLocalWorkspaceStore } from '../../state/durableLandingWorkspace.mjs';
 import { contentHash } from '../../state/builderChangeTransaction.mjs';
 
-export default function useDurableLandingTransaction(activeState, onCommit, ownerId) {
+export default function useDurableLandingTransaction(activeState, onCommit, ownerId, binding) {
   const [view, setView] = useState({ pending: null, review: null, decision: null, revision: 0, canRevert: false, status: 'loading', error: '', busy: false });
   const context = useRef(null);
-  const latest = useRef({ activeState, onCommit, ownerId });
-  latest.current = { activeState, onCommit, ownerId };
+  const latest = useRef({ activeState, onCommit, ownerId, binding });
+  latest.current = { activeState, onCommit, ownerId, binding };
   const projectId = activeState?.projectId;
   useEffect(() => {
     const token = { ownerId, projectId, alive: true, locked: false, record: null, intent: 0 };
     context.current = token;
     const assertCurrent = () => {
       if (token.locked && token.operationIntent !== token.intent) throw new Error('PROPOSAL_CANCELLED');
-      if (!token.alive || context.current !== token || latest.current.ownerId !== ownerId || latest.current.activeState?.projectId !== projectId) throw new Error('SESSION_CHANGED');
+      if (!token.alive || context.current !== token || latest.current.ownerId !== ownerId || latest.current.activeState?.projectId !== projectId || latest.current.binding?.serverRevision !== binding?.serverRevision || latest.current.binding?.projectId !== binding?.projectId) throw new Error('SESSION_CHANGED');
     };
     setView({ pending: null, review: null, decision: null, revision: 0, canRevert: false, status: 'loading', error: '', busy: false });
-    if (!ownerId || !projectId) {
+    if (!ownerId || !projectId || !binding || binding.projectId !== projectId) {
       setView((v) => ({ ...v, status: 'blocked', error: ownerId ? '' : 'Se requiere una sesión autenticada.' }));
       return () => { token.alive = false; };
     }
@@ -28,7 +28,7 @@ export default function useDurableLandingTransaction(activeState, onCommit, owne
     };
     token.publish = publish; token.assertCurrent = assertCurrent;
     try {
-      token.repository = createDurableLandingWorkspace(createLocalWorkspaceStore(window.localStorage, navigator.locks), ownerId, projectId, assertCurrent);
+      token.repository = createDurableLandingWorkspace(createLocalWorkspaceStore(window.localStorage, navigator.locks), ownerId, projectId, assertCurrent, binding);
       token.ready = token.repository.initialize(activeState).then(publish).catch((error) => {
         if (token.alive) setView((v) => ({ ...v, status: 'blocked', error: error.message }));
       });
@@ -43,7 +43,7 @@ export default function useDurableLandingTransaction(activeState, onCommit, owne
     return () => { token.alive = false; window.removeEventListener('storage', invalidate); };
   // The initial state is intentionally captured once per owner/project; later revisions are committed through this session.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, projectId]);
+  }, [ownerId, projectId, binding?.serverRevision, binding?.projectId]);
 
   const operate = async (kind, operations, expectedReviewId, expectedDecisionId) => {
     const token = context.current;

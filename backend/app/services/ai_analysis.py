@@ -76,6 +76,7 @@ async def analyze_with_ai(
     input_type: str,
     input_content: str,
     url_analysis: Optional[Dict[str, Any]] = None,
+    *, identity: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Pipeline del adaptador de primera activación IA:
@@ -98,6 +99,7 @@ async def analyze_with_ai(
         input_type=input_type,
         input_content=input_content,
         url_analysis=url_analysis,
+        identity=identity,
     )
 
     lead_meta = resolve_analysis_lead(context)

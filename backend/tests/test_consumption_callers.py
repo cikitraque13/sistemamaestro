@@ -51,12 +51,13 @@ stub("backend.app.ai.guards.cost_guard", assess_cost=lambda value: {"action": "a
 stub("backend.app.ai.guards.output_guard", validate_output_shape=lambda *args: {"valid": True})
 stub("backend.app.ai.guards.policy_guard", evaluate_policy=lambda **kwargs: {"allowed": True})
 stub("backend.app.ai.guards.security_guard", assess_security_context=lambda value: {"action": "allow"})
-stub("backend.app.ai.telemetry.agent_trace", build_trace=lambda **kwargs: {"status": "completed"})
+stub("backend.app.ai.telemetry.agent_trace", build_trace=lambda **kwargs: {**kwargs, "status": "completed"})
 
 from backend.app.routers import builder_ai, projects, consumption
 from backend.app.ai.schemas.builder_ai_output import BuilderAIInput
 from backend.app.schemas.projects import ProjectCreate
 from backend.tests.test_credit_consumption_safety import engine_payload
+from backend.tests.test_credit_consumption_safety import _matches
 
 
 class FakeProjects:
@@ -67,7 +68,7 @@ class FakeProjects:
 
     async def find_one(self, query, projection=None):
         doc = self.documents.get(query["project_id"])
-        return deepcopy(doc) if doc and doc.get("user_id") == query.get("user_id", doc.get("user_id")) else None
+        return deepcopy(doc) if doc and _matches(doc, query) else None
 
     async def insert_one(self, doc):
         self.insert_count += 1
@@ -94,7 +95,7 @@ class FakeProjects:
 
 
 def request(key="logical-operation-1"):
-    return SimpleNamespace(headers={"Idempotency-Key": key} if key else {})
+    return SimpleNamespace(headers={"Idempotency-Key": key, "If-Match": "0"} if key else {"If-Match": "0"})
 
 
 class ChargedCallerTests(unittest.IsolatedAsyncioTestCase):

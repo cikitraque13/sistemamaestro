@@ -80,7 +80,21 @@ export function createLocalWorkspaceStore(storage, locks) {
   };
 }
 
-export function createDurableLandingWorkspace(store, ownerId, projectId, assertCurrent = () => {}) {
+export function createDurableLandingWorkspace(store, ownerId, projectId, assertCurrent = () => {}, binding = {}) {
+  const revision = binding.serverRevision;
+  const validRevision = revision === '0' || (typeof revision === 'string' && /^\d{4}-\d\d-\d\dT/.test(revision) && Number.isFinite(Date.parse(revision)));
+  const rawStore = store;
+  async function verifyBinding() {
+    assertCurrent();
+    if (!validRevision || typeof binding.verify !== 'function' || await binding.verify() !== revision) fail('SERVER_REVISION_UNVERIFIED');
+    assertCurrent();
+  }
+  store = { transaction: (key, operation) => rawStore.transaction(key, async raw => {
+    await verifyBinding();
+    const result = await operation(raw);
+    await verifyBinding();
+    return result;
+  }) };
   const key = durableWorkspaceKey(ownerId, projectId);
   const sessionId = crypto.randomUUID();
   const authorizations = new Map();
@@ -93,6 +107,7 @@ export function createDurableLandingWorkspace(store, ownerId, projectId, assertC
     if (record?.version !== 1 || record.ownerId !== ownerId || record.projectId !== projectId) fail('OWNERSHIP_OR_VERSION_MISMATCH');
     const { digest, ...body } = record;
     if (digest !== await contentHash(body)) fail('CORRUPT_WORKSPACE');
+    if (record.serverRevision !== revision) fail('SERVER_REVISION_MISMATCH');
     const ws = record.workspace;
     if (!ws || ws.schemaVersion !== 1 || !Number.isSafeInteger(ws.revision) || ws.revision < 0 || !Array.isArray(ws.history) || ws.committed?.projectId !== projectId) fail('CORRUPT_WORKSPACE');
     normalizeHistory(ws);
@@ -110,7 +125,7 @@ export function createDurableLandingWorkspace(store, ownerId, projectId, assertC
     const artifact = preservedArtifact || restored || renderLandingArtifact(workspace.committed);
     if (last) delete last.restoredArtifact;
     validateLandingArtifact(workspace.committed, artifact);
-    const body = { version: 1, ownerId, projectId, workspace, artifact, decisions: copy(decisions), decisionEpoch, pendingDraft: copy(pendingDraft), draftVersion };
+    const body = { version: 1, ownerId, projectId, serverRevision: revision, workspace, artifact, decisions: copy(decisions), decisionEpoch, pendingDraft: copy(pendingDraft), draftVersion };
     const protectedSnapshots = revertibleEvents(workspace).slice(-DURABLE_STORAGE_POLICY.minRevertDepth);
     const cutoff = Date.now() - DURABLE_STORAGE_POLICY.retentionMs;
     const serialize = async () => JSON.stringify({ ...body, digest: await contentHash(body) });

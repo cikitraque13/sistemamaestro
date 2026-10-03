@@ -88,7 +88,7 @@ async function seedLegacy(f, count, timestamps, state = base) {
     workspace = await applyChange(workspace, p);
     if (timestamps) workspace.history.at(-1).createdAt = timestamps(i);
   }
-  const body = { version: 1, ownerId: 'alice', projectId: 'landing', workspace,
+  const body = { version: 1, serverRevision: '0', ownerId: 'alice', projectId: 'landing', workspace,
     artifact: renderLandingArtifact(workspace.committed), decisions: [], decisionEpoch: 0, pendingDraft: null, draftVersion: 0 };
   const record = { ...body, digest: await contentHash(body) };
   f.data.set(a.key, JSON.stringify(record));

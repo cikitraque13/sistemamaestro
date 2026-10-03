@@ -3,7 +3,54 @@ import assert from 'node:assert/strict';
 import {createDurableLandingWorkspace,createLocalWorkspaceStore} from './authorizedRegressionFixture.mjs';
 import {contentHash, newWorkspace, prepareChange, applyChange} from './builderChangeTransaction.mjs';
 import {renderLandingArtifact} from '../preview/landingArtifact.mjs';
+import {createDurableLandingWorkspace as createBoundRepository} from './durableLandingWorkspace.mjs';
+import {requestedProject, validatedProjectIdentity, requireOutputIdentity} from './projectIdentity.mjs';
 const base={projectId:'s12',projectKind:'landing',primaryCTA:'Consultar',visualAccent:'amber',blocks:[{id:'hero',type:'hero',props:{title:'Inicio'}},{id:'info',type:'trust',canonicalStatic:1,props:{title:'Info'}},{id:'tail',type:'trust',canonicalStatic:1,props:{title:'Final'}}]};
+
+function boundFixture() {
+ const data=new Map(); let current='2026-10-03T08:00:00+00:00';
+ const store=createLocalWorkspaceStore({getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v)}, {request:(_k,_o,fn)=>fn()});
+ return {data,setCurrent:v=>{current=v;},open:(revision='2026-10-03T08:00:00+00:00')=>createBoundRepository(store,'alice','s12',()=>{}, {serverRevision:revision,verify:async()=>current})};
+}
+test('S15 matching server token persists separately, recovers pending and retains local revision',async()=>{
+ const f=boundFixture(),a=f.open(); await a.initialize(base);
+ const p=await a.propose([{type:'set_accent',value:'orange'}]);await a.savePending(p);
+ const raw=JSON.parse(f.data.get(a.key)); assert.equal(raw.serverRevision,'2026-10-03T08:00:00+00:00');assert.equal(raw.workspace.revision,0);
+ const b=f.open(),recovered=await b.recoverPending(); const applied=await b.apply(recovered,await b.authorize(recovered));
+ assert.equal(applied.workspace.revision,1);assert.equal(applied.serverRevision,raw.serverRevision);
+ assert.deepEqual((await b.revert(1)).workspace.committed,base);
+});
+test('S15 changed or unverifiable server token rejects recovery/apply preserving every byte',async()=>{
+ for(const revision of ['2026-10-03T09:00:00+00:00',null,undefined]) {
+ const f=boundFixture(),a=f.open();await a.initialize(base);const p=await a.propose([{type:'set_accent',value:'orange'}]);const saved=await a.savePending(p);const auth=await a.authorize(saved);const before=f.data.get(a.key);
+ f.setCurrent(revision);await assert.rejects(a.recoverPending(),/SERVER_REVISION/);await assert.rejects(a.apply(saved,auth),/SERVER_REVISION/);assert.equal(f.data.get(a.key),before);
+ }
+});
+test('S15 missing/mismatched persisted binding preserves legacy without rebasing',async()=>{
+ for(const revision of [undefined,'2026-10-03T07:00:00+00:00']) {
+ const f=boundFixture(),a=f.open();await a.initialize(base);const p=await a.propose([{type:'set_accent',value:'orange'}]);await a.savePending(p);
+ const raw=JSON.parse(f.data.get(a.key));if(revision===undefined)delete raw.serverRevision;else raw.serverRevision=revision;
+ const {digest,...body}=raw;raw.digest=await contentHash(body);f.data.set(a.key,JSON.stringify(raw));const before=f.data.get(a.key);
+ await assert.rejects(f.open().initialize(base),/SERVER_REVISION/);await assert.rejects(f.open().recoverPending(),/SERVER_REVISION/);await assert.rejects(a.authorize(p),/SERVER_REVISION/);assert.equal(f.data.get(a.key),before);
+ }
+});
+test('S15 rechecks server token before committing replacement',async()=>{
+ const data=new Map();let calls=0;const store=createLocalWorkspaceStore({getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v)},{request:(_k,_o,fn)=>fn()});
+ const a=createBoundRepository(store,'alice','s12',()=>{}, {serverRevision:'0',verify:async()=> ++calls===1?'0':null});
+ await assert.rejects(a.initialize(base),/SERVER_REVISION/);assert.equal(data.size,0);
+});
+test('S15 URL/state selection conflicts and server owner/revision mismatch fail closed',()=>{
+ assert.equal(requestedProject('?project_id=A',null),'A');assert.equal(requestedProject('',null),'');
+ assert.throws(()=>requestedProject('?project_id=A',{projectId:'B'}));assert.throws(()=>requestedProject('?project_id=A&project_id=B',null));
+ assert.throws(()=>validatedProjectIdentity({project_id:'A',user_id:'bob'},'alice','A'));
+ assert.throws(()=>validatedProjectIdentity({project_id:'A',user_id:'alice',updated_at:null},'alice','A'));
+ assert.deepEqual(validatedProjectIdentity({project_id:'A',user_id:'alice'},'alice','A'),{ownerId:'alice',projectId:'A',serverRevision:'0'});
+});
+test('S15 projectless and foreign output cannot be adopted by project-bound runtime',()=>{
+ const identity={ownerId:'alice',projectId:'A',serverRevision:'0'};
+ for(const binding of [{...identity,scope:'projectless'},{...identity,scope:'project',projectId:'B'},{...identity,scope:'project',serverRevision:'other'}])assert.throws(()=>requireOutputIdentity({trace:{meta:{identity:binding}}},identity));
+ assert.ok(requireOutputIdentity({trace:{meta:{identity:{...identity,scope:'project'}}}},identity));
+});
 function fixture(){const data=new Map();let tail=Promise.resolve(),quota=false;const store=createLocalWorkspaceStore({getItem:k=>data.get(k)||null,setItem:(k,v)=>{if(quota)throw Error('QUOTA');data.set(k,v);}},{request:(k,o,fn)=>{const p=tail.then(fn);tail=p.catch(()=>{});return p;}});return {data,quota:v=>quota=v,open:(owner='alice',check)=>createDurableLandingWorkspace(store,owner,'s12',check)};}
 async function setup(){const f=fixture(),a=f.open();await a.initialize(base);const p=await a.propose([{type:'set_primary_destination',value:'info'}]);return {f,a,p};}
 test('save/reload/recover preserves exact candidate/artifact and clears authorization; apply/reload/revert',async()=>{
@@ -47,7 +94,7 @@ test('S14 compaction preserves pending candidate, decisions, provenance, recover
   const proposal=await prepareChange(workspace,[{type:'set_accent',value:i%2?'amber':'orange'}],`old-${i}`,'alice');
   workspace=await applyChange(workspace,proposal);
  }
- const body={version:1,ownerId:'alice',projectId:'s12',workspace,artifact:renderLandingArtifact(workspace.committed),decisions:[],decisionEpoch:0,pendingDraft:null,draftVersion:0};
+ const body={version:1,serverRevision:'0',ownerId:'alice',projectId:'s12',workspace,artifact:renderLandingArtifact(workspace.committed),decisions:[],decisionEpoch:0,pendingDraft:null,draftVersion:0};
  f.data.set(a.key,JSON.stringify({...body,digest:await contentHash(body)}));
  const proposed=await a.propose([{type:'set_primary_destination',value:'info'}]);
  const accepted=await a.decide(proposed,'ACCEPT_WARNING','Destino revisado');
