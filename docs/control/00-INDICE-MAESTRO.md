@@ -2,9 +2,9 @@
 
 ## Estado del documento
 
-- Estado: activo, reconciliado tras el release PRE-S14 el 2026-10-02.
+- Estado: activo, reconciliado tras el cierre operacional S15 el 2026-10-05.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
-- Release PRE-S14 y checkpoint S14 Entry: consultar los documentos propietarios de Journey 03, producción/runtime e inventario Gold; este índice no duplica sus identidades.
+- Cierre S15 y Gold post-S15: consultar los documentos propietarios de Journey 03, producción/runtime e inventario Gold; este índice no duplica sus identidades.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
   release Journey 03, S14 y registros históricos.
 
@@ -12,11 +12,11 @@
 
 | Tema | Propietario | Papel |
 |---|---|---|
-| Producción y runtime del release PRE-S14 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para SHA/tree/deployment y riesgos de observabilidad |
-| Journey 03, S1–S13/C1 y validación PRE-S14 | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, release y evidencia PRE-S14 |
+| Producción y runtime del release S15 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para SHA/tree/deployment y riesgos de observabilidad |
+| Journey 03, cierres S1–S15 y validaciones | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, releases y evidencia de Journey 03 |
 | Decisiones aprobadas | [Decisiones cerradas](01-DECISIONES-CERRADAS.md) | SOURCE_OF_TRUTH; conserva procedencia y alcance temporal |
-| Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del frente activo de Journey 03 |
-| Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración |
+| Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del siguiente frente previsto; no lo autoriza |
+| Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración; incluye baseline post-S15 |
 | Rutas de producto y sistema | [Rutas canónicas](04-RUTAS-CANONICAS.md) | SUPPORTING_CANONICAL; inventario vigente completa las incorporaciones PRE-S14 |
 | Procedimientos operativos | [Procedimientos](06-PROCEDIMIENTOS-OPERATIVOS.md) | SUPPORTING_CANONICAL; no autoriza acciones por sí mismo |
 | Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
@@ -55,18 +55,18 @@ Las fuentes de Preservation se consultaron durante la reconciliación documental
 
 PRESERVATION_RECONCILIATION=COMPLETED: las aportaciones válidas se integraron en decisiones y pendientes, conservando sus límites temporales.
 REQUIRES_UPDATE: cualquier futura variación de producción, del checkpoint local o
-de S14 deberá actualizar su propietario canónico; no se presume realizada.
+de S15 deberá actualizar su propietario canónico; no se presume realizada.
 
 ## Orden de lectura y ejecución vigente
 
 1. Runtime and Deploy Truth: identificar `main`, deployment de Railway y riesgos residuales.
-2. Estado Journey 03 PRE-S14: consultar el cierre desplegado, su evidencia y S14.
+2. Estado Journey 03: consultar los cierres y la evidencia acreditada hasta S15.
 3. Decisiones, pendientes y contratos: respetar lo cerrado y el frente abierto.
 4. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
 Los fundamentos Builder state/kernel y el circuito local S1–S13/C1 están implementados
 y validados en ingeniería local; su creación no es una prioridad pendiente.
-El frente activo se describe en [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md); el estado S14 y los criterios de apertura pertenecen al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md). La identidad del Gold S14 Entry está en [Inventario técnico](03-INVENTARIO-TECNICO.md). Este índice no abre S14.
+El siguiente frente previsto se describe en [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md); los estados S14–S18 y los criterios de apertura pertenecen al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md). La identidad del Gold post-S15 está en [Inventario técnico](03-INVENTARIO-TECNICO.md). Este índice no abre S16.
 
 ## Reglas duraderas de gobierno
 

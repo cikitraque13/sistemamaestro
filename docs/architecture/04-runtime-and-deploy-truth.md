@@ -1,6 +1,25 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado del release S14 — 2026-10-03
+## Estado actual del release S15 — 2026-10-05
+
+| Plano | Identidad y estado |
+|---|---|
+| Candidato S15 | e6e73e67b97273db54b41adad6c59232a7cd7f2f |
+| PR | #81 MERGED |
+| GitHub main | e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279 |
+| Tree de main | 523e0f1bee92c59e7d5058426952862beb7da5ab |
+| Railway deployment | a83bab19-a551-4b2f-bb7a-ad066abc0666 |
+| Railway production SHA | e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279 |
+| Trazabilidad candidato → PR/merge → main → Railway | PASS |
+| Railway | SUCCESS |
+| Flujo autenticado y ruta legacy | PASS; evidencia manual HUMAN-LUCAS |
+| SERVER_REVISION_MISMATCH | RESOLVED |
+| Regresión | NO |
+| Cierre operacional S15 | CLOSED |
+
+El candidato S15 es el segundo padre del merge de PR #81; el merge conserva el tree aceptado. HUMAN-LUCAS aportó la evidencia manual de producción autenticada. Este registro no añade resultados de healthcheck o pruebas fuera de esa evidencia.
+
+## Registro histórico del release S14 — 2026-10-03
 
 | Plano | Identidad y estado |
 |---|---|

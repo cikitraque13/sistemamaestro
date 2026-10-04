@@ -7,14 +7,14 @@ El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S1
 
 ## Siguiente frente canónico de Journey 03
 
-CURRENT_PENDING_FRONT=S15_CANONICAL_PROJECT_IDENTITY
-S14=COMPLETED; S15=NOT_STARTED; gate no abierto (estados canónicos en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)).
+CURRENT_PENDING_FRONT=S16_RUNTIME_REPRODUCIBILITY
+S14=COMPLETED; S15=COMPLETED; S16=NOT_DEMONSTRATED; gate S16 no abierto (estados canónicos en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)).
 
-Clasificación: frente estructural siguiente; no abierto por este registro.
+Clasificación: frente estructural siguiente (S16 — Runtime Reproducibility); no abierto por este registro.
 
-WHAT_REMAINS: probar identidad canónica transversal, selección/cambio de proyecto, recuperación y propagación por todas las superficies pertinentes, según el [Master Maturity Roadmap — S15](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+WHAT_REMAINS: enlazar resultados y comandos al artefacto congelado y demostrar que cubren los criterios propios de S16, con identidad exacta de commit/tree, manifests, runtime Node/npm, Dockerfile, imagen/método, plataforma y comandos. Referencia: [Master Maturity Roadmap — S16](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
 
-Este backlog registra el orden del frente pendiente, pero no abre ni autoriza el gate S15.
+Este backlog registra el orden del frente pendiente, pero no abre ni autoriza el gate S16.
 
 ## Cierres que se retiran del backlog activo
 
