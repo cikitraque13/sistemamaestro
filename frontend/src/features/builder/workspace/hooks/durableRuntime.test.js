@@ -1,3 +1,6 @@
+import { createBoundWorkspace as createDurableLandingWorkspace } from '../../state/authorizedRegressionFixture.mjs';
+import { api } from '../../../../lib/apiClient';
+vi.mock('../../../../lib/apiClient', () => ({api:{get:vi.fn()}}));
 import HumanSemanticDecision from '../../panels/HumanSemanticDecision';
 import CTADestinationSelector from '../../panels/CTADestinationSelector';
 import React from 'react';
@@ -9,7 +12,7 @@ import { vi } from 'vitest';
 import useBuilderWorkspaceRuntime from './useBuilderWorkspaceRuntime';
 import { createInitialBuildState } from '../../state/builderBuildState';
 import { BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID, persistBuilderBuildState, restoreBuilderBuildState } from '../../state/builderBuildStateStorage';
-import { durableWorkspaceKey, createDurableLandingWorkspace, createLocalWorkspaceStore } from '../../state/durableLandingWorkspace.mjs';
+import { durableWorkspaceKey, createLocalWorkspaceStore } from '../../state/durableLandingWorkspace.mjs';
 import { transactionStorageKey } from '../../state/builderChangeTransaction.mjs';
 import BuilderChangeReview from '../../panels/BuilderChangeReview';
 import StaticSectionEditor from '../../panels/StaticSectionEditor';
@@ -17,20 +20,23 @@ import LandingArtifactPreview from '../../panels/LandingArtifactPreview';
 Object.defineProperty(globalThis, 'crypto', { value: webcrypto });
 globalThis.TextEncoder = TextEncoder;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const project = { project_id: 'owned-landing', input_type: 'text', input_content: 'Landing de consultoría profesional', route: 'idea', status: 'created' };
-let roots, clients, hold;
+const project = { user_id: 'alice', project_id: 'owned-landing', input_type: 'text', input_content: 'Landing de consultoría profesional', route: 'idea', status: 'created' };
+let roots, clients, hold, fixtureOwner='alice';
 const previewBodies = new Map();
 const previewHtml = node => previewBodies.get(node.querySelector('iframe').getAttribute('src'));
 const NativeBlob = global.Blob;
-function Harness({ owner, slot, activeProject = project }) { clients[slot] = useBuilderWorkspaceRuntime({ project: activeProject, ownerId: owner }); return null; }
+function Harness({ owner, slot, activeProject = project }) { clients[slot] = useBuilderWorkspaceRuntime({ project: { ...activeProject, user_id: owner }, ownerId: owner }); return null; }
 const settle = async () => { for (let i = 0; i < 20; i++) await act(async () => { await new Promise((r) => setTimeout(r, 3)); }); };
 async function mount(owner = 'alice', slot = 0, activeProject = project) {
+  fixtureOwner=owner;
   if (!roots[slot]) roots[slot] = createRoot(document.createElement('div'));
   await act(async () => { roots[slot].render(<Harness key={owner} owner={owner} slot={slot} activeProject={activeProject} />); });
   await settle();
   return clients[slot];
 }
 beforeEach(() => {
+  api.get.mockImplementation(async (url) => ({data: {...project, user_id: fixtureOwner, project_id: decodeURIComponent(url.split('/').at(-1))}}));
+  fixtureOwner='alice';
   roots = []; clients = []; hold = null; localStorage.clear(); previewBodies.clear();
   global.Blob = class extends NativeBlob { constructor(parts,options){super(parts,options);this.testHTML=parts.join('');} };
   URL.createObjectURL = vi.fn(blob => {const url='blob:test-'+previewBodies.size;previewBodies.set(url,blob.testHTML);return url;});
@@ -69,7 +75,7 @@ test('owner recovery, exact artifact, account switch and unclaimed legacy', asyn
   expect(localStorage.getItem(legacyKey)).toBe('{legacy bytes without owner}');
   expect(global.fetch).not.toHaveBeenCalled();
 });
-test('legacy non-landing workspace restores and persists through the main cache', async () => {
+test('unbound legacy non-landing cache is preserved but never recovered', async () => {
   const legacyProject = { ...project, project_id: 'legacy-app' };
   const legacyState = createInitialBuildState({
     projectId: legacyProject.project_id,
@@ -81,12 +87,10 @@ test('legacy non-landing workspace restores and persists through the main cache'
   });
   expect(persistBuilderBuildState({ projectId: legacyProject.project_id, state: legacyState })).toBe(true);
   const client = await mount('alice', 0, legacyProject);
-  expect(client.builderBuildState.projectKind).toBe('app');
-  expect(client.builderBuildState.traceId).toBe('legacy-trace');
-  await act(async () => { client.handleDecision({ type: 'add_api_layer' }); });
+  expect(client.builderBuildState?.traceId).not.toBe('legacy-trace');
   const restored = restoreBuilderBuildState({ projectId: legacyProject.project_id });
-  expect(restored.projectKind).toBe('app');
-  expect(restored.apiRoutes.length).toBeGreaterThan(0);
+  expect(restored).toEqual(legacyState);
+
 });
 test('two mounted clients compete; stale and duplicate writes are blocked', async () => {
   await mount('alice', 0); await mount('alice', 1);

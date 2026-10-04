@@ -13,6 +13,7 @@ export async function buildWithBuilderAI({
   userId = null,
   mode = "build",
   apiBaseUrl = "",
+  serverRevision,
 } = {}) {
   if (!userInput || !String(userInput).trim()) {
     throw new Error("Falta userInput para Builder AI.");
@@ -22,13 +23,14 @@ export async function buildWithBuilderAI({
   const body = {
     userInput: String(userInput).trim(), currentBuildState, projectId, userId, mode,
   };
-  return runEconomicRequest(`${baseUrl}${BUILDER_AI_ENDPOINT}`, body, async (key) => {
+  return runEconomicRequest(`${baseUrl}${BUILDER_AI_ENDPOINT}`, {body, serverRevision}, async (key) => {
   const response = await fetch(`${baseUrl}${BUILDER_AI_ENDPOINT}`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
       "Idempotency-Key": key,
+      ...(projectId ? { "If-Match": serverRevision } : {}),
     },
     body: JSON.stringify(body),
   });

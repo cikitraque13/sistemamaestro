@@ -1,12 +1,9 @@
-import {
-  BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
-  persistBuilderBuildState,
-  restoreBuilderBuildState,
-} from '../../state/builderBuildStateStorage';
+import { api } from '../../../../lib/apiClient';
+import { validatedProjectIdentity, requireOutputIdentity } from '../../state/projectIdentity.mjs';
 import { staticTrustDecision } from '../../state/staticSectionMutation.mjs';
 import useDurableLandingTransaction from './useDurableLandingTransaction';
 import { parseLandingChange } from '../../command/parseLandingChange.mjs';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 import {
   buildLandingCopy,
@@ -636,6 +633,15 @@ export default function useBuilderWorkspaceRuntime({
   const [builderBuildSummary, setBuilderBuildSummary] = useState(null);
   const [appliedDecisionTypes, setAppliedDecisionTypes] = useState([]);
 
+  let identity = null;
+  try { identity = validatedProjectIdentity(project, ownerId, project?.project_id); } catch { /* fail closed */ }
+  const liveIdentity = useRef(null);
+  liveIdentity.current = identity && JSON.stringify(identity);
+  useEffect(() => () => { liveIdentity.current = null; }, []);
+  const binding = identity && { ...identity, verify: async () => {
+    const response = await api.get(`/projects/${encodeURIComponent(identity.projectId)}`);
+    return validatedProjectIdentity(response.data, identity.ownerId, identity.projectId).serverRevision;
+  }};
   const projectId = project?.project_id || '';
   const fallbackId = project?.id || '';
   const projectInputType = project?.input_type || '';
@@ -667,7 +673,7 @@ export default function useBuilderWorkspaceRuntime({
   );
 
   const projectReady = Boolean(
-    projectKey !== 'no-project' &&
+    Boolean(identity) && projectKey !== 'no-project' &&
     !loadingProject &&
     !projectError
   );
@@ -720,21 +726,13 @@ export default function useBuilderWorkspaceRuntime({
     setBuilderDecisionMessage(kernelResult?.decisionMessage || null);
     setBuilderBuildSummary(kernelResult?.summary || null);
 
-    // Keep the legacy project cache for non-landing projects; landings use the durable transaction store.
-    if (nextState && projectId && nextState.projectKind !== 'landing') {
-      persistBuilderBuildState({
-        projectId,
-        templateId: BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
-        state: nextState,
-      });
-    }
-
+    // Unbound legacy caches are preserved on disk, never implicitly recovered.
   }, [projectId]);
 
   const commitLanding = useCallback((state) => {
     applyKernelResult({ ok: true, state, output: createBuilderOutputMap(state), summary: getBuildStateSummary(state) });
   }, [applyKernelResult]);
-  const landingTransaction = useDurableLandingTransaction(builderBuildState, commitLanding, ownerId);
+  const landingTransaction = useDurableLandingTransaction(builderBuildState, commitLanding, ownerId, binding);
 
   const startBuild = useCallback(() => {
     setProgress(4);
@@ -745,7 +743,8 @@ export default function useBuilderWorkspaceRuntime({
     async (text) => {
       const value = String(text || '').trim();
 
-      if (!value) return;
+      if (!value || !projectReady) return;
+      const requestIdentity = liveIdentity.current;
       if (builderBuildState?.projectKind === 'landing') {
         if (!ownerId || landingTransaction.status !== 'ready') {
           landingTransaction.reject('Workspace no disponible. Espera a la recuperación o recarga.');
@@ -837,9 +836,12 @@ export default function useBuilderWorkspaceRuntime({
             project?.id ||
             null,
           userId: null,
+          serverRevision: identity.serverRevision,
           mode: builderBuildState ? 'iterate' : 'build',
         });
 
+          if (liveIdentity.current !== requestIdentity) return;
+          requireOutputIdentity(builderAiResult, identity);
           kernelResult = adaptBuilderAIOutputToKernelResult({
             builderAIOutput: builderAiResult,
             currentBuildState: builderBuildState,
@@ -850,6 +852,7 @@ export default function useBuilderWorkspaceRuntime({
         }
       } catch (error) {
         builderAiError = error;
+        if (!atomicCommand) { landingTransaction.reject(error.message); return; }
 
         if (atomicCommand) {
           kernelResult = kernelResult || buildAtomicCommandKernelResult({
@@ -872,6 +875,7 @@ export default function useBuilderWorkspaceRuntime({
         }
       }
 
+      if (liveIdentity.current !== requestIdentity) return;
       setDirection(nextDirection);
 
       setHubState(response.hub || null);
@@ -1116,10 +1120,7 @@ export default function useBuilderWorkspaceRuntime({
       currentSelection: initialAgent.hub?.selection || null,
       source: 'initial_runtime',
     });
-    const restoredBuildState = restoreBuilderBuildState({
-      projectId,
-      templateId: BUILDER_BUILD_STATE_STORAGE_TEMPLATE_ID,
-    });
+    const restoredBuildState = null; // Preserve unbound legacy cache without recovery.
     const initialKernelResult = restoredBuildState && restoredBuildState.projectKind !== 'landing'
       ? {
           version: 'builder-build-kernel-v1',

@@ -38,6 +38,7 @@ def build_analysis_context(
     input_type: str,
     input_content: str,
     url_analysis: Optional[Dict[str, Any]] = None,
+    *, identity: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Construye un contexto uniforme del caso para el adaptador de análisis.
@@ -68,6 +69,7 @@ def build_analysis_context(
     analysis_scope = "visible_audit" if source_mode == "url" else "problem_discovery"
 
     return {
+        "identity": dict(identity) if identity else None,
         "input_type": normalized_input_type,
         "input_content": input_content_clean,
         "source_mode": source_mode,
@@ -119,13 +121,14 @@ def build_analysis_trace(context: Dict[str, Any], lead_meta: Dict[str, Any]) -> 
         phase=lead_meta["phase"],
         status="started",
         request_id=request_id,
-        project_id=None,
-        user_id=None,
+        project_id=(context.get("identity") or {}).get("project_id"),
+        user_id=(context.get("identity") or {}).get("user_id"),
         notes=[
             f"analysis_mode={lead_meta['analysis_mode']}",
             f"source_mode={ensure_string(context.get('source_mode'), 'text')}",
         ],
         meta={
+            "identity": context.get("identity"),
             "adapter_version": ANALYSIS_ADAPTER_VERSION,
             "input_type": ensure_string(context.get("input_type"), "text"),
             "has_url_analysis": bool(context.get("has_url_analysis")),
@@ -162,8 +165,8 @@ def build_analysis_envelope(
     envelope = AgentInputEnvelope(
         agent_key=lead_meta["lead_agent_key"],
         request_id=request_id,
-        project_id=None,
-        user_id=None,
+        project_id=(context.get("identity") or {}).get("project_id"),
+        user_id=(context.get("identity") or {}).get("user_id"),
         intent=ensure_string(context.get("analysis_scope"), "problem_discovery"),
         payload={
             "input_type": ensure_string(context.get("input_type"), "text"),
@@ -173,6 +176,7 @@ def build_analysis_envelope(
             else None,
         },
         context={
+            "identity": context.get("identity"),
             "source_mode": ensure_string(context.get("source_mode"), "text"),
             "analysis_scope": ensure_string(context.get("analysis_scope"), "problem_discovery"),
             "adapter_version": ANALYSIS_ADAPTER_VERSION,

@@ -204,12 +204,20 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 
 @router.post("/build")
 async def build_with_ai(payload: BuilderAIInput, request: Request):
+    from backend.app.routers.projects import expected_project_revision, assert_project_revision
     user = await get_current_user(request)
     operation_id = request_operation_id(request, "builder_build")
 
     project = None
+    expected = None
+    if payload.projectId is not None and (not isinstance(payload.projectId, str) or not payload.projectId.strip()):
+        raise HTTPException(400, detail={"code": "invalid_project_identity"})
+    state_project = (payload.currentBuildState or {}).get("projectId")
+    if state_project and state_project != payload.projectId:
+        raise HTTPException(409, detail={"code": "project_identity_mismatch"})
 
     if payload.projectId:
+        expected = expected_project_revision(request)
         project = await db.projects.find_one(
             {
                 "project_id": payload.projectId,
@@ -238,6 +246,8 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
         consumption_payload=consumption_payload,
     )
     async def work(consumption_result):
+        if project:
+            assert_project_revision(project, expected)
         guards = run_builder_ai_guards(guard_context)
         enforce_builder_ai_guards(guards)
         safe_payload = payload.model_copy(
@@ -247,6 +257,11 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
         )
 
         result = await run_builder_agent(safe_payload)
+        if project:
+            current = await db.projects.find_one({"project_id": payload.projectId, "user_id": user["user_id"]})
+            if not current:
+                raise HTTPException(409, detail={"code": "project_identity_mismatch"})
+            assert_project_revision(current, expected)
         result_data = result.model_dump()
         output_guard = validate_output_shape("BuilderAIOutput", result_data)
 
@@ -270,6 +285,9 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
                 "guards": guards,
                 "output_guard": output_guard,
                 "builder_mode": payload.mode,
+                "identity": {"scope": "project" if project else "projectless",
+                             "ownerId": user["user_id"], "projectId": payload.projectId,
+                             "serverRevision": expected, "operationId": operation_id},
             },
         )
 
@@ -285,6 +303,8 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
 
     try:
         inputs = payload.model_dump(exclude={"userId"})
+        if project:
+            inputs["expected_revision"] = expected
         return await run_economic_operation(
             user=user, consumption_payload=consumption_payload, inputs=inputs, work=work,
         )

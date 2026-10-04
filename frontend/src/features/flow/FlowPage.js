@@ -1,3 +1,4 @@
+import { serverRevision } from '../builder/state/projectIdentity.mjs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -336,7 +337,7 @@ const FlowPage = () => {
         {
           answers: refineAnswers
         },
-        { withCredentials: true }
+        { withCredentials: true, headers: { 'If-Match': serverRevision(project) } }
       );
 
       const nextProject = response?.data;
@@ -405,7 +406,7 @@ const FlowPage = () => {
       const response = await economicPost(axios,
         `${API_BASE}/projects/${project.project_id}/blueprint`,
         {},
-        { withCredentials: true }
+        { withCredentials: true, headers: { 'If-Match': serverRevision(project) } }
       );
 
       const nextProject = response?.data;

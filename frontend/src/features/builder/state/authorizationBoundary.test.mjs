@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createDurableLandingWorkspace,createLocalWorkspaceStore} from './durableLandingWorkspace.mjs';
+import {createBoundWorkspace as createDurableLandingWorkspace,createLocalWorkspaceStore} from './authorizedRegressionFixture.mjs';
 const base={projectId:'s13',projectKind:'landing',primaryCTA:'Inicio',visualAccent:'amber',blocks:[]};
 function fixture(){const data=new Map();let queue=Promise.resolve();const store=createLocalWorkspaceStore({getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v)},{request:(k,o,fn)=>{const p=queue.then(fn);queue=p.catch(()=>{});return p;}});return {open:()=>createDurableLandingWorkspace(store,'alice','s13')};}
 async function setup(){const f=fixture(),a=f.open();await a.initialize(base);const p=await a.propose([{type:'set_primary_cta',value:'Ver precios'}]);return {f,a,p};}

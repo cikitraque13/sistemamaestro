@@ -1,3 +1,4 @@
+import { serverRevision } from '../../builder/state/projectIdentity.mjs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -63,7 +64,7 @@ const ProjectDetailPage = () => {
       const response = await economicPost(axios,
         `${API_BASE}/projects/${id}/blueprint`,
         {},
-        { withCredentials: true }
+        { withCredentials: true, headers: { 'If-Match': serverRevision(project) } }
       );
       setProject(response.data);
       toast.success('Blueprint generado');

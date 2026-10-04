@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
@@ -28,6 +28,48 @@ from backend.app.services.url_analysis import fetch_and_analyze_url
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 logger = logging.getLogger(__name__)
+
+
+def project_revision(project):
+    if "updated_at" not in project:
+        return "0"
+    value = project["updated_at"]
+    try:
+        if not isinstance(value, str) or not value or value != value.strip():
+            raise ValueError()
+        parsed = datetime.fromisoformat(value)
+        if parsed.tzinfo is None:
+            raise ValueError()
+    except (ValueError, TypeError):
+        raise HTTPException(409, detail={"code": "invalid_project_revision"})
+    return value
+
+
+def expected_project_revision(request):
+    value = request.headers.get("If-Match")
+    if value == "0":
+        return value
+    try:
+        return project_revision({"updated_at": value})
+    except HTTPException:
+        raise HTTPException(400, detail={"code": "expected_revision_required"})
+
+
+def project_cas(project_id, user, expected):
+    return {"project_id": project_id, "user_id": user["user_id"],
+            "updated_at": {"$exists": False} if expected == "0" else expected}
+
+
+def assert_project_revision(project, expected):
+    if project_revision(project) != expected:
+        raise HTTPException(409, detail={"code": "stale_project_revision"})
+
+
+def next_project_revision(expected):
+    now = datetime.now(timezone.utc)
+    if expected != "0":
+        now = max(now, datetime.fromisoformat(expected) + timedelta(microseconds=1))
+    return now.isoformat()
 
 SEMANTIC_ADMISSION_SHADOW_ENABLED_ENV = "SEMANTIC_ADMISSION_SHADOW_ENABLED"
 
@@ -269,6 +311,7 @@ async def create_project(project_data: ProjectCreate, request: Request):
     )
 
     async def work(consumption_result):
+        initial_revision = datetime.now(timezone.utc).isoformat()
         url_analysis = None
         if project_data.input_type == "url":
             url_analysis = await fetch_and_analyze_url(project_data.input_content)
@@ -277,6 +320,8 @@ async def create_project(project_data: ProjectCreate, request: Request):
 
         analysis = await analyze_with_ai(
             project_data.input_type, project_data.input_content, url_analysis,
+            identity={"user_id": user["user_id"], "project_id": project_id,
+                      "operation_id": operation_id, "revision": initial_revision},
         )
         plan_recommendation = build_plan_recommendation(
             input_type=project_data.input_type, input_content=project_data.input_content,
@@ -295,7 +340,7 @@ async def create_project(project_data: ProjectCreate, request: Request):
             "analysis_consumption": consumption_result,
             "status": "analyzed",
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": initial_revision,
         }
         try:
             await db.projects.insert_one(project_doc)
@@ -382,6 +427,7 @@ async def refine_project(
     request: Request,
 ):
     user = await get_current_user(request)
+    expected = expected_project_revision(request)
 
     project = await db.projects.find_one(
         {
@@ -396,6 +442,7 @@ async def refine_project(
             detail="Project not found",
         )
 
+    assert_project_revision(project, expected)
     analysis_for_recommendation = {
         "route": project.get("route", "idea"),
         "diagnosis": project.get("diagnosis", {}),
@@ -410,29 +457,26 @@ async def refine_project(
         refine_answers=refine_data.answers,
     )
 
-    await db.projects.update_one(
-        {"project_id": project_id},
+    updated = await db.projects.find_one_and_update(
+        project_cas(project_id, user, expected),
         {
             "$set": {
                 "refine_answers": refine_data.answers,
                 "plan_recommendation": plan_recommendation,
                 "status": "refined",
-                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": next_project_revision(expected),
             }
-        },
+        }, projection={"_id": 0}, return_document=True,
     )
-
-    updated = await db.projects.find_one(
-        {"project_id": project_id},
-        {"_id": 0},
-    )
-
+    if updated is None:
+        raise HTTPException(409, detail={"code": "stale_project_revision"})
     return updated
 
 
 @router.post("/{project_id}/blueprint")
 async def create_blueprint(project_id: str, request: Request):
     user = await get_current_user(request)
+    expected = expected_project_revision(request)
     operation_id = request_operation_id(request, "create_blueprint")
 
     project = await db.projects.find_one(
@@ -459,15 +503,17 @@ async def create_blueprint(project_id: str, request: Request):
     )
 
     async def work(consumption_result):
+        assert_project_revision(project, expected)
         blueprint = await generate_blueprint(project)
+        revision = next_project_revision(expected)
         try:
             updated = await db.projects.find_one_and_update(
-                {"project_id": project_id, "user_id": user["user_id"]},
+                project_cas(project_id, user, expected),
                 {"$set": {
                     "blueprint": blueprint,
                     "blueprint_consumption": consumption_result,
                     "status": "blueprint_generated",
-                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": revision,
                 }},
                 projection={"_id": 0}, return_document=True,
             )
@@ -478,27 +524,25 @@ async def create_blueprint(project_id: str, request: Request):
                 )
             except Exception as read_error:
                 raise EconomicPersistenceUncertain("Blueprint write outcome unknown") from read_error
-            if not updated or updated.get("blueprint_consumption", {}).get("trace", {}).get("operation_id") != operation_id:
+            if not updated or updated.get("updated_at") != revision or updated.get("blueprint_consumption", {}).get("trace", {}).get("operation_id") != operation_id:
                 raise EconomicPersistenceUncertain("Blueprint write outcome unknown") from exc
         if updated is None:
-            raise HTTPException(404, detail="Project not found")
+            raise HTTPException(409, detail={"code": "stale_project_revision"})
         return updated
 
     return await run_economic_operation(
         user=user, consumption_payload=consumption_payload,
-        inputs={"project_id": project_id}, work=work,
+        inputs={"project_id": project_id, "expected_revision": expected}, work=work,
     )
 
 
 @router.delete("/{project_id}")
 async def delete_project(project_id: str, request: Request):
     user = await get_current_user(request)
+    expected = expected_project_revision(request)
 
     result = await db.projects.delete_one(
-        {
-            "project_id": project_id,
-            "user_id": user["user_id"],
-        }
+        project_cas(project_id, user, expected)
     )
 
     if result.deleted_count == 0:

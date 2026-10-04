@@ -39,7 +39,7 @@ export async function runEconomicRequest(scope, inputs, send, { newOperation = f
 }
 
 export function economicPost(client, url, data, config = {}, options = {}) {
-  return runEconomicRequest(url, data, (key) => client.post(url, data, {
+  return runEconomicRequest(url, config.headers?.['If-Match'] === undefined ? data : { data, expectedRevision: config.headers['If-Match'] }, (key) => client.post(url, data, {
     ...config, headers: { ...config.headers, 'Idempotency-Key': key },
   }), options);
 }

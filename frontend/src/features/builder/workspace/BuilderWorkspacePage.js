@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { requestedProject, validatedProjectIdentity, serverRevision } from '../state/projectIdentity.mjs';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -21,16 +22,6 @@ const NAVIGATION_ROUTES = {
   opportunities: '/dashboard/opportunities',
   billing: '/dashboard/billing',
   settings: '/dashboard/settings',
-};
-
-const readStoredBuilderProjectId = () => {
-  if (typeof window === 'undefined') return '';
-
-  try {
-    return window.localStorage.getItem(ACTIVE_BUILDER_PROJECT_STORAGE_KEY) || '';
-  } catch {
-    return '';
-  }
 };
 
 const writeStoredBuilderProjectId = (projectId = '') => {
@@ -171,13 +162,20 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   const initialPrompt = getInitialPrompt(location.state);
   const initialMode = getInitialMode(location.state);
   const stateProjectId = getStateProjectId(location.state);
-  const storedProjectId = readStoredBuilderProjectId();
-
-  const runtimeProjectId = stateProjectId || queryProjectId || storedProjectId;
-
-  const [activeProjectId, setActiveProjectId] = useState(
-    runtimeProjectId || builderProjects[0]?.id || 'project-alpha'
-  );
+  let selectionId = '';
+  let selectionError = '';
+  try { selectionId = requestedProject(location.search, location.state); }
+  catch (error) { selectionError = error.message; }
+  const selection = useRef(null);
+  const selectionKey = JSON.stringify([ownerId, selectionId, selectionError]);
+  if (!selection.current || selection.current.key !== selectionKey) {
+    selection.current = {
+      key: selectionKey,
+      epoch: (selection.current?.epoch || 0) + 1,
+    };
+  }
+  const selectionEpoch = selection.current.epoch;
+  const runtimeProjectId = selectionId;
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState(
     builderWorkspaceTabs[0]?.id || 'preview'
@@ -189,35 +187,10 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   const [generatingBlueprint, setGeneratingBlueprint] = useState(false);
 
   useEffect(() => {
-    if (!runtimeProjectId) return;
-
-    writeStoredBuilderProjectId(runtimeProjectId);
-
-    if (!queryProjectId || queryProjectId !== runtimeProjectId) {
-      navigate(buildBuilderProjectRoute(runtimeProjectId), {
-        replace: true,
-        state: buildNavigationState({
-          locationState: location.state,
-          projectId: runtimeProjectId,
-          initialPrompt,
-          initialMode,
-        }),
-      });
-    }
-  }, [
-    runtimeProjectId,
-    queryProjectId,
-    navigate,
-    location.state,
-    initialPrompt,
-    initialMode,
-  ]);
-
-  useEffect(() => {
-    if (!runtimeProjectId) {
+    if (!runtimeProjectId || selectionError) {
       setLoadingProject(false);
       setProject(null);
-      setProjectError('');
+      setProjectError(selectionError);
       return;
     }
 
@@ -230,18 +203,19 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       try {
         const response = await api.get(`/projects/${runtimeProjectId}`);
 
-        if (!mounted) return;
+        if (!mounted || selection.current?.key !== selectionKey) return;
 
-        const loadedProjectId = response.data?.project_id || runtimeProjectId;
+        validatedProjectIdentity(response.data, ownerId, runtimeProjectId);
+        const loadedProjectId = response.data.project_id;
 
         setProject(response.data);
-        setActiveProjectId(loadedProjectId);
         writeStoredBuilderProjectId(loadedProjectId);
       } catch (error) {
-        if (!mounted) return;
+        if (!mounted || selection.current?.key !== selectionKey) return;
 
         const message = getErrorMessage(error);
 
+        setProject(null);
         setProjectError(message);
         toast.error('No se pudo cargar el proyecto');
       } finally {
@@ -256,23 +230,28 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     return () => {
       mounted = false;
     };
-  }, [runtimeProjectId]);
+  }, [runtimeProjectId, ownerId, selectionKey, selectionError]);
+
+  const resolved = !selectionError && project?.project_id === selectionId && project?.user_id === ownerId ? project : null;
+  const projectLoadingForCurrentSelection =
+    loadingProject ||
+    (Boolean(runtimeProjectId) && !selectionError && !resolved && !projectError);
 
   const activeProjectData = useMemo(
     () =>
-      builderProjects.find((item) => item.id === activeProjectId) ||
+      builderProjects.find((item) => item.id === runtimeProjectId) ||
       builderProjects[0] ||
       { label: 'Proyecto activo' },
-    [activeProjectId]
+    [runtimeProjectId]
   );
 
-  const activeIntent = resolveBuilderIntent(initialMode || project?.route);
-  const activeType = resolveBuilderType(initialMode || project?.input_type);
-  const projectLabel = buildProjectLabel(project, activeProjectData.label);
+  const activeIntent = resolveBuilderIntent(initialMode || resolved?.route);
+  const activeType = resolveBuilderType(initialMode || resolved?.input_type);
+  const projectLabel = buildProjectLabel(resolved, activeProjectData.label);
 
   const currentBuilderProjectId =
-    project?.project_id ||
-    runtimeProjectId ||
+    resolved?.project_id ||
+    (selectionError ? '' : runtimeProjectId) ||
     '';
 
   const handleNavChange = (navId) => {
@@ -315,16 +294,25 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   };
 
   const handleGenerateBlueprint = async () => {
-    if (!project?.project_id || generatingBlueprint) return;
+    if (
+      !resolved?.project_id ||
+      generatingBlueprint ||
+      selection.current?.key !== selectionKey ||
+      selection.current?.epoch !== selectionEpoch
+    ) return;
 
+    const requestSelection = { key: selectionKey, epoch: selectionEpoch };
+    const projectId = resolved.project_id;
     setGeneratingBlueprint(true);
 
     try {
       const response = await economicPost(api,
-        `/projects/${project.project_id}/blueprint`,
-        {}
+        `/projects/${projectId}/blueprint`,
+        {}, { headers: { 'If-Match': serverRevision(resolved) } }
       );
 
+      if (selection.current?.key !== requestSelection.key || selection.current?.epoch !== requestSelection.epoch) return;
+      validatedProjectIdentity(response.data, ownerId, projectId);
       setProject(response.data);
       setActiveWorkspaceTab('structure');
       toast.success('Blueprint generado.');
@@ -336,20 +324,19 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     }
   };
 
-  const contextBody = project
-    ? `Proyecto real ${project.project_id}. Estado: ${project.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
+  const contextBody = resolved
+    ? `Proyecto real ${resolved.project_id}. Estado: ${resolved.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
     : initialPrompt
       ? `Entrada recibida: "${initialPrompt}". El Builder está esperando proyecto real.`
       : 'Builder operativo para construir, revisar diagnóstico, generar blueprint y preparar continuidad.';
-
   return (
     <AppShellLayout
       productLabel="Sistema Maestro"
       activeNavId="builder"
       onNavChange={handleNavChange}
       projectItems={builderProjects}
-      activeProjectId={activeProjectId}
-      onProjectChange={setActiveProjectId}
+      activeProjectId={selectionError ? '' : (runtimeProjectId || resolved?.project_id || '')}
+      onProjectChange={(id) => navigate(buildBuilderProjectRoute(id), { state: { projectId: id } })}
       workspaceTabs={builderWorkspaceTabs}
       activeWorkspaceTab={activeWorkspaceTab}
       onWorkspaceTabChange={setActiveWorkspaceTab}
@@ -358,20 +345,20 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       usageLabel="Créditos visibles para análisis, builder, blueprint, exportación y deploy."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
-      contextTitle={project ? `Proyecto ${project.project_id}` : 'Builder activo'}
+      contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}
       contextBody={contextBody}
     >
       <BuilderWorkspaceLayout
-        key={JSON.stringify([ownerId, project?.project_id || null])}
+        key={JSON.stringify([ownerId, selectionKey, resolved?.updated_at])}
         ownerId={ownerId}
         activeIntent={activeIntent}
         activeType={activeType}
         activeWorkspaceTab={activeWorkspaceTab}
         projectLabel={projectLabel}
-        initialPrompt={project?.input_content || initialPrompt || ''}
-        project={project}
-        loadingProject={loadingProject}
-        projectError={projectError}
+        initialPrompt={resolved?.input_content || initialPrompt || ''}
+        project={resolved}
+        loadingProject={projectLoadingForCurrentSelection}
+        projectError={selectionError || projectError || (!resolved ? 'Proyecto no validado.' : '')}
         onGenerateBlueprint={handleGenerateBlueprint}
         generatingBlueprint={generatingBlueprint}
       />

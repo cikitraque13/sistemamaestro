@@ -1,3 +1,4 @@
+import { serverRevision } from '../builder/state/projectIdentity.mjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -190,7 +191,7 @@ const ProjectsPage = () => {
     if (!window.confirm('¿Seguro que quieres eliminar este proyecto?')) return;
 
     try {
-      await api.delete(`/projects/${projectId}`);
+      await api.delete(`/projects/${projectId}`, { headers: { 'If-Match': serverRevision(projects.find(p => p.project_id === projectId)) } });
 
       setProjects((prev) =>
         prev.filter((project) => project.project_id !== projectId)
