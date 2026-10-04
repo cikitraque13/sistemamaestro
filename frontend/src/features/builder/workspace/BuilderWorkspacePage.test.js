@@ -31,6 +31,79 @@ test('S15 A to B rejects late A; existing selection handler navigates instead of
  await act(async()=>resolveA({data:{project_id:'A',user_id:'alice',input_content:'late A'}}));expect(mocks.mockProps.project.project_id).toBe('B');
  act(()=>root.unmount());
 });
+test('S15 A to B to A hides stale shell and rejects stale project actions during A2 load', async () => {
+  const { economicPost } = await import('../../../lib/economicRequest');
+  const node = document.createElement('div');
+  const root = createRoot(node);
+  let resolveA2;
+  let aLoads = 0;
+  mocks.mockUser = { user_id: 'alice' };
+  api.get.mockImplementation((path) => {
+    const projectId = path.split('/').pop();
+    if (projectId === 'A') {
+      aLoads += 1;
+      if (aLoads === 2) return new Promise((resolve) => { resolveA2 = resolve; });
+    }
+    return Promise.resolve({
+      data: {
+        project_id: projectId,
+        user_id: 'alice',
+        input_content: `${projectId} content`,
+        status: 'ready',
+        updated_at: '2026-10-03T10:00:00Z',
+      },
+    });
+  });
+
+  mocks.mockLocation = { search: '?project_id=A', state: null };
+  await act(async () => root.render(<BuilderWorkspacePage />));
+  expect(mocks.mockShellProps.contextTitle).toBe('Proyecto A');
+  expect(mocks.mockShellProps.contextBody).toContain('Proyecto real A');
+
+  mocks.mockShellProps.onProjectChange('B');
+  mocks.mockLocation = { search: '?project_id=B', state: { projectId: 'B' } };
+  await act(async () => root.render(<BuilderWorkspacePage />));
+  expect(mocks.mockShellProps.contextTitle).toBe('Proyecto B');
+  expect(mocks.mockShellProps.activeProjectId).toBe('B');
+  const generateFromB = mocks.mockProps.onGenerateBlueprint;
+
+  mocks.mockLocation = { search: '?project_id=A', state: { projectId: 'A' } };
+  await act(async () => root.render(<BuilderWorkspacePage />));
+
+  expect(mocks.mockShellProps.productLabel).toBe('Sistema Maestro');
+  expect(mocks.mockShellProps.contextTitle).toBe('Builder activo');
+  expect(mocks.mockShellProps.contextBody).not.toContain('Proyecto real B');
+  expect(mocks.mockShellProps.activeProjectId).toBe('A');
+  expect(mocks.mockProps.project).toBeNull();
+  expect(mocks.mockProps.loadingProject).toBe(true);
+
+  mocks.mockNavigate.mockClear();
+  act(() => mocks.mockShellProps.onNavChange('builder'));
+  expect(mocks.mockNavigate).toHaveBeenCalledWith(
+    '/dashboard/builder?project_id=A',
+    { state: { projectId: 'A', initialPrompt: undefined, initialMode: 'idea' } }
+  );
+
+  const requestCountBeforeStaleAction = economicPost.mock.calls.length;
+  await act(async () => { await generateFromB(); });
+  expect(economicPost).toHaveBeenCalledTimes(requestCountBeforeStaleAction);
+
+  await act(async () => resolveA2({
+    data: {
+      project_id: 'A',
+      user_id: 'alice',
+      input_content: 'A2 content',
+      status: 'ready',
+      updated_at: '2026-10-03T10:02:00Z',
+    },
+  }));
+  expect(mocks.mockProps.project.project_id).toBe('A');
+  expect(mocks.mockShellProps.contextTitle).toBe('Proyecto A');
+  expect(mocks.mockShellProps.contextBody).toContain('Proyecto real A');
+  expect(mocks.mockShellProps.contextBody).not.toContain('Proyecto real B');
+  act(() => root.unmount());
+});
+
 test('S15 cache cannot select, conflicting URL/state and foreign server identity never expose project',async()=>{
  const root=createRoot(document.createElement('div'));mocks.mockUser={user_id:'alice'};
  localStorage.setItem('sistema_maestro.active_builder_project_id','A');mocks.mockLocation={search:'',state:null};

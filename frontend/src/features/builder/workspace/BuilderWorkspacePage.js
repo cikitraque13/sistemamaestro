@@ -174,11 +174,8 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       epoch: (selection.current?.epoch || 0) + 1,
     };
   }
+  const selectionEpoch = selection.current.epoch;
   const runtimeProjectId = selectionId;
-
-  const [activeProjectId, setActiveProjectId] = useState(
-    runtimeProjectId || builderProjects[0]?.id || 'project-alpha'
-  );
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState(
     builderWorkspaceTabs[0]?.id || 'preview'
@@ -212,7 +209,6 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         const loadedProjectId = response.data.project_id;
 
         setProject(response.data);
-        setActiveProjectId(loadedProjectId);
         writeStoredBuilderProjectId(loadedProjectId);
       } catch (error) {
         if (!mounted || selection.current?.key !== selectionKey) return;
@@ -236,21 +232,26 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     };
   }, [runtimeProjectId, ownerId, selectionKey, selectionError]);
 
+  const resolved = !selectionError && project?.project_id === selectionId && project?.user_id === ownerId ? project : null;
+  const projectLoadingForCurrentSelection =
+    loadingProject ||
+    (Boolean(runtimeProjectId) && !selectionError && !resolved && !projectError);
+
   const activeProjectData = useMemo(
     () =>
-      builderProjects.find((item) => item.id === activeProjectId) ||
+      builderProjects.find((item) => item.id === runtimeProjectId) ||
       builderProjects[0] ||
       { label: 'Proyecto activo' },
-    [activeProjectId]
+    [runtimeProjectId]
   );
 
-  const activeIntent = resolveBuilderIntent(initialMode || project?.route);
-  const activeType = resolveBuilderType(initialMode || project?.input_type);
-  const projectLabel = buildProjectLabel(project, activeProjectData.label);
+  const activeIntent = resolveBuilderIntent(initialMode || resolved?.route);
+  const activeType = resolveBuilderType(initialMode || resolved?.input_type);
+  const projectLabel = buildProjectLabel(resolved, activeProjectData.label);
 
   const currentBuilderProjectId =
-    project?.project_id ||
-    runtimeProjectId ||
+    resolved?.project_id ||
+    (selectionError ? '' : runtimeProjectId) ||
     '';
 
   const handleNavChange = (navId) => {
@@ -293,19 +294,25 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   };
 
   const handleGenerateBlueprint = async () => {
-    if (!project?.project_id || generatingBlueprint) return;
+    if (
+      !resolved?.project_id ||
+      generatingBlueprint ||
+      selection.current?.key !== selectionKey ||
+      selection.current?.epoch !== selectionEpoch
+    ) return;
 
-    const requestSelection = selection.current;
+    const requestSelection = { key: selectionKey, epoch: selectionEpoch };
+    const projectId = resolved.project_id;
     setGeneratingBlueprint(true);
 
     try {
       const response = await economicPost(api,
-        `/projects/${project.project_id}/blueprint`,
-        {}, { headers: { 'If-Match': serverRevision(project) } }
+        `/projects/${projectId}/blueprint`,
+        {}, { headers: { 'If-Match': serverRevision(resolved) } }
       );
 
-      if (selection.current?.key !== requestSelection?.key || selection.current?.epoch !== requestSelection?.epoch) return;
-      validatedProjectIdentity(response.data, ownerId, project.project_id);
+      if (selection.current?.key !== requestSelection.key || selection.current?.epoch !== requestSelection.epoch) return;
+      validatedProjectIdentity(response.data, ownerId, projectId);
       setProject(response.data);
       setActiveWorkspaceTab('structure');
       toast.success('Blueprint generado.');
@@ -317,20 +324,18 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     }
   };
 
-  const contextBody = project
-    ? `Proyecto real ${project.project_id}. Estado: ${project.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
+  const contextBody = resolved
+    ? `Proyecto real ${resolved.project_id}. Estado: ${resolved.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
     : initialPrompt
       ? `Entrada recibida: "${initialPrompt}". El Builder está esperando proyecto real.`
       : 'Builder operativo para construir, revisar diagnóstico, generar blueprint y preparar continuidad.';
-
-  const resolved = !selectionError && project?.project_id === selectionId && project?.user_id === ownerId ? project : null;
   return (
     <AppShellLayout
       productLabel="Sistema Maestro"
       activeNavId="builder"
       onNavChange={handleNavChange}
       projectItems={builderProjects}
-      activeProjectId={activeProjectId}
+      activeProjectId={selectionError ? '' : (runtimeProjectId || resolved?.project_id || '')}
       onProjectChange={(id) => navigate(buildBuilderProjectRoute(id), { state: { projectId: id } })}
       workspaceTabs={builderWorkspaceTabs}
       activeWorkspaceTab={activeWorkspaceTab}
@@ -340,7 +345,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       usageLabel="Créditos visibles para análisis, builder, blueprint, exportación y deploy."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
-      contextTitle={project ? `Proyecto ${project.project_id}` : 'Builder activo'}
+      contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}
       contextBody={contextBody}
     >
       <BuilderWorkspaceLayout
@@ -350,9 +355,9 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         activeType={activeType}
         activeWorkspaceTab={activeWorkspaceTab}
         projectLabel={projectLabel}
-        initialPrompt={project?.input_content || initialPrompt || ''}
+        initialPrompt={resolved?.input_content || initialPrompt || ''}
         project={resolved}
-        loadingProject={loadingProject}
+        loadingProject={projectLoadingForCurrentSelection}
         projectError={selectionError || projectError || (!resolved ? 'Proyecto no validado.' : '')}
         onGenerateBlueprint={handleGenerateBlueprint}
         generatingBlueprint={generatingBlueprint}
