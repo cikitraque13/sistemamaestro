@@ -1,6 +1,6 @@
-# Journey 03 — Estado canónico tras el cierre de S14
+# Journey 03 — Estado canónico tras el cierre operacional de S15
 
-## Estado de release y autoridad — 2026-10-03
+## Estado de release y autoridad — 2026-10-05
 
 Este documento es el propietario canónico de los cierres y validaciones de Journey 03. El frente siguiente se conserva en el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md).
 El [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) es propietario del estado S14–S18/J04–J16; [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad productiva.
@@ -10,17 +10,25 @@ El [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) es propietario del e
 | S1, S2, S3A, S3B, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13 | COMPLETED |
 | C1 | COMPLETED |
 | PRE-S14 release | CLOSED / DEPLOYED / VERIFIED (checkpoint histórico) |
-| S14 | COMPLETED; evidencia de cierre en esta página y estado canónico en el Roadmap |
+| S14 | COMPLETED |
+| S15 | COMPLETED; cierre operacional PASS; evidencia en esta página y estado canónico en el Roadmap |
 | HUMAN_GATE_2 | PASS |
-| Frente siguiente | Consultar el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) |
-| Alcance | Journey 03 local gobernado, incluidos los límites S14; no certifica todos los flujos legacy ni el producto completo |
+| Frente siguiente | S16 — Runtime Reproducibility; consultar el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) |
+| Alcance | Journey 03 local gobernado y cierre S15 conforme al alcance acreditado; no certifica el producto completo |
 
 C1 se registra como cierre acreditado por el checkpoint; no se inventa una denominación,
 un commit propio ni una funcionalidad adicional para ese identificador.
 
 ## Identidad de producción y release
 
-La fuente única para commit, tree, deployment, correspondencia main/Railway y verificaciones productivas del cierre S14 es [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md). El estado del release y la cadena de validación S14 se conserva aquí; este documento no duplica la identidad productiva.
+La fuente única para commit, tree, deployment, correspondencia GitHub main/Railway y verificaciones productivas es [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md). El estado del release y la cadena de validación S14 se conserva aquí; el cierre S15 se registra más abajo. Este documento no duplica la identidad productiva.
+
+## Cierre operacional de S15
+
+- S15_OPERATIONAL_CLOSURE=PASS; S15_STATUS=CLOSED.
+- Candidato S15: e6e73e67b97273db54b41adad6c59232a7cd7f2f. PR #81 MERGED; GitHub main y Railway production: e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279; tree: 523e0f1bee92c59e7d5058426952862beb7da5ab; Railway SUCCESS; TRACEABILITY=PASS.
+- Evidencia manual HUMAN-LUCAS: sesión autenticada en producción; proyecto existente/activo abre Builder sin SERVER_REVISION_MISMATCH. LEGACY_PRODUCTION=PASS; SERVER_REVISION_MISMATCH_RESOLVED=YES; REGRESSION=NO.
+- Gold: GOLD_FREEZE_POST_S15_CLOSED_BASELINE_2026-10-05. El frente previsto es S16 — Runtime Reproducibility; este cierre no abre S16.
 
 ## Capacidad local acreditada y referencias verificables
 
@@ -110,7 +118,7 @@ El detalle de identidad de producción pertenece a [Runtime and Deploy Truth](..
 
 El cierre cubre únicamente `sistemamaestro:durable:v1` y la política aprobada de capacidad/margen, retención/compactación, history/revert, continuidad de revisión, recuperación y fallo cerrado ante cuota. Se preservan pending work, provenance, anti-replay y aislamiento owner/project.
 
-Quedan fuera: mutación de `builderBuildState:v1`, `landingTransaction:v1`, `active_builder_project_id`, otros namespaces preserve-only/legacy, MongoDB, Railway como superficie de cambio y UI. La persistencia sigue siendo local al navegador; no acredita sincronización remota ni protección frente a borrado de datos del navegador. El siguiente gate secuencial es S15 — Canonical Project Identity; su estado y alcance están en el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md) y el backlog lo referencia sin abrirlo.
+Quedan fuera: mutación de `builderBuildState:v1`, `landingTransaction:v1`, `active_builder_project_id`, otros namespaces preserve-only/legacy, MongoDB, Railway como superficie de cambio y UI. La persistencia sigue siendo local al navegador; no acredita sincronización remota ni protección frente a borrado de datos del navegador. Al cierre de S14, el siguiente gate secuencial previsto era S15 — Canonical Project Identity. Su cierre consta ahora en el roadmap y el backlog sitúa S16 como siguiente frente previsto.
 
 El [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md) conserva el único frente abierto sin duplicar su estado. S14–S18 y J04–J16 se rigen por el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md). La [política de Git y deploy](../../control/07-GIT-DEPLOY-HIGIENE.md)
 rige cualquier promoción futura, que exige su propia autorización.

@@ -26,7 +26,7 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - ORIGINAL_PURPOSE: definir capacidad, retención, compactación y respuesta segura ante presión de cuota para el estado durable local, preservando trabajo pendiente, trazabilidad, decisiones, anti-replay y revert.
 - CURRENT_STATUS: COMPLETED.
 - ACCREDITED_EVIDENCE: implementación S14 conforme a la política y al design lock aprobados; revisión SM-SEC=PASS; QA independiente=PASS; 79/79 pruebas; publicación en el commit `180fdfc887ce9f83b0c269f1daeea8fdfc11abe7`; Railway SUCCESS, SHA de producción coincidente, health/home HTTP 200 y production smoke PASS. La identidad productiva es propiedad de [Runtime and Deploy Truth](../../architecture/04-runtime-and-deploy-truth.md); el cierre y sus validaciones están en [Journey 03](07-JOURNEY-03-ESTADO-PRE-S14.md).
-- WHAT_REMAINS: ninguno dentro del scope S14 acreditado. El siguiente gate secuencial es S15 — Canonical Project Identity; su estado sigue NOT_STARTED y esta entrada no lo abre.
+- WHAT_REMAINS: ninguno dentro del scope S14 acreditado. S15 — Canonical Project Identity figura COMPLETED en este roadmap. El siguiente gate secuencial previsto es S16 — Runtime Reproducibility; esta entrada no lo abre.
 - EVIDENCE_REUSABLE_IF: las rutas de persistencia, política, pruebas y límites de S14 permanecen idénticos al artefacto publicado.
 - REVALIDATE_IF: cambia esquema, clave, locking, revisionado, recuperación, decisiones, pending work, snapshot/revert o criterio de capacidad.
 - DEPENDENCIES: baseline de almacenamiento S1–S13 y decisión de alcance S14, cerrados con evidencia referenciada en Journey 03.
@@ -34,9 +34,9 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 ### S15 — Canonical Project Identity
 
 - ORIGINAL_PURPOSE: establecer identidad canónica de proyecto/workspace y vincularla a owner, revisión y artefactos en todas las operaciones.
-- CURRENT_STATUS: NOT_STARTED; gate no abierto.
-- ACCREDITED_EVIDENCE: Journey 03 acredita aislamiento owner/project y protecciones de revisión dentro del circuito local delimitado.
-- WHAT_REMAINS: probar identidad canónica transversal, selección/cambio de proyecto, recuperación y propagación por todas las superficies pertinentes.
+- CURRENT_STATUS: COMPLETED; S15_OPERATIONAL_CLOSURE=PASS.
+- ACCREDITED_EVIDENCE: candidato e6e73e67b97273db54b41adad6c59232a7cd7f2f; PR #81 MERGED; GitHub main y Railway SUCCESS en e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279, tree 523e0f1bee92c59e7d5058426952862beb7da5ab. HUMAN-LUCAS confirmó producción autenticada: proyecto existente/activo abre Builder sin SERVER_REVISION_MISMATCH; LEGACY_PRODUCTION=PASS; REGRESSION=NO. Gold post-S15 registrado en Inventario técnico.
+- WHAT_REMAINS: ninguno dentro del alcance aceptado de S15.
 - EVIDENCE_REUSABLE_IF: los contratos y bytes de identidad/ownership permanecen iguales y el nuevo gate mantiene el mismo alcance.
 - REVALIDATE_IF: cambian identidad, owner binding, workspace, selección, APIs, recuperación o límites entre cliente y servidor.
 - DEPENDENCIES: Journey 03 y contratos de autorización; definir alcance canónico del proyecto.
