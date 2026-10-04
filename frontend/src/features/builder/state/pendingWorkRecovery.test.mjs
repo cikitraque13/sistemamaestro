@@ -156,3 +156,80 @@ test('S14 compacted IDs cannot be resurrected through a forged pending envelope'
  await assert.rejects(a.savePending(wrong),/OWNER_OR_PROJECT_MISMATCH/);
  assert.equal(f.data.get(a.key),previous);
 });
+
+// S14 -> S15 compatibility: only exact, authenticated, pending-free records.
+async function legacyFixture(change = () => {}) {
+ const data = new Map(); let tail = Promise.resolve(), writes = 0, current = '0', generation = 0, quota = false;
+ const storage = {getItem:k=>data.get(k)??null,setItem:(k,v)=>{if(quota)throw Error('QUOTA'); writes++;data.set(k,v);}};
+ const store = createLocalWorkspaceStore(storage,{request:(_k,_o,fn)=>{const p=tail.then(fn);tail=p.catch(()=>{});return p;}});
+ const key='sistemamaestro:durable:v1:'+JSON.stringify(['alice','s12']);
+ const body={version:1,ownerId:'alice',projectId:'s12',workspace:newWorkspace(base),artifact:renderLandingArtifact(base),decisions:[],decisionEpoch:0,pendingDraft:null,draftVersion:0};
+ change(body); data.set(key,JSON.stringify({...body,digest:await contentHash(body)}));
+ return {data,key,original:data.get(key),writes:()=>writes,setCurrent:v=>current=v,switch:()=>generation++,quota:()=>quota=true,
+ open:(options={})=>{const epoch=generation; return createBoundRepository(store,'alice','s12',()=>{if(epoch!==generation)throw Error('SESSION_CHANGED');},{ownerId:'alice',projectId:'s12',serverRevision:'0',verify:async()=>current,...options});}};
+}
+test('legacy exact binding preserves complete payload/artifact/local revision; repeated and concurrent initialization is idempotent',async()=>{
+ const f=await legacyFixture(); const before=JSON.parse(f.original);
+ const results=await Promise.all([f.open().initialize(base),f.open().initialize(base)]);
+ assert.equal(f.writes(),1); assert.deepEqual(results[0],results[1]);
+ const after=JSON.parse(f.data.get(f.key));const {digest,serverRevision,...payload}=after;
+ const {digest:oldDigest,...originalPayload}=before;
+ assert.deepEqual(payload,originalPayload);assert.equal(serverRevision,'0');assert.equal(digest,await contentHash({...payload,serverRevision}));
+ await f.open().initialize(base);assert.equal(f.writes(),1);
+ const p=await f.open().propose([{type:'set_accent',value:'orange'}]);
+ assert.deepEqual(JSON.parse(f.data.get(f.key)).workspace.committed,base);assert.ok(p.review);
+});
+test('legacy complete equality rejects hidden content changes and unknown envelope/workspace/artifact fields without writes',async(t)=>{
+ for(const [name,change] of [
+ ['content',b=>b.workspace.committed.primaryCTA='Different'],
+ ['hidden state',b=>b.workspace.committed.hiddenField=true],
+ ['envelope',b=>b.extra=true],['workspace',b=>b.workspace.extra=true],['artifact',b=>b.artifact.extra=true],
+ ['pending',b=>b.pendingDraft={}],['missing pending',b=>delete b.pendingDraft],
+ ['null token',b=>b.serverRevision=null],['stale token',b=>b.serverRevision='2026-10-01T00:00:00Z'],
+ ['owner',b=>b.ownerId='bob'],['project',b=>b.projectId='other'],
+ ]) await t.test(name,async()=>{const f=await legacyFixture(change);await assert.rejects(f.open().initialize(base));assert.equal(f.data.get(f.key),f.original);assert.equal(f.writes(),0);});
+});
+test('legacy requires verified owner/project and authenticated current revision',async(t)=>{
+ for(const options of [{ownerId:'bob'},{projectId:'B'},{ownerId:undefined},{verify:async()=>null},{verify:async()=>{throw Error('UNAUTHORIZED');}}])await t.test(JSON.stringify(options),async()=>{
+ const f=await legacyFixture();await assert.rejects(f.open(options).initialize(base));assert.equal(f.data.get(f.key),f.original);});
+});
+test('legacy original digest and CAS are checked; stale GET, competing write and quota preserve bytes',async(t)=>{
+ await t.test('digest',async()=>{const f=await legacyFixture();f.data.set(f.key,f.original.replace('Consultar','Tampered'));const before=f.data.get(f.key);await assert.rejects(f.open().initialize(base),/CORRUPT/);assert.equal(f.data.get(f.key),before);});
+ await t.test('stale GET',async()=>{const f=await legacyFixture();let calls=0;await assert.rejects(f.open({verify:async()=>++calls===1?'0':'2026-10-04T00:00:00Z'}).initialize(base),/SERVER_REVISION/);assert.equal(f.data.get(f.key),f.original);});
+ await t.test('CAS',async()=>{const f=await legacyFixture();let calls=0;const competing=f.original+' ';await assert.rejects(f.open({verify:async()=>{if(++calls===2)f.data.set(f.key,competing);return '0';}}).initialize(base),/STORAGE_CONFLICT/);assert.equal(f.data.get(f.key),competing);assert.equal(f.writes(),0);});
+ await t.test('quota',async()=>{const f=await legacyFixture();f.quota();await assert.rejects(f.open().initialize(base),/QUOTA/);assert.equal(f.data.get(f.key),f.original);});
+});
+test('legacy A B A session generation cannot complete an old migration',async()=>{
+ const f=await legacyFixture();let enter,release;const started=new Promise(r=>enter=r),held=new Promise(r=>release=r);
+ const old=f.open({verify:async()=>{enter();await held;return '0';}});const pending=old.initialize(base);await started;
+ f.switch();f.switch();release();await assert.rejects(pending,/SESSION_CHANGED/);assert.equal(f.data.get(f.key),f.original);
+ await f.open().initialize(base);assert.equal(f.writes(),1);
+});
+test('legacy read/recover/apply do not migrate or auto-apply',async()=>{
+ const f=await legacyFixture(),a=f.open();await assert.rejects(a.read(),/SERVER_REVISION/);await assert.rejects(a.recoverPending(),/SERVER_REVISION/);
+ assert.throws(()=>a.apply({},{}),/AUTHORIZATION/);assert.equal(f.data.get(f.key),f.original);
+});
+
+test('legacy history, consumed IDs, decisions and exact artifact survive binding after an exact revert',async()=>{
+ const f=await legacyFixture(),a=f.open();await a.initialize(base);
+ const proposal=await a.propose([{type:'set_primary_destination',value:'info'}]);
+ const accepted=await a.decide(proposal,'ACCEPT_WARNING','Destino elegido deliberadamente');
+ await a.apply(accepted,await a.authorize(accepted));await a.revert(1);
+ const record=JSON.parse(f.data.get(f.key));delete record.serverRevision;const {digest,...body}=record;
+ record.digest=await contentHash(body);f.data.set(f.key,JSON.stringify(record));
+ const migrated=await f.open().initialize(base);const after=JSON.parse(f.data.get(f.key));
+ assert.equal(migrated.workspace.revision,2);assert.deepEqual(after.workspace,record.workspace);
+ assert.deepEqual(after.decisions,record.decisions);assert.deepEqual(after.artifact,record.artifact);
+ const state=await f.open().read();assert.deepEqual(state.workspace.committed,base);
+ // Unknown nested authorization data must never inherit server authority.
+ delete after.serverRevision;after.workspace.history[0].authorization.unknown=true;
+ const {digest:ignored,...changed}=after;after.digest=await contentHash(changed);const bytes=JSON.stringify(after);f.data.set(f.key,bytes);
+ await assert.rejects(f.open().initialize(base),/LEGACY_SCHEMA_UNKNOWN/);assert.equal(f.data.get(f.key),bytes);
+});
+test('legacy canonical equality ignores object key order only and leaves excluded namespaces untouched',async()=>{
+ const f=await legacyFixture();const unrelated=['builderBuildState:v1','landingTransaction:v1','sistema_maestro.active_builder_project_id'];
+ for(const key of unrelated)f.data.set(key,'untouched');
+ const reordered=Object.fromEntries(Object.entries(base).reverse());await f.open().initialize(reordered);
+ for(const key of unrelated)assert.equal(f.data.get(key),'untouched');
+ const g=await legacyFixture();await assert.rejects(g.open().initialize({...base,updatedAt:'new'}),/LEGACY_CONTENT_MISMATCH/);assert.equal(g.data.get(g.key),g.original);
+});

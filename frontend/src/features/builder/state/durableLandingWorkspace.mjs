@@ -74,6 +74,7 @@ export function createLocalWorkspaceStore(storage, locks) {
     transaction: (key, operation) => locks.request(key, { mode: 'exclusive' }, async () => {
       const result = await operation(storage.getItem(key));
       result.assertCurrent?.();
+      if (result.expectedRaw !== undefined && storage.getItem(key) !== result.expectedRaw) fail('STORAGE_CONFLICT');
       if (result.write !== undefined) storage.setItem(key, result.write);
       return result.value;
     }),
@@ -100,14 +101,14 @@ export function createDurableLandingWorkspace(store, ownerId, projectId, assertC
   const authorizations = new Map();
   const repairAttempts = new Set();
   const destinationAttempts = new Map();
-  async function decode(raw) {
+  async function decode(raw, allowLegacy = false) {
     if (raw === null) return null;
     let record;
     try { record = JSON.parse(raw); } catch { fail('CORRUPT_WORKSPACE'); }
     if (record?.version !== 1 || record.ownerId !== ownerId || record.projectId !== projectId) fail('OWNERSHIP_OR_VERSION_MISMATCH');
     const { digest, ...body } = record;
     if (digest !== await contentHash(body)) fail('CORRUPT_WORKSPACE');
-    if (record.serverRevision !== revision) fail('SERVER_REVISION_MISMATCH');
+    if (record.serverRevision !== revision && !(allowLegacy && !Object.hasOwn(record, 'serverRevision'))) fail('SERVER_REVISION_MISMATCH');
     const ws = record.workspace;
     if (!ws || ws.schemaVersion !== 1 || !Number.isSafeInteger(ws.revision) || ws.revision < 0 || !Array.isArray(ws.history) || ws.committed?.projectId !== projectId) fail('CORRUPT_WORKSPACE');
     normalizeHistory(ws);
@@ -117,6 +118,57 @@ export function createDurableLandingWorkspace(store, ownerId, projectId, assertC
     }
     validateLandingArtifact(ws.committed, record.artifact);
     return { ...record, digest: await contentHash(body) };
+  }
+  // Only initialization may claim an unbound v1 record. Never use encode here:
+  // normalization/compaction would silently alter the legacy payload.
+  async function bindLegacy(raw, initial) {
+    const original = JSON.parse(raw);
+    const onlyKeys = (value, allowed) => {
+      if (!value || typeof value !== 'object' || Array.isArray(value) ||
+          Object.keys(value).some(k => !allowed.includes(k))) fail('LEGACY_SCHEMA_UNKNOWN');
+    };
+    onlyKeys(original, ['version','ownerId','projectId','workspace','artifact','decisions','decisionEpoch','pendingDraft','draftVersion','digest']);
+    onlyKeys(original.workspace, ['schemaVersion','revision','committed','history','lastOperationId','historyBaseRevision','consumedOperationIds','revertSnapshots','compactedProvenance']);
+    onlyKeys(original.artifact, ['rendererVersion','mediaType','html']);
+    if (original.pendingDraft !== null) fail('SERVER_REVISION_MISMATCH');
+    if (binding.ownerId !== ownerId || binding.projectId !== projectId) fail('LEGACY_IDENTITY_UNVERIFIED');
+    if (!Array.isArray(original.decisions) || !Number.isSafeInteger(original.decisionEpoch) || original.decisionEpoch < 0 ||
+        !Number.isSafeInteger(original.draftVersion) || original.draftVersion < 0) fail('LEGACY_SCHEMA_UNKNOWN');
+    const checkDecision = async decision => {
+      onlyKeys(decision, ['version','ownerId','projectId','reviewId','proposalId','candidateHash','artifactHash','baseRevision','semanticAssessmentId','semanticAssessment','type','rationale','sessionId','sequence','createdAt','validity','decisionId']);
+      onlyKeys(decision.semanticAssessment, ['version','method','advisoryOnly','status','reason','promise','destinationId','destinationContent','recognizedIntents','limitation']);
+      const { decisionId, ...body } = decision;
+      if (decision.ownerId !== ownerId || decision.projectId !== projectId || decisionId !== await contentHash(body) ||
+          decision.semanticAssessmentId !== await contentHash(decision.semanticAssessment)) fail('LEGACY_PROVENANCE_UNVERIFIED');
+    };
+    const events = [...original.workspace.history, ...(original.workspace.revertSnapshots || []), ...(original.workspace.compactedProvenance || [])];
+    for (const event of events) {
+      onlyKeys(event, ['operationId','before','beforeHash','afterHash','artifactHash','rendererVersion','kind','revertedOperationId','createdAt','beforeArtifact','authorization','humanDecision','repair','reviewId','proposalHash']);
+      if (event.beforeArtifact) onlyKeys(event.beforeArtifact, ['rendererVersion','mediaType','html']);
+      if (event.authorization) {
+        onlyKeys(event.authorization, ['kind','ownerId','projectId','sessionId','baseRevision','proposalId','candidateHash','artifactHash','reviewId','semanticAssessmentId','decisionId','decisionEpoch','draftVersion','envelopeHash','authorizationId','validity','createdAt','beforeHash']);
+        if (event.authorization.ownerId !== ownerId || event.authorization.projectId !== projectId || event.authorization.validity !== 'CONSUMED') fail('LEGACY_PROVENANCE_UNVERIFIED');
+      }
+      if (event.humanDecision) await checkDecision(event.humanDecision);
+      if (event.repair) {
+        // Reconstruct rather than accept opaque nested repair fields. A compacted
+        // event without its before state cannot prove this binding, so stays intact.
+        if (!event.before) fail('LEGACY_PROVENANCE_UNVERIFIED');
+        const parent = event.repair.parent;
+        const repaired = await prepareRepair({ ...newWorkspace(event.before), revision: parent?.baseRevision }, parent, event.repair.selection?.sectionId, event.operationId);
+        if (await contentHash(repaired.repair) !== await contentHash(event.repair)) fail('LEGACY_PROVENANCE_UNVERIFIED');
+      }
+    }
+    for (const decision of original.decisions) await checkDecision(decision);
+    await decode(raw, true);
+    if (await contentHash(original.workspace.committed) !== await contentHash(initial)) fail('LEGACY_CONTENT_MISMATCH');
+    const { digest, ...body } = original;
+    const replacement = { ...body, serverRevision: revision };
+    const next = { ...replacement, digest: await contentHash(replacement) };
+    const write = JSON.stringify(next);
+    if (2 * (key.length + write.length) > DURABLE_STORAGE_POLICY.capacityBytes) fail('DURABLE_CAPACITY_EXCEEDED');
+    const verified = await decode(write);
+    return { write, expectedRaw: raw, value: copy(verified), assertCurrent };
   }
   async function encode(workspace, decisions = [], decisionEpoch = 0, pendingDraft = null, draftVersion = 0, preservedArtifact = null) {
     workspace = normalizeHistory(copy(workspace));
@@ -210,6 +262,11 @@ export function createDurableLandingWorkspace(store, ownerId, projectId, assertC
       const initial = copy(state);
       if (initial.projectId !== projectId) fail('PROJECT_MISMATCH');
       return store.transaction(key, async (raw) => {
+        if (raw !== null) {
+          // Verify integrity/ownership before even considering compatibility.
+          const checked = await decode(raw, true);
+          if (!Object.hasOwn(checked, 'serverRevision')) return bindLegacy(raw, initial);
+        }
         const existing = await decode(raw);
         if (existing) return { value: copy(existing), assertCurrent };
         const record = await encode(newWorkspace(initial));
