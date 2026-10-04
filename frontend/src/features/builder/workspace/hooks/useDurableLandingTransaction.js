@@ -13,11 +13,12 @@ export default function useDurableLandingTransaction(activeState, onCommit, owne
     const token = { ownerId, projectId, alive: true, locked: false, record: null, intent: 0 };
     context.current = token;
     const assertCurrent = () => {
+      if (token.conflict) throw new Error('STORAGE_CONFLICT');
       if (token.locked && token.operationIntent !== token.intent) throw new Error('PROPOSAL_CANCELLED');
-      if (!token.alive || context.current !== token || latest.current.ownerId !== ownerId || latest.current.activeState?.projectId !== projectId || latest.current.binding?.serverRevision !== binding?.serverRevision || latest.current.binding?.projectId !== binding?.projectId) throw new Error('SESSION_CHANGED');
+      if (!token.alive || context.current !== token || latest.current.ownerId !== ownerId || latest.current.activeState?.projectId !== projectId || latest.current.binding?.ownerId !== ownerId || latest.current.binding?.serverRevision !== binding?.serverRevision || latest.current.binding?.projectId !== binding?.projectId) throw new Error('SESSION_CHANGED');
     };
     setView({ pending: null, review: null, decision: null, revision: 0, canRevert: false, status: 'loading', error: '', busy: false });
-    if (!ownerId || !projectId || !binding || binding.projectId !== projectId) {
+    if (!ownerId || !projectId || !binding || binding.ownerId !== ownerId || binding.projectId !== projectId) {
       setView((v) => ({ ...v, status: 'blocked', error: ownerId ? '' : 'Se requiere una sesión autenticada.' }));
       return () => { token.alive = false; };
     }
@@ -43,7 +44,7 @@ export default function useDurableLandingTransaction(activeState, onCommit, owne
     return () => { token.alive = false; window.removeEventListener('storage', invalidate); };
   // The initial state is intentionally captured once per owner/project; later revisions are committed through this session.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ownerId, projectId, binding?.serverRevision, binding?.projectId]);
+  }, [ownerId, projectId, binding?.ownerId, binding?.serverRevision, binding?.projectId]);
 
   const operate = async (kind, operations, expectedReviewId, expectedDecisionId) => {
     const token = context.current;
