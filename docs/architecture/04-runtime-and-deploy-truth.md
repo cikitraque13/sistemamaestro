@@ -1,6 +1,25 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado actual del release S15 — 2026-10-05
+## Estado actual del release S16 — 2026-10-07
+
+| Plano | Identidad y estado |
+|---|---|
+| Final Gold prepublicación | `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; PASS |
+| Commit de publicación | `4322f7936a93c12eec288e44efcd3eb43d2a3639` |
+| PR | [#83](https://github.com/cikitraque13/sistemamaestro/pull/83) MERGED |
+| GitHub main | `2b3f8c0345829273a3c92d08633e789334424a23` |
+| Railway deployment | `824b2d5b-12ad-4364-8464-9462679ffc9b` |
+| Railway production SHA | `2b3f8c0345829273a3c92d08633e789334424a23` |
+| Railway Docker build | SUCCESS; Node `22.22.2-alpine` con digest `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f` |
+| `/health` / home | `200 / 200` |
+| Regresión operacional | NO |
+| Trazabilidad GitHub main → Railway → producción | PASS |
+| S16 | CLOSED; READY_FOR_S17=YES |
+| S17 | Aún no abierto; checkpoint post-S16 pendiente |
+
+El PR #83 contiene exactamente las 18 rutas del candidato congelado (16 tracked modificadas y `.nvmrc`/`.python-version` nuevas). Railway reporta el mismo SHA de `main`, y la verificación pública de health y home respondió HTTP 200.
+
+## Registro histórico del release S15 — 2026-10-05
 
 | Plano | Identidad y estado |
 |---|---|
@@ -17,11 +36,11 @@
 | Regresión | NO |
 | Cierre operacional S15 | CLOSED |
 
-El candidato S15 es el segundo padre del merge de PR #81; el merge conserva el tree aceptado. HUMAN-LUCAS aportó la evidencia manual de producción autenticada. Este registro no añade resultados de healthcheck o pruebas fuera de esa evidencia.
+El candidato S15 es el segundo padre del merge de PR #81; el merge conserva el tree aceptado. HUMAN-LUCAS aportó la evidencia manual de producción autenticada. Este registro histórico no representa el release productivo vigente, que consta arriba, ni añade resultados de healthcheck o pruebas fuera de aquella evidencia.
 
-## Estado candidato local S16 — 2026-10-05
+## Evidencia prepublicación del candidato S16 — 2026-10-05 (histórica)
 
-Este registro describe el candidato local S16 y no altera la identidad del release en producción, que sigue siendo el release S15 indicado arriba.
+Los estados OPEN/PENDING, el worktree candidato y el R2 pendiente que siguen describen exclusivamente el corte anterior a la publicación. Fueron superados por el cierre vigente documentado al inicio de este archivo.
 
 - STATUS: OPEN; S16_TECHNICAL_WORK=COMPLETE; no aceptación/cierre.
 - CANDIDATE: branch `s16/runtime-identity`; HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb`; tree `36e7c83cf16e6e95a610625f197f6e093f4a0b73`.
