@@ -19,6 +19,26 @@
 
 El candidato S15 es el segundo padre del merge de PR #81; el merge conserva el tree aceptado. HUMAN-LUCAS aportó la evidencia manual de producción autenticada. Este registro no añade resultados de healthcheck o pruebas fuera de esa evidencia.
 
+## Estado candidato local S16 — 2026-10-05
+
+Este registro describe el candidato local S16 y no altera la identidad del release en producción, que sigue siendo el release S15 indicado arriba.
+
+- STATUS: OPEN; S16_TECHNICAL_WORK=COMPLETE; no aceptación/cierre.
+- CANDIDATE: branch `s16/runtime-identity`; HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb`; tree `36e7c83cf16e6e95a610625f197f6e093f4a0b73`.
+- WORKTREE: TRACKED_MODIFIED=16; NEW_UNTRACKED=2 (`.nvmrc`, `.python-version`); TOTAL_S16_PATHS=18. Both new paths are expected candidate files, not recovery contamination.
+- RUNTIME: Node 22.22.2; Python 3.11; RUNTIME_IDENTITY=PASS.
+- INSTALL_REPRODUCIBILITY=PASS; TEST_REPRODUCIBILITY=PASS; backend tests 73 passed, 27 subtests passed; FRONTEND_BUILD=PASS; PRODUCT_CODE_CHANGED=NO.
+- R1 Review Target transport: WIRING_DESIGN=PASS; SHARED_TRANSPORT=PASS; PREFLIGHT=PASS; exact shared target, source/destination hash match and FS/QA/SEC resolution accredited. This transport fix is distinct from SM-ED materialization.
+- R1 SM-ED: canonical personal Skill authority verified; supported local materialization in this Work=PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. No automatic synchronization across runtimes is asserted.
+- R1 wiring changeset: 7 files; hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235`. It is distinct from the 18-path S16 worktree.
+- R2: Node image `node:22.22.2-alpine`, digest `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`; digest fix=PASS; SM-FS=PASS; SM-SEC=PASS; Docker build=NOT_RUN because the authorized Docker engine was unavailable. Railway publication build remains mandatory for subsequent S16 closure; R2 does not block the prepublication Final Gold.
+- FINAL_GOLD: `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; STATUS=PENDING; prepublication freeze.
+- PRE-S17_SANITATION: PASS against the sealed target `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z` (SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`); SM-FS=PASS, SM-QA=PASS_WITH_EVIDENCE_LIMITATION, SM-SEC=PASS; zero critical structural findings; zero FIX_BEFORE_S17 findings; candidate contamination=NO; documentation divergence=NO; secret exposure=NO.
+- REVIEW_TARGET_TRANSPORT_ROOT_FIX: PASS; exact target materialized in the collaboration-shared workspace, source/destination hashes matched, and SM-FS/SM-QA/SM-SEC each resolved the same reference/hash before audit. No product code changed.
+- OBS-01: future Review Targets should attach or reference immutable raw execution evidence when independent re-verification is required. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
+- S16 remains OPEN; sanitation does not close S16 or open S17. SM-ED local materialization is resolved for this Work; automatic cross-runtime synchronization is not asserted. Review Target transport is a separate PASS.
+- NEXT_CONTROL_STEP: create the pending prepublication Final Gold; after publication, complete the mandatory R2 Railway publication build and subsequent production verification for S16 closure. S17 remains unopened.
+
 ## Registro histórico del release S14 — 2026-10-03
 
 | Plano | Identidad y estado |
@@ -139,7 +159,7 @@ El `CMD` del Dockerfile usa `sh -c` y sí expande correctamente `PORT`.
 
 El Dockerfile debe:
 
-- construir frontend con Node 22;
+- construir frontend con Node 22.22.2, fijado por la referencia de imagen S16;
 - usar `npm ci`;
 - compilar `frontend/dist`;
 - usar Python 3.11 para runtime;

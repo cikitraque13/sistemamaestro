@@ -328,10 +328,11 @@ La economía del sistema ya no es solo una idea comercial. Existe una base técn
 - bcrypt
 - httpx
 
-El frontend usa scripts activos con:
+Desde la raíz del repositorio, el frontend usa scripts activos con:
 
 ```bash
-npm install
+cd frontend
+npm ci
 npm start
 npm run build
 ```
@@ -344,7 +345,7 @@ npm run build
 
 ```bash
 cd backend
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 uvicorn backend.app.main:app --reload --port 8001
 ```
 
@@ -352,7 +353,7 @@ uvicorn backend.app.main:app --reload --port 8001
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm start
 ```
 

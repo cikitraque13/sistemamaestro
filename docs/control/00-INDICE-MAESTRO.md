@@ -12,7 +12,7 @@
 
 | Tema | Propietario | Papel |
 |---|---|---|
-| Producción y runtime del release S15 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para SHA/tree/deployment y riesgos de observabilidad |
+| Producción S15 y estado local de runtime S16 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para identidad productiva S15 y evidencia/runtime S16; no confundir candidato local con producción |
 | Journey 03, cierres S1–S15 y validaciones | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, releases y evidencia de Journey 03 |
 | Decisiones aprobadas | [Decisiones cerradas](01-DECISIONES-CERRADAS.md) | SOURCE_OF_TRUTH; conserva procedencia y alcance temporal |
 | Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del siguiente frente previsto; no lo autoriza |
@@ -66,7 +66,7 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 
 Los fundamentos Builder state/kernel y el circuito local S1–S13/C1 están implementados
 y validados en ingeniería local; su creación no es una prioridad pendiente.
-El siguiente frente previsto se describe en [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md); los estados S14–S18 y los criterios de apertura pertenecen al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md). La identidad del Gold post-S15 está en [Inventario técnico](03-INVENTARIO-TECNICO.md). Este índice no abre S16.
+S16 está OPEN, su trabajo técnico está completo y el Final Gold prepublicación permanece PENDING. El candidato en HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb` comprende 16 archivos tracked modificados y 2 nuevos/untracked (`.nvmrc`, `.python-version`): 18 rutas esperadas. SM-ED canónica está verificada y materializada localmente en el Work; no se afirma sincronización automática entre runtimes. El transporte compartido del Review Target es un PASS independiente. El changeset de wiring R1 de siete archivos no representa el total S16. R2 Railway publication build y la verificación posterior de producción son obligatorios para el cierre S16, pero no bloquean el Final Gold prepublicación. El saneamiento PRE-S17 está cerrado con PASS, cero hallazgos críticos y cero correcciones obligatorias; su detalle y OBS-01 diferido constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). La identidad del Gold post-S15 y el checkpoint PRE-SANEO están en [Inventario técnico](03-INVENTARIO-TECNICO.md). S17 sigue sin abrir.
 
 ## Reglas duraderas de gobierno
 
