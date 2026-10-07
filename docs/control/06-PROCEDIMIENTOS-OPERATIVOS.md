@@ -262,7 +262,29 @@ No se hace commit “para ir guardando de todo un poco”.
 
 ---
 
-## 10. Procedimiento de tratamiento de incidencias
+## 10. Procedimiento de alineación local post-merge
+
+### Cuándo usarlo
+
+Después de cada merge a `main`, antes de declarar completa la publicación o crear un checkpoint/Gold post-publicación.
+
+### Invariante de cierre
+
+`PUBLICATION_COMPLETE=YES` solo si `PR_MERGED=YES`, `LOCAL_BRANCH=main`, `LOCAL_HEAD=ORIGIN_MAIN=GITHUB_MAIN` y `WORKTREE=CLEAN`.
+
+### Secuencia
+
+1. actualizar normalmente las referencias remotas;
+2. situar el checkout local en `main`;
+3. actualizar `main` únicamente mediante una operación Git normal y segura, preferentemente fast-forward desde `origin/main`;
+4. verificar `LOCAL_HEAD=ORIGIN_MAIN=GITHUB_MAIN` y `WORKTREE=CLEAN`;
+5. solo entonces declarar completa la publicación o crear un checkpoint/Gold post-publicación.
+
+Si la alineación no puede obtenerse de forma normal y segura, `PUBLICATION_COMPLETE=NO`: detenerse. No usar force, `reset --hard` ni rebase improvisado.
+
+---
+
+## 11. Procedimiento de tratamiento de incidencias
 
 ### Cuándo usarlo
 
