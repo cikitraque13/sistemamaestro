@@ -2,12 +2,12 @@
 
 ## Estado operativo vigente — 2026-10-07
 
-Propietario del backlog actual. S14–S16 están cerrados; la identidad productiva S16 consta en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El [inventario técnico](03-INVENTARIO-TECNICO.md) registra el Gold post-S15 histórico y el Final Gold prepublicación S16. El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva los cierres históricos. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. El siguiente paso vigente es crear el checkpoint post-S16 antes de abrir el gate S17.
+Propietario del backlog actual. S14–S16 están cerrados; la identidad productiva S16 consta en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El [inventario técnico](03-INVENTARIO-TECNICO.md) registra el Gold post-S15 histórico y el Final Gold prepublicación S16. El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva los cierres históricos. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. El checkpoint post-S16 está creado y PASS; su identidad consta en el [inventario técnico](03-INVENTARIO-TECNICO.md). S17 aún no está abierto y requiere su propio gate.
 
 ## Cierre canónico de S16 — 2026-10-07
 
-CURRENT_PENDING_FRONT=POST_S16_CHECKPOINT
-S14=COMPLETED; S15=COMPLETED; S16=CLOSED; FINAL_GOLD_PREPUBLICATION=PASS; READY_FOR_S17=YES; S17=NOT_OPENED.
+CURRENT_PENDING_FRONT=S17_ENTRY_GATE
+S14=COMPLETED; S15=COMPLETED; S16=CLOSED; FINAL_GOLD_PREPUBLICATION=PASS; POST_S16_GOLD=CREATED/PASS; BASELINE_FOR_S17=READY; S17=NOT_OPENED.
 
 PUBLICATION: PR #83 MERGED; PUBLICATION_COMMIT=4322f7936a93c12eec288e44efcd3eb43d2a3639; GITHUB_MAIN_SHA=2b3f8c0345829273a3c92d08633e789334424a23. PR_DIFF_SCOPE=PASS (exactamente 18 rutas; 16 tracked modificadas y `.nvmrc`/`.python-version` nuevas).
 
@@ -27,7 +27,7 @@ PRE-S17_SANITATION=PASS contra el Review Target sellado `S16-PRE-S17-7ab084f38d8
 
 OBS-01: adjuntar o referenciar evidencia cruda e inmutable de ejecución en futuros Review Targets cuando se requiera reverificación independiente. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
 
-NEXT_CONTROL_STEP=Crear el checkpoint post-S16. S17 está preparado pero no abierto y requiere su propio gate.
+NEXT_CONTROL_STEP=S17 requiere su propio gate; el checkpoint post-S16 está creado y PASS. S17 sigue sin abrirse.
 
 ## Cierres que se retiran del backlog activo
 

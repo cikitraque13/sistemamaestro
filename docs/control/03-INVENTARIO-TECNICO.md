@@ -25,7 +25,21 @@ Como antecedente histórico, el checkout usado para el Gold post-S15 estaba en l
 - PRE-S17_SANITATION=PASS contra `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z`, target SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`; SM-FS=PASS, SM-QA=PASS_WITH_EVIDENCE_LIMITATION, SM-SEC=PASS; critical findings=0; FIX_BEFORE_S17=0; candidate contamination=NO; documentation divergence=NO; secret exposure=NO.
 - REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: bundle e integridad del target verificados después de la materialización compartida; hashes origen/destino coinciden y FS/QA/SEC resolvieron la misma referencia. No cambió código de producto.
 - OBS-01: adjuntar/referenciar evidencia cruda e inmutable en futuros Review Targets cuando se requiera reverificación independiente. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
-- CHECKPOINT_POST_S16=NOT_CREATED; S17 todavía no está abierto y requiere su gate propio. Este inventario no es el checkpoint post-S16.
+- CHECKPOINT_POST_S16=CREATED/PASS; BASELINE_FOR_S17=READY; S17=NOT_OPENED. La identidad e integridad del Gold constan a continuación.
+
+## Gold Freeze post-S16 cerrado — PASS
+
+- GOLD_NAME: `GOLD_FREEZE_POST_S16_CLOSED_2026-10-07`
+- PATH: `Backups/GOLD/GOLD_FREEZE_POST_S16_CLOSED_2026-10-07`
+- SOURCE_BRANCH: `main`; SOURCE_HEAD: `467199979544ca548191813d7325377de1e636ea`
+- SOURCE_TREE: `36116b9f65754e59ea1fa22ff09685c4651dce42`
+- LOCAL_HEAD = ORIGIN_MAIN = GITHUB_MAIN: YES; WORKTREE: CLEAN
+- FILES_EXPECTED / FILES_COPIED: `413 / 413`
+- SHA256_MATCH: YES; GLOBAL_DIGEST: `aa9d62264223ed4ea654ef4ce7d65b556ce53206e2ec3c0b8b06981c053a08db`
+- SECRETS_INCLUDED: NO; PREVIOUS_GOLDS_PRESERVED: YES; RESTORE_CHECK: PASS; SOURCE_MODIFIED: NO
+- BASELINE_FOR_S17=READY; S17=NOT_OPENED.
+
+El Gold post-S16 congela el baseline cerrado inmediatamente anterior a S17. El Gold S16 prepublicación que aparece abajo se conserva como checkpoint histórico distinto.
 
 ## Fuente y estructura material
 
