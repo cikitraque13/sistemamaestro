@@ -2,10 +2,10 @@
 from copy import deepcopy
 from types import SimpleNamespace
 from unittest.mock import patch
-from backend.tests import test_consumption_callers as f
+import test_consumption_callers as f
 
 
-class ProjectIdentityTests(f.ChargedCallerTests):
+class ProjectIdentityTests(f.ChargedCallerFixture):
     async def test_projectless_cannot_carry_project_state(self):
         with self.assertRaises(f.HTTPException):
             await f.builder_ai.build_with_ai(f.BuilderAIInput(userInput='synthetic', currentBuildState={'projectId':'project_test'}), f.request())

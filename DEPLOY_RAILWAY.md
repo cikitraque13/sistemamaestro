@@ -83,7 +83,7 @@ Dockerfile esperado:
 
 ```dockerfile
 # Frontend build
-FROM node:22-alpine AS frontend-build
+FROM node:22.22.2-alpine AS frontend-build
 
 WORKDIR /app/frontend
 
@@ -106,8 +106,7 @@ ENV PORT=8080
 
 COPY backend/requirements.txt /app/backend/requirements.txt
 
-RUN python -m pip install --upgrade pip \
-    && pip install --no-cache-dir -r /app/backend/requirements.txt
+RUN python -m pip install --no-cache-dir -r /app/backend/requirements.txt
 
 COPY backend/ /app/backend/
 COPY --from=frontend-build /app/frontend/dist /app/frontend/dist
@@ -199,23 +198,22 @@ Uso:
 
 ```dockerfile
 COPY backend/requirements.txt /app/backend/requirements.txt
-RUN python -m pip install --upgrade pip \
-    && pip install --no-cache-dir -r /app/backend/requirements.txt
+RUN python -m pip install --no-cache-dir -r /app/backend/requirements.txt
 ```
 
 Este archivo debe contener dependencias fijadas/pineadas para producción.
 
 ### `requirements.txt` en raíz
 
-Es una lista mínima útil para entorno local, pruebas o desarrollo.
+Es una extensión local de desarrollo/pruebas del backend canónico: incluye `backend/requirements.txt` y conserva `pytest`, que ya figuraba en este archivo. No duplica ni reemplaza las versiones de dependencias de la aplicación.
 
-Puede incluir:
+Para instalar el perfil local de desarrollo/pruebas desde la raíz:
 
-```text
-pytest
+```bash
+python -m pip install -r requirements.txt
 ```
 
-No debe asumirse como fuente canónica del contenedor Railway mientras el Dockerfile use `backend/requirements.txt`.
+Docker/Railway instala directamente `backend/requirements.txt`. El README instala ese mismo archivo desde `backend/`; ambas rutas comparten una única fuente para dependencias de aplicación. `pytest` sigue sin versión fijada, por lo que la herramienta de pruebas queda fuera de esta alineación de instalación de aplicación.
 
 ---
 
@@ -355,7 +353,7 @@ Hardcodear dominio en build rompe previews, dominios alternativos y despliegues 
 El Dockerfile hace:
 
 ```text
-FROM node:22-alpine
+FROM node:22.22.2-alpine
 COPY frontend/package*.json
 npm ci
 COPY frontend/
@@ -375,7 +373,7 @@ El Dockerfile hace:
 ```text
 FROM python:3.11-slim
 COPY backend/requirements.txt
-pip install -r backend/requirements.txt
+python -m pip install --no-cache-dir -r backend/requirements.txt
 COPY backend/
 COPY frontend build
 CMD python -m uvicorn backend.app.main:app

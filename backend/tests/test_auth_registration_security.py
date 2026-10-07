@@ -76,18 +76,19 @@ for function_name in (
 mongodb_stub = ModuleType("backend.app.db.mongodb")
 mongodb_stub.db = SimpleNamespace()
 
-for module_name, module in (
-    ("fastapi", fastapi_stub),
-    ("pydantic", pydantic_stub),
-    ("httpx", httpx_stub),
-    ("jwt", jwt_stub),
-    ("backend.app.core.config", config_stub),
-    ("backend.app.core.security", security_stub),
-    ("backend.app.db.mongodb", mongodb_stub),
+with patch.dict(
+    sys.modules,
+    {
+        "fastapi": fastapi_stub,
+        "pydantic": pydantic_stub,
+        "httpx": httpx_stub,
+        "jwt": jwt_stub,
+        "backend.app.core.config": config_stub,
+        "backend.app.core.security": security_stub,
+        "backend.app.db.mongodb": mongodb_stub,
+    },
 ):
-    sys.modules.setdefault(module_name, module)
-
-from backend.app.routers import auth
+    from backend.app.routers import auth
 
 
 class FakeUsers:

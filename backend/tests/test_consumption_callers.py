@@ -98,7 +98,7 @@ def request(key="logical-operation-1"):
     return SimpleNamespace(headers={"Idempotency-Key": key, "If-Match": "0"} if key else {"If-Match": "0"})
 
 
-class ChargedCallerTests(unittest.IsolatedAsyncioTestCase):
+class ChargedCallerFixture(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.db = FakeDb(100)
         self.db.projects = FakeProjects()
@@ -125,6 +125,7 @@ class ChargedCallerTests(unittest.IsolatedAsyncioTestCase):
     def entry(self):
         return next(iter(self.db.ledger.documents.values()))
 
+class ChargedCallerTests(ChargedCallerFixture):
     async def test_each_real_caller_replays_exact_durable_response_once(self):
         for kind, worker in (("project", self.analysis), ("blueprint", self.blueprint), ("builder", self.builder)):
             with self.subTest(kind=kind):

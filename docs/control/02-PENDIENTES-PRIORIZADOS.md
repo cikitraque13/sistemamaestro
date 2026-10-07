@@ -1,20 +1,35 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-03
+## Estado operativo vigente — 2026-10-05
 
-Propietario del backlog actual. S14 quedó cerrado y su publicación/producción están verificadas; la identidad del release consta en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El Gold S14 Entry permanece registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md) como checkpoint de entrada, no como evidencia del cierre posterior.
-El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario de sus cierres y validaciones. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad productiva.
+Propietario del backlog actual. S14 y S15 están cerrados; la identidad productiva S15 consta en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md), y el Gold post-S15 permanece registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md). El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva los cierres históricos. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16.
 
-## Siguiente frente canónico de Journey 03
+## Estado canónico de S16
 
 CURRENT_PENDING_FRONT=S16_RUNTIME_REPRODUCIBILITY
-S14=COMPLETED; S15=COMPLETED; S16=NOT_DEMONSTRATED; gate S16 no abierto (estados canónicos en [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md)).
+S14=COMPLETED; S15=COMPLETED; S16=OPEN; S16_TECHNICAL_WORK=COMPLETE; S16_ACCEPTANCE=PENDING; FINAL_GOLD_STATUS=PENDING.
 
-Clasificación: frente estructural siguiente (S16 — Runtime Reproducibility); no abierto por este registro.
+Runtime identity: Node 22.22.2 y Python 3.11; PASS. Instalación y tests reproducibles: PASS. Backend: 73 passed y 27 subtests passed. Frontend build: PASS. PRODUCT_CODE_CHANGED=NO.
 
-WHAT_REMAINS: enlazar resultados y comandos al artefacto congelado y demostrar que cubren los criterios propios de S16, con identidad exacta de commit/tree, manifests, runtime Node/npm, Dockerfile, imagen/método, plataforma y comandos. Referencia: [Master Maturity Roadmap — S16](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+CANDIDATE_WORKTREE: TRACKED_MODIFIED=16; NEW_UNTRACKED=2 (`.nvmrc`, `.python-version`); TOTAL_S16_PATHS=18. Ambas rutas nuevas pertenecen al candidato esperado y no son contaminación de la recuperación.
 
-Este backlog registra el orden del frente pendiente, pero no abre ni autoriza el gate S16.
+PRE-S17_SANITATION=PASS contra el Review Target sellado `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z` (SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`); SM-FS=PASS; SM-QA=PASS_WITH_EVIDENCE_LIMITATION; SM-SEC=PASS; hallazgos críticos=0; FIX_BEFORE_S17=0; contaminación=NO; divergencia documental=NO; exposición de secretos=NO.
+
+REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: materialización compartida, igualdad de hash y resolución por FS/QA/SEC acreditadas en la misma referencia. Sin cambios de producto.
+
+R1_REVIEW_TARGET_TRANSPORT: WIRING_DESIGN=PASS; SHARED_TRANSPORT=PASS; PREFLIGHT=PASS; materialización compartida, source/destination hash match y resolución del mismo target acreditados.
+
+R1_SM_ED: autoridad canónica de la Skill personal verificada; materialización local soportada en este Work=PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. No se afirma sincronización automática entre runtimes.
+
+R1_WIRING_CHANGESET_FILES=7; CHANGESET_HASH=260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235. Corresponde al wiring R1 y es distinto de las 18 rutas del candidato S16.
+
+R2: imagen Node `node:22.22.2-alpine`, digest `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`; DIGEST_FIX=PASS; SM-FS=PASS; SM-SEC=PASS; DOCKER_BUILD=NOT_RUN porque el Docker engine autorizado no estaba disponible. R2_FINAL_VALIDATION_GATE=Railway publication build; es obligatorio para el cierre posterior de S16 y no bloquea el Final Gold prepublicación pendiente. Después requiere verificación de producción; no se afirma Docker build PASS ni cierre S16.
+
+OBS-01: adjuntar o referenciar evidencia cruda e inmutable de ejecución en futuros Review Targets cuando se requiera reverificación independiente. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
+
+NEXT_CONTROL_STEP=Crear el Final Gold prepublicación pendiente; después de publicar, completar R2 Railway publication build y la verificación de producción para el cierre S16. S16 permanece OPEN; S17 no está abierto.
+
+Referencia de evidencia y límites: [Master Maturity Roadmap — S16](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) y [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
 
 ## Cierres que se retiran del backlog activo
 

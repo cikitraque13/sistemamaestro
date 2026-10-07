@@ -44,12 +44,24 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 ### S16 — Runtime Reproducibility
 
 - ORIGINAL_PURPOSE: hacer reproducibles instalación, pruebas y build en un runtime soportado y documentado.
-- CURRENT_STATUS: NOT_DEMONSTRATED; evidencia adelantada, no cierre.
-- ACCREDITED_EVIDENCE: PRE-S14 registró Node 22, lockfile reparado, npm ls limpio, cero advisories critical/high en el audit reportado, MJS 69/69, Vitest 36/36, build y Docker PASS.
-- WHAT_REMAINS: enlazar resultados y comandos al artefacto congelado y demostrar que cubren los criterios propios de S16.
-- EVIDENCE_REUSABLE_IF: commit/tree, manifests, lockfile, Node/npm, Dockerfile, imagen/método, plataforma y comandos coinciden.
-- REVALIDATE_IF: cambia cualquiera de esas entradas, el entorno o los criterios de reproducibilidad.
-- DEPENDENCIES: runtime y manifests canónicos; evidencia con identidad exacta.
+- CURRENT_STATUS: OPEN; S16_TECHNICAL_WORK=COMPLETE; S16_ACCEPTANCE=PENDING.
+- CANDIDATE_IDENTITY: branch `s16/runtime-identity`; HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb`; tree `36e7c83cf16e6e95a610625f197f6e093f4a0b73`.
+- CANDIDATE_WORKTREE: TRACKED_MODIFIED=16; NEW_UNTRACKED=2 (`.nvmrc`, `.python-version`); TOTAL_S16_PATHS=18. Las dos rutas nuevas son parte esperada del candidato, no contaminación de la recuperación.
+- RUNTIME: Node 22.22.2; Python 3.11; runtime identity PASS.
+- ACCREDITED_EVIDENCE: installation reproducibility PASS; test reproducibility PASS; backend 73 passed and 27 subtests passed; frontend build PASS; PRODUCT_CODE_CHANGED=NO. The S16 Docker image digest fix is independently verified, but Docker build is NOT_RUN.
+- R1 Review Target transport: wiring design, shared transport and preflight PASS; shared target, source/destination hash match and same-target resolution accredited.
+- R1 SM-ED: canonical personal Skill authority verified; supported local materialization in this Work=PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. Automatic synchronization across runtimes is not asserted.
+- R1 wiring changeset: 7 files; hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235`. This is distinct from the 18-path S16 candidate worktree.
+- FINAL_GOLD: `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; STATUS=PENDING; prepublication freeze.
+- R2: Node image `node:22.22.2-alpine` pinned to `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`; DIGEST_FIX=PASS; SM-FS=PASS; SM-SEC=PASS; DOCKER_BUILD=NOT_RUN because the authorized Docker engine was unavailable. R2_FINAL_VALIDATION_GATE=Railway publication build; mandatory for subsequent S16 closure, but it does not block the prepublication Final Gold. Closure also requires subsequent production verification.
+- PRE-S17_SANITATION: PASS against sealed Review Target `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z` (SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`). SM-FS=PASS; SM-QA=PASS_WITH_EVIDENCE_LIMITATION; SM-SEC=PASS; critical structural findings=0; FIX_BEFORE_S17=0; contamination=NO; documentation divergence=NO; secret exposure=NO.
+- REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: shared materialization and source/destination hash match verified; all three specialist roles resolved the same shared reference/hash before the audit. No product code changed.
+- OBS-01: attach/reference immutable raw execution evidence in future Review Targets when independent re-verification is required. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
+- WHAT_REMAINS: S16 remains OPEN and Final Gold is pending. After the prepublication freeze and publication, complete the mandatory R2 Railway publication build and subsequent production verification for S16 closure. Do not infer closure from the digest review, sanitation, or other S16 evidence.
+- NEXT_CONTROL_STEP: create the pending prepublication Final Gold; S17 remains unopened, and sanitation did not open it.
+- EVIDENCE_REUSABLE_IF: candidate bytes affecting each result, manifests, runtime/toolchain, image reference, platform and commands remain identical.
+- REVALIDATE_IF: a relevant candidate byte, runtime, image digest, platform, command or acceptance criterion changes.
+- DEPENDENCIES: canonical runtime/manifests and R2 publication-build evidence bound to the exact candidate identity for subsequent S16 closure.
 
 ### S17 — Native Browser Accreditation Harness
 
