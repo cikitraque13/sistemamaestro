@@ -58,7 +58,8 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: shared materialization y source/destination hash match verificados; los tres roles de especialistas resolvieron la misma referencia/hash antes de la auditoría. No cambió código de producto.
 - OBS-01: adjuntar/referenciar evidencia cruda e inmutable en futuros Review Targets cuando se requiera reverificación independiente. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
 - WHAT_REMAINS: ninguno dentro del alcance aceptado de S16.
-- NEXT_CONTROL_STEP: crear el checkpoint post-S16 antes de abrir S17. S17 aún no está abierto.
+- POST_S16_CHECKPOINT: CREATED/PASS; `GOLD_FREEZE_POST_S16_CLOSED_2026-10-07`; `BASELINE_FOR_S17=READY`. La identidad e integridad constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md).
+- NEXT_CONTROL_STEP: S17 requiere su propio gate y aún no está abierto; el checkpoint post-S16 ya está creado.
 - EVIDENCE_REUSABLE_IF: candidato publicado, manifests, runtime/toolchain, imagen, plataforma y comandos relevantes permanecen idénticos.
 - REVALIDATE_IF: cambia un byte relevante del candidato, runtime, digest de imagen, plataforma, comando o criterio.
 - DEPENDENCIES: para S17, runtime/build S16 cerrado, harness nativo repetible y sus límites de autorización.

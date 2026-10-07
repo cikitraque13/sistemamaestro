@@ -15,7 +15,7 @@
 | Regresión operacional | NO |
 | Trazabilidad GitHub main → Railway → producción | PASS |
 | S16 | CLOSED; READY_FOR_S17=YES |
-| S17 | Aún no abierto; checkpoint post-S16 pendiente |
+| S17 | Aún no abierto; checkpoint post-S16 CREATED/PASS; baseline READY (identidad en Inventario técnico) |
 
 El PR #83 contiene exactamente las 18 rutas del candidato congelado (16 tracked modificadas y `.nvmrc`/`.python-version` nuevas). Railway reporta el mismo SHA de `main`, y la verificación pública de health y home respondió HTTP 200.
 
