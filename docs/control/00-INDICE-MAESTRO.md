@@ -2,9 +2,9 @@
 
 ## Estado del documento
 
-- Estado: activo, reconciliado tras el cierre operacional S15 el 2026-10-05.
+- Estado: activo, reconciliado tras el cierre operacional S16 el 2026-10-07.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
-- Cierre S15 y Gold post-S15: consultar los documentos propietarios de Journey 03, producción/runtime e inventario Gold; este índice no duplica sus identidades.
+- Cierre S16 y Gold prepublicación: consultar los propietarios de producción/runtime, roadmap e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
   release Journey 03, S14 y registros históricos.
 
@@ -12,11 +12,11 @@
 
 | Tema | Propietario | Papel |
 |---|---|---|
-| Producción S15 y estado local de runtime S16 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para identidad productiva S15 y evidencia/runtime S16; no confundir candidato local con producción |
+| Producción y publicación S16 | [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) | SOURCE_OF_TRUTH para identidad productiva y verificación S16; distingue candidato prepublicación de release vigente |
 | Journey 03, cierres S1–S15 y validaciones | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, releases y evidencia de Journey 03 |
 | Decisiones aprobadas | [Decisiones cerradas](01-DECISIONES-CERRADAS.md) | SOURCE_OF_TRUTH; conserva procedencia y alcance temporal |
 | Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del siguiente frente previsto; no lo autoriza |
-| Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración; incluye baseline post-S15 |
+| Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración; registra Gold prepublicación S16 y cierre publicado |
 | Rutas de producto y sistema | [Rutas canónicas](04-RUTAS-CANONICAS.md) | SUPPORTING_CANONICAL; inventario vigente completa las incorporaciones PRE-S14 |
 | Procedimientos operativos | [Procedimientos](06-PROCEDIMIENTOS-OPERATIVOS.md) | SUPPORTING_CANONICAL; no autoriza acciones por sí mismo |
 | Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
@@ -59,14 +59,14 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 
 ## Orden de lectura y ejecución vigente
 
-1. Runtime and Deploy Truth: identificar `main`, deployment de Railway y riesgos residuales.
+1. Runtime and Deploy Truth: identificar `main`, deployment de Railway y riesgos residuales vigentes.
 2. Estado Journey 03: consultar los cierres y la evidencia acreditada hasta S15.
-3. Decisiones, pendientes y contratos: respetar lo cerrado y el frente abierto.
+3. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate aún no abierto.
 4. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
 Los fundamentos Builder state/kernel y el circuito local S1–S13/C1 están implementados
 y validados en ingeniería local; su creación no es una prioridad pendiente.
-S16 está OPEN, su trabajo técnico está completo y el Final Gold prepublicación permanece PENDING. El candidato en HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb` comprende 16 archivos tracked modificados y 2 nuevos/untracked (`.nvmrc`, `.python-version`): 18 rutas esperadas. SM-ED canónica está verificada y materializada localmente en el Work; no se afirma sincronización automática entre runtimes. El transporte compartido del Review Target es un PASS independiente. El changeset de wiring R1 de siete archivos no representa el total S16. R2 Railway publication build y la verificación posterior de producción son obligatorios para el cierre S16, pero no bloquean el Final Gold prepublicación. El saneamiento PRE-S17 está cerrado con PASS, cero hallazgos críticos y cero correcciones obligatorias; su detalle y OBS-01 diferido constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). La identidad del Gold post-S15 y el checkpoint PRE-SANEO están en [Inventario técnico](03-INVENTARIO-TECNICO.md). S17 sigue sin abrir.
+S16 está CLOSED. El Final Gold `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05` quedó PASS como freeze prepublicación; PR #83 está MERGED con commit de publicación `4322f7936a93c12eec288e44efcd3eb43d2a3639`, y GitHub main/Railway production corresponden a `2b3f8c0345829273a3c92d08633e789334424a23`. El deployment `824b2d5b-12ad-4364-8464-9462679ffc9b` y R2 Railway build son SUCCESS; `/health` y home respondieron HTTP 200, sin regresión operacional y con trazabilidad PASS. S16 deja READY_FOR_S17=YES, pero S17 aún no está abierto: queda crear el checkpoint post-S16. Se preservan los antecedentes prepublicación de las 18 rutas (16 tracked modificadas y 2 nuevas), el Review Target transport resuelto y SM-ED materializada localmente en este Work, sin afirmar sincronización automática entre runtimes. El wiring R1 de siete archivos con hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235` es distinto del candidato S16. El saneamiento PRE-S17 y OBS-01 diferido constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md); la identidad del Gold post-S15 y el Gold prepublicación S16 constan en [Inventario técnico](03-INVENTARIO-TECNICO.md).
 
 ## Reglas duraderas de gobierno
 

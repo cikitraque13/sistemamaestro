@@ -44,24 +44,24 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 ### S16 — Runtime Reproducibility
 
 - ORIGINAL_PURPOSE: hacer reproducibles instalación, pruebas y build en un runtime soportado y documentado.
-- CURRENT_STATUS: OPEN; S16_TECHNICAL_WORK=COMPLETE; S16_ACCEPTANCE=PENDING.
-- CANDIDATE_IDENTITY: branch `s16/runtime-identity`; HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb`; tree `36e7c83cf16e6e95a610625f197f6e093f4a0b73`.
-- CANDIDATE_WORKTREE: TRACKED_MODIFIED=16; NEW_UNTRACKED=2 (`.nvmrc`, `.python-version`); TOTAL_S16_PATHS=18. Las dos rutas nuevas son parte esperada del candidato, no contaminación de la recuperación.
-- RUNTIME: Node 22.22.2; Python 3.11; runtime identity PASS.
-- ACCREDITED_EVIDENCE: installation reproducibility PASS; test reproducibility PASS; backend 73 passed and 27 subtests passed; frontend build PASS; PRODUCT_CODE_CHANGED=NO. The S16 Docker image digest fix is independently verified, but Docker build is NOT_RUN.
-- R1 Review Target transport: wiring design, shared transport and preflight PASS; shared target, source/destination hash match and same-target resolution accredited.
-- R1 SM-ED: canonical personal Skill authority verified; supported local materialization in this Work=PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. Automatic synchronization across runtimes is not asserted.
-- R1 wiring changeset: 7 files; hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235`. This is distinct from the 18-path S16 candidate worktree.
-- FINAL_GOLD: `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; STATUS=PENDING; prepublication freeze.
-- R2: Node image `node:22.22.2-alpine` pinned to `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`; DIGEST_FIX=PASS; SM-FS=PASS; SM-SEC=PASS; DOCKER_BUILD=NOT_RUN because the authorized Docker engine was unavailable. R2_FINAL_VALIDATION_GATE=Railway publication build; mandatory for subsequent S16 closure, but it does not block the prepublication Final Gold. Closure also requires subsequent production verification.
-- PRE-S17_SANITATION: PASS against sealed Review Target `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z` (SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`). SM-FS=PASS; SM-QA=PASS_WITH_EVIDENCE_LIMITATION; SM-SEC=PASS; critical structural findings=0; FIX_BEFORE_S17=0; contamination=NO; documentation divergence=NO; secret exposure=NO.
-- REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: shared materialization and source/destination hash match verified; all three specialist roles resolved the same shared reference/hash before the audit. No product code changed.
-- OBS-01: attach/reference immutable raw execution evidence in future Review Targets when independent re-verification is required. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
-- WHAT_REMAINS: S16 remains OPEN and Final Gold is pending. After the prepublication freeze and publication, complete the mandatory R2 Railway publication build and subsequent production verification for S16 closure. Do not infer closure from the digest review, sanitation, or other S16 evidence.
-- NEXT_CONTROL_STEP: create the pending prepublication Final Gold; S17 remains unopened, and sanitation did not open it.
-- EVIDENCE_REUSABLE_IF: candidate bytes affecting each result, manifests, runtime/toolchain, image reference, platform and commands remain identical.
-- REVALIDATE_IF: a relevant candidate byte, runtime, image digest, platform, command or acceptance criterion changes.
-- DEPENDENCIES: canonical runtime/manifests and R2 publication-build evidence bound to the exact candidate identity for subsequent S16 closure.
+- CURRENT_STATUS: COMPLETED; S16_STATUS=CLOSED; READY_FOR_S17=YES; BLOCKERS=NONE.
+- PREPUBLICATION_CANDIDATE: branch `s16/runtime-identity`; HEAD base `7ab084f38d8de39baa6a79b566a74a168b91a8cb`; tree `36e7c83cf16e6e95a610625f197f6e093f4a0b73`; 16 tracked modificados + 2 nuevos (`.nvmrc`, `.python-version`) = 18 rutas. Ambas rutas nuevas eran parte esperada del candidato.
+- FINAL_GOLD_PREPUBLICATION: `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; PASS; freeze previo a la publicación.
+- PUBLICATION: PR #83 MERGED; commit candidato `4322f7936a93c12eec288e44efcd3eb43d2a3639`; diff del PR exactamente 18 rutas; GITHUB_MAIN_SHA=`2b3f8c0345829273a3c92d08633e789334424a23`.
+- ACCREDITED_EVIDENCE: instalación y tests reproducibles PASS; backend 73 passed y 27 subtests; frontend build PASS; PRODUCT_CODE_CHANGED=NO. Docker build local=NOT_RUN por indisponibilidad del engine, distinto del build de publicación.
+- R1 Review Target transport: wiring design, shared transport y preflight PASS; target compartido, hashes origen/destino coincidentes y resolución del mismo target.
+- R1 SM-ED: autoridad de Skill personal canónica y materialización local soportada en este Work PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. No se afirma sincronización automática entre runtimes.
+- R1 wiring changeset: 7 archivos; hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235`; es distinto de las 18 rutas del candidato S16.
+- R2_RAILWAY_BUILD=PASS; RAILWAY_DEPLOYMENT=SUCCESS; deployment `824b2d5b-12ad-4364-8464-9462679ffc9b`; imagen Node `22.22.2-alpine` con digest `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`.
+- PRODUCTION_HEALTH=PASS (`/health` HTTP 200); PRODUCTION_HOME=PASS (HTTP 200); PRODUCTION_REGRESSION=NO; TRACEABILITY=PASS entre GitHub main, Railway deployment y producción.
+- PRE-S17_SANITATION: PASS contra sealed Review Target `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z` (SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`). SM-FS=PASS; SM-QA=PASS_WITH_EVIDENCE_LIMITATION; SM-SEC=PASS; critical structural findings=0; FIX_BEFORE_S17=0; contamination=NO; documentation divergence=NO; secret exposure=NO.
+- REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: shared materialization y source/destination hash match verificados; los tres roles de especialistas resolvieron la misma referencia/hash antes de la auditoría. No cambió código de producto.
+- OBS-01: adjuntar/referenciar evidencia cruda e inmutable en futuros Review Targets cuando se requiera reverificación independiente. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
+- WHAT_REMAINS: ninguno dentro del alcance aceptado de S16.
+- NEXT_CONTROL_STEP: crear el checkpoint post-S16 antes de abrir S17. S17 aún no está abierto.
+- EVIDENCE_REUSABLE_IF: candidato publicado, manifests, runtime/toolchain, imagen, plataforma y comandos relevantes permanecen idénticos.
+- REVALIDATE_IF: cambia un byte relevante del candidato, runtime, digest de imagen, plataforma, comando o criterio.
+- DEPENDENCIES: para S17, runtime/build S16 cerrado, harness nativo repetible y sus límites de autorización.
 
 ### S17 — Native Browser Accreditation Harness
 

@@ -1,31 +1,31 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — S15 cerrado; S16 abierto, 2026-10-05
+## Estado vigente — S16 cerrado, 2026-10-07
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
 [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del cierre y validaciones de Journey 03; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
 
-El checkpoint canónico de entrada a S14 se conserva como evidencia histórica en la sección Gold S14 Entry histórico; el baseline vigente post-S15 se registra a continuación.
+El checkpoint canónico de entrada a S14 y el baseline post-S15 se conservan como evidencia histórica; el estado vigente de S16 y su cierre se registran a continuación.
 
-El checkout local observado para el Gold post-S15 está en la rama del candidato S15 y limpio; su tree coincide con el commit de GitHub main e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279. La identidad productiva y el deployment pertenecen exclusivamente a Runtime and Deploy Truth.
+Como antecedente histórico, el checkout usado para el Gold post-S15 estaba en la rama del candidato S15 y limpio; su tree coincide con el commit de GitHub main e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279. La identidad productiva vigente y el deployment pertenecen exclusivamente a Runtime and Deploy Truth.
 
-## Checkpoint de trabajo S16 — no es un Gold
+## Cierre y publicación S16 — 2026-10-07
 
-- STATUS: OPEN; S16_TECHNICAL_WORK=COMPLETE; S16 no está cerrado.
-- CANDIDATE: branch `s16/runtime-identity`; HEAD `7ab084f38d8de39baa6a79b566a74a168b91a8cb`; tree `36e7c83cf16e6e95a610625f197f6e093f4a0b73`.
-- WORKTREE: TRACKED_MODIFIED=16; NEW_UNTRACKED=2 (`.nvmrc`, `.python-version`); TOTAL_S16_PATHS=18. Ambos archivos nuevos son parte esperada del candidato, no contaminación de la recuperación.
-- RUNTIME: Node 22.22.2 y Python 3.11; identidad PASS. Instalación PASS; tests PASS (backend 73 passed, 27 subtests); frontend build PASS; PRODUCT_CODE_CHANGED=NO.
+- S16_STATUS=CLOSED; READY_FOR_S17=YES; BLOCKERS=NONE.
+- FINAL_GOLD_PREPUBLICATION=`GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; PASS; congelado antes de publicar. Su ruta y digest se conservan en el registro del checkpoint.
+- CANDIDATE: branch `s16/runtime-identity`; commit de publicación `4322f7936a93c12eec288e44efcd3eb43d2a3639`; PR #83 MERGED. El candidato tenía 16 tracked modificados y 2 nuevos (`.nvmrc`, `.python-version`), 18 rutas en total; los dos archivos nuevos eran esperados, no contaminación.
+- GITHUB_MAIN_SHA=`2b3f8c0345829273a3c92d08633e789334424a23`; PR_DIFF_SCOPE=PASS, exactamente las 18 rutas del candidato.
+- RAILWAY_DEPLOYMENT_ID=`824b2d5b-12ad-4364-8464-9462679ffc9b`; RAILWAY_BUILD=SUCCESS; R2_RAILWAY_BUILD=PASS; RAILWAY_DEPLOYMENT=SUCCESS. La imagen Node `22.22.2-alpine` usó el digest fijado `sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`.
+- PRODUCTION_HEALTH=PASS (`/health` HTTP 200); PRODUCTION_HOME=PASS (HTTP 200); PRODUCTION_REGRESSION=NO; TRACEABILITY=PASS desde GitHub main al deployment Railway y producción.
+- Evidencia prepublicación reutilizada: Node 22.22.2, Python 3.11, instalación y tests reproducibles PASS, backend 73 passed y 27 subtests, frontend build PASS, PRODUCT_CODE_CHANGED=NO. El Docker build local quedó NOT_RUN por indisponibilidad del engine; es distinto del Railway build PASS que cerró R2.
 - R1 Review Target transport: diseño, shared transport y preflight PASS; target compartido, igualdad de hashes origen/destino y resolución del mismo target acreditados.
-- R1 SM-ED: autoridad de la Skill personal canónica verificada; materialización local soportada en este Work PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. No se afirma sincronización automática entre runtimes.
+- R1 SM-ED: autoridad de la Skill personal canónica y materialización local soportada en este Work PASS; ENGINEERING_DIRECTOR=ACTIVE; SKILL_LOADED=YES; CONTRACT_APPLIED=YES. No se afirma sincronización automática entre runtimes.
 - R1 wiring changeset: 7 archivos, hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235`; es distinto de las 18 rutas del candidato S16.
-- R2: `node:22.22.2-alpine@sha256:8ea2348b068a9544dae7317b4f3aafcdc032df1647bb7d768a05a5cad1a7683f`; digest fix, SM-FS y SM-SEC PASS; Docker build NOT_RUN porque el Docker engine autorizado no estaba disponible. Railway publication build sigue pendiente y es obligatorio para el cierre posterior de S16, no para el Final Gold prepublicación. El cierre requiere además verificación posterior de producción.
-- FINAL_GOLD: `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; STATUS=PENDING.
-- PRE-S17_SANITATION=PASS contra `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z`, target SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`; SM-FS=PASS, SM-QA=PASS_WITH_EVIDENCE_LIMITATION, SM-SEC=PASS; critical findings=0; FIX_BEFORE_S17=0. Candidate contamination=NO; documentation divergence=NO; secret exposure=NO.
-- REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: 415 bundle members and target integrity verified after shared materialization; source/destination hashes match; FS/QA/SEC resolved the same shared reference before audit. No product code changed.
-- OBS-01: future Review Targets should attach/reference immutable raw execution evidence when independent re-verification is required. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
-- SM-ED is locally materialized and resolved in this Work; automatic cross-runtime synchronization is not asserted. This is separate from the already resolved Review Target transport.
-- NEXT_CONTROL_STEP: create the pending prepublication Final Gold; after publication, complete mandatory R2 Railway publication build and subsequent production verification for S16 closure. S16 remains OPEN; S17 is not opened. This checkpoint remains inventory evidence, not a Gold.
+- PRE-S17_SANITATION=PASS contra `S16-PRE-S17-7ab084f38d8de39b-20261005T1305Z`, target SHA-256 `2bebd818e4d205043a6209a201cadfac5cc2be55eecc10204e59dbbcb7cf85b8`; SM-FS=PASS, SM-QA=PASS_WITH_EVIDENCE_LIMITATION, SM-SEC=PASS; critical findings=0; FIX_BEFORE_S17=0; candidate contamination=NO; documentation divergence=NO; secret exposure=NO.
+- REVIEW_TARGET_TRANSPORT_ROOT_FIX=PASS: bundle e integridad del target verificados después de la materialización compartida; hashes origen/destino coinciden y FS/QA/SEC resolvieron la misma referencia. No cambió código de producto.
+- OBS-01: adjuntar/referenciar evidencia cruda e inmutable en futuros Review Targets cuando se requiera reverificación independiente. CLASSIFICATION=STRATEGIC_OPTIMIZATION; DISPOSITION=DEFER.
+- CHECKPOINT_POST_S16=NOT_CREATED; S17 todavía no está abierto y requiere su gate propio. Este inventario no es el checkpoint post-S16.
 
 ## Fuente y estructura material
 
@@ -58,6 +58,20 @@ remota ni a autorización de servidor. S14 implementa capacidad, retención/comp
 history/revert y fallo cerrado ante cuota únicamente en `sistemamaestro:durable:v1`;
 la evidencia del cierre y los límites están en Journey 03. Los flujos legacy y generación IA
 general no quedan certificados por el cierre del circuito local.
+
+## Gold Freeze S16 final prepublicación — PASS
+
+- PATH: §Backups/GOLD/GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05§
+- SOURCE_COMMIT: §7ab084f38d8de39baa6a79b566a74a168b91a8cb§
+- SOURCE_TREE: §36e7c83cf16e6e95a610625f197f6e093f4a0b73§
+- S16_PATHS: 16 tracked modified + 2 new (§.nvmrc§, §.python-version§) = 18
+- FILES_EXPECTED / FILES_COPIED: 413 / 413
+- SHA256_MATCH: YES; GLOBAL_DIGEST: §50e79cf8d98bee5c7f2beff1b321914948e59cc5c8ae2aa1aaf7bff394c3241c§
+- MANIFEST_SHA256: §d4b3833629bd8b1745e1c903a065617bfd975c938dfebf6d5e2f344cafe1c44d§
+- RESTORE_CHECK: PASS; el conjunto de archivos y los SHA-256 por archivo coinciden.
+- STATUS: FROZEN_PREPUBLICATION; no es el checkpoint post-S16.
+
+El checkpoint preserva el candidato S16 antes de su publicación. El cierre y los identificadores de producción publicados se registran en Runtime and Deploy Truth y en la sección de cierre S16 anterior.
 
 ## Gold Freeze post-S15 cerrado
 
