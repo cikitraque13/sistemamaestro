@@ -11,8 +11,6 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/s17/playwright-harness'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
-    env:
-      TMPDIR: ${{ runner.temp }}
     steps:
       - name: Check trusted manual ref
         shell: bash
@@ -50,6 +48,8 @@ jobs:
         timeout-minutes: 15
 
       - name: Run isolated A1-A6 harness
+        env:
+          TMPDIR: ${{ runner.temp }}
         run: npm run test:e2e
         working-directory: frontend
         timeout-minutes: 35
@@ -58,6 +58,7 @@ jobs:
         if: ${{ always() }}
         shell: bash
         env:
+          TMPDIR: ${{ runner.temp }}
           CLEANUP_EVIDENCE_PATH: ${{ runner.temp }}/sm-s17-cleanup-evidence.json
         run: |
           python3 - <<'PY'
@@ -310,6 +311,7 @@ jobs:
         if: ${{ always() }}
         shell: bash
         env:
+          TMPDIR: ${{ runner.temp }}
           SAFE_EVIDENCE_PATH: ${{ runner.temp }}/s17-sanitized-evidence.json
           CLEANUP_EVIDENCE_PATH: ${{ runner.temp }}/sm-s17-cleanup-evidence.json
         run: |
