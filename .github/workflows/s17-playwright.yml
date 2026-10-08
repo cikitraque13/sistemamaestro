@@ -1,0 +1,506 @@
+name: S17 isolated Playwright
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  s17-playwright:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/s17/playwright-harness'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Check trusted manual ref
+        shell: bash
+        run: |
+          test "$GITHUB_EVENT_NAME" = "workflow_dispatch"
+          test "$GITHUB_REF" = "refs/heads/s17/playwright-harness"
+
+      - name: Checkout selected commit
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify checked out identity
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$GITHUB_REF" = "refs/heads/s17/playwright-harness"
+
+      - name: Set up Node.js 22.22.2
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22.22.2
+          check-latest: false
+          package-manager-cache: false
+
+      - name: Install locked frontend dependencies
+        run: npm ci
+        working-directory: frontend
+        timeout-minutes: 15
+
+      - name: Install Chromium and required system packages
+        run: ./node_modules/.bin/playwright install --with-deps chromium
+        working-directory: frontend
+        timeout-minutes: 15
+
+      - name: Run isolated A1-A6 harness
+        env:
+          TMPDIR: ${{ runner.temp }}
+        run: npm run test:e2e
+        working-directory: frontend
+        timeout-minutes: 35
+
+      - name: Remove only this run's labeled containers and network
+        if: ${{ always() }}
+        shell: bash
+        env:
+          TMPDIR: ${{ runner.temp }}
+          CLEANUP_EVIDENCE_PATH: ${{ runner.temp }}/sm-s17-cleanup-evidence.json
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          run_label = "org.sistemamaestro.test.run-uuid"
+          db_label = "org.sistemamaestro.test.database"
+          order_label = "org.sistemamaestro.test.work-order"
+          order_id = "WO-S17-PLAYWRIGHT-IMPL-FS-02"
+          guard_labels = {
+              "org.sistemamaestro.test.target-is-test": "true",
+              "org.sistemamaestro.test.data-is-synthetic": "true",
+              "org.sistemamaestro.test.auth-is-test": "true",
+              "org.sistemamaestro.test.cleanup-is-scoped": "true",
+          }
+          count_fields = ("runContainers", "projectContainers", "runNetworks", "projectNetworks")
+          evidence_path = Path(os.environ["CLEANUP_EVIDENCE_PATH"])
+          outcome = {
+              "status": "NOT_VERIFIABLE",
+              "failureKind": "not_started",
+              "beforeCounts": {key: None for key in count_fields},
+              "afterCounts": {key: None for key in count_fields},
+          }
+          run_id = None
+          project = None
+          database = None
+          exit_code = 0
+
+          class CleanupStop(Exception):
+              def __init__(self, status, failure_kind):
+                  self.status = status
+                  self.failure_kind = failure_kind
+
+          def stop(status, failure_kind):
+              raise CleanupStop(status, failure_kind)
+
+          def raw_docker(args):
+              return subprocess.run(
+                  ["docker", *args],
+                  check=False,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.DEVNULL,
+                  text=True,
+              )
+
+          def docker(args, status="FAILED", failure_kind="docker_operation_failed"):
+              result = raw_docker(args)
+              if result.returncode != 0:
+                  stop(status, failure_kind)
+              return result.stdout.strip()
+
+          def ids(args):
+              return [item.strip() for item in docker(args).splitlines() if item.strip()]
+
+          def safe_ids(args):
+              try:
+                  result = raw_docker(args)
+                  if result.returncode != 0:
+                      return None
+                  return [item.strip() for item in result.stdout.splitlines() if item.strip()]
+              except Exception:
+                  return None
+
+          def safe_counts():
+              if not run_id or not project:
+                  return {key: None for key in count_fields}
+              values = {
+                  "runContainers": safe_ids([
+                      "ps", "-aq", "--filter", "label=" + run_label + "=" + run_id
+                  ]),
+                  "projectContainers": safe_ids([
+                      "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project
+                  ]),
+                  "runNetworks": safe_ids([
+                      "network", "ls", "-q", "--filter", "label=" + run_label + "=" + run_id
+                  ]),
+                  "projectNetworks": safe_ids([
+                      "network", "ls", "-q", "--filter", "label=com.docker.compose.project=" + project
+                  ]),
+              }
+              return {key: None if values[key] is None else len(values[key]) for key in count_fields}
+
+          def persist_report():
+              global exit_code
+              try:
+                  outcome["afterCounts"] = safe_counts()
+                  if outcome["status"] in ("VERIFIED_ABSENT", "REMOVED_AND_VERIFIED"):
+                      counts = outcome["afterCounts"]
+                      if counts is None or any(counts[key] != 0 for key in count_fields):
+                          outcome["status"] = "FAILED"
+                          outcome["failureKind"] = "resources_remain_or_unverified"
+                          exit_code = 1
+                  evidence_path.parent.mkdir(parents=True, exist_ok=True)
+                  evidence_path.write_text(
+                      json.dumps(outcome, separators=(",", ":"), sort_keys=True) + "\n",
+                      encoding="utf-8",
+                  )
+              except Exception:
+                  print("Cleanup evidence could not be persisted.", file=sys.stderr)
+                  exit_code = 1
+
+          def perform_cleanup():
+              global run_id, project, database
+              temp = Path(os.environ["TMPDIR"])
+              evidence_dir = temp / "sm-s17-playwright-evidence"
+              pattern = re.compile(
+                  r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json"
+              )
+              candidates = [p for p in evidence_dir.iterdir() if pattern.fullmatch(p.name)] if evidence_dir.is_dir() else []
+              if len(candidates) != 1 or candidates[0].stat().st_size > 262144:
+                  stop("NOT_VERIFIABLE", "metadata_missing_or_ambiguous")
+              try:
+                  metadata = json.loads(candidates[0].read_text(encoding="utf-8"))
+              except Exception:
+                  stop("NOT_VERIFIABLE", "metadata_unreadable")
+              if not isinstance(metadata, dict):
+                  stop("NOT_VERIFIABLE", "metadata_invalid")
+              run_id = metadata.get("runId")
+              if (
+                  not isinstance(run_id, str)
+                  or not pattern.fullmatch(run_id + ".json")
+                  or candidates[0].stem != run_id
+              ):
+                  stop("NOT_VERIFIABLE", "run_identity_invalid")
+              compact = run_id.replace("-", "")
+              project = "sm-s17-" + compact
+              database = "sm_s17_" + compact
+              outcome["beforeCounts"] = safe_counts()
+              if metadata.get("failure") == "Random Compose project identity already exists; refusing startup.":
+                  outcome["beforeCounts"] = safe_counts()
+                  stop("REFUSED_PREEXISTING", "preexisting_identity_collision")
+
+              expected = {
+                  order_label: order_id,
+                  run_label: run_id,
+                  db_label: database,
+                  "com.docker.compose.project": project,
+                  **guard_labels,
+              }
+              run_containers = ids([
+                  "ps", "-aq", "--filter", "label=" + run_label + "=" + run_id
+              ])
+              project_containers = ids([
+                  "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project
+              ])
+              run_networks = ids([
+                  "network", "ls", "-q", "--filter", "label=" + run_label + "=" + run_id
+              ])
+              project_networks = ids([
+                  "network", "ls", "-q", "--filter", "label=com.docker.compose.project=" + project
+              ])
+              outcome["beforeCounts"] = {
+                  "runContainers": len(run_containers),
+                  "projectContainers": len(project_containers),
+                  "runNetworks": len(run_networks),
+                  "projectNetworks": len(project_networks),
+              }
+
+              if set(project_containers) != set(run_containers) or set(project_networks) != set(run_networks):
+                  stop("REFUSED_MISMATCH", "project_uuid_label_sets_differ")
+
+              service_names = set()
+              for container_id in run_containers:
+                  raw = docker([
+                      "inspect", "--format", "{{json .Config.Labels}}", container_id
+                  ])
+                  try:
+                      labels = json.loads(raw)
+                  except Exception:
+                      stop("REFUSED_MISMATCH", "container_labels_invalid")
+                  if not isinstance(labels, dict) or any(labels.get(k) != v for k, v in expected.items()):
+                      stop("REFUSED_MISMATCH", "container_guard_labels_mismatch")
+                  service = labels.get("com.docker.compose.service")
+                  if service not in ("api", "mongo") or service in service_names:
+                      stop("REFUSED_MISMATCH", "container_service_labels_mismatch")
+                  service_names.add(service)
+              if len(run_containers) > 2 or len(run_networks) > 1:
+                  stop("REFUSED_MISMATCH", "resource_count_exceeded")
+
+              for network_id in run_networks:
+                  raw = docker([
+                      "network", "inspect", "--format",
+                      "{{json .Labels}}|{{.Name}}|{{.Internal}}", network_id
+                  ])
+                  try:
+                      label_text, name, internal = raw.split("|", 2)
+                      labels = json.loads(label_text)
+                  except Exception:
+                      stop("REFUSED_MISMATCH", "network_metadata_invalid")
+                  if (
+                      not isinstance(labels, dict)
+                      or any(labels.get(k) != v for k, v in expected.items())
+                      or name != project
+                      or internal.lower() != "true"
+                  ):
+                      stop("REFUSED_MISMATCH", "network_guard_or_isolation_mismatch")
+
+              if run_containers:
+                  docker(["rm", "--force", *run_containers])
+              if run_networks:
+                  docker(["network", "rm", *run_networks])
+
+              after = {
+                  "runContainers": ids([
+                      "ps", "-aq", "--filter", "label=" + run_label + "=" + run_id
+                  ]),
+                  "projectContainers": ids([
+                      "ps", "-aq", "--filter", "label=com.docker.compose.project=" + project
+                  ]),
+                  "runNetworks": ids([
+                      "network", "ls", "-q", "--filter", "label=" + run_label + "=" + run_id
+                  ]),
+                  "projectNetworks": ids([
+                      "network", "ls", "-q", "--filter", "label=com.docker.compose.project=" + project
+                  ]),
+              }
+              outcome["afterCounts"] = {key: len(after[key]) for key in count_fields}
+              if any(outcome["afterCounts"][key] != 0 for key in count_fields):
+                  stop("FAILED", "resources_remain_after_scoped_removal")
+              before = outcome["beforeCounts"]
+              existed = any(before[key] != 0 for key in count_fields)
+              outcome["status"] = "REMOVED_AND_VERIFIED" if existed else "VERIFIED_ABSENT"
+              outcome["failureKind"] = "none"
+
+          try:
+              perform_cleanup()
+          except CleanupStop as error:
+              outcome["status"] = error.status
+              outcome["failureKind"] = error.failure_kind
+              exit_code = 1
+          except Exception:
+              outcome["status"] = "FAILED"
+              outcome["failureKind"] = "unexpected_internal_error"
+              exit_code = 1
+          finally:
+              persist_report()
+
+          if exit_code:
+              print("Scoped cleanup did not prove safe completion.", file=sys.stderr)
+              raise SystemExit(1)
+          print("Scoped cleanup outcome and before/after counts recorded.")
+          PY
+
+      - name: Write allowlisted evidence
+        if: ${{ always() }}
+        shell: bash
+        env:
+          TMPDIR: ${{ runner.temp }}
+          SAFE_EVIDENCE_PATH: ${{ runner.temp }}/s17-sanitized-evidence.json
+          CLEANUP_EVIDENCE_PATH: ${{ runner.temp }}/sm-s17-cleanup-evidence.json
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          output = Path(os.environ["SAFE_EVIDENCE_PATH"])
+          temp = Path(os.environ["TMPDIR"])
+          cleanup_path = Path(os.environ["CLEANUP_EVIDENCE_PATH"])
+          names = ("A1", "A2", "A3", "A4", "A5", "A6")
+          allowed_case_status = {"NOT_RUN", "IN_PROGRESS", "PASS", "FAIL", "BLOCKED", "INVALID"}
+          case_evidence_states = {"NOT_STARTED", "MERGED", "MISSING", "INVALID"}
+          runner_statuses = {
+              "NOT_STARTED", "PREFLIGHT", "STACK_STARTING", "E2E_RUNNING",
+              "E2E_COMPLETED", "FAILED", "CLEANUP_FAILED", "INVALID",
+          }
+          cleanup_statuses = {
+              "VERIFIED_ABSENT", "REMOVED_AND_VERIFIED", "NOT_VERIFIABLE",
+              "REFUSED_PREEXISTING", "REFUSED_MISMATCH", "FAILED",
+          }
+          cleanup_failure_kinds = {
+              "none", "not_started", "metadata_missing_or_ambiguous", "metadata_unreadable",
+              "metadata_invalid", "run_identity_invalid", "preexisting_identity_collision",
+              "docker_query_failed", "docker_operation_failed", "project_uuid_label_sets_differ",
+              "container_labels_invalid", "container_guard_labels_mismatch",
+              "container_service_labels_mismatch", "resource_count_exceeded",
+              "network_metadata_invalid", "network_guard_or_isolation_mismatch",
+              "resources_remain_after_scoped_removal", "resources_remain_or_unverified",
+              "unexpected_internal_error", "evidence_write_failed",
+          }
+          count_fields = ("runContainers", "projectContainers", "runNetworks", "projectNetworks")
+
+          def safe_counts(value):
+              if not isinstance(value, dict) or set(value) != set(count_fields):
+                  return None
+              if any(value[key] is not None and (type(value[key]) is not int or value[key] < 0 or value[key] > 100) for key in count_fields):
+                  return None
+              return {key: value[key] for key in count_fields}
+
+          cleanup = {
+              "evidenceStatus": "MISSING",
+              "status": "NOT_VERIFIABLE",
+              "failureKind": "not_started",
+              "beforeCounts": {key: None for key in count_fields},
+              "afterCounts": {key: None for key in count_fields},
+          }
+          try:
+              if cleanup_path.is_file() and cleanup_path.stat().st_size <= 16384:
+                  report = json.loads(cleanup_path.read_text(encoding="utf-8"))
+                  if isinstance(report, dict):
+                      status = report.get("status")
+                      failure_kind = report.get("failureKind")
+                      before = safe_counts(report.get("beforeCounts"))
+                      after = safe_counts(report.get("afterCounts"))
+                      if status in cleanup_statuses and failure_kind in cleanup_failure_kinds:
+                          cleanup = {
+                              "evidenceStatus": "VALID",
+                              "status": status,
+                              "failureKind": failure_kind,
+                              "beforeCounts": before,
+                              "afterCounts": after,
+                          }
+                          if status in ("VERIFIED_ABSENT", "REMOVED_AND_VERIFIED") and (before is None or after is None or any(before[k] is None for k in count_fields) or any(after[k] != 0 for k in count_fields)):
+                              cleanup["evidenceStatus"] = "INVALID"
+                              cleanup["status"] = "NOT_VERIFIABLE"
+                              cleanup["failureKind"] = "invalid_cleanup_proof"
+                      else:
+                          cleanup["evidenceStatus"] = "INVALID"
+                          cleanup["failureKind"] = "invalid_cleanup_report"
+          except Exception:
+              cleanup["evidenceStatus"] = "INVALID"
+              cleanup["failureKind"] = "invalid_cleanup_report"
+
+          fixture_id = None
+          metadata = None
+          metadata_status = "MISSING"
+          evidence_dir = temp / "sm-s17-playwright-evidence"
+          if evidence_dir.is_dir():
+              matching = [
+                  p for p in evidence_dir.iterdir()
+                  if re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json", p.name)
+              ]
+              if len(matching) > 1:
+                  metadata_status = "INVALID"
+              elif len(matching) == 1 and matching[0].stat().st_size <= 262144:
+                  try:
+                      parsed = json.loads(matching[0].read_text(encoding="utf-8"))
+                      if isinstance(parsed, dict) and parsed.get("runId") == matching[0].stem:
+                          metadata = parsed
+                          fixture_id = matching[0].stem
+                          metadata_status = "VALID"
+                      else:
+                          metadata_status = "INVALID"
+                  except Exception:
+                      metadata_status = "INVALID"
+              elif len(matching) == 1:
+                  metadata_status = "INVALID"
+
+          expected_commit = os.environ.get("GITHUB_SHA", "")
+          observed_commit = metadata.get("sourceCommit") if isinstance(metadata, dict) else None
+          commit = expected_commit if re.fullmatch(r"[0-9a-f]{40}", expected_commit) else None
+          if metadata_status == "VALID" and observed_commit != expected_commit:
+              metadata_status = "INVALID"
+              metadata = None
+              fixture_id = None
+
+          build_id = None
+          browser_version = None
+          case_results = {name: "NOT_RUN" for name in names}
+          runner_status = "NOT_STARTED"
+          case_evidence_status = "MISSING" if metadata_status == "MISSING" else "NOT_STARTED"
+          if metadata_status == "INVALID":
+              case_results = {name: "INVALID" for name in names}
+              runner_status = "INVALID"
+              case_evidence_status = "INVALID"
+          elif isinstance(metadata, dict):
+              candidate_build = metadata.get("buildId")
+              if isinstance(candidate_build, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", candidate_build):
+                  build_id = candidate_build
+              browser = metadata.get("browser")
+              if isinstance(browser, dict) and browser.get("name") == "Chromium":
+                  version = browser.get("version")
+                  if isinstance(version, str) and re.fullmatch(r"[0-9]+(\.[0-9]+){1,4}", version):
+                      browser_version = version
+              status = metadata.get("runnerStatus")
+              runner_status = status if status in runner_statuses - {"INVALID"} else "INVALID"
+              observed_case_state = metadata.get("caseEvidenceStatus")
+              case_evidence_status = observed_case_state if observed_case_state in case_evidence_states else "INVALID"
+              results = metadata.get("results")
+              if isinstance(results, dict):
+                  for name in names:
+                      value = results.get(name)
+                      if value == "NOT_RUN":
+                          case_results[name] = "NOT_RUN"
+                      elif isinstance(value, dict) and value.get("status") in allowed_case_status:
+                          case_results[name] = value.get("status")
+                      elif isinstance(value, str) and value in allowed_case_status:
+                          case_results[name] = value
+                      elif value is not None:
+                          case_results[name] = "INVALID"
+                      elif case_evidence_status != "NOT_STARTED":
+                          case_results[name] = "INVALID"
+              elif case_evidence_status != "NOT_STARTED":
+                  case_results = {name: "INVALID" for name in names}
+              if case_evidence_status == "INVALID":
+                  case_results = {name: "INVALID" for name in names}
+
+          all_cases_pass = all(case_results[name] == "PASS" for name in names)
+          cleanup_proven = cleanup["evidenceStatus"] == "VALID" and cleanup["status"] in ("VERIFIED_ABSENT", "REMOVED_AND_VERIFIED")
+          if not cleanup_proven:
+              gate_status = "BLOCKED_CLEANUP"
+          elif metadata_status == "INVALID" or case_evidence_status == "INVALID" or any(case_results[name] == "INVALID" for name in names):
+              gate_status = "INVALID_EVIDENCE"
+          elif runner_status == "E2E_COMPLETED" and all_cases_pass:
+              gate_status = "PASS"
+          elif runner_status in ("FAILED", "CLEANUP_FAILED") or any(case_results[name] in ("FAIL", "BLOCKED") for name in names):
+              gate_status = "FAIL"
+          else:
+              gate_status = "NOT_VERIFIED"
+
+          safe = {
+              "sourceCommit": commit,
+              "buildId": build_id,
+              "browser": {"name": "Chromium", "version": browser_version},
+              "run": {
+                  "workflowRunId": os.environ.get("GITHUB_RUN_ID", ""),
+                  "fixtureRunId": fixture_id,
+                  "metadataStatus": metadata_status,
+                  "status": runner_status,
+                  "caseEvidenceStatus": case_evidence_status,
+                  "cases": [{"case": name, "status": case_results[name]} for name in names],
+                  "gateStatus": gate_status,
+                  "cleanup": cleanup,
+              },
+              "projectAlias": "s17-fixture-project",
+              "sessionAlias": "s17-owner-browser-context",
+          }
+          output.write_text(json.dumps(safe, separators=(",", ":"), sort_keys=True) + "\n", encoding="utf-8")
+          print("Allowlisted evidence path: " + str(output))
+          PY
+
+      - name: Upload allowlisted evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: s17-playwright-evidence
+          path: ${{ runner.temp }}/s17-sanitized-evidence.json
+          if-no-files-found: error
+          retention-days: 1
