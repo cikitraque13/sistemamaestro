@@ -1,6 +1,25 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado actual del release S16 — 2026-10-07
+## Estado operativo observado — 2026-10-10
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `ead9f4e796f9e2be89a8d0b7948364edbf67066b` |
+| GitHub tree | `bfa0db0b43dc29167ff87be277312f9f2813e502` |
+| Railway deployment | `6c77f4b8-5431-471e-9320-b3d51761b019`; SUCCESS, 2026-10-10 20:31:43 UTC |
+| Railway deployed SHA | `ead9f4e796f9e2be89a8d0b7948364edbf67066b` |
+| Railway service | `sistemamaestro`; Online, una réplica observada |
+| Health endpoint | GET `/health` respondió HTTP 200; no se leyó el cuerpo |
+| Builder reportado por la configuración live | `RAILPACK` |
+| Domain target port | `8080` |
+| Live `startCommand` / healthcheck | No aparecen en los metadatos consultados; no se infiere su valor efectivo |
+| `railway.json` versionado | Declara builder `DOCKERFILE`, `dockerfilePath: Dockerfile`, healthcheck `/health`, timeout 300 y restart policy |
+| Actual build provenance | `UNVERIFIED`; no se determina qué configuración produjo la imagen desplegada |
+| S18 | OPEN; estado técnico NOT_DEMONSTRATED; ejecución ON_HOLD |
+
+La diferencia entre el builder reportado en live y el declarado por el repositorio es una condición de verificación antes de futuros despliegues. Este registro no prescribe cambiar builder, start command ni configuración del servicio. La ausencia de workflow YAML versionado en el árbol de main no afirma que se hayan eliminado ejecuciones históricas o registros de GitHub Actions.
+
+## Registro histórico del release S16 — 2026-10-07
 
 | Plano | Identidad y estado |
 |---|---|
@@ -83,22 +102,19 @@ El release PRE-S14 usó el checkpoint de main `3b0a23a96711a7be9d2fa42ccce101882
 
 [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el cierre y la cadena de validación S14. [Inventario](../control/03-INVENTARIO-TECNICO.md) registra el Gold PRE-S14 anterior, el Gold S14 Entry y el alcance técnico implementado. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es owner de los estados S14–S18/J04–J16; las reglas transversales están en [Journey Gate Operating Rules](../control/09-JOURNEY-GATE-OPERATING-RULES.md).
 
-Este documento y los archivos Dockerfile/railway.json prevalecen sobre ejemplos
-incompatibles del procedimiento DEPLOY_RAILWAY.md: su ejemplo startCommand
-no representa la configuración actual. La regla vigente es usar CMD del Dockerfile,
-sin deploy.startCommand. La guía queda sin modificar por estar fuera del alcance.
+El repositorio declara el Dockerfile como builder y no define `deploy.startCommand` en `railway.json`; los metadatos live consultados reportan `RAILPACK` y no muestran `startCommand` ni healthcheck. La procedencia efectiva de build y arranque permanece UNVERIFIED. Los ejemplos y checklists de [DEPLOY_RAILWAY.md](../../DEPLOY_RAILWAY.md) no deben tratarse como configuración efectiva: antes de cualquier despliegue futuro se debe verificar y reconciliar la configuración real del servicio con la declarada, sin inferir ni cambiar builder o start command por este documento.
 
 
 ## Estado del documento
 
 - Estado: activo
 - Tipo: arquitectura canónica de runtime y deploy
-- Alcance: backend, Dockerfile, Railway, healthcheck, frontend build y legacy retirado
-- Objetivo: fijar la única verdad de arranque y despliegue del sistema.
+- Alcance: configuración versionada de backend, Dockerfile, Railway, healthcheck y frontend, separada de las observaciones live.
+- Objetivo: registrar la arquitectura declarada y las diferencias o incertidumbres respecto al servicio observado.
 
 ---
 
-## 1. Runtime canónico actual
+## 1. Runtime declarado por el repositorio
 
 Servidor canónico:
 
@@ -120,7 +136,7 @@ FastAPI + Uvicorn
 
 ---
 
-## 2. Deploy canónico actual
+## 2. Configuración de deploy declarada por el repositorio
 
 Archivos canónicos:
 
@@ -137,13 +153,15 @@ DEPLOY_RAILWAY.md
 
 ---
 
-## 3. Healthcheck canónico
+## 3. Endpoint de health y configuración declarada
 
 Ruta:
 
 ```text
 /health
 ```
+
+El endpoint respondió HTTP 200 en la observación live del 2026-10-10. La ruta declarada en `railway.json` coincide, pero el healthcheck configurado en Railway no apareció en los metadatos consultados; no se afirma que esté activo.
 
 Respuesta esperada:
 
@@ -153,11 +171,11 @@ Respuesta esperada:
 
 ---
 
-## 4. Regla actual de arranque
+## 4. Contrato de arranque declarado en el repositorio
 
-El `Dockerfile` debe arrancar el servicio mediante su `CMD`.
+El `Dockerfile` versionado arranca el servicio mediante su `CMD`.
 
-`railway.json` no debe contener `deploy.startCommand`.
+`railway.json` versionado no contiene `deploy.startCommand`.
 
 Motivo:
 
@@ -170,11 +188,11 @@ ${PORT:-8080}
 
 como puerto.
 
-El `CMD` del Dockerfile usa `sh -c` y sí expande correctamente `PORT`.
+El `CMD` del Dockerfile usa `sh -c` y expande `PORT`. Esto describe el contrato versionado, no acredita que Railway usara ese Dockerfile en el deployment observado.
 
 ---
 
-## 5. Dockerfile esperado
+## 5. Dockerfile versionado
 
 El Dockerfile debe:
 
@@ -189,9 +207,9 @@ El Dockerfile debe:
 
 ---
 
-## 6. railway.json esperado
+## 6. railway.json versionado
 
-`railway.json` debe definir:
+El `railway.json` versionado actualmente declara:
 
 - builder Dockerfile;
 - ruta del Dockerfile;
@@ -199,7 +217,7 @@ El Dockerfile debe:
 - timeout;
 - restart policy.
 
-No debe definir:
+No define:
 
 ```text
 deploy.startCommand
@@ -207,19 +225,19 @@ deploy.startCommand
 
 ---
 
-## 7. Frontend en producción
+## 7. Frontend según la configuración versionada
 
-El frontend se sirve como build estático desde FastAPI.
+El Dockerfile versionado declara compilar el frontend y copiar el build estático a `/app/frontend/dist`; el código versionado configura FastAPI para servirlo desde esa ubicación. Esto describe la arquitectura declarada por el repositorio, no acredita qué proceso atendió el deployment observado.
 
-No existe un dev server de React en producción.
+La observación live disponible no permite determinar si el deployment ejecuta un dev server de React. El builder reportado fue `RAILPACK` y la procedencia efectiva del build permanece `UNVERIFIED`; no se afirma que exista o que no exista un dev server en producción.
 
-Ruta esperada:
+Ruta declarada:
 
 ```text
 /app/frontend/dist
 ```
 
-FastAPI debe servir:
+Según el código versionado, FastAPI sirve:
 
 - `/static`;
 - `/`;
@@ -230,7 +248,7 @@ FastAPI debe servir:
 
 ## 8. Variables de entorno críticas
 
-Railway debe contener:
+La aplicación documenta estas variables como requisitos de configuración cuando se activan las funciones correspondientes; esta lista no verifica ni expone los valores configurados en Railway:
 
 ```text
 MONGO_URL
@@ -244,13 +262,13 @@ ALLOWED_ORIGINS
 COOKIE_SECURE=true
 ```
 
-`PORT` lo gestiona Railway.
+El puerto asignado por Railway debe verificarse en el runtime efectivo; esta descripción del contrato no acredita la configuración live.
 
 ---
 
-## 9. Legacy runtime retirado
+## 9. Rutas identificadas como legacy en el repositorio
 
-Las siguientes piezas no forman parte del runtime activo:
+La documentación del repositorio clasifica estas piezas como legacy/no canónicas:
 
 ```text
 backend/server.py
@@ -258,20 +276,20 @@ railway/server_railway.py
 railway/requirements.txt
 ```
 
-No deben reintroducirse.
+La configuración live observada no permite verificar si el deployment actual las utiliza. Esta clasificación documental no se presenta como prueba de exclusión efectiva del runtime. No se deben reintroducir como nueva vía declarada sin revisar el contrato vigente.
 
 ---
 
-## 10. Principios
+## 10. Objetivos de diseño
 
-1. Un solo servidor vivo.
-2. Un solo camino de deploy.
-3. Una sola verdad de runtime.
-4. Todo el legacy fuera del flujo operativo.
-5. Ningún archivo paralelo decide el arranque.
-6. No hay deploy sin healthcheck.
-7. No hay secretos en Git.
-8. No hay frontend dev server en producción.
+1. Mantener un único servidor declarado para el runtime previsto.
+2. Mantener una ruta de despliegue canónica en la configuración del repositorio.
+3. Distinguir esa declaración del runtime observado en Railway.
+4. Objetivo: mantener las piezas legacy fuera de la ruta canónica declarada; la exclusión efectiva del runtime live no está verificada.
+5. No añadir archivos paralelos que decidan el arranque declarado.
+6. El procedimiento de despliegue debe verificar un healthcheck efectivo; el endpoint `/health` respondió HTTP 200 en la observación del 2026-10-10, pero los metadatos consultados no mostraron un healthcheck configurado.
+7. Objetivo de control: no incluir secretos en Git. Este documento no certifica la ausencia actual de secretos en el repositorio.
+8. No se ha determinado si el deployment observado usa un frontend dev server; no atribuirle presencia ni ausencia sin evidencia de runtime.
 
 ---
 
@@ -305,7 +323,7 @@ debe responder:
 
 ## 12. Veredicto operativo
 
-La verdad actual de runtime y deploy es:
+El runtime declarado por el repositorio es:
 
 ```text
 Dockerfile
@@ -314,4 +332,4 @@ Dockerfile
 → Railway
 ```
 
-Cualquier segunda vía de arranque debe considerarse legacy o error.
+Cualquier conclusión sobre el runtime efectivamente desplegado requiere verificar la configuración live y la procedencia de build; la observación actual y su discrepancia constan al inicio de este documento.

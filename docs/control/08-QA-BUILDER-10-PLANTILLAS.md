@@ -1,9 +1,9 @@
 # 08-QA-BUILDER-10-PLANTILLAS
 
-El release PRE-S14 y sus validaciones acreditadas pertenecen a [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
-Esta matriz es QA comercial de plantillas: el release no acredita 10/10 PASS ni ejecuta
-esta matriz. Su eventual ejecución necesita alcance propio; no es otro frente activo
-de Journey 03, cuyo único pendiente actual es S14.
+El release PRE-S14 y sus validaciones acreditadas pertenecen al registro histórico de [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
+Esta matriz es QA comercial de plantillas: ningún cierre de gate acredita 10/10 PASS ni ejecuta
+esta matriz. Su eventual ejecución necesita alcance propio. El estado vigente de S14–S18
+pertenece al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md); S17 está cerrado por aceptación humana con limitaciones y S18 está OPEN, en espera de ejecución.
 
 ## Estado del documento
 

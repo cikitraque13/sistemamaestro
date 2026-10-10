@@ -1,16 +1,18 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — S16 cerrado, 2026-10-07
+## Estado vigente — 2026-10-11
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
 [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del cierre y validaciones de Journey 03; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
 
-El checkpoint canónico de entrada a S14 y el baseline post-S15 se conservan como evidencia histórica; el estado vigente de S16 y su cierre se registran a continuación.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está OPEN, con estado técnico NOT_DEMONSTRATED y ejecución ON_HOLD. La primera actividad obligatoria S18 es revisar todas las escrituras activas en modo READ-ONLY. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) contiene los estados y límites de aceptación.
+
+El checkpoint canónico de entrada a S14 y los Gold posteriores se conservan como evidencia histórica; el estado vigente de producción/runtime se registra en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
 
 Como antecedente histórico, el checkout usado para el Gold post-S15 estaba en la rama del candidato S15 y limpio; su tree coincide con el commit de GitHub main e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279. La identidad productiva vigente y el deployment pertenecen exclusivamente a Runtime and Deploy Truth.
 
-## Cierre y publicación S16 — 2026-10-07
+## Registro histórico: cierre y publicación S16 — 2026-10-07
 
 - S16_STATUS=CLOSED; READY_FOR_S17=YES; BLOCKERS=NONE.
 - FINAL_GOLD_PREPUBLICATION=`GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05`; PASS; congelado antes de publicar. Su ruta y digest se conservan en el registro del checkpoint.
@@ -56,6 +58,32 @@ El Gold post-S16 congela el baseline cerrado inmediatamente anterior a S17. El G
 - SM_SEC=BLOCKED_PENDING_SIGNAL_CLASSIFICATION. Revisión no intrusiva informó una señal agregada de patrón de asignación sensible sin clasificación; no se registra ni reproduce su valor o ruta. No se considera secreto confirmado.
 - SECRET_SCREEN=LIMITED; sin escáner dedicado, 39 archivos no fueron examinados como texto y la señal SEC sigue sin clasificar. No es certificación absoluta de ausencia de secretos.
 - El estado de integridad del Gold y la revisión SEC son independientes; este registro no altera el cierre humano S17 ni declara TECHNICAL_PASS.
+
+## Gold pre-S18 — checkpoints preservados
+
+Los dos checkpoints siguientes corresponden a fuentes distintas y se conservan sin sobrescribirlos. Sus recuentos y revisiones no deben compararse como si fueran el mismo paquete.
+
+### Entrada pre-ejecución S18
+
+- GOLD_NAME: `GOLD_FREEZE_PRE_S18_EXECUTION_2026-10-10`
+- PATH: `Backups/GOLD/GOLD_FREEZE_PRE_S18_EXECUTION_2026-10-10`
+- SOURCE_COMMIT: `77b540f0fb423b2e56d97dd78fd12ad299530124`
+- SOURCE_TREE: `2b76c4b57a1ae34379c87f71c44c8303e31a2070`
+- FILES_VERIFIED: `417 / 417`; RESTORE_CHECK=PASS registrado.
+- LIMITATION: checkpoint de integridad/recuperación, no certificación funcional.
+
+### Posterior al saneamiento y previo a ejecución S18
+
+- GOLD_NAME: `GOLD_FREEZE_POST_SANITATION_PRE_S18_2026-10-10`
+- PATH: `Backups/GOLD/GOLD_FREEZE_POST_SANITATION_PRE_S18_2026-10-10`
+- SOURCE_COMMIT: `ead9f4e796f9e2be89a8d0b7948364edbf67066b`
+- SOURCE_TREE: `bfa0db0b43dc29167ff87be277312f9f2813e502`
+- FILES_VERIFIED: `415 / 415`; RESTORE_CHECK=PASS registrado por el owner.
+- GLOBAL_DIGEST: `5c1fd8840700b00618a6b6de8a6f7ef2117324c7473b7bfd738b353cb79fa5257`
+- MANIFEST_SHA256: `bac5a775ca06f09958a02af19617efd2789bc377afa29ba9bfe8d86a0c8f7d4a`
+- SM_QA / SM_SEC: `APPROVED_WITH_RISKS`.
+- SECRET_SCREEN: INCONCLUSIVE; una señal de patrón quedó sin clasificación y dos coincidencias de ejemplo se verificaron solo por nombre de archivo. No se afirma ausencia absoluta de secretos.
+- LIMITATION: Gold de checkpoint, no PASS funcional de S18; los Gold anteriores no tienen baseline byte a byte para una comparación retrospectiva.
 
 ## Fuente y estructura material
 
@@ -157,4 +185,4 @@ En el saneamiento previo se retiraron `frontend/node_modules` y `frontend/build`
 Dependencias instaladas, builds, cachés y temporales no son fuente del producto.
 El manifiesto y lockfile se conservan. No se leen ni copian secretos.
 
-En el preflight de entrada, el checkout canónico estaba en `main`, alineado con `origin/main` y limpio; la identidad del checkpoint se conserva en la sección Gold S14 Entry vigente. La raíz `S.Maestro` quedó limitada a `sistemamaestro/` y `Backups/`; los andamios EVIDENCE, EXPERIMENTS, HISTORICAL y el ZIP histórico se retiraron. S1–S13/C1 forman parte del release PRE-S14 desplegado. El estado de S14 pertenece al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+En el preflight de entrada, el checkout canónico estaba en `main`, alineado con `origin/main` y limpio; la identidad del checkpoint se conserva en la sección Gold S14 Entry histórica. La raíz `S.Maestro` quedó limitada a `sistemamaestro/` y `Backups/`; los andamios EVIDENCE, EXPERIMENTS, HISTORICAL y el ZIP histórico se retiraron. S1–S13/C1 forman parte del release PRE-S14 desplegado. El estado de S14 pertenece al [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).

@@ -8,13 +8,15 @@ La hoja histórica [Roadmap de Implementación V1](06-ROADMAP-DE-IMPLEMENTACION-
 
 ## Checkpoint de referencia
 
-La identidad e integridad del Gold de entrada a S14 constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-s14-entry-vigente). Este roadmap conserva la autoridad de los estados y dependencias S14–S18/J04–J16.
+La identidad e integridad del Gold de entrada a S14 constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-s14-entry-histórico). Este roadmap conserva la autoridad de los estados y dependencias S14–S18/J04–J16.
 
 ## Cómo leer los estados
 
 - `COMPLETED`: gate cerrado con evidencia dentro del alcance indicado.
 - `NOT_STARTED`: estado explícitamente acreditado.
 - `NOT_DEMONSTRATED`: las fuentes reconciliadas no acreditan cierre ni un estado más preciso.
+- `OPEN`: entrada al ciclo de vida autorizada explícitamente por HUMAN-LUCAS; el roadmap registra esa decisión, pero no la concede ni autoriza gates por sí mismo.
+- `ON_HOLD`: para este checkpoint S18, la ejecución técnica aún no ha comenzado y permanece detenida.
 - Evidencia adelantada informa un gate futuro, pero no lo cierra por semejanza.
 
 La reutilización exige identidad y condiciones coincidentes. Aplicar la regla de delta en [Journey Gate Operating Rules](../../control/09-JOURNEY-GATE-OPERATING-RULES.md).
@@ -79,16 +81,17 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - WHAT_REMAINS: las limitaciones técnicas anteriores pueden abordarse en gates futuros cuando correspondan a su alcance; no son condiciones retroactivas para el cierre humano limitado de S17.
 - EVIDENCE_REUSABLE_IF: aplicar la regla de delta de Journey Gate Operating Rules; reutilizar solo evidencia cuya identidad, alcance y condiciones coincidan con el gate receptor.
 - REVALIDATE_IF: cambia el recorrido aceptado, las rutas, auth/session, build o los criterios de un gate posterior.
-- NEXT_GATE: S18 es la siguiente etapa prevista, pero no está abierta. No hereda PASS ni garantías sobre las limitaciones no acreditadas de S17.
+- NEXT_GATE: S18 es la siguiente etapa y está OPEN desde la publicación de su contrato de entrada. No hereda PASS ni garantías sobre las limitaciones no acreditadas de S17.
+- S18_OPENING_AUTHORIZATION: HUMAN-LUCAS autorizó la apertura de S18 en el gate `S18_CANONICAL_PUBLICATION_AND_OPENING`, después de la publicación del contrato de entrada mediante PR #89. Este registro documenta la decisión humana; el roadmap no autoriza gates.
 - DEPENDENCIES: S15 y S16 aportan identidad y reproducibilidad como contexto; la aceptación de S17 se limita al recorrido descrito y no certifica persistencia, apply/revert, captura de fallos ni repetibilidad del harness.
 - GOLD_AND_REVIEW: Gold e integridad, junto con los veredictos QA/SEC y sus límites, constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-freeze-post-s17-canónico-integridad-verificada-revisión-de-seguridad-pendiente). La señal SEC pendiente no modifica el cierre humano de S17 ni se presenta como una exposición confirmada.
-- S18_OPENING_READINESS: READY_TO_OPEN_PENDING_HUMAN_AUTHORIZATION. HUMAN-LUCAS aprobó la interpretación de entrada que sigue; S18 aún no está abierto.
+- S18_OPENING_READINESS: OPEN; la autorización humana y el contrato de entrada se publicaron. La ejecución técnica sigue ON_HOLD.
 - TRANSITION_BASIS: para la entrada a S18, el cierre `CLOSED_BY_HUMAN_ACCEPTANCE` de S17 satisface la dependencia de flujo únicamente dentro del recorrido visual aceptado. No acredita el harness E2E repetible ni las cuatro garantías técnicas residuales, que siguen sin PASS. S15 y S16 permanecen satisfechas. La revisión de todas las escrituras activas es la primera actividad obligatoria de S18, no una condición previa de apertura. Hasta completarla, no se autorizarán modificaciones que afecten a escrituras activas ni se declarará validada la máquina de estados completa. La señal SEC pendiente del Gold permanece como observación independiente y no se reclasifica.
 
 ### S18 — Canonical State Machine
 
 - ORIGINAL_PURPOSE: expresar y verificar estados/transiciones canónicos, incluidos fallos, stale state, recuperación y autorización.
-- CURRENT_STATUS: NOT_DEMONSTRATED; no está cerrado.
+- LIFECYCLE_STATUS: OPEN (entrada autorizada por HUMAN-LUCAS); S18_TECHNICAL_STATUS=NOT_DEMONSTRATED; S18_EXECUTION=ON_HOLD (la ejecución técnica no ha comenzado y permanece detenida); no está cerrado.
 - ACCREDITED_EVIDENCE: S1–S13 prueban transacciones locales acotadas, autorización explícita y recuperación; son insumos, no el modelo completo.
 - WHAT_REMAINS: definir y validar la máquina de estados completa frente a implementación y casos límite.
 - EVIDENCE_REUSABLE_IF: contratos, identidad, runtime y harness relevantes siguen coincidiendo.

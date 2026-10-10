@@ -2,9 +2,9 @@
 
 ## Estado del documento
 
-- Estado: activo, reconciliado tras el cierre operacional S16 el 2026-10-07.
+- Estado: activo; reconciliación documental S17/S18 al 2026-10-11.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
-- Cierre S16 y Gold prepublicación: consultar los propietarios de producción/runtime, roadmap e inventario técnico; este índice no duplica hashes de manifiestos.
+- S14–S18: consultar los propietarios de madurez, producción/runtime e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
   release Journey 03, S14 y registros históricos.
 
@@ -31,7 +31,7 @@
 | IA | [Orchestration](../architecture/02-ai-orchestration.md), [Agent Contracts](../architecture/03-agent-contracts.md) | Contratos/dirección; no declara runtime multiagente nuevo |
 | Economía | [Créditos y Economía](../product/sistema-maestro/03-CREDITOS-Y-ECONOMIA.md) | Doctrina comercial |
 | Créditos técnicos | [Política](../system/credits/00-POLITICA-CANONICA-CREDITOS-V1.md), [Matriz](../system/credits/01-MATRIZ-OPERATIVA-CREDITOS-V1.md), [Motor](../system/credits/02-MOTOR-CONSUMO-V1.md), [Contrato](../system/credits/03-CONTRATO-TECNICO-V1.md) | SUPPORTING_CANONICAL, sin cambios en esta reconciliación |
-| Operación del despliegue | [DEPLOY_RAILWAY](../../DEPLOY_RAILWAY.md) | Procedimiento auxiliar: el ejemplo startCommand no es vigente; prevalecen Runtime and Deploy Truth y la configuración real |
+| Operación del despliegue | [DEPLOY_RAILWAY](../../DEPLOY_RAILWAY.md) | Guía de verificación previa; distinguir la observación live de la configuración declarada y verificar procedencia antes de futuros despliegues; consultar [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) |
 | Informe puntual | [Contrato](../product/01-INFORME-PUNTUAL-CANONICO.md), [Salida PDF](../product/02-PDF-INFORME-PUNTUAL-SALIDA-VISUAL.md) | Contratos de producto existentes |
 | Diseño | [README de diseño](../design/README.md), [Guías](../design/design_guidelines.json) | SUPPORTING_CANONICAL; no impone una dirección visual genérica a todo proyecto |
 | Seguridad | [Decisiones cerradas](01-DECISIONES-CERRADAS.md), [código](../../backend/app/core/security.py), [pruebas](../../backend/tests/test_security_jwt.py) | Reglas y evidencia de implementación; no certificación nueva de seguridad |
@@ -59,14 +59,13 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 
 ## Orden de lectura y ejecución vigente
 
-1. Runtime and Deploy Truth: identificar `main`, deployment de Railway y riesgos residuales vigentes.
-2. Estado Journey 03: consultar los cierres y la evidencia acreditada hasta S15.
-3. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate aún no abierto.
-4. Inventario, rutas y procedimientos: localizar las piezas necesarias.
+1. Runtime and Deploy Truth: distinguir GitHub main, Railway observado, configuración declarada y procedencia de build.
+2. Master Maturity Roadmap: consultar los estados vigentes S14–S18 y la evidencia/limitaciones de cada gate.
+3. Journey 03 PRE-S14: consultar únicamente el historial de cierres S1–S15.
+4. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate autorizado.
+5. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
-Los fundamentos Builder state/kernel y el circuito local S1–S13/C1 están implementados
-y validados en ingeniería local; su creación no es una prioridad pendiente.
-S16 está CLOSED. El Final Gold `GOLD_FREEZE_S16_POST_SANEO_FINAL_2026-10-05` quedó PASS como freeze prepublicación; PR #83 está MERGED con commit de publicación `4322f7936a93c12eec288e44efcd3eb43d2a3639`, y el release S16 quedó verificado en GitHub/Railway. El deployment `824b2d5b-12ad-4364-8464-9462679ffc9b` y R2 Railway build son SUCCESS; `/health` y home respondieron HTTP 200, sin regresión operacional y con trazabilidad PASS. El checkpoint post-S16 `GOLD_FREEZE_POST_S16_CLOSED_2026-10-07` está CREATED/PASS y `BASELINE_FOR_S17=READY`; su identidad e integridad constan en [Inventario técnico](03-INVENTARIO-TECNICO.md). S17 aún no está abierto y requiere su propio gate. Se preservan los antecedentes prepublicación de las 18 rutas (16 tracked modificadas y 2 nuevas), el Review Target transport resuelto y SM-ED materializada localmente en este Work, sin afirmar sincronización automática entre runtimes. El wiring R1 de siete archivos con hash `260f2972d98eb464175e1e461df6c68684f9918d6b8cabba2c1f9ebb54b84235` es distinto del candidato S16. El saneamiento PRE-S17 y OBS-01 diferido constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md); la identidad de los Gold S15 y S16 consta en [Inventario técnico](03-INVENTARIO-TECNICO.md).
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está OPEN, S18_TECHNICAL_STATUS=NOT_DEMONSTRATED y S18_EXECUTION=ON_HOLD; su primera actividad obligatoria es el inventario/revisión READ-ONLY de escrituras activas. Las cuatro garantías E2E pendientes y los dos Gold pre-S18, con sus reservas, constan en [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) e [Inventario técnico](03-INVENTARIO-TECNICO.md). GitHub main es `ead9f4e796f9e2be89a8d0b7948364edbf67066b`; la observación de Railway y la discrepancia de builder/procedencia constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El detalle histórico de S16 se conserva en el registro correspondiente del inventario y runtime.
 
 ## Reglas duraderas de gobierno
 

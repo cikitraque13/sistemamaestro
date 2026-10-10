@@ -1,8 +1,8 @@
 # 01-DECISIONES-CERRADAS
 
-## Lectura vigente PRE-S14 — 2026-10-02
+## Lectura vigente — 2026-10-11
 
-Las decisiones fechadas conservan su contexto histórico; las restricciones de release registradas antes del Gate 2 no sustituyen el resultado de la promoción autorizada. El estado del release Journey 03 pertenece a [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md), el frente vigente a [Pendientes](02-PENDIENTES-PRIORIZADOS.md) y la identidad de producción a [Runtime](../architecture/04-runtime-and-deploy-truth.md). El release PRE-S14 está cerrado, desplegado y verificado; S14 permanece NOT_STARTED.
+Las decisiones fechadas conservan su contexto histórico; las restricciones de release anteriores no sustituyen los resultados de promociones posteriores. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados S14–S18; [Pendientes](02-PENDIENTES-PRIORIZADOS.md) registra el frente vigente y [Runtime](../architecture/04-runtime-and-deploy-truth.md) distingue main, Railway observado y configuración declarada. El registro PRE-S14 y las decisiones anteriores a S14 que siguen en este documento son históricos, no el estado actual.
 
 
 ## Estado del documento
