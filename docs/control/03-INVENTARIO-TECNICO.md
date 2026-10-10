@@ -41,6 +41,22 @@ Como antecedente histórico, el checkout usado para el Gold post-S15 estaba en l
 
 El Gold post-S16 congela el baseline cerrado inmediatamente anterior a S17. El Gold S16 prepublicación que aparece abajo se conserva como checkpoint histórico distinto.
 
+## Gold Freeze post-S17 canónico — integridad verificada, revisión de seguridad pendiente
+
+- GOLD_NAME: `GOLD_FREEZE_POST_S17_CANONICAL_2026-10-10`
+- PATH: `Backups/GOLD/GOLD_FREEZE_POST_S17_CANONICAL_2026-10-10`
+- SOURCE_COMMIT: `0eb89345f77c2bfda3ea9582fe1aac94346a974b`
+- SOURCE_TREE: `2b76c4b57a1ae34379c87f71c44c8303e31a2070`
+- FILES_EXPECTED / FILES_COPIED: `417 / 417`; QA verificó independientemente 417 hashes coincidentes y cero ausentes o divergentes.
+- GLOBAL_DIGEST: `8cccacf8a6e68aa8710dc5083495bd0a45ae727810eceed2dbd56b6e65210968`; registrado en el manifiesto, no reproducido independientemente en la revisión QA.
+- MANIFEST_SHA256: `d0eb0952ce18d8738c8e55062e325c0b4cc94d9ae54f590e344dee001aa0ead0`
+- EVIDENCE_SUMMARY_SHA256: `73a090645c89b803ec2c60585b5d863c35e3d15438d93d3642fd076c22ac8861`
+- RESTORE_CHECK: PASS registrado; QA no pudo reejecutar la restauración porque los registros originales no están en el paquete.
+- SM_QA=APPROVED_WITH_RISKS; limitaciones: logs de pruebas ausentes, digest global no reproducido y restauración solo registrada.
+- SM_SEC=BLOCKED_PENDING_SIGNAL_CLASSIFICATION. Revisión no intrusiva informó una señal agregada de patrón de asignación sensible sin clasificación; no se registra ni reproduce su valor o ruta. No se considera secreto confirmado.
+- SECRET_SCREEN=LIMITED; sin escáner dedicado, 39 archivos no fueron examinados como texto y la señal SEC sigue sin clasificar. No es certificación absoluta de ausencia de secretos.
+- El estado de integridad del Gold y la revisión SEC son independientes; este registro no altera el cierre humano S17 ni declara TECHNICAL_PASS.
+
 ## Fuente y estructura material
 
 | Área | Rutas y responsabilidad |

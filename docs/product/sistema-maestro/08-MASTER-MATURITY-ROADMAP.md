@@ -81,6 +81,9 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - REVALIDATE_IF: cambia el recorrido aceptado, las rutas, auth/session, build o los criterios de un gate posterior.
 - NEXT_GATE: S18 es la siguiente etapa prevista, pero no está abierta. No hereda PASS ni garantías sobre las limitaciones no acreditadas de S17.
 - DEPENDENCIES: S15 y S16 aportan identidad y reproducibilidad como contexto; la aceptación de S17 se limita al recorrido descrito y no certifica persistencia, apply/revert, captura de fallos ni repetibilidad del harness.
+- GOLD_AND_REVIEW: Gold e integridad, junto con los veredictos QA/SEC y sus límites, constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-freeze-post-s17-canónico-integridad-verificada-revisión-de-seguridad-pendiente). La señal SEC pendiente no modifica el cierre humano de S17 ni se presenta como una exposición confirmada.
+- S18_OPENING_READINESS: READY_TO_OPEN_PENDING_HUMAN_AUTHORIZATION. HUMAN-LUCAS aprobó la interpretación de entrada que sigue; S18 aún no está abierto.
+- TRANSITION_BASIS: para la entrada a S18, el cierre `CLOSED_BY_HUMAN_ACCEPTANCE` de S17 satisface la dependencia de flujo únicamente dentro del recorrido visual aceptado. No acredita el harness E2E repetible ni las cuatro garantías técnicas residuales, que siguen sin PASS. S15 y S16 permanecen satisfechas. La revisión de todas las escrituras activas es la primera actividad obligatoria de S18, no una condición previa de apertura. Hasta completarla, no se autorizarán modificaciones que afecten a escrituras activas ni se declarará validada la máquina de estados completa. La señal SEC pendiente del Gold permanece como observación independiente y no se reclasifica.
 
 ### S18 — Canonical State Machine
 
@@ -90,7 +93,8 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - WHAT_REMAINS: definir y validar la máquina de estados completa frente a implementación y casos límite.
 - EVIDENCE_REUSABLE_IF: contratos, identidad, runtime y harness relevantes siguen coincidiendo.
 - REVALIDATE_IF: cambian transiciones, persistencia, recuperación, permisos, retries o estado de artefactos.
-- DEPENDENCIES: S15 identidad, S16 reproducibilidad y S17 flujo/harness acreditado, además de revisión de todas las escrituras activas.
+- DEPENDENCIES: S15 identidad y S16 reproducibilidad (satisfechas); recorrido visual S17 aceptado por HUMAN-LUCAS (suficiente para abrir S18 solo respecto al flujo aceptado). La revisión de todas las escrituras activas es la primera actividad obligatoria de S18.
+- S18_ENTRY_CONTRACT: la revisión inicial inventariará y clasificará todas las escrituras activas antes de cualquier modificación que las afecte. Hasta completar la revisión, tales modificaciones no están autorizadas y la máquina de estados completa no puede declararse validada. La aceptación visual S17 no acredita el harness repetible ni persistencia tras recarga, repetibilidad, apply/revert efectivo o captura de fallos.
 
 ## Journey 04–16 — madurez del producto
 
