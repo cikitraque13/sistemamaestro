@@ -1,10 +1,10 @@
 # Sistema Maestro
 
-## Release PRE-S14 — 2026-10-02
+## Estado actual de Journey 03 — 2026-10-11
 
-El release PRE-S14 de Journey 03 está **CLOSED / DEPLOYED / VERIFIED**. Incluye S1–S13/C1 y la migración Vite/Vitest. S14 permanece NOT_STARTED.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE y S18 está OPEN, con estado técnico NOT_DEMONSTRATED y ejecución ON_HOLD. La aceptación S17 cubre el recorrido visual revisado, no certifica el harness E2E ni sus cuatro garantías pendientes. El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez y el [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
 
-La identidad de `main`, el deployment de Railway, las validaciones y la limitación de evidencia residual están en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md) y [Journey 03](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md). El [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
+La identidad de GitHub main, la observación de Railway y sus diferencias están en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md). El documento [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el registro histórico de esa etapa; no es el estado vigente de S14–S18.
 
 Sistema Maestro es una plataforma guiada de transformación digital diseñada para convertir una necesidad, una idea o un activo existente en una solución digital estructurada, monetizable y operable.
 
@@ -79,9 +79,9 @@ La memoria canónica de gobierno técnico vive en:
 
 - `docs/control/`
 
-### Estado del legado retirado
+### Referencias de legado
 
-Las siguientes piezas ya no forman parte del repo activo:
+El inventario siguiente conserva referencias históricas a piezas identificadas como legacy/no canónicas; no acredita su ausencia del repositorio ni su exclusión del runtime actual:
 
 - `backend/server.py`
 - `railway/server_railway.py`
@@ -89,7 +89,7 @@ Las siguientes piezas ya no forman parte del repo activo:
 - `memory/`
 - `test_reports/`
 
-Su retirada se hizo de forma controlada durante el saneo y, cuando aplicó, quedaron movidas a un área externa de safety.
+El registro histórico describe decisiones de retirada y, cuando aplicó, movimientos a un área externa de safety; ese registro no acredita el estado físico actual de cada ruta.
 
 ### Ruta auxiliar vigente
 
@@ -247,13 +247,13 @@ La app canónica de runtime queda fijada como:
 
 - `backend.app.main:app`
 
-### Legacy retirado del repo activo
+### Referencia histórica: backend/server.py
 
 La pieza plana heredada:
 
 - `backend/server.py`
 
-ya no forma parte del repo activo. Fue retirada a safety para cierre controlado del legado.
+El historial documental registra su retirada a safety. Ese registro histórico no acredita su ausencia del repositorio actual ni su exclusión del runtime live.
 
 ### Routers backend detectados
 
@@ -361,19 +361,21 @@ npm start
 
 ## Runtime y despliegue
 
-### Runtime canónico actual
+### Runtime de aplicación declarado en archivos versionados
 
 - servidor canónico: `backend/app/main.py`
 - app canónica: `backend.app.main:app`
 
-### Deploy canónico actual
+### Archivos de deploy versionados en el repositorio
 
 - `Dockerfile`
 - `railway.json`
 
-### Healthcheck canónico
+### Endpoint `/health` de la aplicación
 
 - `/health`
+
+Estos datos describen el runtime y los archivos versionados del repositorio, no el runtime ni la configuración efectiva verificada de Railway. Los metadatos live reportan `RAILPACK`, con procedencia `UNVERIFIED`; `/health` respondió HTTP 200, pero el healthcheck efectivo de Railway no está verificado. Véase [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md).
 
 ### Regla
 
@@ -410,13 +412,13 @@ No deben subirse secretos reales al repositorio.
 
 ## Estado de Journey 03
 
-Consultar [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) para el estado vigente.
+Consultar el [Master Maturity Roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) para el estado vigente de S14–S18. El documento [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es histórico.
 
 ---
 
 ## Qué no debe interpretarse mal
 
-- el runtime legacy ya no está en el repo activo;
+- las rutas descritas como legacy no se consideran canónicas; su ausencia del repositorio y su exclusión del runtime actual no están verificadas;
 - `node_modules`, builds y cachés no forman parte del producto real;
 - `tests/` es soporte técnico, no núcleo canónico;
 - la Home actual ya no es una landing plana;

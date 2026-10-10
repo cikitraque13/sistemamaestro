@@ -1,10 +1,10 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-07
+## Estado operativo vigente — 2026-10-11
 
-Propietario del backlog actual. S14–S16 están cerrados; la identidad productiva S16 consta en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El [inventario técnico](03-INVENTARIO-TECNICO.md) registra el Gold post-S15 histórico y el Final Gold prepublicación S16. El [estado de Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva los cierres históricos. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados y dependencias S14–S18/J04–J16. El checkpoint post-S16 está creado y PASS; su identidad consta en el [inventario técnico](03-INVENTARIO-TECNICO.md). S17 aún no está abierto y requiere su propio gate.
+Propietario del backlog actual. S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del recorrido visual aceptado y sin TECHNICAL_PASS del harness E2E. S18 está OPEN, S18_TECHNICAL_STATUS=NOT_DEMONSTRATED y S18_EXECUTION=ON_HOLD. La primera actividad obligatoria de S18 es el inventario y revisión READ-ONLY de escrituras activas. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y dependencias; el [inventario técnico](03-INVENTARIO-TECNICO.md) registra Golds y límites. El [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) distingue GitHub main de Railway observado y deja la procedencia del build sin verificar.
 
-## Cierre canónico de S16 — 2026-10-07
+## Registro histórico: cierre canónico de S16 — 2026-10-07
 
 CURRENT_PENDING_FRONT=S17_ENTRY_GATE
 S14=COMPLETED; S15=COMPLETED; S16=CLOSED; FINAL_GOLD_PREPUBLICATION=PASS; POST_S16_GOLD=CREATED/PASS; BASELINE_FOR_S17=READY; S17=NOT_OPENED.
