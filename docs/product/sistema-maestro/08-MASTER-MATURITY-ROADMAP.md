@@ -67,12 +67,20 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 ### S17 — Native Browser Accreditation Harness
 
 - ORIGINAL_PURPOSE: acreditar con un harness nativo repetible navegación, render, identidad de preview, persistencia, autorización, apply/revert y captura de fallos.
-- CURRENT_STATUS: NOT_DEMONSTRATED; evidencia adelantada, no cierre.
-- ACCREDITED_EVIDENCE: OAuth E2E y smoke autenticado reportaron login/sesión, Dashboard, Builder, deep route y ausencia de errores materiales observados.
-- WHAT_REMAINS: demostrar harness canónico repetible, cobertura de criterios y captura de resultados vinculada a un build exacto.
-- EVIDENCE_REUSABLE_IF: navegador, harness, build, entorno, sesión autorizada y casos son los requeridos por el gate.
-- REVALIDATE_IF: cambia harness, navegador, auth/session, rutas, build, persistencia o criterios.
-- DEPENDENCIES: runtime/build reproducible S16 y límites de autorización; el smoke de producción no sustituye el harness.
+- CURRENT_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE (2026-10-10); cierre limitado a la aceptación humana del recorrido real del Builder observado. No equivale a TECHNICAL_PASS ni certifica integralmente el harness repetible.
+- S17_ROUTE_ASSESSMENT: FAVORABLE.
+- BROWSER_VISUAL_EVIDENCE: REVIEWED por HUMAN-LUCAS para evaluar el recorrido; las capturas no se incorporan al repositorio.
+- BUILDER_MATURITY: IN_PROGRESS; el cierre de S17 no declara terminado el Builder.
+- HUMAN_LUCAS: ACCEPTED.
+- TECHNICAL_REVIEW: FAVORABLE_WITH_LIMITATIONS.
+- ACCEPTED_SCOPE: recorrido visual observado de Login → Dashboard → Proyectos → Continuar → Builder → Código/Preview/Agente → Propuesta → Revisión/Validación → Controles de autorización.
+- RESIDUAL_LIMITATIONS: persistencia tras recarga, repetibilidad del harness, ejecución efectiva de apply/revert y captura de fallos permanecen sin acreditación técnica. La aceptación humana no las convierte en PASS.
+- HISTORICAL_EVIDENCE: OAuth E2E y smoke autenticado reportaron login/sesión, Dashboard, Builder, deep route y ausencia de errores materiales observados. Esta evidencia histórica y la revisión visual informan el alcance aceptado; no prueban las limitaciones anteriores.
+- WHAT_REMAINS: las limitaciones técnicas anteriores pueden abordarse en gates futuros cuando correspondan a su alcance; no son condiciones retroactivas para el cierre humano limitado de S17.
+- EVIDENCE_REUSABLE_IF: aplicar la regla de delta de Journey Gate Operating Rules; reutilizar solo evidencia cuya identidad, alcance y condiciones coincidan con el gate receptor.
+- REVALIDATE_IF: cambia el recorrido aceptado, las rutas, auth/session, build o los criterios de un gate posterior.
+- NEXT_GATE: S18 es la siguiente etapa prevista, pero no está abierta. No hereda PASS ni garantías sobre las limitaciones no acreditadas de S17.
+- DEPENDENCIES: S15 y S16 aportan identidad y reproducibilidad como contexto; la aceptación de S17 se limita al recorrido descrito y no certifica persistencia, apply/revert, captura de fallos ni repetibilidad del harness.
 
 ### S18 — Canonical State Machine
 

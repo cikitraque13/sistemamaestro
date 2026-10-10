@@ -45,7 +45,9 @@ Las mutaciones de Builder mantienen la frontera acreditada: salida no confiable 
 
 ## Cierre de Journey
 
-Un journey se cierra solo cuando cumple sus criterios explícitos, evidencia requerida, revisión independiente y reconciliación documental. “El código funciona” o evidencia adelantada no equivale a cierre. Registrar alcance, límites, riesgos y evidencia faltante. No marcar cerrado por inferencia ni reabrirlo sin contradicción o delta material.
+Un gate resuelve su responsabilidad concreta, preserva las garantías alcanzadas y entrega una base mejor a la siguiente etapa.
+
+Un journey se cierra conforme a sus criterios explícitos, evidencia requerida, revisión independiente y reconciliación documental. Cuando HUMAN-LUCAS acepta expresamente un cierre humano limitado a un alcance identificado, registrar `CLOSED_BY_HUMAN_ACCEPTANCE`, el alcance aceptado y sus limitaciones. Ese estado no equivale a `TECHNICAL_PASS` ni acredita criterios o comportamientos no observados. La aceptación humana de un alcance no transfiere `PASS` a criterios no observados ni a gates posteriores. Registrar riesgos y evidencia faltante; no marcar otros alcances como cerrados por inferencia ni reabrirlos sin contradicción o delta material.
 
 ## Documentación y checkpoints
 
