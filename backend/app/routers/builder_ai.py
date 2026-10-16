@@ -246,13 +246,16 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
                 status_code=404,
                 detail="Project not found",
             )
+        if payload.contextUse != "project_overview":
+            raise HTTPException(
+                status_code=422,
+                detail={"code": "incompatible_project_context_selector"},
+            )
         try:
             project_context = build_project_context_snapshot(
                 project,
                 project_id=payload.projectId,
                 expected_revision=expected,
-                # The operation and project identity govern context selection;
-                # a client-supplied selector cannot narrow or broaden it.
                 context_use="project_overview",
             )
         except ProjectContextSnapshotError as exc:

@@ -51,11 +51,20 @@ def _build_prompt(
     project_context: Dict[str, Any] | None = None,
 ) -> str:
     input_payload = payload.model_dump(exclude={"userId", "contextUse"})
+    provider_project_context = None
+    if project_context is not None:
+        provider_project_context = {
+            "selector": project_context["selector"],
+            "items": [
+                {"field": item["field"], "value": item["value"]}
+                for item in project_context["items"]
+            ],
+        }
     return json.dumps(
         {
             "task": "Crear BuilderAIOutput V1 para Sistema Maestro.",
             "input": input_payload,
-            "projectContext": project_context,
+            "projectContext": provider_project_context,
             "outputContract": get_builder_ai_output_contract(),
             "expectedShape": {
                 "intent": "Qué quiere construir el usuario.",

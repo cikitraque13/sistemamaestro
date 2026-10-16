@@ -52,9 +52,17 @@ class ProjectContextSnapshotTests(f.unittest.TestCase):
             contextUse="project_overview",
         )
         project_context = {
+            "schemaVersion": "project_context_v1",
+            "projectId": "synthetic-project-id",
             "selector": "project_overview",
             "revision": REVISION,
-            "items": [{"field": "input_content", "value": "synthetic project fact"}],
+            "items": [{
+                "field": "input_content",
+                "value": "synthetic project fact",
+                "source": "project.input_content",
+                "provenance": "user_supplied",
+                "revision": REVISION,
+            }],
         }
 
         prompt = json.loads(_build_prompt(payload, project_context))
@@ -62,7 +70,16 @@ class ProjectContextSnapshotTests(f.unittest.TestCase):
         self.assertEqual(prompt["input"]["userInput"], "synthetic user instruction")
         self.assertNotIn("userId", prompt["input"])
         self.assertNotIn("contextUse", prompt["input"])
-        self.assertEqual(prompt["projectContext"], project_context)
+        self.assertEqual(prompt["projectContext"], {
+            "selector": "project_overview",
+            "items": [{"field": "input_content", "value": "synthetic project fact"}],
+        })
+        prompt_text = json.dumps(prompt)
+        for internal_metadata in (
+            "schemaVersion", "synthetic-project-id", REVISION,
+            "project.input_content", "user_supplied", "source", "provenance",
+        ):
+            self.assertNotIn(internal_metadata, prompt_text)
         self.assertNotIn("instructions", prompt["input"])
         self.assertNotIn("synthetic project fact", prompt["input"]["userInput"])
 
@@ -231,7 +248,7 @@ class ProjectContextSnapshotRouterTests(f.ChargedCallerFixture):
         self.assertEqual([item["field"] for item in context["items"]],
                          ["input_type", "input_content", "route"])
 
-    async def test_project_bound_context_selector_is_server_derived_for_supported_modes(self):
+    async def test_project_bound_incompatible_selectors_reject_before_economic_operation(self):
         self.db.projects.documents["project_test"].update(project_fixture())
 
         for mode, client_selector in (
@@ -241,20 +258,49 @@ class ProjectContextSnapshotRouterTests(f.ChargedCallerFixture):
             ("iterate", "recommendation_review"),
         ):
             with self.subTest(mode=mode, client_selector=client_selector):
-                await f.builder_ai.build_with_ai(
-                    BuilderAIInput(
-                        userInput="synthetic instruction",
-                        projectId="project_test",
-                        mode=mode,
-                        contextUse=client_selector,
-                    ),
-                    SimpleNamespace(headers={
-                        "Idempotency-Key": f"selector-{mode}-{client_selector}",
-                        "If-Match": REVISION,
-                    }),
+                with patch.object(
+                    f.builder_ai, "run_economic_operation", new_callable=AsyncMock,
+                ) as economic:
+                    with self.assertRaises(f.HTTPException) as error:
+                        await f.builder_ai.build_with_ai(
+                            BuilderAIInput(
+                                userInput="synthetic instruction",
+                                projectId="project_test",
+                                mode=mode,
+                                contextUse=client_selector,
+                            ),
+                            SimpleNamespace(headers={
+                                "Idempotency-Key": f"selector-{mode}-{client_selector}",
+                                "If-Match": REVISION,
+                            }),
+                        )
+
+                self.assertEqual(error.exception.status_code, 422)
+                self.assertEqual(
+                    error.exception.detail["code"],
+                    "incompatible_project_context_selector",
                 )
-                context = self.builder.await_args.kwargs["project_context"]
-                self.assertEqual(context["selector"], "project_overview")
+                economic.assert_not_awaited()
+                self.builder.assert_not_awaited()
+
+    async def test_iterate_accepts_project_overview_selector(self):
+        self.db.projects.documents["project_test"].update(project_fixture())
+        await f.builder_ai.build_with_ai(
+            BuilderAIInput(
+                userInput="synthetic iteration",
+                projectId="project_test",
+                mode="iterate",
+                contextUse="project_overview",
+            ),
+            SimpleNamespace(headers={
+                "Idempotency-Key": "selector-iterate-project-overview",
+                "If-Match": REVISION,
+            }),
+        )
+        self.assertEqual(
+            self.builder.await_args.kwargs["project_context"]["selector"],
+            "project_overview",
+        )
 
     async def test_projectless_contextual_selectors_reject_before_economic_operation(self):
         for selector in ("project_overview", "recommendation_review"):
