@@ -209,6 +209,16 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 @router.post("/build")
 async def build_with_ai(payload: BuilderAIInput, request: Request):
     from backend.app.routers.projects import expected_project_revision, assert_project_revision
+
+    # This endpoint currently supports the two operations emitted by the Builder
+    # workspace. Keep schema-admitted modes such as `repair` fail-closed before
+    # economic-operation processing or model invocation.
+    if payload.mode not in {"build", "iterate"}:
+        raise HTTPException(
+            status_code=422,
+            detail={"code": "unsupported_builder_mode"},
+        )
+
     user = await get_current_user(request)
     operation_id = request_operation_id(request, "builder_build")
 
@@ -241,7 +251,9 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
                 project,
                 project_id=payload.projectId,
                 expected_revision=expected,
-                context_use=payload.contextUse,
+                # The operation and project identity govern context selection;
+                # a client-supplied selector cannot narrow or broaden it.
+                context_use="project_overview",
             )
         except ProjectContextSnapshotError as exc:
             status_code = 409 if exc.code == "stale_project_revision" else 422

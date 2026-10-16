@@ -2,6 +2,7 @@
 import json
 from copy import deepcopy
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, patch
 
 import test_credit_consumption_safety as credits_fixture
 credits_fixture.config_stub.OPENAI_API_KEY = None
@@ -182,6 +183,67 @@ class ProjectContextSnapshotRouterTests(f.ChargedCallerFixture):
         self.assertEqual([item["field"] for item in context["items"]],
                          ["input_type", "input_content", "route"])
 
+    async def test_project_bound_context_selector_is_server_derived_for_supported_modes(self):
+        self.db.projects.documents["project_test"].update(project_fixture())
+
+        for mode, client_selector in (
+            ("build", "formatting_only"),
+            ("build", "recommendation_review"),
+            ("iterate", "formatting_only"),
+            ("iterate", "recommendation_review"),
+        ):
+            with self.subTest(mode=mode, client_selector=client_selector):
+                await f.builder_ai.build_with_ai(
+                    BuilderAIInput(
+                        userInput="synthetic instruction",
+                        projectId="project_test",
+                        mode=mode,
+                        contextUse=client_selector,
+                    ),
+                    SimpleNamespace(headers={
+                        "Idempotency-Key": f"selector-{mode}-{client_selector}",
+                        "If-Match": REVISION,
+                    }),
+                )
+                context = self.builder.await_args.kwargs["project_context"]
+                self.assertEqual(context["selector"], "project_overview")
+
+    async def test_projectless_contextual_selectors_reject_before_economic_operation(self):
+        for selector in ("project_overview", "recommendation_review"):
+            with self.subTest(selector=selector):
+                with patch.object(f.builder_ai, "run_economic_operation", new_callable=AsyncMock) as economic:
+                    with self.assertRaises(f.HTTPException) as error:
+                        await f.builder_ai.build_with_ai(
+                            BuilderAIInput(userInput="synthetic", contextUse=selector),
+                            f.request(f"projectless-{selector}"),
+                        )
+
+                self.assertEqual(error.exception.status_code, 400)
+                self.assertEqual(error.exception.detail["code"], "project_context_requires_project")
+                economic.assert_not_awaited()
+                self.builder.assert_not_awaited()
+
+    async def test_repair_mode_rejects_before_economic_operation_and_model(self):
+        with patch.object(f.builder_ai, "run_economic_operation", new_callable=AsyncMock) as economic:
+            with self.assertRaises(f.HTTPException) as error:
+                await f.builder_ai.build_with_ai(
+                    BuilderAIInput(userInput="synthetic", mode="repair"),
+                    f.request("unsupported-repair"),
+                )
+
+        self.assertEqual(error.exception.status_code, 422)
+        self.assertEqual(error.exception.detail["code"], "unsupported_builder_mode")
+        economic.assert_not_awaited()
+        self.builder.assert_not_awaited()
+
+    async def test_unknown_selector_rejects_before_economic_operation_and_model(self):
+        with patch.object(f.builder_ai, "run_economic_operation", new_callable=AsyncMock) as economic:
+            with self.assertRaises(ValidationError):
+                BuilderAIInput(userInput="synthetic", contextUse="unknown_selector")
+
+        economic.assert_not_awaited()
+        self.builder.assert_not_awaited()
+
     async def test_foreign_or_stale_project_never_reaches_agent(self):
         self.db.projects.documents["project_test"]["user_id"] = "another_owner"
         with self.assertRaises(f.HTTPException) as error:
@@ -260,24 +322,6 @@ class ProjectContextSnapshotRouterTests(f.ChargedCallerFixture):
                 ),
                 SimpleNamespace(headers={
                     "Idempotency-Key": "logical-operation-1",
-                    "If-Match": REVISION,
-                }),
-            )
-        self.assertEqual(error.exception.status_code, 422)
-        self.assertEqual(error.exception.detail["code"], "invalid_project_context_source")
-        self.builder.assert_not_awaited()
-
-        self.db.projects.documents["project_test"].update(project_fixture())
-        self.db.projects.documents["project_test"]["plan_recommendation"]["scores"]["complexity"] = 8
-        with self.assertRaises(f.HTTPException) as error:
-            await f.builder_ai.build_with_ai(
-                BuilderAIInput(
-                    userInput="synthetic",
-                    projectId="project_test",
-                    contextUse="recommendation_review",
-                ),
-                SimpleNamespace(headers={
-                    "Idempotency-Key": "logical-operation-2",
                     "If-Match": REVISION,
                 }),
             )
