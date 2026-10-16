@@ -1,8 +1,8 @@
 # Sistema Maestro
 
-## Estado actual de Journey 03 — 2026-10-11
+## Estado actual de Journey 03 — 2026-10-16
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE y S18 está OPEN, con estado técnico NOT_DEMONSTRATED y ejecución ON_HOLD. La aceptación S17 cubre el recorrido visual revisado, no certifica el harness E2E ni sus cuatro garantías pendientes. El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez y el [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE y S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, con S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones y J04 permanece sin abrir. La aceptación S17 cubre el recorrido visual revisado, no certifica el harness E2E ni sus cuatro garantías pendientes. El detalle acumulativo de S17/S18 está en el [Registro de garantías pendientes](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md). El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez y el [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
 
 La identidad de GitHub main, la observación de Railway y sus diferencias están en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md). El documento [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el registro histórico de esa etapa; no es el estado vigente de S14–S18.
 

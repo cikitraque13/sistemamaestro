@@ -1,8 +1,8 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-11
+## Estado operativo vigente — 2026-10-16
 
-Propietario del backlog actual. S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del recorrido visual aceptado y sin TECHNICAL_PASS del harness E2E. S18 está OPEN, S18_TECHNICAL_STATUS=NOT_DEMONSTRATED y S18_EXECUTION=ON_HOLD. La primera actividad obligatoria de S18 es el inventario y revisión READ-ONLY de escrituras activas. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y dependencias; el [inventario técnico](03-INVENTARIO-TECNICO.md) registra Golds y límites. El [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) distingue GitHub main de Railway observado y deja la procedencia del build sin verificar.
+Propietario del backlog actual. S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del recorrido visual aceptado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 queda cerrado con limitaciones. J04 permanece NOT_DEMONSTRATED y NOT_OPENED; el siguiente paso es preparar su entrada para autorización expresa, sin iniciar ejecución. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y dependencias; el [Registro acumulativo de garantías](10-REGISTRO-GARANTIAS-PENDIENTES.md) es propietario de sus evidencias y condiciones de revalidación; el [inventario técnico](03-INVENTARIO-TECNICO.md) registra Golds y límites. El [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) distingue GitHub main de Railway observado y deja la procedencia del build sin verificar.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 
