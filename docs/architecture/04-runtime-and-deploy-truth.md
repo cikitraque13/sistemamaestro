@@ -1,6 +1,21 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado operativo observado — 2026-10-10
+## Estado publicado y documental — 2026-10-16
+
+| Plano | Identidad y estado |
+|---|---|
+| GitHub main | `c35e16bbb73536620fa8991044a05ceb6458c533` |
+| GitHub tree | `a680fb4acbafa2c96f87fdd42f8f09f36b0ec465` |
+| J03 | CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS |
+| S17 | CLOSED_BY_HUMAN_ACCEPTANCE; sin TECHNICAL_PASS del harness E2E |
+| S18 | CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS; estado técnico PARTIAL; TECHNICAL_PASS=NO |
+| J04 | NOT_OPENED |
+| Correspondencia Railway/main después de esta publicación | NO VERIFICADA; la última observación live registrada abajo corresponde al SHA `ead9f4e796f9e2be89a8d0b7948364edbf67066b` del 2026-10-10 |
+| Actual build provenance | UNVERIFIED |
+
+Esta tabla registra la identidad publicada del repositorio y los estados documentales de los gates; no es una observación nueva de Railway. El deployment, servicio, builder, endpoint de salud y configuración live descritos abajo corresponden a la observación del 2026-10-10 y no deben tratarse como vigentes después de publicar `c35e16b` sin evidencia nueva.
+
+## Última observación live registrada — 2026-10-10
 
 | Plano | Identidad y estado observado |
 |---|---|
@@ -15,7 +30,7 @@
 | Live `startCommand` / healthcheck | No aparecen en los metadatos consultados; no se infiere su valor efectivo |
 | `railway.json` versionado | Declara builder `DOCKERFILE`, `dockerfilePath: Dockerfile`, healthcheck `/health`, timeout 300 y restart policy |
 | Actual build provenance | `UNVERIFIED`; no se determina qué configuración produjo la imagen desplegada |
-| S18 | OPEN; estado técnico NOT_DEMONSTRATED; ejecución ON_HOLD |
+| S18 (estado documentado el 2026-10-10) | OPEN; estado técnico NOT_DEMONSTRATED; ejecución ON_HOLD. Registro histórico, sustituido el 2026-10-16 por cierre humano con limitaciones (estado técnico PARTIAL; TECHNICAL_PASS=NO) |
 
 La diferencia entre el builder reportado en live y el declarado por el repositorio es una condición de verificación antes de futuros despliegues. Este registro no prescribe cambiar builder, start command ni configuración del servicio. La ausencia de workflow YAML versionado en el árbol de main no afirma que se hayan eliminado ejecuciones históricas o registros de GitHub Actions.
 

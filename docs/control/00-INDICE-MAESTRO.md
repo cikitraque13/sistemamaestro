@@ -16,7 +16,7 @@
 | Journey 03, cierres S1–S15 y validaciones | [Estado PRE-S14](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) | SOURCE_OF_TRUTH del cierre, releases y evidencia de Journey 03 |
 | Decisiones aprobadas | [Decisiones cerradas](01-DECISIONES-CERRADAS.md) | SOURCE_OF_TRUTH; conserva procedencia y alcance temporal |
 | Pendientes vigentes | [Pendientes priorizados](02-PENDIENTES-PRIORIZADOS.md) | SOURCE_OF_TRUTH del siguiente frente previsto; no lo autoriza |
-| Existencia de piezas y Gold Freeze | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario y evidencia de restauración; registra los Gold prepublicación y post-S16 |
+| Gold Freeze y Evidence | [Inventario técnico](03-INVENTARIO-TECNICO.md) | Inventario vigente de checkpoints y archivo histórico; registra integridad y límites de restauración |
 | Rutas de producto y sistema | [Rutas canónicas](04-RUTAS-CANONICAS.md) | SUPPORTING_CANONICAL; inventario vigente completa las incorporaciones PRE-S14 |
 | Procedimientos operativos | [Procedimientos](06-PROCEDIMIENTOS-OPERATIVOS.md) | SUPPORTING_CANONICAL; no autoriza acciones por sí mismo |
 | Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
@@ -66,7 +66,7 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 4. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate autorizado.
 5. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 está cerrado con limitaciones; J04 permanece sin apertura y requiere autorización humana. El estado de S17/S18 consta en el [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md); las cinco garantías pendientes y sus condiciones de revalidación están en el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md); los dos Gold pre-S18 y sus reservas constan en el [Inventario técnico](03-INVENTARIO-TECNICO.md). GitHub main es `ead9f4e796f9e2be89a8d0b7948364edbf67066b`; la observación de Railway y la discrepancia de builder/procedencia constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El detalle histórico de S16 se conserva en el registro correspondiente del inventario y runtime.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 está cerrado con limitaciones; J04 permanece NOT_OPENED. El [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) conserva los estados y límites; el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) contiene las garantías pendientes y sus condiciones de revalidación; el [Inventario técnico](03-INVENTARIO-TECNICO.md) distingue Gold vigentes y archivo histórico. GitHub main publicado es `c35e16bbb73536620fa8991044a05ceb6458c533`. La última observación live de Railway registrada corresponde al 2026-10-10 y al SHA `ead9f4e796f9e2be89a8d0b7948364edbf67066b`; su correspondencia con el main actual no está verificada. El detalle histórico de S16 se conserva en el registro correspondiente del inventario y runtime.
 
 ## Reglas duraderas de gobierno
 
