@@ -9,6 +9,7 @@ CONTEXT_USE_SELECTORS = frozenset({
     "project_overview",
     "recommendation_review",
     "formatting_only",
+    "blueprint_generation",
 })
 SCORE_FIELDS = (
     "complexity",
@@ -16,6 +17,13 @@ SCORE_FIELDS = (
     "urgency",
     "structure_need",
     "continuity_need",
+)
+BLUEPRINT_FIELDS = (
+    ("route", "model_derived_persisted"),
+    ("diagnosis", "model_derived_persisted"),
+    ("input_content", "user_supplied"),
+    ("refine_answers", "user_supplied"),
+    ("url_analysis", "public_page_derived_persisted"),
 )
 
 
@@ -116,6 +124,24 @@ def build_project_context_snapshot(
                 value,
                 actual_revision,
                 "persisted_derived",
+            ))
+    elif context_use == "blueprint_generation":
+        # Preserve generate_blueprint's existing .get defaults exactly. The
+        # returned snapshot is internal; only its five values are projected
+        # for the provider adapter.
+        defaults = {
+            "route": "",
+            "diagnosis": {},
+            "input_content": "",
+            "refine_answers": {},
+            "url_analysis": "N/A",
+        }
+        for field, provenance in BLUEPRINT_FIELDS:
+            items.append(_item(
+                field,
+                project.get(field, defaults[field]),
+                actual_revision,
+                provenance,
             ))
 
     return {

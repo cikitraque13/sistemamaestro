@@ -127,6 +127,54 @@ class ProjectContextSnapshotTests(f.unittest.TestCase):
         )
         self.assertEqual(result["items"], [])
 
+    def test_blueprint_generation_selects_only_five_prompt_values_with_internal_provenance(self):
+        source = project_fixture()
+        source.update({
+            "diagnosis": {"summary": "synthetic diagnosis"},
+            "refine_answers": {"audience": "synthetic"},
+            "url_analysis": {"title": "synthetic page"},
+            "blueprint": {"must_not_leak": True},
+        })
+        result = build_project_context_snapshot(
+            source,
+            project_id="project_test",
+            expected_revision=REVISION,
+            context_use="blueprint_generation",
+        )
+        self.assertEqual([item["field"] for item in result["items"]], [
+            "route", "diagnosis", "input_content", "refine_answers", "url_analysis",
+        ])
+        self.assertEqual([item["provenance"] for item in result["items"]], [
+            "model_derived_persisted", "model_derived_persisted", "user_supplied",
+            "user_supplied", "public_page_derived_persisted",
+        ])
+        self.assertTrue(all(item["revision"] == REVISION for item in result["items"]))
+        self.assertEqual(
+            {item["field"]: item["value"] for item in result["items"]},
+            {field: source[field] for field in (
+                "route", "diagnosis", "input_content", "refine_answers", "url_analysis",
+            )},
+        )
+        self.assertEqual(result["projectId"], "project_test")
+        self.assertEqual(result["revision"], REVISION)
+        self.assertNotIn("user_test", str(result))
+        self.assertNotIn("must_not_leak", str(result))
+
+    def test_blueprint_generation_preserves_existing_prompt_defaults(self):
+        result = build_project_context_snapshot(
+            {"project_id": "project_test", "updated_at": REVISION},
+            project_id="project_test",
+            expected_revision=REVISION,
+            context_use="blueprint_generation",
+        )
+        self.assertEqual(
+            {item["field"]: item["value"] for item in result["items"]},
+            {
+                "route": "", "diagnosis": {}, "input_content": "",
+                "refine_answers": {}, "url_analysis": "N/A",
+            },
+        )
+
     def test_invalid_selector_revision_identity_and_required_data_fail_closed(self):
         cases = [
             (project_fixture(), "other", REVISION, "project_overview", "invalid_project_identity"),
@@ -242,6 +290,11 @@ class ProjectContextSnapshotRouterTests(f.ChargedCallerFixture):
                 BuilderAIInput(userInput="synthetic", contextUse="unknown_selector")
 
         economic.assert_not_awaited()
+        self.builder.assert_not_awaited()
+
+    async def test_blueprint_selector_is_not_a_builder_client_option(self):
+        with self.assertRaises(ValidationError):
+            BuilderAIInput(userInput="synthetic", contextUse="blueprint_generation")
         self.builder.assert_not_awaited()
 
     async def test_foreign_or_stale_project_never_reaches_agent(self):
