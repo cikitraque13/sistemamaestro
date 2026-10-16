@@ -2,7 +2,7 @@
 
 ## Estado del documento
 
-- Estado: activo; reconciliación documental S17/S18 al 2026-10-11.
+- Estado: activo; cierre documental J03 y preparación de entrada J04 al 2026-10-16.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
 - S14–S18: consultar los propietarios de madurez, producción/runtime e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
@@ -21,6 +21,7 @@
 | Procedimientos operativos | [Procedimientos](06-PROCEDIMIENTOS-OPERATIVOS.md) | SUPPORTING_CANONICAL; no autoriza acciones por sí mismo |
 | Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
 | Roadmap y estado de madurez | [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) | SOURCE_OF_TRUTH de S14–S18 y J04–J16 |
+| Garantías pendientes S17/S18 | [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) | SOURCE_OF_TRUTH del detalle de evidencia, limitación, riesgo, decisión, dependencia y revalidación; no declara PASS ni reabre gates |
 | Reglas de gates | [Journey Gate Operating Rules](09-JOURNEY-GATE-OPERATING-RULES.md) | SOURCE_OF_TRUTH de proceso, evidencia y checkpoints; no duplica estados de gates |
 | QA comercial de plantillas | [QA Builder 10 plantillas](08-QA-BUILDER-10-PLANTILLAS.md) | QA específica; no duplica el cierre de Journey 03 |
 | Contrato actual de la transacción local | [Contratos Técnicos V1](../product/sistema-maestro/05-CONTRATOS-TECNICOS-V1.md) | Extensión PRE-S14 validada y límites de aplicación |
@@ -65,7 +66,7 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 4. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate autorizado.
 5. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está OPEN, S18_TECHNICAL_STATUS=NOT_DEMONSTRATED y S18_EXECUTION=ON_HOLD; su primera actividad obligatoria es el inventario/revisión READ-ONLY de escrituras activas. Las cuatro garantías E2E pendientes y los dos Gold pre-S18, con sus reservas, constan en [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) e [Inventario técnico](03-INVENTARIO-TECNICO.md). GitHub main es `ead9f4e796f9e2be89a8d0b7948364edbf67066b`; la observación de Railway y la discrepancia de builder/procedencia constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El detalle histórico de S16 se conserva en el registro correspondiente del inventario y runtime.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 está cerrado con limitaciones; J04 permanece sin apertura y requiere autorización humana. El estado de S17/S18 consta en el [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md); las cinco garantías pendientes y sus condiciones de revalidación están en el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md); los dos Gold pre-S18 y sus reservas constan en el [Inventario técnico](03-INVENTARIO-TECNICO.md). GitHub main es `ead9f4e796f9e2be89a8d0b7948364edbf67066b`; la observación de Railway y la discrepancia de builder/procedencia constan en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md). El detalle histórico de S16 se conserva en el registro correspondiente del inventario y runtime.
 
 ## Reglas duraderas de gobierno
 

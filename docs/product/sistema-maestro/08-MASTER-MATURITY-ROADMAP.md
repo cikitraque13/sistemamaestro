@@ -16,12 +16,14 @@ La identidad e integridad del Gold de entrada a S14 constan en el [Inventario t�
 - `NOT_STARTED`: estado explícitamente acreditado.
 - `NOT_DEMONSTRATED`: las fuentes reconciliadas no acreditan cierre ni un estado más preciso.
 - `OPEN`: entrada al ciclo de vida autorizada explícitamente por HUMAN-LUCAS; el roadmap registra esa decisión, pero no la concede ni autoriza gates por sí mismo.
-- `ON_HOLD`: para este checkpoint S18, la ejecución técnica aún no ha comenzado y permanece detenida.
+- `ON_HOLD`: la ejecución técnica de un gate está detenida; el estado se interpreta según el checkpoint vigente. S18 ya no está ON_HOLD: quedó cerrado por aceptación humana con limitaciones.
 - Evidencia adelantada informa un gate futuro, pero no lo cierra por semejanza.
 
 La reutilización exige identidad y condiciones coincidentes. Aplicar la regla de delta en [Journey Gate Operating Rules](../../control/09-JOURNEY-GATE-OPERATING-RULES.md).
 
 ## Journey 03 — cierre del Builder local gobernado
+
+- JOURNEY_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS (HUMAN-LUCAS, gate S18_HUMAN_CLOSURE); TECHNICAL_PASS=NO. S17 y S18 conservan sus estados y limitaciones individuales; el cierre de J03 no convierte evidencia pendiente en PASS.
 
 ### S14 — Local Storage Capacity and Retention
 
@@ -76,28 +78,28 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - HUMAN_LUCAS: ACCEPTED.
 - TECHNICAL_REVIEW: FAVORABLE_WITH_LIMITATIONS.
 - ACCEPTED_SCOPE: recorrido visual observado de Login → Dashboard → Proyectos → Continuar → Builder → Código/Preview/Agente → Propuesta → Revisión/Validación → Controles de autorización.
-- RESIDUAL_LIMITATIONS: persistencia tras recarga, repetibilidad del harness, ejecución efectiva de apply/revert y captura de fallos permanecen sin acreditación técnica. La aceptación humana no las convierte en PASS.
+- RESIDUAL_LIMITATIONS: persistencia tras recarga, repetibilidad del harness, ejecución efectiva de apply/revert y captura de fallos permanecen sin acreditación técnica. La aceptación humana no las convierte en PASS. El detalle acumulativo está en el [Registro de garantías pendientes](../../control/10-REGISTRO-GARANTIAS-PENDIENTES.md); sus entradas no alteran el cierre humano de S17.
 - HISTORICAL_EVIDENCE: OAuth E2E y smoke autenticado reportaron login/sesión, Dashboard, Builder, deep route y ausencia de errores materiales observados. Esta evidencia histórica y la revisión visual informan el alcance aceptado; no prueban las limitaciones anteriores.
 - WHAT_REMAINS: las limitaciones técnicas anteriores pueden abordarse en gates futuros cuando correspondan a su alcance; no son condiciones retroactivas para el cierre humano limitado de S17.
 - EVIDENCE_REUSABLE_IF: aplicar la regla de delta de Journey Gate Operating Rules; reutilizar solo evidencia cuya identidad, alcance y condiciones coincidan con el gate receptor.
 - REVALIDATE_IF: cambia el recorrido aceptado, las rutas, auth/session, build o los criterios de un gate posterior.
-- NEXT_GATE: S18 es la siguiente etapa y está OPEN desde la publicación de su contrato de entrada. No hereda PASS ni garantías sobre las limitaciones no acreditadas de S17.
+- NEXT_GATE: Preparar J04 para decisión expresa de apertura por HUMAN-LUCAS; J04 permanece NOT_OPENED. S18 se cerró por aceptación humana con limitaciones, según el registro §S18. Este documento no abre la jornada siguiente ni hereda PASS o garantías sobre las limitaciones no acreditadas de S17.
 - S18_OPENING_AUTHORIZATION: HUMAN-LUCAS autorizó la apertura de S18 en el gate `S18_CANONICAL_PUBLICATION_AND_OPENING`, después de la publicación del contrato de entrada mediante PR #89. Este registro documenta la decisión humana; el roadmap no autoriza gates.
 - DEPENDENCIES: S15 y S16 aportan identidad y reproducibilidad como contexto; la aceptación de S17 se limita al recorrido descrito y no certifica persistencia, apply/revert, captura de fallos ni repetibilidad del harness.
 - GOLD_AND_REVIEW: Gold e integridad, junto con los veredictos QA/SEC y sus límites, constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-freeze-post-s17-canónico-integridad-verificada-revisión-de-seguridad-pendiente). La señal SEC pendiente no modifica el cierre humano de S17 ni se presenta como una exposición confirmada.
-- S18_OPENING_READINESS: OPEN; la autorización humana y el contrato de entrada se publicaron. La ejecución técnica sigue ON_HOLD.
-- TRANSITION_BASIS: para la entrada a S18, el cierre `CLOSED_BY_HUMAN_ACCEPTANCE` de S17 satisface la dependencia de flujo únicamente dentro del recorrido visual aceptado. No acredita el harness E2E repetible ni las cuatro garantías técnicas residuales, que siguen sin PASS. S15 y S16 permanecen satisfechas. La revisión de todas las escrituras activas es la primera actividad obligatoria de S18, no una condición previa de apertura. Hasta completarla, no se autorizarán modificaciones que afecten a escrituras activas ni se declarará validada la máquina de estados completa. La señal SEC pendiente del Gold permanece como observación independiente y no se reclasifica.
+- S18_CLOSURE_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS; S18_TECHNICAL_STATUS=PARTIAL; TECHNICAL_PASS=NO. La evidencia y las limitaciones constan en §S18.
+- TRANSITION_BASIS: para la entrada a S18, el cierre `CLOSED_BY_HUMAN_ACCEPTANCE` de S17 satisface la dependencia de flujo únicamente dentro del recorrido visual aceptado. No acredita el harness E2E repetible ni las cuatro garantías técnicas residuales, que siguen sin PASS. S15 y S16 permanecen satisfechas. La revisión READ-ONLY de escrituras activas, primera actividad obligatoria de S18, se completó con limitaciones de alcance. No declara validada la máquina completa ni autoriza por sí misma modificaciones a esas escrituras. La señal SEC pendiente del Gold permanece como observación independiente y no se reclasifica.
 
 ### S18 — Canonical State Machine
 
 - ORIGINAL_PURPOSE: expresar y verificar estados/transiciones canónicos, incluidos fallos, stale state, recuperación y autorización.
-- LIFECYCLE_STATUS: OPEN (entrada autorizada por HUMAN-LUCAS); S18_TECHNICAL_STATUS=NOT_DEMONSTRATED; S18_EXECUTION=ON_HOLD (la ejecución técnica no ha comenzado y permanece detenida); no está cerrado.
-- ACCREDITED_EVIDENCE: S1–S13 prueban transacciones locales acotadas, autorización explícita y recuperación; son insumos, no el modelo completo.
-- WHAT_REMAINS: definir y validar la máquina de estados completa frente a implementación y casos límite.
+- LIFECYCLE_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS (HUMAN-LUCAS, gate `S18_HUMAN_CLOSURE`); S18_TECHNICAL_STATUS=PARTIAL; TECHNICAL_PASS=NO.
+- ACCREDITED_EVIDENCE: S1–S13 prueban transacciones locales acotadas, autorización explícita y recuperación; son insumos, no el modelo completo. La validación sintética S18 registró 41 pruebas PASS y 0 fallos de prueba en `S18-MIN-CONTRACTUAL-VALIDATION-20261016-v1` (SHA-256 `F6781F5F27BB0A3441D207360AF1AD0C6176550A01904AB54B772470EAA1D4FA`); SM-QA=PASS_WITH_LIMITATIONS y SM-SEC=PASS_WITH_LIMITATION sobre ese candidato.
+- TECHNICAL_LIMITATIONS: S18 no obtuvo TECHNICAL_PASS. La integración durable del runtime React —recuperación y apply/revert del hook tras remontaje— permanece sin acreditar: `durableRuntime.test.js` no se ejecutó porque Vitest no estaba disponible sin instalación. Las 41 pruebas sintéticas PASS y las revisiones QA/SEC no cubren esa integración. El detalle acumulativo está en el [Registro de garantías pendientes](../../control/10-REGISTRO-GARANTIAS-PENDIENTES.md).
 - EVIDENCE_REUSABLE_IF: contratos, identidad, runtime y harness relevantes siguen coincidiendo.
 - REVALIDATE_IF: cambian transiciones, persistencia, recuperación, permisos, retries o estado de artefactos.
 - DEPENDENCIES: S15 identidad y S16 reproducibilidad (satisfechas); recorrido visual S17 aceptado por HUMAN-LUCAS (suficiente para abrir S18 solo respecto al flujo aceptado). La revisión de todas las escrituras activas es la primera actividad obligatoria de S18.
-- S18_ENTRY_CONTRACT: la revisión inicial inventariará y clasificará todas las escrituras activas antes de cualquier modificación que las afecte. Hasta completar la revisión, tales modificaciones no están autorizadas y la máquina de estados completa no puede declararse validada. La aceptación visual S17 no acredita el harness repetible ni persistencia tras recarga, repetibilidad, apply/revert efectivo o captura de fallos.
+- S18_ENTRY_CONTRACT: la revisión READ-ONLY de todas las escrituras activas, obligatoria antes de modificarlas, se completó con limitaciones de alcance. Este resultado no declara validada la máquina de estados completa ni autoriza por sí mismo cambios. La aceptación visual S17 no acredita las cuatro garantías listadas en el [Registro acumulativo](../../control/10-REGISTRO-GARANTIAS-PENDIENTES.md).
 
 ## Journey 04–16 — madurez del producto
 
@@ -107,6 +109,7 @@ Los propósitos y dependencias conservan la intención del roadmap maestro. Salv
 
 - ORIGINAL_PURPOSE: construir contexto estructural y factual del proyecto, seleccionar lo relevante y mantenerlo ligado a su revisión.
 - CURRENT_STATUS: NOT_DEMONSTRATED.
+- ENTRY_STATUS: NOT_OPENED; preparación documental no equivale a autorización; la apertura requiere decisión expresa de HUMAN-LUCAS.
 - ACCREDITED_EVIDENCE: hay contratos y superficies de proyecto; no se acredita el sistema integral de contexto de J04.
 - WHAT_REMAINS: inventario, grafo/contexto, selección y actualización de realidad del proyecto.
 - EVIDENCE_REUSABLE_IF: identidad S15 y fuentes del contexto coinciden con el gate.
