@@ -838,6 +838,7 @@ export default function useBuilderWorkspaceRuntime({
           userId: null,
           serverRevision: identity.serverRevision,
           mode: builderBuildState ? 'iterate' : 'build',
+          contextUse: projectId ? 'project_overview' : 'formatting_only',
         });
 
           if (liveIdentity.current !== requestIdentity) return;

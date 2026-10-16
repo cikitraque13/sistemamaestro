@@ -15,7 +15,12 @@ from backend.app.services.blueprint import generate_blueprint
 from backend.app.services.economic_operation import (
     EconomicPersistenceUncertain, request_fingerprint, request_operation_id, run_economic_operation,
 )
+from backend.app.services.credits import get_credit_operation
 from backend.app.services.plan_recommendation import build_plan_recommendation
+from backend.app.services.project_context_snapshot import (
+    ProjectContextSnapshotError,
+    build_project_context_snapshot,
+)
 from backend.app.services.semantic_admission import run_semantic_admission
 from backend.app.services.semantic_admission_trace import (
     build_semantic_admission_trace_payload,
@@ -492,6 +497,10 @@ async def create_blueprint(project_id: str, request: Request):
             detail="Project not found",
         )
 
+    prior_operation = await get_credit_operation(user["user_id"], operation_id)
+    if prior_operation is None:
+        assert_project_revision(project, expected)
+
     consumption_payload = build_project_consumption_request(
         user=user,
         project_id=project_id,
@@ -503,8 +512,30 @@ async def create_blueprint(project_id: str, request: Request):
     )
 
     async def work(consumption_result):
-        assert_project_revision(project, expected)
-        blueprint = await generate_blueprint(project)
+        live_project = await db.projects.find_one(
+            {
+                "project_id": project_id,
+                "user_id": user["user_id"],
+            },
+            {"_id": 0},
+        )
+        if not live_project:
+            raise HTTPException(404, detail="Project not found")
+        try:
+            snapshot = build_project_context_snapshot(
+                live_project,
+                project_id=project_id,
+                expected_revision=expected,
+                context_use="blueprint_generation",
+            )
+        except ProjectContextSnapshotError as exc:
+            status_code = 409 if exc.code == "stale_project_revision" else 422
+            raise HTTPException(status_code, detail={"code": exc.code}) from exc
+
+        blueprint_context = {
+            item["field"]: item["value"] for item in snapshot["items"]
+        }
+        blueprint = await generate_blueprint(blueprint_context)
         revision = next_project_revision(expected)
         try:
             updated = await db.projects.find_one_and_update(

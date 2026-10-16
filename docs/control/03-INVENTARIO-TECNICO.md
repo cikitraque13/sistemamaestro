@@ -1,12 +1,12 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — 2026-10-16
+## Estado vigente — 2026-10-17
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
 [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del cierre y validaciones de Journey 03; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones y J04 permanece NOT_OPENED. La revisión READ-ONLY de escrituras activas fue la primera actividad obligatoria de S18 y se completó con limitaciones de alcance; no valida la máquina de estados completa ni autoriza modificar esas escrituras. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y límites de aceptación.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J05_ENTRY_ASSESSMENT_ELIGIBLE=YES y J05 permanece NOT_OPENED. La revisión READ-ONLY de escrituras activas fue la primera actividad obligatoria de S18 y se completó con limitaciones de alcance; no valida la máquina de estados completa ni autoriza modificar esas escrituras. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y límites de aceptación.
 
 ## Inventario vigente de checkpoints — 2026-10-16
 

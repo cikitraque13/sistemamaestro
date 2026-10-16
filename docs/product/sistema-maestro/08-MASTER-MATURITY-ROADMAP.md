@@ -83,7 +83,7 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - WHAT_REMAINS: las limitaciones técnicas anteriores pueden abordarse en gates futuros cuando correspondan a su alcance; no son condiciones retroactivas para el cierre humano limitado de S17.
 - EVIDENCE_REUSABLE_IF: aplicar la regla de delta de Journey Gate Operating Rules; reutilizar solo evidencia cuya identidad, alcance y condiciones coincidan con el gate receptor.
 - REVALIDATE_IF: cambia el recorrido aceptado, las rutas, auth/session, build o los criterios de un gate posterior.
-- NEXT_GATE: Preparar J04 para decisión expresa de apertura por HUMAN-LUCAS; J04 permanece NOT_OPENED. S18 se cerró por aceptación humana con limitaciones, según el registro §S18. Este documento no abre la jornada siguiente ni hereda PASS o garantías sobre las limitaciones no acreditadas de S17.
+- NEXT_GATE: J05_ENTRY_ASSESSMENT_ELIGIBLE=YES; J05 permanece NOT_OPENED y requiere decisión expresa de HUMAN-LUCAS. J04 se cerró por aceptación humana dentro del alcance V1–V3 y con limitaciones; no declara TECHNICAL_PASS integral ni transfiere garantías no acreditadas. S18 se cerró por aceptación humana con limitaciones, según el registro §S18. Este documento no abre J05 ni hereda PASS o garantías de etapas anteriores.
 - S18_OPENING_AUTHORIZATION: HUMAN-LUCAS autorizó la apertura de S18 en el gate `S18_CANONICAL_PUBLICATION_AND_OPENING`, después de la publicación del contrato de entrada mediante PR #89. Este registro documenta la decisión humana; el roadmap no autoriza gates.
 - DEPENDENCIES: S15 y S16 aportan identidad y reproducibilidad como contexto; la aceptación de S17 se limita al recorrido descrito y no certifica persistencia, apply/revert, captura de fallos ni repetibilidad del harness.
 - GOLD_AND_REVIEW: Gold e integridad, junto con los veredictos QA/SEC y sus límites, constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-freeze-post-s17-canónico-integridad-verificada-revisión-de-seguridad-pendiente). La señal SEC pendiente no modifica el cierre humano de S17 ni se presenta como una exposición confirmada.
@@ -108,12 +108,16 @@ Los propósitos y dependencias conservan la intención del roadmap maestro. Salv
 ### J04 — Project Context
 
 - ORIGINAL_PURPOSE: construir contexto estructural y factual del proyecto, seleccionar lo relevante y mantenerlo ligado a su revisión.
-- CURRENT_STATUS: NOT_DEMONSTRATED.
-- ENTRY_STATUS: NOT_OPENED; preparación documental no equivale a autorización; la apertura requiere decisión expresa de HUMAN-LUCAS.
-- ACCREDITED_EVIDENCE: hay contratos y superficies de proyecto; no se acredita el sistema integral de contexto de J04.
-- WHAT_REMAINS: inventario, grafo/contexto, selección y actualización de realidad del proyecto.
-- EVIDENCE_REUSABLE_IF: identidad S15 y fuentes del contexto coinciden con el gate.
-- REVALIDATE_IF: cambia identidad, estructura, indexación o selección de contexto.
+- LIFECYCLE_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE (HUMAN-LUCAS, gate `J04_HUMAN_LIMITED_CLOSURE`), limitado a las capacidades acreditadas en V1–V3.
+- TECHNICAL_STATUS: PARTIAL; TECHNICAL_PASS=NO para el sistema integral de contexto.
+- ENTRY_STATUS: OPENED_BY_HUMAN_LUCAS; la aceptación de cierre se limita al alcance registrado aquí y no abre J05.
+- ACCREDITED_EVIDENCE: V1 (`68fdd1e21234b367ae5a47473398db2ea87d3e44`) construye snapshots factuales efímeros con allowlist, procedencia, identidad y revisión. V2 (`a3e7600f0d53943890fd73d7d232b6c7ea7c2fb8`) deriva selección contextual de servidor para las operaciones Builder cubiertas. V3 (`05e0625b0470b45e3814fc611eb9c636109e965d`) añade `blueprint_generation` con selector cerrado, cinco entradas existentes y procedencia interna; conserva el prompt. Las pruebas focalizadas del candidato V3 registraron 31 PASS. SM-QA=PASS_WITH_LIMITATIONS sobre `J04-CANONICAL-CLOSURE-READINESS-20261017-R1` (SHA-256 `78DAD55CC5B2C69233DCBD2E1F3B539EE3F414F3BC05CA1A04C4EDB5B149642C`); SM-SEC=PASS_WITH_LIMITATIONS sobre `J04-BLUEPRINT-CONTEXT-V3-IMPLEMENTATION-20261016-R1` (SHA-256 `8C75FE91DEF787F9EE0A2182914580A742E6627D5C20231C23906EBA725C999E`), que contiene los mismos cuatro hashes V3.
+- ACCEPTED_SCOPE: inventario factual efímero limitado a campos permitidos y usados por las operaciones cubiertas; selección server-side para Builder build/iterate y generación de blueprint; propietario, proyecto, procedencia y revisión asociados al snapshot; relectura acotada y CAS para bloquear persistencia obsoleta.
+- RESIDUAL_LIMITATIONS: inventario factual ampliado no acreditado; grafo o relaciones estructurales ampliadas no acreditados; eficacia empírica de relevancia no medida; persiste una ventana de concurrencia tras la última lectura; límites de tamaño anidados no acreditados; resistencia a prompt injection no demostrada para contenido del proyecto, especialmente `url_analysis`; la suite amplia no se completó. El test `test_concurrent_http_callers_do_work_once` reproduce en el baseline la incompatibilidad del fixture `slow(payload)` con el argumento `project_context`; el diagnóstico se detuvo antes de un resumen de suite y no se atribuye a V3.
+- WHAT_REMAINS: las limitaciones anteriores permanecen sin PASS y solo se revalidan si una dependencia contractual indispensable lo requiere o HUMAN-LUCAS autoriza un gate posterior. No se amplía aquí J04 ni se transfieren garantías a J05.
+- J05_ENTRY_ASSESSMENT_ELIGIBLE: YES; J05 permanece NOT_OPENED y requiere autorización propia.
+- EVIDENCE_REUSABLE_IF: identidad S15, propietario, fuente y revisión del contexto coinciden con el gate receptor.
+- REVALIDATE_IF: cambian identidad, estructura, fuentes, operación que consume contexto o reglas de selección/revisión.
 - DEPENDENCIES: S15 y acceso gobernado al proyecto.
 
 ### J05 — Project Memory

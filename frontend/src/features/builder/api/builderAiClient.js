@@ -14,6 +14,7 @@ export async function buildWithBuilderAI({
   mode = "build",
   apiBaseUrl = "",
   serverRevision,
+  contextUse = "formatting_only",
 } = {}) {
   if (!userInput || !String(userInput).trim()) {
     throw new Error("Falta userInput para Builder AI.");
@@ -21,7 +22,7 @@ export async function buildWithBuilderAI({
 
   const baseUrl = normalizeBaseUrl(apiBaseUrl);
   const body = {
-    userInput: String(userInput).trim(), currentBuildState, projectId, userId, mode,
+    userInput: String(userInput).trim(), currentBuildState, projectId, userId, mode, contextUse,
   };
   return runEconomicRequest(`${baseUrl}${BUILDER_AI_ENDPOINT}`, {body, serverRevision}, async (key) => {
   const response = await fetch(`${baseUrl}${BUILDER_AI_ENDPOINT}`, {
