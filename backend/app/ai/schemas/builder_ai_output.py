@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 
 BuilderMode = Literal["build", "iterate", "repair"]
+ContextUse = Literal["project_overview", "recommendation_review", "formatting_only"]
 ProjectKind = Literal["landing", "web", "app", "dashboard", "logo", "component", "unknown"]
 
 
@@ -15,6 +16,7 @@ class BuilderAIInput(BaseModel):
     projectId: Optional[str] = None
     userId: Optional[str] = None
     mode: BuilderMode = "build"
+    contextUse: ContextUse = "formatting_only"
 
 
 class BuilderAIMutation(BaseModel):

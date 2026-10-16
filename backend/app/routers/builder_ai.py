@@ -16,6 +16,10 @@ from backend.app.ai.telemetry.agent_trace import build_trace
 from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
+from backend.app.services.project_context_snapshot import (
+    ProjectContextSnapshotError,
+    build_project_context_snapshot,
+)
 from backend.app.services.economic_operation import (
     request_fingerprint, request_operation_id, run_economic_operation,
 )
@@ -210,6 +214,7 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
 
     project = None
     expected = None
+    project_context = None
     if payload.projectId is not None and (not isinstance(payload.projectId, str) or not payload.projectId.strip()):
         raise HTTPException(400, detail={"code": "invalid_project_identity"})
     state_project = (payload.currentBuildState or {}).get("projectId")
@@ -231,6 +236,21 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
                 status_code=404,
                 detail="Project not found",
             )
+        try:
+            project_context = build_project_context_snapshot(
+                project,
+                project_id=payload.projectId,
+                expected_revision=expected,
+                context_use=payload.contextUse,
+            )
+        except ProjectContextSnapshotError as exc:
+            status_code = 409 if exc.code == "stale_project_revision" else 422
+            raise HTTPException(status_code, detail={"code": exc.code}) from exc
+    elif payload.contextUse != "formatting_only":
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "project_context_requires_project"},
+        )
 
     consumption_payload = build_builder_consumption_request(
         user=user,
@@ -256,7 +276,22 @@ async def build_with_ai(payload: BuilderAIInput, request: Request):
             }
         )
 
-        result = await run_builder_agent(safe_payload)
+        if project:
+            current_before_agent = await db.projects.find_one(
+                {
+                    "project_id": payload.projectId,
+                    "user_id": user["user_id"],
+                },
+                {"_id": 0, "updated_at": 1},
+            )
+            if not current_before_agent:
+                raise HTTPException(404, detail="Project not found")
+            assert_project_revision(current_before_agent, expected)
+
+        result = await run_builder_agent(
+            safe_payload,
+            project_context=project_context,
+        )
         if project:
             current = await db.projects.find_one({"project_id": payload.projectId, "user_id": user["user_id"]})
             if not current:
