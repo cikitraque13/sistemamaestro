@@ -1,12 +1,28 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — 2026-10-11
+## Estado vigente — 2026-10-16
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
 [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del cierre y validaciones de Journey 03; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está OPEN, con estado técnico NOT_DEMONSTRATED y ejecución ON_HOLD. La primera actividad obligatoria S18 es revisar todas las escrituras activas en modo READ-ONLY. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) contiene los estados y límites de aceptación.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones y J04 permanece NOT_OPENED. La revisión READ-ONLY de escrituras activas fue la primera actividad obligatoria de S18 y se completó con limitaciones de alcance; no valida la máquina de estados completa ni autoriza modificar esas escrituras. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y límites de aceptación.
+
+## Inventario vigente de checkpoints — 2026-10-16
+
+En `Backups/GOLD` hay exactamente tres checkpoints directos:
+
+| Gold vigente | Payload verificado |
+|---|---:|
+| `GOLD_FREEZE_POST_J03_2026-10-16` | 414 / 414 |
+| `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` | 413 / 413 |
+| `GOLD_FREEZE_POST_SANITATION_PRE_S18_2026-10-10` | 415 / 415 |
+
+La verificación registrada encontró cero archivos ausentes o extra y cero discrepancias de tamaño o SHA-256. En `Backups/EVIDENCE` hay exactamente dos paquetes: `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` y `HISTORICAL_CONSOLIDATED_PRE_J04_2026-10-16`. El paquete consolidado conserva el archivo histórico y el paquete de preservación local: 5.595 / 5.595 archivos verificados; digest global `4f8aa07bcd71a631009a30a9b0f7e9b89a410f869d27d225120bc0fb4740a021`; SHA-256 del manifiesto `19057fdc6cd6c01bf84cad315ab399086a28e3c991caf868199ef8f95a59ef38`.
+
+Los registros de restauración disponibles consignan: para `GOLD_FREEZE_POST_J03_2026-10-16`, `files_restored=414` y `all_sha256_match=True`; para el paquete Evidence `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11`, `result=PASS`, `file_count=413` y comparación exacta de archivos, rutas, SHA-256 y Git blob; para `HISTORICAL_CONSOLIDATED_PRE_J04_2026-10-16`, `result=PASS` con tres `restoredPaths`. Estos resultados son registros existentes; no se reejecutaron ni verificaron de forma independiente durante esta revisión final.
+
+Límites restantes: no se usó un escáner dedicado de secretos ni se certifica ausencia absoluta; las revisiones QA/SEC previas no quedaron vinculadas a un target identificable y no se presentan aquí como acreditación independiente de este inventario. Los registros Gold posteriores en este documento conservan sus nombres y datos de origen; sus rutas son referencias históricas de creación. Los snapshots que ya no figuran entre los tres Gold directos se preservan en el archivo consolidado, no se reclasifican como actuales ni se eliminan por esta actualización.
 
 El checkpoint canónico de entrada a S14 y los Gold posteriores se conservan como evidencia histórica; el estado vigente de producción/runtime se registra en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
 
@@ -141,6 +157,8 @@ El checkpoint preserva el candidato S16 antes de su publicación. El cierre y lo
 - MANIFEST_SHA256: cf26de2ad77255bc18679d6349e2139de6836e39c6653724b0d2d4914bec6572
 - SECRETS_INCLUDED: NO; secret scan matches: 0; RESTORE_CHECK: PASS
 - PREVIOUS_GOLDS_PRESERVED: YES; WORKTREE_CLEAN: YES en el checkout local usado para crear el freeze.
+
+Las declaraciones `SECRETS_INCLUDED: NO` y `secret scan matches: 0` de este registro describen exclusivamente el resultado histórico consignado para ese Gold; no certifican el inventario vigente ni el contenido actual de otros paquetes.
 
 El Gold congela el commit de GitHub main. El checkout local estaba en el candidato S15 y limpio; su tree coincide con el source tree congelado.
 
