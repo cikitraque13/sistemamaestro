@@ -1,21 +1,41 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado publicado y documental — 2026-10-16
+## Release operativo de código J04 — 2026-10-17
 
 | Plano | Identidad y estado |
 |---|---|
-| GitHub main | `c35e16bbb73536620fa8991044a05ceb6458c533` |
-| GitHub tree | `a680fb4acbafa2c96f87fdd42f8f09f36b0ec465` |
+| GitHub main en la publicación del código J04 | `3da6a26d446994ac48cc1ce287b49df98c37a55e` |
+| GitHub tree | `58379c6775dc038c0fe7fcb77e18732829c69639` |
+| PR J04 | #94 MERGED; candidato `64d2f781afd61cdce36d6e0567450fd227b54f7c` |
 | J03 | CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS |
 | S17 | CLOSED_BY_HUMAN_ACCEPTANCE; sin TECHNICAL_PASS del harness E2E |
 | S18 | CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS; estado técnico PARTIAL; TECHNICAL_PASS=NO |
-| J04 | NOT_OPENED |
-| Correspondencia Railway/main después de esta publicación | NO VERIFICADA; la última observación live registrada abajo corresponde al SHA `ead9f4e796f9e2be89a8d0b7948364edbf67066b` del 2026-10-10 |
-| Actual build provenance | UNVERIFIED |
+| J04 | CLOSED_BY_HUMAN_ACCEPTANCE; TECHNICAL_STATUS=PARTIAL; TECHNICAL_PASS=NO |
+| J05 | ENTRY_ASSESSMENT_ELIGIBLE=YES; NOT_OPENED |
+| Railway deployment | `ea3d3c10-2ec7-4a58-91ff-75922795ca4e`; SUCCESS; deployed SHA `3da6a26d446994ac48cc1ce287b49df98c37a55e` (main en el momento del release) |
+| Health | GET `/health` respondió HTTP 200 |
+| Checks de PR #94 | 0 checks y estado combinado vacío; CI no acreditado para este commit |
+| Procedencia efectiva del build | UNVERIFIED |
 
-Esta tabla registra la identidad publicada del repositorio y los estados documentales de los gates; no es una observación nueva de Railway. El deployment, servicio, builder, endpoint de salud y configuración live descritos abajo corresponden a la observación del 2026-10-10 y no deben tratarse como vigentes después de publicar `c35e16b` sin evidencia nueva.
+Esta observación separa identidad publicada, estado live y límites de verificación. La observación anterior del 2026-10-10 se conserva como historial más abajo.
 
-## Última observación live registrada — 2026-10-10
+## Observación de publicación J04 — 2026-10-17
+
+| Verificación | Resultado observado |
+|---|---|
+| GitHub PR #94 | MERGED; merge commit `3da6a26d446994ac48cc1ce287b49df98c37a55e` |
+| Railway deployment | `ea3d3c10-2ec7-4a58-91ff-75922795ca4e`; SUCCESS; source commit `3da6a26d446994ac48cc1ce287b49df98c37a55e` |
+| Railway live builder | `RAILPACK`; el repositorio declara `DOCKERFILE` |
+| Build provenance efectiva | UNVERIFIED; no se infiere cómo se seleccionó la configuración efectiva |
+| Health | `GET /health` HTTP 200 |
+| Servicio | `sistemamaestro`; deployment live SUCCESS; sin fallos recientes ni avisos/alertas en la consulta |
+| Builder | La ruta de workspace renderizó controles del Builder; no se envió una solicitud de generación ni se consumieron créditos |
+| Blueprint | No se ejecutó la generación en producción: la operación realiza consumo económico; la ruta se conserva como validada por pruebas sintéticas focalizadas, no por este smoke |
+| CI | PR #94 mostró cero checks; el estado combinado consultado no contenía estados. CI=NO_ACREDITADO |
+
+Las comprobaciones de Builder acreditan carga de la interfaz observada, no persistencia, comportamiento completo ni generación de IA. La generación de blueprint y las llamadas económicas permanecen sin verificación de producción. J04 conserva `CLOSED_BY_HUMAN_ACCEPTANCE`, `TECHNICAL_STATUS=PARTIAL` y `TECHNICAL_PASS=NO`.
+
+## Observación histórica anterior — 2026-10-10
 
 | Plano | Identidad y estado observado |
 |---|---|
