@@ -1,17 +1,31 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado operativo vigente — 2026-10-17
+## Estado operativo — referencia y última observación registrada
+
+`GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`), no un SHA que este documento deba mantener actualizado en cada cambio documental. Los identificadores siguientes son una observación fechada y un historial de publicaciones; no afirman cuál es el estado live en una fecha posterior.
+
+### Última observación registrada — 2026-10-17, después de PR #96
 
 | Plano | Identidad y estado observado |
 |---|---|
-| GitHub main | `decc927145cae257b89140cf098b902d206ab206` |
-| PR documental #95 | MERGED; main contiene el cierre documental operativo J04 |
-| Railway deployment vigente | `9c61ccb8-c452-459f-b840-0bdbbdca7911`; SUCCESS; source commit `decc927145cae257b89140cf098b902d206ab206` |
-| Deployment anterior | `ea3d3c10-2ec7-4a58-91ff-75922795ca4e`; estado observado `REMOVED`; source commit `3da6a26d446994ac48cc1ce287b49df98c37a55e` |
-| Salud HTTP del deployment vigente | No comprobada en esta reconciliación |
+| GitHub main en esta observación | `62c49a4edba14837fad2ccb4f49fc5a8de209034` |
+| PR documental #96 | MERGED; merge SHA `62c49a4edba14837fad2ccb4f49fc5a8de209034` |
+| Railway deployment observado | `d143f96c-d2c6-462b-a2b5-4ed9c10c9882`; SUCCESS; source commit `62c49a4edba14837fad2ccb4f49fc5a8de209034` |
+| Comprobación HTTP del deployment observado | No realizada; no se afirma un resultado de health |
 | Procedencia efectiva del build | UNVERIFIED |
 
-El estado `SUCCESS` acredita el resultado reportado por Railway para el deployment vigente y su commit de origen. No se atribuye a este deployment una respuesta HTTP de health que no se comprobó en esta revisión. La observación histórica HTTP 200 del deployment anterior permanece en su sección histórica.
+`SUCCESS` refleja el estado reportado para ese deployment en la observación indicada. El estado live puede cambiar posteriormente; este registro no se actualiza por cada commit documental. Se añade una observación nueva cuando se verifica un cambio de runtime o deployment, conservando las anteriores como historial.
+
+### Historial reciente de deployments
+
+| Observación | Railway deployment | Estado observado | Source commit | Referencia de publicación |
+|---|---|---|---|---|
+| Deployment inmediatamente anterior a PR #96 | `9c61ccb8-c452-459f-b840-0bdbbdca7911` | SUCCESS | `decc927145cae257b89140cf098b902d206ab206` | Estado documentado antes del merge de PR #96 |
+| Después de PR #96, observado el 2026-10-17 | `d143f96c-d2c6-462b-a2b5-4ed9c10c9882` | SUCCESS | `62c49a4edba14837fad2ccb4f49fc5a8de209034` | PR #96 MERGED |
+
+No se comprobó HTTP health para el deployment `d143f96c-d2c6-462b-a2b5-4ed9c10c9882`. La procedencia efectiva del build continúa `UNVERIFIED`. Los valores anteriores son observaciones fechadas, no garantías de estado actual ni evidencia de pruebas de producción no ejecutadas.
+
+J04 permanece `CLOSED_BY_HUMAN_ACCEPTANCE`, `TECHNICAL_STATUS=PARTIAL` y `TECHNICAL_PASS=NO`. J05 permanece `NOT_OPENED`.
 
 ## Release operativo de código J04 — histórico, 2026-10-17
 
