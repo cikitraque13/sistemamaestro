@@ -8,17 +8,21 @@ Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegu
 
 S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J05_ENTRY_ASSESSMENT_ELIGIBLE=YES y J05 permanece NOT_OPENED. La revisión READ-ONLY de escrituras activas fue la primera actividad obligatoria de S18 y se completó con limitaciones de alcance; no valida la máquina de estados completa ni autoriza modificar esas escrituras. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y límites de aceptación.
 
-## Inventario vigente de checkpoints — 2026-10-16
+## Inventario observado de checkpoints — 2026-10-17
 
-En `Backups/GOLD` hay exactamente tres checkpoints directos:
+La inspección local observó cinco directorios bajo `Backups/GOLD` y dos paquetes bajo `Backups/EVIDENCE`. La presencia en disco se distingue de la acreditación de integridad, restauración o exclusión de secretos.
 
-| Gold vigente | Payload verificado |
-|---|---:|
-| `GOLD_FREEZE_POST_J03_2026-10-16` | 414 / 414 |
-| `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` | 413 / 413 |
-| `GOLD_FREEZE_POST_SANITATION_PRE_S18_2026-10-10` | 415 / 415 |
+| Gold observado | Evidencia registrada | Estado en este inventario |
+|---|---|---|
+| `GOLD_FREEZE_POST_J03_2026-10-16` | 414 / 414; digest y restauración PASS constan en registros previos | Acreditación previa conservada; no repetida aquí |
+| `GOLD_FREEZE_POST_S17_PRE_J04_2026-10-16` | Manifiesto y registro de restauración consignan 414 / 414 archivos; origen `16a6daf6fbce3886df728131f7ee5b4fa373bec9`, tree `0884bbcb0fe93112363418df4f8b9a978ef16685`, digest `d0a409f84c8ce7f13895f45df9a381d876c1941c138218c36acbd97616e90966`; la restauración registra 414 archivos restaurados y `all_sha256_match=True` | Integridad/restauración registradas como verificadas; evidencia de registros existentes, no una revalidación independiente en esta revisión. La exclusión de secretos conserva su propia limitación |
+| `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` | 413 / 413 y restauración PASS constan en registros previos | Acreditación previa conservada; no repetida aquí |
+| `GOLD_FREEZE_POST_SANITATION_PRE_S18_2026-10-10` | 415 / 415; digest, restauración y QA/SEC con reservas constan en registros previos | Acreditación previa conservada con sus reservas; no repetida aquí |
+| `GOLD_FREEZE_POST_J04_2026-10-17` | Origen `decc927145cae257b89140cf098b902d206ab206`, tree `55c9ead39e98019cc3de73492e7aaa31cfdb850a`, 416 / 416, SHA-256 coincidente, digest `f28d606ec5ac23eab0c3e9b2c60347f4beaeaef741365bb6729d555f36dd7e55`; restauración aislada PASS | Integridad y restauración registradas PASS; revisión de exclusión de valores secretos pendiente/inconclusa: filtro de rutas PASS, escaneo de valores UNVERIFIED |
 
-La verificación registrada encontró cero archivos ausentes o extra y cero discrepancias de tamaño o SHA-256. En `Backups/EVIDENCE` hay exactamente dos paquetes: `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` y `HISTORICAL_CONSOLIDATED_PRE_J04_2026-10-16`. El paquete consolidado conserva el archivo histórico y el paquete de preservación local: 5.595 / 5.595 archivos verificados; digest global `4f8aa07bcd71a631009a30a9b0f7e9b89a410f869d27d225120bc0fb4740a021`; SHA-256 del manifiesto `19057fdc6cd6c01bf84cad315ab399086a28e3c991caf868199ef8f95a59ef38`.
+En `Backups/EVIDENCE` se observaron exactamente dos paquetes: `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` y `HISTORICAL_CONSOLIDATED_PRE_J04_2026-10-16`. El paquete consolidado conserva el archivo histórico y el paquete de preservación local: 5.595 / 5.595 archivos verificados; digest global `4f8aa07bcd71a631009a30a9b0f7e9b89a410f869d27d225120bc0fb4740a021`; SHA-256 del manifiesto `19057fdc6cd6c01bf84cad315ab399086a28e3c991caf868199ef8f95a59ef38`.
+
+El Gold POST-J04 contiene 416 archivos de payload verificados y sus metadatos registran tres rutas de entorno excluidas, cero rutas incluidas nombradas como credencial/secreto, y una restauración aislada con 416 hashes coincidentes. `value_level_scan=UNVERIFIED`: GitHub secret scanning está deshabilitado y no hay escáner local dedicado; no se inspeccionaron valores. Por tanto, el estado del Gold no certifica ausencia absoluta de secretos. No se modificaron ni revalidaron los Gold o Evidence anteriores durante esta actualización.
 
 Los registros de restauración disponibles consignan: para `GOLD_FREEZE_POST_J03_2026-10-16`, `files_restored=414` y `all_sha256_match=True`; para el paquete Evidence `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11`, `result=PASS`, `file_count=413` y comparación exacta de archivos, rutas, SHA-256 y Git blob; para `HISTORICAL_CONSOLIDATED_PRE_J04_2026-10-16`, `result=PASS` con tres `restoredPaths`. Estos resultados son registros existentes; no se reejecutaron ni verificaron de forma independiente durante esta revisión final.
 

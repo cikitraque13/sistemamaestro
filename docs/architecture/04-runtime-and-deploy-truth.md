@@ -1,6 +1,19 @@
 # 04 — Runtime and Deploy Truth
 
-## Release operativo de código J04 — 2026-10-17
+## Estado operativo vigente — 2026-10-17
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `decc927145cae257b89140cf098b902d206ab206` |
+| PR documental #95 | MERGED; main contiene el cierre documental operativo J04 |
+| Railway deployment vigente | `9c61ccb8-c452-459f-b840-0bdbbdca7911`; SUCCESS; source commit `decc927145cae257b89140cf098b902d206ab206` |
+| Deployment anterior | `ea3d3c10-2ec7-4a58-91ff-75922795ca4e`; estado observado `REMOVED`; source commit `3da6a26d446994ac48cc1ce287b49df98c37a55e` |
+| Salud HTTP del deployment vigente | No comprobada en esta reconciliación |
+| Procedencia efectiva del build | UNVERIFIED |
+
+El estado `SUCCESS` acredita el resultado reportado por Railway para el deployment vigente y su commit de origen. No se atribuye a este deployment una respuesta HTTP de health que no se comprobó en esta revisión. La observación histórica HTTP 200 del deployment anterior permanece en su sección histórica.
+
+## Release operativo de código J04 — histórico, 2026-10-17
 
 | Plano | Identidad y estado |
 |---|---|
@@ -12,8 +25,8 @@
 | S18 | CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS; estado técnico PARTIAL; TECHNICAL_PASS=NO |
 | J04 | CLOSED_BY_HUMAN_ACCEPTANCE; TECHNICAL_STATUS=PARTIAL; TECHNICAL_PASS=NO |
 | J05 | ENTRY_ASSESSMENT_ELIGIBLE=YES; NOT_OPENED |
-| Railway deployment | `ea3d3c10-2ec7-4a58-91ff-75922795ca4e`; SUCCESS; deployed SHA `3da6a26d446994ac48cc1ce287b49df98c37a55e` (main en el momento del release) |
-| Health | GET `/health` respondió HTTP 200 |
+| Railway deployment en el momento de la observación | `ea3d3c10-2ec7-4a58-91ff-75922795ca4e`; SUCCESS entonces; posteriormente observado como REMOVED; deployed SHA `3da6a26d446994ac48cc1ce287b49df98c37a55e` |
+| Health del deployment anterior | GET `/health` respondió HTTP 200 en la observación de entonces; no representa una comprobación del deployment vigente |
 | Checks de PR #94 | 0 checks y estado combinado vacío; CI no acreditado para este commit |
 | Procedencia efectiva del build | UNVERIFIED |
 
