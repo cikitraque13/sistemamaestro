@@ -2,7 +2,7 @@
 
 ## Estado del documento
 
-- Estado: activo; consolidación local de J04 con cierre humano limitado al 2026-10-17.
+- Estado: activo; documentación canónica de J04 publicada con cierre humano limitado al 2026-10-17.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
 - S14–S18: consultar los propietarios de madurez, producción/runtime e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,

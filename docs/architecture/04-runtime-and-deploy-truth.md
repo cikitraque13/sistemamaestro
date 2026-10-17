@@ -4,7 +4,7 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`), no un SHA que este documento deba mantener actualizado en cada cambio documental. Los identificadores siguientes son una observación fechada y un historial de publicaciones; no afirman cuál es el estado live en una fecha posterior.
 
-### Última observación registrada — 2026-10-17, después de PR #96
+### Observación anterior — 2026-10-17, después de PR #96
 
 | Plano | Identidad y estado observado |
 |---|---|
@@ -24,6 +24,18 @@
 | Después de PR #96, observado el 2026-10-17 | `d143f96c-d2c6-462b-a2b5-4ed9c10c9882` | SUCCESS | `62c49a4edba14837fad2ccb4f49fc5a8de209034` | PR #96 MERGED |
 
 No se comprobó HTTP health para el deployment `d143f96c-d2c6-462b-a2b5-4ed9c10c9882`. La procedencia efectiva del build continúa `UNVERIFIED`. Los valores anteriores son observaciones fechadas, no garantías de estado actual ni evidencia de pruebas de producción no ejecutadas.
+
+### Observación posterior a PR #97 — 2026-10-17
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main durante esta observación | `7136dc77522db3c024c0658e01b55f63ad71e127` |
+| PR documental #97 | MERGED; merge SHA `7136dc77522db3c024c0658e01b55f63ad71e127` |
+| Railway deployment observado | `a2700d22-1ac7-430a-bbd3-fa4ba7d1d523`; SUCCESS; source commit `7136dc77522db3c024c0658e01b55f63ad71e127` |
+| Comprobación HTTP observada | GET `/health` respondió HTTP 200 |
+| Procedencia efectiva del build | UNVERIFIED |
+
+Esta es una observación fechada, no una identidad permanente de `main` ni una afirmación sobre deployments posteriores. `SUCCESS` y HTTP 200 se limitan a las comprobaciones indicadas; no acreditan otros recorridos de producción. La procedencia efectiva del build continúa sin verificarse.
 
 J04 permanece `CLOSED_BY_HUMAN_ACCEPTANCE`, `TECHNICAL_STATUS=PARTIAL` y `TECHNICAL_PASS=NO`. J05 permanece `NOT_OPENED`.
 
