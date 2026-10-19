@@ -6,6 +6,10 @@ from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
 
+from backend.app.ai.memory.project_memory import (
+    ProjectMemoryError,
+    build_project_memory,
+)
 from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
@@ -535,6 +539,20 @@ async def create_blueprint(project_id: str, request: Request):
         blueprint_context = {
             item["field"]: item["value"] for item in snapshot["items"]
         }
+        try:
+            project_memory = build_project_memory(
+                live_project,
+                owner_id=user["user_id"],
+                project_id=project_id,
+                expected_revision=expected,
+            )
+        except ProjectMemoryError as exc:
+            status_code = 409 if exc.code == "stale_project_revision" else 422
+            raise HTTPException(status_code, detail={"code": exc.code}) from exc
+
+        # Use the projection only as the source of the already-existing value.
+        # Its identity and provenance metadata never enter the provider payload.
+        blueprint_context["refine_answers"] = project_memory["answers"]
         blueprint = await generate_blueprint(blueprint_context)
         revision = next_project_revision(expected)
         try:
