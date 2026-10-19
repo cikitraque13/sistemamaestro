@@ -36,6 +36,9 @@ class ProjectIdentityTests(f.ChargedCallerFixture):
         self.assertEqual(result['updated_at'], self.identity['revision'])
         self.assertEqual(self.db.projects.insert_count, 1)
     async def test_refine_owner_and_cas_and_no_replay(self):
+        self.db.projects.documents['project_test']['refine_questions'] = [
+            {'id': 'x', 'question': 'Synthetic question?'}
+        ]
         before = deepcopy(self.db.projects.documents)
         with patch.object(f.projects, 'get_current_user', return_value={'user_id': 'other'}):
             with self.assertRaises(f.HTTPException):

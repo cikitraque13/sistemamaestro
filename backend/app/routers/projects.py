@@ -38,6 +38,72 @@ router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 logger = logging.getLogger(__name__)
 
+MAX_REFINE_ANSWER_KEY_CHARS = 128
+MAX_REFINE_ANSWER_VALUE_CHARS = 4000
+
+
+def _merge_refine_answers(project, incoming_answers):
+    """Validate current answers while preserving opaque historical entries.
+
+    `refine_answers` is replaced as one map by the existing owner/revision CAS.
+    Keep stored keys that no longer correspond to current questions, but never
+    let a request create or rewrite such a key.
+    """
+    if not isinstance(incoming_answers, dict) or len(incoming_answers) > 100:
+        raise HTTPException(422, detail={"code": "invalid_refine_answers"})
+
+    stored_answers = project.get("refine_answers", {})
+    if not isinstance(stored_answers, dict):
+        raise HTTPException(422, detail={"code": "invalid_stored_refine_answers"})
+
+    changed_entries = {}
+    for key, value in incoming_answers.items():
+        if not isinstance(key, str) or not isinstance(value, str):
+            raise HTTPException(422, detail={"code": "invalid_refine_answer_entry"})
+        # Exact round-trips of stored values are preservation, not new input.
+        # In particular, don't make an old oversized/opaque answer impossible
+        # to carry while the user updates a current answer.
+        if key in stored_answers and stored_answers[key] == value:
+            continue
+        changed_entries[key] = value
+
+    authorized_ids = set()
+    if changed_entries:
+        seen_ids = set()
+        questions = project.get("refine_questions", [])
+        if not isinstance(questions, list):
+            raise HTTPException(422, detail={"code": "invalid_refine_questions"})
+        for question in questions:
+            if not isinstance(question, dict):
+                raise HTTPException(422, detail={"code": "invalid_refine_questions"})
+            question_id = question.get("id")
+            if (
+                not isinstance(question_id, str)
+                or not question_id
+                or question_id != question_id.strip()
+                or len(question_id) > MAX_REFINE_ANSWER_KEY_CHARS
+            ):
+                raise HTTPException(422, detail={"code": "invalid_refine_questions"})
+            if question_id in seen_ids:
+                raise HTTPException(422, detail={"code": "duplicate_refine_question_id"})
+            seen_ids.add(question_id)
+            authorized_ids.add(question_id)
+
+    for key, value in changed_entries.items():
+        if (
+            not key
+            or key != key.strip()
+            or len(key) > MAX_REFINE_ANSWER_KEY_CHARS
+            or len(value) > MAX_REFINE_ANSWER_VALUE_CHARS
+        ):
+            raise HTTPException(422, detail={"code": "invalid_refine_answer_entry"})
+        if key not in authorized_ids:
+            raise HTTPException(422, detail={"code": "unauthorized_refine_answer_id"})
+
+    merged = dict(stored_answers)
+    merged.update(incoming_answers)
+    return merged
+
 
 def project_revision(project):
     if "updated_at" not in project:
@@ -452,6 +518,7 @@ async def refine_project(
         )
 
     assert_project_revision(project, expected)
+    merged_answers = _merge_refine_answers(project, refine_data.answers)
     analysis_for_recommendation = {
         "route": project.get("route", "idea"),
         "diagnosis": project.get("diagnosis", {}),
@@ -463,14 +530,14 @@ async def refine_project(
         input_content=project.get("input_content", ""),
         analysis=analysis_for_recommendation,
         url_analysis=project.get("url_analysis"),
-        refine_answers=refine_data.answers,
+        refine_answers=merged_answers,
     )
 
     updated = await db.projects.find_one_and_update(
         project_cas(project_id, user, expected),
         {
             "$set": {
-                "refine_answers": refine_data.answers,
+                "refine_answers": merged_answers,
                 "plan_recommendation": plan_recommendation,
                 "status": "refined",
                 "updated_at": next_project_revision(expected),
