@@ -1,5 +1,8 @@
 ﻿from backend.app.routers import builder_ai
 import logging
+import asyncio
+from contextlib import suppress
+from backend.app.services.intent_clarification import run_receipt_compaction_worker
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -58,6 +61,7 @@ async def startup_event():
     await db.payment_transactions.create_index("stripe_session_id")
     await db.login_attempts.create_index("identifier")
     await db.newsletter_subscribers.create_index("email", unique=True)
+    app.state.j06_receipt_compaction_task = asyncio.create_task(run_receipt_compaction_worker(db.projects))
 
 
 @app.get("/health")
@@ -96,6 +100,11 @@ async def serve_react(full_path: str):
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    task = getattr(app.state, "j06_receipt_compaction_task", None)
+    if task is not None:
+        task.cancel()
+        with suppress(asyncio.CancelledError):
+            await task
     client.close()
 
 app.include_router(builder_ai.router)

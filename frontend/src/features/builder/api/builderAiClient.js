@@ -48,3 +48,19 @@ export async function buildWithBuilderAI({
 }
 
 export { BUILDER_AI_ENDPOINT };
+
+// Intent requests deliberately bypass economicRequest and BuilderAIOutput.
+export async function submitIntentOperation(body, revision, apiBaseUrl = '') {
+  const response = await fetch(`${normalizeBaseUrl(apiBaseUrl)}${BUILDER_AI_ENDPOINT}`, {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'If-Match': revision },
+    body: JSON.stringify({ ...body, kind: 'intent' }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    const error = new Error(result?.detail?.code || 'PERSISTENCE_UNAVAILABLE');
+    error.code = result?.detail?.code || 'PERSISTENCE_UNAVAILABLE';
+    throw error;
+  }
+  return result;
+}

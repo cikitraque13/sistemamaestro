@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import logging
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union, Annotated
+from pydantic import Discriminator, Tag
 
 from fastapi import APIRouter, HTTPException, Request
 
 from backend.app.ai.agents.builder_agent import run_builder_agent
+from backend.app.ai.schemas.intent_clarification import IntentOperation
+from backend.app.services.intent_clarification import apply_intent, IntentError
 from backend.app.ai.guards.cost_guard import assess_cost
 from backend.app.ai.guards.output_guard import validate_output_shape
 from backend.app.ai.guards.policy_guard import evaluate_policy
@@ -24,6 +27,13 @@ from backend.app.services.economic_operation import (
     request_fingerprint, request_operation_id, run_economic_operation,
 )
 
+
+def _builder_input_kind(value):
+    if isinstance(value, IntentOperation): return "intent"
+    if isinstance(value, dict): return "intent" if value.get("kind") == "intent" else "build"
+    return "build"
+
+BuilderEndpointInput = Annotated[Union[Annotated[IntentOperation, Tag("intent")], Annotated[BuilderAIInput, Tag("build")]], Discriminator(_builder_input_kind)]
 
 router = APIRouter(prefix="/api/builder", tags=["builder-ai"])
 logger = logging.getLogger(__name__)
@@ -207,8 +217,17 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 
 
 @router.post("/build")
-async def build_with_ai(payload: BuilderAIInput, request: Request):
-    from backend.app.routers.projects import expected_project_revision, assert_project_revision
+async def build_with_ai(payload: BuilderEndpointInput, request: Request):
+    from backend.app.routers.projects import expected_project_revision, assert_project_revision, next_project_revision
+
+    if isinstance(payload, IntentOperation):
+        user = await get_current_user(request)
+        expected = expected_project_revision(request)
+        try:
+            return await apply_intent(db.projects, user["user_id"], payload, expected, revision_factory=next_project_revision)
+        except IntentError as exc:
+            status = 403 if exc.code == "ACCESS_DENIED" else 400 if exc.code == "INVALID_REQUEST" else 503 if exc.code in {"CLASSIFIER_UNAVAILABLE", "PERSISTENCE_UNAVAILABLE"} else 409
+            raise HTTPException(status, detail={"code": exc.code}) from None
 
     # This endpoint currently supports the two operations emitted by the Builder
     # workspace. Keep schema-admitted modes such as `repair` fail-closed before

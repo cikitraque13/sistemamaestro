@@ -744,6 +744,12 @@ export default function useBuilderWorkspaceRuntime({
       const value = String(text || '').trim();
 
       if (!value || !projectReady) return;
+      // Existing-project requests are reviewed in the intent panel; confirmation
+      // does not chain into construction in this first J06.1 slice.
+      if (project?.project_id) {
+        landingTransaction.reject('Revisa la intención en el panel del proyecto. La construcción posterior no está habilitada en J06.1.');
+        return;
+      }
       const requestIdentity = liveIdentity.current;
       if (builderBuildState?.projectKind === 'landing') {
         if (!ownerId || landingTransaction.status !== 'ready') {
