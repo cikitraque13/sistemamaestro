@@ -1,8 +1,8 @@
 # Sistema Maestro
 
-## Estado actual — 2026-10-17
+## Estado actual — 2026-10-20
 
-S14, S15 y S16 están COMPLETED. S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE para el alcance V1–V3, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05_ENTRY_ASSESSMENT_ELIGIBLE=YES; J05 permanece NOT_OPENED. La aceptación humana no acredita garantías técnicas no observadas. El detalle acumulativo de S17/S18 está en el [Registro de garantías pendientes](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md). El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez y el [índice maestro](docs/control/00-INDICE-MAESTRO.md) distribuye la autoridad documental.
+S14, S15 y S16 están COMPLETED. S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 permanece cerrado con limitaciones. J04 sigue CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está técnicamente completada frente a su contrato canónico (`TECHNICAL_PASS=YES`), con riesgos residuales de precisión semántica y cobertura descritos en el roadmap y el registro acumulativo. J06 permanece NOT_OPENED; su evaluación de entrada está pendiente del Gold POST-J05 y requiere decisión expresa de HUMAN-LUCAS. El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez; el [registro acumulativo](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md) conserva limitaciones y revalidación.
 
 La identidad de GitHub main, la observación de Railway y sus diferencias están en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md). El documento [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el registro histórico de esa etapa; no es el estado vigente de S14–S18.
 
@@ -393,7 +393,7 @@ La configuración exacta puede evolucionar, pero a nivel mínimo el backend requ
 ```env
 OPENAI_API_KEY=sk-xxx
 STRIPE_SECRET_KEY=sk_xxx
-MONGO_URL=mongodb+srv://usuario:password@cluster.mongodb.net/sistemamaestro
+MONGO_URL=[MongoDB Atlas connection URI removed; configure credentials privately.]/sistemamaestro
 DB_NAME=sistemamaestro
 JWT_SECRET=clave_segura_larga
 ALLOWED_ORIGINS=http://localhost:3000,https://tu-dominio.com
