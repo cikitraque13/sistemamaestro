@@ -6,7 +6,7 @@ Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 co
 
 ### Frente elegible, no abierto
 
-J06 — Intent + Planning: `NOT_OPENED`; `ENTRY_ASSESSMENT_ELIGIBLE=NO_PENDING_POST_J05_GOLD`. Tras publicación y verificación del cierre documental, crear el checkpoint Gold POST-J05; entonces reevaluar la elegibilidad y esperar decisión expresa de HUMAN-LUCAS. J05 no queda en backlog activo salvo aparición de evidencia material que invalide su cierre.
+J06 — Intent + Planning: `READY / NOT_OPENED`; `ENTRY_ASSESSMENT_ELIGIBLE=YES`. El checkpoint `GOLD_FREEZE_POST_J05_2026-10-20` está creado y registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md), con origen `e7370c323267f5c2f105a3c3b7265ea9723719a7`; integridad y restauración PASS, con las limitaciones de exclusión de secretos allí consignadas. La apertura de J06 sigue requiriendo decisión expresa de HUMAN-LUCAS. J05 no queda en backlog activo salvo aparición de evidencia material que invalide su cierre.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 
