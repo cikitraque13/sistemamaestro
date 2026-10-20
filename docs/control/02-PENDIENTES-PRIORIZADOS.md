@@ -2,7 +2,7 @@
 
 ## Estado operativo vigente — 2026-10-20
 
-Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 conservan sus cierres humanos con limitaciones; J03 está cerrado con limitaciones. J04 permanece CLOSED_BY_HUMAN_ACCEPTANCE, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato, conservando riesgos residuales en el [registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md). El roadmap es propietario de estados y dependencias; el [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) registra la observación de publicación de PR #101; el [inventario técnico](03-INVENTARIO-TECNICO.md) posee Gold/Evidence y Atlas Testing.
+Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 conservan sus cierres humanos con limitaciones; J03 está cerrado con limitaciones. J04 permanece CLOSED_BY_HUMAN_ACCEPTANCE, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato, conservando riesgos residuales en el [registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md). El roadmap es propietario de estados y dependencias; [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) conserva las observaciones históricas y registra la observación más reciente posterior a PR #103; el [inventario técnico](03-INVENTARIO-TECNICO.md) posee Gold/Evidence y Atlas Testing.
 
 ### Frente elegible, no abierto
 

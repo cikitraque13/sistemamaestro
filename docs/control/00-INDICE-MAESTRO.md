@@ -2,7 +2,7 @@
 
 ## Estado del documento
 
-- Estado: activo; documentación canónica reconciliada con J05 técnico cerrado y J06 todavía no abierto (2026-10-20, candidato de reconciliación pendiente de publicación).
+- Estado: activo; última publicación documental registrada: PR #103 (2026-10-20). J05 continúa cerrado y J06 todavía no está abierto.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
 - S14–S18: consultar los propietarios de madurez, producción/runtime e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,

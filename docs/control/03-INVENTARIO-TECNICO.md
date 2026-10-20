@@ -38,6 +38,14 @@ Para J05-V3 se registró `TESTS_COLLECTED=8`, `TESTS_PASSED=8`, `TESTS_FAILED=0`
 
 El inventario local observado el 2026-10-17 conservaba cinco directorios Gold y dos paquetes Evidence; la misma carpeta `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` aparecía bajo Gold y Evidence. Esa observación precede al checkpoint POST-J05 descrito a continuación y no representa el conteo vigente.
 
+## Conteo local observado — 2026-10-20, después de PR #103
+
+Una enumeración local de directorios confirmó seis carpetas bajo `Backups/GOLD` y dos bajo `Backups/EVIDENCE`. Esta comprobación acredita nombres y presencia, no integridad, equivalencia entre copias ni restaurabilidad; no se leyeron ni modificaron los contenidos.
+
+Gold observados: `GOLD_FREEZE_POST_J03_2026-10-16`, `GOLD_FREEZE_POST_J04_2026-10-17`, `GOLD_FREEZE_POST_J05_2026-10-20`, `GOLD_FREEZE_POST_S17_PRE_J04_2026-10-16`, `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` y `GOLD_FREEZE_POST_SANITATION_PRE_S18_2026-10-10`.
+
+Evidence observados: `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` y `HISTORICAL_CONSOLIDATED_PRE_J04_2026-10-16`. El primer nombre también aparece en GOLD; esta enumeración no determina si ambas copias son idénticas o redundantes. No se retiró ni sobrescribió ningún backup.
+
 ## Gold Freeze POST-J05 — 2026-10-20
 
 GOLD=PASS. `GOLD_FREEZE_POST_J05_2026-10-20` está creado en `Backups/GOLD/GOLD_FREEZE_POST_J05_2026-10-20`, desde GitHub main commit `e7370c323267f5c2f105a3c3b7265ea9723719a7` (tree `55e676ebe60ac26ffa7a779a32ad897e56e02c47`). El checkpoint registró 422 / 422 archivos copiados y verificados, SHA-256 coincidentes, digest global `1186BD5225FBBC7537E0BB0C5D143E35FFFBFF38259FF1F1B9BED85750E4154F`, SHA-256 del manifiesto `85F936A0BBF22950206A62E0C2B68ED4DA3F658BACE2494AE6D9377988482585` y restauración aislada PASS. El filtro de exclusión retiró `.env*`, dependencias, cachés, temporales y backups anteriores del conjunto; el escaneo de patrones no encontró coincidencias, pero no constituye certificación absoluta de ausencia de secretos. Los Gold y Evidence anteriores se conservaron.
