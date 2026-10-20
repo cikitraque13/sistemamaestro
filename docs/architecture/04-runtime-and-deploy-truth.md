@@ -4,7 +4,20 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`), no un SHA que este documento deba mantener actualizado en cada cambio documental. Los identificadores siguientes son una observación fechada y un historial de publicaciones; no afirman cuál es el estado live en una fecha posterior.
 
-### Observación posterior a PR #101 — 2026-10-20
+### Observación posterior a PR #103 — 2026-10-20
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `1c45c10255a87759b334d32c9267feb85cba5fb4` |
+| PR documental #103 | MERGED; commit de la rama `4536b97479cd6dba0ff736b16c11a6734a0c42de`; merge commit en main `1c45c10255a87759b334d32c9267feb85cba5fb4` |
+| Railway deployment | `d9f2fc0d-c174-4cc0-a03f-2a6c04c57fab`; SUCCESS; source commit `1c45c10255a87759b334d32c9267feb85cba5fb4` |
+| Health | GET `/health` respondió HTTP 200 |
+| Build provenance | UNVERIFIED |
+| Alcance del cambio publicado | Documentación; no se atribuyen cambios funcionales de producto a PR #103 |
+
+Esta observación acredita la identidad y el estado reportado del deployment, así como la comprobación HTTP indicada en esa fecha. No acredita la procedencia efectiva del build ni pruebas funcionales adicionales en producción. Los identificadores son una observación fechada; `GitHub main` sigue siendo una referencia dinámica.
+
+### Observación anterior posterior a PR #101 — 2026-10-20
 
 | Plano | Identidad y estado observado |
 |---|---|
@@ -29,7 +42,7 @@ La observación acredita correspondencia de identidad del deployment, estado rep
 
 `SUCCESS` refleja el estado reportado para ese deployment en la observación indicada. El estado live puede cambiar posteriormente; este registro no se actualiza por cada commit documental. Se añade una observación nueva cuando se verifica un cambio de runtime o deployment, conservando las anteriores como historial.
 
-### Historial reciente de deployments
+### Historial de deployments anteriores a PR #103
 
 | Observación | Railway deployment | Estado observado | Source commit | Referencia de publicación |
 |---|---|---|---|---|
