@@ -8,6 +8,7 @@ import { api } from '../../../lib/apiClient';
 import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
+import IntentClarification from '../panels/IntentClarification';
 
 import builderProjects from '../data/builderProjects';
 import builderWorkspaceTabs from '../data/builderWorkspaceTabs';
@@ -348,6 +349,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}
       contextBody={contextBody}
     >
+      {resolved && !selectionError && <IntentClarification key={`${ownerId}:${resolved.project_id}`} project={resolved} ownerId={ownerId} />}
       <BuilderWorkspaceLayout
         key={JSON.stringify([ownerId, selectionKey, resolved?.updated_at])}
         ownerId={ownerId}
