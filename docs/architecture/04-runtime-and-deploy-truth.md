@@ -1,8 +1,21 @@
 # 04 — Runtime and Deploy Truth
 
-## Estado operativo — referencia y última observación registrada
+## Referencia dinámica e historial selectivo de observaciones fechadas
 
-`GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`), no un SHA que este documento deba mantener actualizado en cada cambio documental. Los identificadores siguientes son una observación fechada y un historial de publicaciones; no afirman cuál es el estado live en una fecha posterior.
+`GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`). Las entradas siguientes son observaciones históricas fechadas, no un indicador exhaustivo de la última PR ni de cada deployment. Una PR exclusivamente documental y su autodeployment no obligan por sí solos a actualizar esta sección. Se registra una observación nueva cuando un gate requiere ese checkpoint o se verifica un cambio operativo relevante; el estado live actual debe comprobarse en GitHub y Railway cuando corresponda.
+
+### Observación posterior a PR #104 — 2026-10-20
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `589a6bb387afb367d400eac54ee84df0f4eec6e0` |
+| PR documental #104 | MERGED; merge commit en main `589a6bb387afb367d400eac54ee84df0f4eec6e0` |
+| Railway deployment | `f09d6a65-a6bc-411f-bf96-7389c9c8ebed`; SUCCESS; source commit `589a6bb387afb367d400eac54ee84df0f4eec6e0` |
+| Health | GET `/health` respondió HTTP 200 |
+| Build provenance | UNVERIFIED |
+| Alcance del cambio publicado | Documentación; no se atribuyen cambios funcionales de producto a PR #104 |
+
+Esta observación registra el checkpoint verificado tras PR #104. No certifica la procedencia efectiva del build ni recorridos funcionales de producción. La identidad de main y el estado live posteriores deben verificarse cuando un gate lo requiera.
 
 ### Observación posterior a PR #103 — 2026-10-20
 
@@ -40,7 +53,7 @@ La observación acredita correspondencia de identidad del deployment, estado rep
 | Comprobación HTTP del deployment observado | No realizada; no se afirma un resultado de health |
 | Procedencia efectiva del build | UNVERIFIED |
 
-`SUCCESS` refleja el estado reportado para ese deployment en la observación indicada. El estado live puede cambiar posteriormente; este registro no se actualiza por cada commit documental. Se añade una observación nueva cuando se verifica un cambio de runtime o deployment, conservando las anteriores como historial.
+`SUCCESS` refleja el estado reportado para ese deployment en la observación indicada. El estado live puede cambiar posteriormente; las observaciones son históricas y selectivas, no un changelog de cada commit, PR documental o autodeployment. Se añade una observación cuando un gate requiere el checkpoint o se verifica un cambio operativo relevante, conservando las anteriores como historial.
 
 ### Historial de deployments anteriores a PR #103
 
