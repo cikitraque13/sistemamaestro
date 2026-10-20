@@ -191,6 +191,7 @@ class ProjectIdentityTests(f.ChargedCallerFixture):
             'updated_at': '2026-10-16T12:00:00+00:00',
             'route': 'idea', 'diagnosis': {'summary': 'synthetic diagnosis'},
             'input_content': 'synthetic project',
+            'refine_questions': [{'id': 'audience', 'question': 'Synthetic audience?'}],
             'refine_answers': {'audience': 'synthetic'},
             'url_analysis': {'title': 'synthetic page'},
             'plan_recommendation': {'scores': {'complexity': 4}},

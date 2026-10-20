@@ -21,6 +21,11 @@ from backend.app.services.economic_operation import (
 )
 from backend.app.services.credits import get_credit_operation
 from backend.app.services.plan_recommendation import build_plan_recommendation
+from backend.app.services.project_memory_conflicts import (
+    MemoryReviewError,
+    input_digest as project_memory_input_digest,
+    review_project_memory,
+)
 from backend.app.services.project_context_snapshot import (
     ProjectContextSnapshotError,
     build_project_context_snapshot,
@@ -138,6 +143,22 @@ def project_cas(project_id, user, expected):
 def assert_project_revision(project, expected):
     if project_revision(project) != expected:
         raise HTTPException(409, detail={"code": "stale_project_revision"})
+
+
+async def assert_project_memory_compatible(project):
+    try:
+        review = await review_project_memory(project)
+    except MemoryReviewError as exc:
+        detail = {"code": exc.code}
+        if exc.question_ids:
+            detail["question_ids"] = list(exc.question_ids)
+        raise HTTPException(exc.status_code, detail=detail) from exc
+    if review.groups:
+        kind = "project_memory_conflict" if any(
+            group["kind"] == "conflict" for group in review.groups
+        ) else "project_memory_uncertain"
+        raise HTTPException(409, detail={"code": kind, "groups": list(review.groups)})
+    return review
 
 
 def next_project_revision(expected):
@@ -519,6 +540,8 @@ async def refine_project(
 
     assert_project_revision(project, expected)
     merged_answers = _merge_refine_answers(project, refine_data.answers)
+    proposed_project = {**project, "refine_answers": merged_answers}
+    await assert_project_memory_compatible(proposed_project)
     analysis_for_recommendation = {
         "route": project.get("route", "idea"),
         "diagnosis": project.get("diagnosis", {}),
@@ -569,8 +592,35 @@ async def create_blueprint(project_id: str, request: Request):
         )
 
     prior_operation = await get_credit_operation(user["user_id"], operation_id)
+    # A completed idempotent replay returns its durable result without another
+    # provider call. A new attempt is checked before any economic reservation.
     if prior_operation is None:
         assert_project_revision(project, expected)
+        try:
+            context_snapshot = build_project_context_snapshot(
+                project,
+                project_id=project_id,
+                expected_revision=expected,
+                context_use="blueprint_generation",
+            )
+        except ProjectContextSnapshotError as exc:
+            status_code = 409 if exc.code == "stale_project_revision" else 422
+            raise HTTPException(status_code, detail={"code": exc.code}) from exc
+        try:
+            project_memory = build_project_memory(
+                project,
+                owner_id=user["user_id"],
+                project_id=project_id,
+                expected_revision=expected,
+            )
+        except ProjectMemoryError as exc:
+            status_code = 409 if exc.code == "stale_project_revision" else 422
+            raise HTTPException(status_code, detail={"code": exc.code}) from exc
+        memory_review = await assert_project_memory_compatible(project)
+    else:
+        context_snapshot = None
+        project_memory = None
+        memory_review = None
 
     consumption_payload = build_project_consumption_request(
         user=user,
@@ -592,35 +642,27 @@ async def create_blueprint(project_id: str, request: Request):
         )
         if not live_project:
             raise HTTPException(404, detail="Project not found")
-        try:
-            snapshot = build_project_context_snapshot(
-                live_project,
-                project_id=project_id,
-                expected_revision=expected,
-                context_use="blueprint_generation",
-            )
-        except ProjectContextSnapshotError as exc:
-            status_code = 409 if exc.code == "stale_project_revision" else 422
-            raise HTTPException(status_code, detail={"code": exc.code}) from exc
+        assert_project_revision(live_project, expected)
+        if project_memory_input_digest(live_project) != memory_review.digest:
+            raise HTTPException(409, detail={"code": "stale_project_revision"})
 
         blueprint_context = {
-            item["field"]: item["value"] for item in snapshot["items"]
+            item["field"]: item["value"] for item in context_snapshot["items"]
         }
-        try:
-            project_memory = build_project_memory(
-                live_project,
-                owner_id=user["user_id"],
-                project_id=project_id,
-                expected_revision=expected,
-            )
-        except ProjectMemoryError as exc:
-            status_code = 409 if exc.code == "stale_project_revision" else 422
-            raise HTTPException(status_code, detail={"code": exc.code}) from exc
 
         # Use the projection only as the source of the already-existing value.
         # Its identity and provenance metadata never enter the provider payload.
         blueprint_context["refine_answers"] = project_memory["answers"]
         blueprint = await generate_blueprint(blueprint_context)
+        after_provider = await db.projects.find_one(
+            {"project_id": project_id, "user_id": user["user_id"]},
+            {"_id": 0},
+        )
+        if not after_provider:
+            raise HTTPException(404, detail="Project not found")
+        assert_project_revision(after_provider, expected)
+        if project_memory_input_digest(after_provider) != memory_review.digest:
+            raise HTTPException(409, detail={"code": "stale_project_revision"})
         revision = next_project_revision(expected)
         try:
             updated = await db.projects.find_one_and_update(

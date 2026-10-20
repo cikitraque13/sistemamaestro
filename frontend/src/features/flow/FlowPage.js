@@ -30,6 +30,7 @@ import {
   resolveRestoredStep,
   wait
 } from './flow.utils';
+import { mapMemoryReviewGroups, parseMemoryReviewError, questionHasMemoryReview } from './memoryReview.mjs';
 
 import MatrixTransitionOverlay from './components/MatrixTransitionOverlay';
 import FlowResultStep from './steps/FlowResultStep';
@@ -54,6 +55,9 @@ const FlowPage = () => {
   const [recoveringResult, setRecoveringResult] = useState(false);
   const [project, setProject] = useState(null);
   const [refineAnswers, setRefineAnswers] = useState({});
+  const [memoryReview, setMemoryReview] = useState(null);
+  const [replacementRecovery, setReplacementRecovery] = useState(false);
+  const [showReplacementConfirmation, setShowReplacementConfirmation] = useState(false);
   const [transitionOverlay, setTransitionOverlay] = useState({
     visible: false,
     title: '',
@@ -188,6 +192,7 @@ const FlowPage = () => {
   }, []);
 
   useEffect(() => {
+    if (location.state?.replacementRecovery) return;
     if (!projectIdFromQuery || project) return;
 
     const loadProjectFromQuery = async () => {
@@ -220,7 +225,7 @@ const FlowPage = () => {
     };
 
     loadProjectFromQuery();
-  }, [navigate, project, projectIdFromQuery, urlStep]);
+  }, [navigate, project, projectIdFromQuery, urlStep, location.state?.replacementRecovery]);
 
   useEffect(() => {
     if (voice.transcript && inputType === 'text') {
@@ -249,9 +254,14 @@ const FlowPage = () => {
     window.history.replaceState(null, '', buildFlowUrl(step, effectiveProjectId));
   }, [step, project?.project_id, projectIdFromQuery]);
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = async ({ replacementConfirmed = false } = {}) => {
     if (!inputContent.trim()) {
       toast.error('Por favor, ingresa una descripción o URL');
+      return;
+    }
+
+    if (replacementRecovery && !replacementConfirmed) {
+      setShowReplacementConfirmation(true);
       return;
     }
 
@@ -287,6 +297,8 @@ const FlowPage = () => {
 
       setProject(nextProject);
       setRefineAnswers(nextProject.refine_answers || {});
+      setReplacementRecovery(false);
+      setShowReplacementConfirmation(false);
 
       const nextStep = nextProject.refine_questions?.length > 0 ? 'refine' : 'result';
       window.history.replaceState(
@@ -348,6 +360,7 @@ const FlowPage = () => {
 
       setProject(nextProject);
       setRefineAnswers(nextProject.refine_answers || {});
+      setMemoryReview(null);
       window.history.replaceState(
         null,
         '',
@@ -358,11 +371,30 @@ const FlowPage = () => {
       toast.success('Afinado guardado correctamente');
       setStep('result');
     } catch (error) {
-      toast.error(
-        formatApiErrorDetail(error.response?.data?.detail) ||
-          error.message ||
-          'Error al guardar respuestas'
-      );
+      const detail = error.response?.data?.detail;
+      const memoryError = parseMemoryReviewError(detail);
+      const code = memoryError?.code;
+      if (code === 'project_memory_conflict' || code === 'project_memory_uncertain') {
+        setMemoryReview(memoryError);
+      } else if (code === 'memory_review_legacy_unmapped') {
+        setMemoryReview(memoryError);
+      } else if (code === 'stale_project_revision') {
+        setMemoryReview(null);
+        try {
+          const latest = await axios.get(`${API_BASE}/projects/${project.project_id}`, { withCredentials: true });
+          if (isValidProjectPayload(latest?.data)) {
+            setProject(latest.data);
+            setRefineAnswers(latest.data.refine_answers || {});
+            toast.error('El proyecto cambió en otra sesión. Se cargó la revisión actual; revisa tus respuestas y vuelve a enviarlas.');
+          } else {
+            toast.error('El proyecto cambió en otra sesión. Recárgalo antes de volver a enviar.');
+          }
+        } catch {
+          toast.error('El proyecto cambió en otra sesión y no se pudo recargar. Inténtalo de nuevo.');
+        }
+      } else {
+        toast.error(formatApiErrorDetail(detail) || error.message || 'Error al guardar respuestas');
+      }
     } finally {
       setTransitionOverlay({
         visible: false,
@@ -372,6 +404,17 @@ const FlowPage = () => {
       });
       setLoading(false);
     }
+  };
+
+  const beginReplacementRecovery = () => {
+    setProject(null);
+    setMemoryReview(null);
+    setRefineAnswers({});
+    setInputContent('');
+    setReplacementRecovery(true);
+    setShowReplacementConfirmation(false);
+    setStep('input');
+    navigate('/flow/input', { replace: true, state: { replacementRecovery: true } });
   };
 
   const handleGenerateBlueprint = async () => {
@@ -425,11 +468,16 @@ const FlowPage = () => {
       await wait(1000);
       setStep('blueprint');
     } catch (error) {
-      toast.error(
-        formatApiErrorDetail(error.response?.data?.detail) ||
-          error.message ||
-          'Error al generar blueprint'
-      );
+      const detail = error.response?.data?.detail;
+      const memoryError = parseMemoryReviewError(detail);
+      if (memoryError?.code === 'project_memory_conflict' || memoryError?.code === 'project_memory_uncertain') {
+        setMemoryReview(memoryError);
+        setStep('refine');
+      } else if (memoryError?.code === 'memory_review_legacy_unmapped') {
+        setMemoryReview(memoryError);
+      } else {
+        toast.error(formatApiErrorDetail(detail) || error.message || 'Error al generar blueprint');
+      }
     } finally {
       setTransitionOverlay({
         visible: false,
@@ -557,6 +605,16 @@ const FlowPage = () => {
 
       <main className="flex-1 py-12 px-6">
         <div className="max-w-2xl mx-auto">
+          {memoryReview?.code === 'memory_review_legacy_unmapped' && (
+            <section className="rounded-xl border border-amber-400/40 bg-amber-400/10 p-4 mb-6" role="alert" data-testid="memory-legacy-recovery">
+              <h3 className="text-white font-medium mb-2">Este proyecto conserva respuestas históricas sin pregunta asociada</h3>
+              <p className="text-sm text-[#D4D4D4] mb-3">No se han cambiado ni descartado. Para continuar, puedes crear otro proyecto y reintroducir manualmente los datos que sigan siendo relevantes. El proyecto original permanecerá intacto.</p>
+              <ul className="text-sm text-[#D4D4D4] list-disc pl-5 mb-4">
+                {memoryReview.questionIds.map((id) => <li key={id}>ID histórico: {id}</li>)}
+              </ul>
+              <button type="button" onClick={beginReplacementRecovery} className="btn-secondary" data-testid="create-replacement-project-btn">Empezar un proyecto nuevo</button>
+            </section>
+          )}
           <AnimatePresence mode="wait">
             {step === 'input' && (
               <motion.div
@@ -714,6 +772,30 @@ const FlowPage = () => {
                 </div>
 
                 <div className="bg-[#171717] border border-white/10 rounded-2xl p-6 space-y-6">
+                  {(memoryReview?.code === 'project_memory_conflict' || memoryReview?.code === 'project_memory_uncertain') && (
+                    <section className="rounded-xl border border-amber-400/40 bg-amber-400/10 p-4" role="alert" data-testid="memory-conflict-review">
+                      <h3 className="text-white font-medium mb-2">
+                        {memoryReview.code === 'project_memory_conflict' ? 'Revisa respuestas incompatibles' : 'Aclara el contexto de estas respuestas'}
+                      </h3>
+                      <p className="text-sm text-[#D4D4D4] mb-4">Edita conjuntamente las respuestas relacionadas. El proyecto solo se actualizará cuando el conjunto completo sea compatible.</p>
+                      <div className="space-y-3">
+                        {mapMemoryReviewGroups(memoryReview.groups, project.refine_questions).map((group, groupIndex) => {
+                          return (
+                            <div key={`memory-group-${groupIndex}`} className="rounded-lg border border-white/10 p-3" data-testid="memory-conflict-group">
+                              <p className="text-xs uppercase tracking-wide text-amber-200 mb-2">{group.kind === 'uncertain' ? 'Grupo por aclarar' : `Grupo ${groupIndex + 1}`}</p>
+                              {group.mappedQuestions.map((question) => (
+                                <p key={question.id} className="text-sm text-white">{question.question}</p>
+                              ))}
+                              {group.unmappedIds.map((id) => (
+                                <p key={id} className="text-sm text-[#A3A3A3]">ID sin pregunta autorizada: {id}</p>
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  )}
+
                   {project.refine_questions.map((question, index) => (
                     <div key={question.id || index}>
                       <label className="block text-white mb-2">
@@ -722,16 +804,17 @@ const FlowPage = () => {
 
                       <textarea
                         value={refineAnswers[question.id] || ''}
-                        onChange={(event) =>
-                          setRefineAnswers({
-                            ...refineAnswers,
-                            [question.id]: event.target.value
-                          })
-                        }
+                        onChange={(event) => {
+                          setMemoryReview(null);
+                          setRefineAnswers({ ...refineAnswers, [question.id]: event.target.value });
+                        }}
                         placeholder="Tu respuesta..."
-                        className="w-full h-20 bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none"
+                        className={`w-full h-20 bg-[#0A0A0A] border rounded-lg px-4 py-3 text-white placeholder-[#A3A3A3] focus:outline-none focus:border-[#0F5257] focus:ring-1 focus:ring-[#0F5257]/50 transition-all resize-none ${questionHasMemoryReview(memoryReview?.groups, question.id) ? 'border-amber-300/70 ring-1 ring-amber-300/30' : 'border-white/10'}`}
                         data-testid={`refine-answer-${index}`}
                       />
+                      {questionHasMemoryReview(memoryReview?.groups, question.id) && (
+                        <p className="text-xs text-amber-200 mt-2">Esta respuesta forma parte de una revisión conjunta.</p>
+                      )}
                     </div>
                   ))}
 
@@ -896,6 +979,19 @@ const FlowPage = () => {
           </AnimatePresence>
         </div>
       </main>
+
+      {showReplacementConfirmation && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-6">
+          <section className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#171717] p-6" role="dialog" aria-modal="true" aria-labelledby="replacement-confirmation-title" data-testid="replacement-consumption-confirmation">
+            <h2 id="replacement-confirmation-title" className="text-xl text-white mb-3">Confirmar nuevo análisis</h2>
+            <p className="text-[#D4D4D4] mb-5">Crear el proyecto nuevo ejecutará el análisis inicial habitual para {inputType === 'url' ? 'una URL' : 'una idea'} y aplicará el consumo normal de créditos definido para esa operación. La cantidad depende de la operación y de la configuración de tu cuenta. No se copiarán las respuestas históricas y el proyecto original permanecerá intacto.</p>
+            <div className="flex gap-3 justify-end">
+              <button type="button" className="btn-secondary" onClick={() => setShowReplacementConfirmation(false)} data-testid="cancel-replacement-confirmation">Cancelar</button>
+              <button type="button" className="btn-primary" onClick={() => handleAnalyze({ replacementConfirmed: true })} data-testid="confirm-replacement-consumption">Confirmar y crear proyecto</button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };

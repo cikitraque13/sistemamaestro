@@ -19,7 +19,7 @@ def project_fixture():
         "user_id": "user_test",
         "updated_at": REVISION,
         "refine_questions": [{"id": "goal", "question": "Project goal?"}],
-        "refine_answers": {"goal": "synthetic", "opaque/key": "value"},
+        "refine_answers": {"goal": "synthetic"},
         "route": "idea",
         "diagnosis": {"summary": "synthetic"},
         "input_content": "synthetic project",
@@ -45,7 +45,7 @@ class ProjectMemoryProjectionTests(f.unittest.TestCase):
             "source": "project.refine_answers",
             "provenance": "user_authored",
             "revision": REVISION,
-            "answers": {"goal": "synthetic", "opaque/key": "value"},
+            "answers": {"goal": "synthetic"},
         })
 
     def test_projection_defaults_to_empty_answers_and_zero_revision(self):
@@ -143,7 +143,7 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
         self.assertEqual(error.exception.detail["code"], "stale_project_revision")
         self.assertEqual(
             self.db.projects.documents["project_test"]["refine_answers"],
-            {"goal": "recovered", "opaque/key": "value"},
+            {"goal": "recovered"},
         )
         self.assertEqual(
             self.db.projects.documents["project_test"]["updated_at"],
@@ -171,14 +171,14 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
             SimpleNamespace(headers={"If-Match": "0"}),
         )
         first_revision = first["updated_at"]
-        self.assertEqual(first["refine_answers"], {"goal": "first", "opaque/key": "value"})
+        self.assertEqual(first["refine_answers"], {"goal": "first"})
 
         second = await f.projects.refine_project(
             "project_test",
             SimpleNamespace(answers={"goal": "second"}),
             SimpleNamespace(headers={"If-Match": first_revision}),
         )
-        self.assertEqual(second["refine_answers"], {"goal": "second", "opaque/key": "value"})
+        self.assertEqual(second["refine_answers"], {"goal": "second"})
         self.assertGreater(second["updated_at"], first_revision)
         self.assertEqual(cas_queries, [
             {
@@ -208,7 +208,7 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
             )
         self.assertEqual(
             recommendation.call_args.kwargs["refine_answers"],
-            {"goal": "updated", "opaque/key": "value"},
+            {"goal": "updated"},
         )
 
     async def test_refine_rejects_unknown_new_answer_without_mutation(self):
@@ -225,24 +225,22 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
         self.assertEqual(error.exception.detail["code"], "unauthorized_refine_answer_id")
         self.assertEqual(project, before)
 
-    async def test_refine_preserves_unchanged_or_omitted_legacy_answers(self):
+    async def test_refine_blocks_unmapped_legacy_without_mutation(self):
         project = self.db.projects.documents["project_test"]
         project.update(project_fixture())
-        result = await f.projects.refine_project(
-            "project_test",
-            SimpleNamespace(answers={"goal": "updated", "opaque/key": "value"}),
-            SimpleNamespace(headers={"If-Match": REVISION}),
-        )
-        self.assertEqual(result["refine_answers"], {"goal": "updated", "opaque/key": "value"})
-
-        result = await f.projects.refine_project(
-            "project_test",
-            SimpleNamespace(answers={"goal": "updated again"}),
-            SimpleNamespace(headers={"If-Match": result["updated_at"]}),
-        )
-        self.assertEqual(result["refine_answers"], {
-            "goal": "updated again", "opaque/key": "value",
+        project["refine_answers"]["legacy_id"] = "preserved"
+        before = deepcopy(project)
+        with self.assertRaises(f.HTTPException) as error:
+            await f.projects.refine_project(
+                "project_test",
+                SimpleNamespace(answers={"goal": "updated"}),
+                SimpleNamespace(headers={"If-Match": REVISION}),
+            )
+        self.assertEqual(error.exception.status_code, 409)
+        self.assertEqual(error.exception.detail, {
+            "code": "memory_review_legacy_unmapped", "question_ids": ["legacy_id"],
         })
+        self.assertEqual(project, before)
 
     async def test_refine_round_trips_oversized_legacy_value_unchanged(self):
         project = self.db.projects.documents["project_test"]
@@ -250,13 +248,15 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
         legacy_key = "legacy/" + ("k" * f.projects.MAX_REFINE_ANSWER_KEY_CHARS)
         legacy_value = "v" * (f.projects.MAX_REFINE_ANSWER_VALUE_CHARS + 1)
         project["refine_answers"][legacy_key] = legacy_value
-        result = await f.projects.refine_project(
-            "project_test",
-            SimpleNamespace(answers={"goal": "updated", legacy_key: legacy_value}),
-            SimpleNamespace(headers={"If-Match": REVISION}),
-        )
-        self.assertEqual(result["refine_answers"][legacy_key], legacy_value)
-        self.assertEqual(result["refine_answers"]["goal"], "updated")
+        before = deepcopy(project)
+        with self.assertRaises(f.HTTPException) as error:
+            await f.projects.refine_project(
+                "project_test",
+                SimpleNamespace(answers={"goal": "updated", legacy_key: legacy_value}),
+                SimpleNamespace(headers={"If-Match": REVISION}),
+            )
+        self.assertEqual(error.exception.detail["code"], "memory_review_legacy_unmapped")
+        self.assertEqual(project, before)
 
     async def test_refine_rejects_altered_legacy_answer_without_mutation(self):
         project = self.db.projects.documents["project_test"]
@@ -308,6 +308,7 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
         max_key = "k" * f.projects.MAX_REFINE_ANSWER_KEY_CHARS
         max_value = "v" * f.projects.MAX_REFINE_ANSWER_VALUE_CHARS
         project["refine_questions"] = [{"id": max_key, "question": "Boundary?"}]
+        project["refine_answers"] = {}
         result = await f.projects.refine_project(
             "project_test",
             SimpleNamespace(answers={max_key: max_value}),
@@ -402,7 +403,7 @@ class ProjectMemoryBlueprintTests(f.ChargedCallerFixture):
             "route": "idea",
             "diagnosis": {"summary": "synthetic"},
             "input_content": "synthetic project",
-            "refine_answers": {"goal": "synthetic", "opaque/key": "value"},
+            "refine_answers": {"goal": "synthetic"},
             "url_analysis": "synthetic URL facts",
         })
         for metadata in ("schema_version", "owner_id", "project_id", "provenance", REVISION):
