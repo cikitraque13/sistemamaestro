@@ -2,7 +2,7 @@
 
 ## Estado del documento
 
-- Estado: activo; última publicación documental registrada: PR #103 (2026-10-20). J05 continúa cerrado y J06 todavía no está abierto.
+- Estado: activo; J05 continúa cerrado y J06 figura READY / NOT_OPENED según el Roadmap. Las publicaciones se conservan como observaciones fechadas en Runtime and Deploy Truth, no como un indicador dinámico de la última PR.
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
 - S14–S18: consultar los propietarios de madurez, producción/runtime e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
@@ -66,7 +66,7 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 4. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate autorizado.
 5. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 permanece cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato canónico, con limitaciones semánticas y de cobertura registradas. J06 está READY / NOT_OPENED; la elegibilidad de entrada cuenta con el Gold POST-J05 registrado en el [Inventario técnico](03-INVENTARIO-TECNICO.md), y su apertura requiere decisión expresa de HUMAN-LUCAS. El [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) conserva estados y dependencias; el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) posee riesgos y condiciones de revalidación; el [Inventario técnico](03-INVENTARIO-TECNICO.md) posee el inventario de Gold/Evidence. La identidad de la observación de publicación más reciente está en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 permanece cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato canónico, con limitaciones semánticas y de cobertura registradas. J06 está READY / NOT_OPENED; la elegibilidad de entrada cuenta con el Gold POST-J05 registrado en el [Inventario técnico](03-INVENTARIO-TECNICO.md), y su apertura requiere decisión expresa de HUMAN-LUCAS. El [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) conserva estados y dependencias; el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) posee riesgos y condiciones de revalidación; el [Inventario técnico](03-INVENTARIO-TECNICO.md) posee el inventario de Gold/Evidence. El historial de observaciones fechadas de publicación está en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
 
 ## Reglas duraderas de gobierno
 
