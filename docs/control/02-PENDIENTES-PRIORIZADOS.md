@@ -1,8 +1,12 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-17
+## Estado operativo vigente — 2026-10-20
 
-Propietario del backlog actual. S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del recorrido visual aceptado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 queda cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05_ENTRY_ASSESSMENT_ELIGIBLE=YES; J05 permanece NOT_OPENED y requiere autorización propia. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y dependencias; el [Registro acumulativo de garantías](10-REGISTRO-GARANTIAS-PENDIENTES.md) es propietario de evidencias y condiciones de revalidación; el [inventario técnico](03-INVENTARIO-TECNICO.md) distingue los Gold vigentes del archivo histórico. El [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) registra el release de código J04 integrado mediante PR #94 en `3da6a26d446994ac48cc1ce287b49df98c37a55e`. Railway deployment `ea3d3c10-2ec7-4a58-91ff-75922795ca4e` terminó SUCCESS sobre el mismo SHA y GET `/health` respondió HTTP 200. La ruta Builder renderizó; generación y blueprint no se invocaron en producción; no hubo checks CI en la PR. Railway reporta RAILPACK frente al DOCKERFILE declarado; la procedencia efectiva del build sigue UNVERIFIED.
+Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 conservan sus cierres humanos con limitaciones; J03 está cerrado con limitaciones. J04 permanece CLOSED_BY_HUMAN_ACCEPTANCE, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato, conservando riesgos residuales en el [registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md). El roadmap es propietario de estados y dependencias; el [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) registra la observación de publicación de PR #101; el [inventario técnico](03-INVENTARIO-TECNICO.md) posee Gold/Evidence y Atlas Testing.
+
+### Frente elegible, no abierto
+
+J06 — Intent + Planning: `NOT_OPENED`; `ENTRY_ASSESSMENT_ELIGIBLE=NO_PENDING_POST_J05_GOLD`. Tras publicación y verificación del cierre documental, crear el checkpoint Gold POST-J05; entonces reevaluar la elegibilidad y esperar decisión expresa de HUMAN-LUCAS. J05 no queda en backlog activo salvo aparición de evidencia material que invalide su cierre.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 

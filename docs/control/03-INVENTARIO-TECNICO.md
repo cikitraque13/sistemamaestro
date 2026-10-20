@@ -1,12 +1,12 @@
 # 03-INVENTARIO-TECNICO
 
-## Estado vigente — 2026-10-17
+## Estado vigente — 2026-10-20
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.
 [Runtime](../architecture/04-runtime-and-deploy-truth.md) es propietario de la identidad de producción.
 [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es propietario del cierre y validaciones de Journey 03; el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados S14–S18 y J04–J16.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E; S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J03 está cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J05_ENTRY_ASSESSMENT_ELIGIBLE=YES y J05 permanece NOT_OPENED. La revisión READ-ONLY de escrituras activas fue la primera actividad obligatoria de S18 y se completó con limitaciones de alcance; no valida la máquina de estados completa ni autoriza modificar esas escrituras. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de estados y límites de aceptación.
+S14, S15 y S16 están COMPLETED; S17 y S18 conservan sus cierres humanos con limitaciones; J03 queda cerrado con limitaciones. J04 sigue CLOSED_BY_HUMAN_ACCEPTANCE, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato, con riesgos residuales registrados. El [roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) posee los estados y límites; este inventario no los sustituye.
 
 ## Inventario observado de checkpoints — 2026-10-17
 
@@ -29,6 +29,14 @@ Los registros de restauración disponibles consignan: para `GOLD_FREEZE_POST_J03
 Límites restantes: no se usó un escáner dedicado de secretos ni se certifica ausencia absoluta; las revisiones QA/SEC previas no quedaron vinculadas a un target identificable y no se presentan aquí como acreditación independiente de este inventario. Los registros Gold posteriores en este documento conservan sus nombres y datos de origen; sus rutas son referencias históricas de creación. Los snapshots que ya no figuran entre los tres Gold directos se preservan en el archivo consolidado, no se reclasifican como actuales ni se eliminan por esta actualización.
 
 El checkpoint canónico de entrada a S14 y los Gold posteriores se conservan como evidencia histórica; el estado vigente de producción/runtime se registra en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
+
+## Atlas Testing — evidencia J05-V2/V3
+
+El entorno de integración informado y utilizado para J05 es el proyecto Atlas independiente `Sistema Maestro - Testing`, clúster `SM-Testing` (FREE/M0), base `sistemamaestro_test` y usuario técnico con rol `readWrite` limitado a esa base. La URI se introdujo localmente en forma oculta y no se incorpora al repositorio ni a este inventario. Atlas MCP se utilizó para metadatos administrativos de solo lectura; las pruebas funcionales se ejecutaron con el runner local contra el entorno de testing.
+
+Para J05-V3 se registró `TESTS_COLLECTED=8`, `TESTS_PASSED=8`, `TESTS_FAILED=0`, clasificador mock y `CLEANUP=PASS_DELETED_AND_VERIFIED`. Esto acredita las operaciones de memoria probadas contra MongoDB de testing y la limpieza sintética; no acredita precisión del proveedor real, ejecución funcional en producción ni exclusión absoluta de secretos del Gold. No se consultó Project 0 / Cluster0 como parte de la validación.
+
+El inventario local observado antes de esta reconciliación conserva cinco directorios Gold y dos paquetes Evidence; el detalle, hashes y limitaciones de cada backup son los registrados anteriormente en este documento. La misma carpeta `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` aparece bajo Gold y Evidence en la estructura observada. No se inspeccionaron ni alteraron contenidos de backup durante esta tarea. No existe aún un Gold Freeze POST-J05 acreditado en este checkpoint (`POST_J05_GOLD=NOT_CREATED`).
 
 Como antecedente histórico, el checkout usado para el Gold post-S15 estaba en la rama del candidato S15 y limpio; su tree coincide con el commit de GitHub main e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279. La identidad productiva vigente y el deployment pertenecen exclusivamente a Runtime and Deploy Truth.
 

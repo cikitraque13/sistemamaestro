@@ -2,7 +2,7 @@
 
 ## Estado del documento
 
-- Estado: activo; documentación canónica de J04 publicada con cierre humano limitado al 2026-10-17.
+- Estado: activo; documentación canónica reconciliada con J05 técnico cerrado y J06 todavía no abierto (2026-10-20, candidato de reconciliación pendiente de publicación).
 - Función: repartir autoridad documental; no sustituye contratos, evidencia ni backlog.
 - S14–S18: consultar los propietarios de madurez, producción/runtime e inventario técnico; este índice no duplica hashes de manifiestos.
 - Regla de autoridad: consultar los propietarios canónicos para identidad de producción,
@@ -21,7 +21,7 @@
 | Procedimientos operativos | [Procedimientos](06-PROCEDIMIENTOS-OPERATIVOS.md) | SUPPORTING_CANONICAL; no autoriza acciones por sí mismo |
 | Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
 | Roadmap y estado de madurez | [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) | SOURCE_OF_TRUTH de S14–S18 y J04–J16 |
-| Garantías pendientes S17/S18 | [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) | SOURCE_OF_TRUTH del detalle de evidencia, limitación, riesgo, decisión, dependencia y revalidación; no declara PASS ni reabre gates |
+| Garantías pendientes S17/S18 y riesgos residuales J05 | [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) | SOURCE_OF_TRUTH del detalle de evidencia, limitación, riesgo, decisión, dependencia y revalidación; no declara PASS ni reabre gates |
 | Reglas de gates | [Journey Gate Operating Rules](09-JOURNEY-GATE-OPERATING-RULES.md) | SOURCE_OF_TRUTH de proceso, evidencia y checkpoints; no duplica estados de gates |
 | QA comercial de plantillas | [QA Builder 10 plantillas](08-QA-BUILDER-10-PLANTILLAS.md) | QA específica; no duplica el cierre de Journey 03 |
 | Contrato actual de la transacción local | [Contratos Técnicos V1](../product/sistema-maestro/05-CONTRATOS-TECNICOS-V1.md) | Extensión PRE-S14 validada y límites de aplicación |
@@ -66,7 +66,7 @@ de S15 deberá actualizar su propietario canónico; no se presume realizada.
 4. Decisiones, pendientes y contratos: respetar lo cerrado y el siguiente gate autorizado.
 5. Inventario, rutas y procedimientos: localizar las piezas necesarias.
 
-S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 está cerrado con limitaciones; J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, con TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05_ENTRY_ASSESSMENT_ELIGIBLE=YES; J05 permanece NOT_OPENED. El [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) conserva los estados y límites; el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) contiene las garantías pendientes y sus condiciones de revalidación; el [Inventario técnico](03-INVENTARIO-TECNICO.md) distingue Gold vigentes y archivo histórico. El release de código J04 se publicó mediante PR #94 en el merge commit `3da6a26d446994ac48cc1ce287b49df98c37a55e`; Railway deployment `ea3d3c10-2ec7-4a58-91ff-75922795ca4e` terminó SUCCESS sobre ese SHA y GET `/health` respondió HTTP 200. La ruta Builder renderizó; no se invocaron generación ni blueprint en producción y CI no reportó checks. Railway reporta RAILPACK mientras el repositorio declara DOCKERFILE; la procedencia efectiva del build sigue UNVERIFIED. El detalle histórico de S16 se conserva en el registro correspondiente del inventario y runtime.
+S14, S15 y S16 están COMPLETED; S17 está CLOSED_BY_HUMAN_ACCEPTANCE, limitado al recorrido visual revisado y sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, S18_TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 permanece cerrado con limitaciones. J04 está CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato canónico, con limitaciones semánticas y de cobertura registradas. J06 sigue NOT_OPENED; su elegibilidad de entrada está pendiente del Gold POST-J05 y de la decisión expresa de HUMAN-LUCAS. El [Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) conserva estados y dependencias; el [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) posee riesgos y condiciones de revalidación; el [Inventario técnico](03-INVENTARIO-TECNICO.md) posee el inventario de Gold/Evidence. La identidad de la observación de publicación más reciente está en [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md).
 
 ## Reglas duraderas de gobierno
 

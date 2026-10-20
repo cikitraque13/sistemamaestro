@@ -21,6 +21,10 @@ La identidad e integridad del Gold de entrada a S14 constan en el [Inventario t�
 
 La reutilización exige identidad y condiciones coincidentes. Aplicar la regla de delta en [Journey Gate Operating Rules](../../control/09-JOURNEY-GATE-OPERATING-RULES.md).
 
+## Disciplina transversal de journeys
+
+Cada journey avanza por incrementos mínimos y reversibles, con criterios de aceptación definidos antes de implementar. La evidencia se liga a un candidato inmutable y la revisión QA/SEC es independiente y del mismo alcance. La publicación requiere autorización humana cuando afecta main o producción; después se reconcilian las fuentes canónicas, se registran las lecciones e incidencias verificadas y se crea el Gold Freeze cuando corresponda al checkpoint aprobado. La ejecución detallada y las reglas de reuso de evidencia son propietarias de [Journey Gate Operating Rules](../../control/09-JOURNEY-GATE-OPERATING-RULES.md); este roadmap no duplica su procedimiento ni autoriza gates.
+
 ## Journey 03 — cierre del Builder local gobernado
 
 - JOURNEY_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS (HUMAN-LUCAS, gate S18_HUMAN_CLOSURE); TECHNICAL_PASS=NO. S17 y S18 conservan sus estados y limitaciones individuales; el cierre de J03 no convierte evidencia pendiente en PASS.
@@ -83,7 +87,7 @@ La reutilización exige identidad y condiciones coincidentes. Aplicar la regla d
 - WHAT_REMAINS: las limitaciones técnicas anteriores pueden abordarse en gates futuros cuando correspondan a su alcance; no son condiciones retroactivas para el cierre humano limitado de S17.
 - EVIDENCE_REUSABLE_IF: aplicar la regla de delta de Journey Gate Operating Rules; reutilizar solo evidencia cuya identidad, alcance y condiciones coincidan con el gate receptor.
 - REVALIDATE_IF: cambia el recorrido aceptado, las rutas, auth/session, build o los criterios de un gate posterior.
-- NEXT_GATE: J05_ENTRY_ASSESSMENT_ELIGIBLE=YES; J05 permanece NOT_OPENED y requiere decisión expresa de HUMAN-LUCAS. J04 se cerró por aceptación humana dentro del alcance V1–V3 y con limitaciones; no declara TECHNICAL_PASS integral ni transfiere garantías no acreditadas. S18 se cerró por aceptación humana con limitaciones, según el registro §S18. Este documento no abre J05 ni hereda PASS o garantías de etapas anteriores.
+- NEXT_GATE_AT_S17_CLOSURE: J05_ENTRY_ASSESSMENT_ELIGIBLE=YES; entonces J05 permanecía NOT_OPENED y requería decisión expresa de HUMAN-LUCAS. J05 se abrió posteriormente y su cierre actual está en su propia sección. Este registro histórico no heredó PASS ni abrió el siguiente gate.
 - S18_OPENING_AUTHORIZATION: HUMAN-LUCAS autorizó la apertura de S18 en el gate `S18_CANONICAL_PUBLICATION_AND_OPENING`, después de la publicación del contrato de entrada mediante PR #89. Este registro documenta la decisión humana; el roadmap no autoriza gates.
 - DEPENDENCIES: S15 y S16 aportan identidad y reproducibilidad como contexto; la aceptación de S17 se limita al recorrido descrito y no certifica persistencia, apply/revert, captura de fallos ni repetibilidad del harness.
 - GOLD_AND_REVIEW: Gold e integridad, junto con los veredictos QA/SEC y sus límites, constan en el [Inventario técnico](../../control/03-INVENTARIO-TECNICO.md#gold-freeze-post-s17-canónico-integridad-verificada-revisión-de-seguridad-pendiente). La señal SEC pendiente no modifica el cierre humano de S17 ni se presenta como una exposición confirmada.
@@ -110,12 +114,12 @@ Los propósitos y dependencias conservan la intención del roadmap maestro. Salv
 - ORIGINAL_PURPOSE: construir contexto estructural y factual del proyecto, seleccionar lo relevante y mantenerlo ligado a su revisión.
 - LIFECYCLE_STATUS: CLOSED_BY_HUMAN_ACCEPTANCE (HUMAN-LUCAS, gate `J04_HUMAN_LIMITED_CLOSURE`), limitado a las capacidades acreditadas en V1–V3.
 - TECHNICAL_STATUS: PARTIAL; TECHNICAL_PASS=NO para el sistema integral de contexto.
-- ENTRY_STATUS: OPENED_BY_HUMAN_LUCAS; la aceptación de cierre se limita al alcance registrado aquí y no abre J05.
+- ENTRY_STATUS: OPENED_BY_HUMAN_LUCAS; al cerrar J04, la aceptación limitada no abrió automáticamente J05. J05 fue abierta después mediante autorización expresa de HUMAN-LUCAS.
 - ACCREDITED_EVIDENCE: V1 (`68fdd1e21234b367ae5a47473398db2ea87d3e44`) construye snapshots factuales efímeros con allowlist, procedencia, identidad y revisión. V2 (`a3e7600f0d53943890fd73d7d232b6c7ea7c2fb8`) deriva selección contextual de servidor para las operaciones Builder cubiertas. V3 (`05e0625b0470b45e3814fc611eb9c636109e965d`) añade `blueprint_generation` con selector cerrado, cinco entradas existentes y procedencia interna; conserva el prompt. Las pruebas focalizadas del candidato V3 registraron 31 PASS. SM-QA=PASS_WITH_LIMITATIONS sobre `J04-CANONICAL-CLOSURE-READINESS-20261017-R1` (SHA-256 `78DAD55CC5B2C69233DCBD2E1F3B539EE3F414F3BC05CA1A04C4EDB5B149642C`); SM-SEC=PASS_WITH_LIMITATIONS sobre `J04-BLUEPRINT-CONTEXT-V3-IMPLEMENTATION-20261016-R1` (SHA-256 `8C75FE91DEF787F9EE0A2182914580A742E6627D5C20231C23906EBA725C999E`), que contiene los mismos cuatro hashes V3. La integración final se publicó mediante PR #94: candidato `64d2f781afd61cdce36d6e0567450fd227b54f7c`, merge commit `3da6a26d446994ac48cc1ce287b49df98c37a55e`; Railway deployment `ea3d3c10-2ec7-4a58-91ff-75922795ca4e` terminó SUCCESS sobre el mismo SHA y GET `/health` respondió HTTP 200. La interfaz de workspace Builder renderizó en producción; no se ejecutaron generación Builder ni blueprint, y la PR no reportó checks CI. Esto acredita publicación operativa acotada, no amplía el alcance aceptado ni cambia TECHNICAL_PASS=NO.
 - ACCEPTED_SCOPE: inventario factual efímero limitado a campos permitidos y usados por las operaciones cubiertas; selección server-side para Builder build/iterate y generación de blueprint; propietario, proyecto, procedencia y revisión asociados al snapshot; relectura acotada y CAS para bloquear persistencia obsoleta.
 - RESIDUAL_LIMITATIONS: inventario factual ampliado no acreditado; grafo o relaciones estructurales ampliadas no acreditados; eficacia empírica de relevancia no medida; persiste una ventana de concurrencia tras la última lectura; límites de tamaño anidados no acreditados; resistencia a prompt injection no demostrada para contenido del proyecto, especialmente `url_analysis`; la suite amplia no se completó. El test `test_concurrent_http_callers_do_work_once` reproduce en el baseline la incompatibilidad del fixture `slow(payload)` con el argumento `project_context`; el diagnóstico se detuvo antes de un resumen de suite y no se atribuye a V3.
 - WHAT_REMAINS: las limitaciones anteriores permanecen sin PASS y solo se revalidan si una dependencia contractual indispensable lo requiere o HUMAN-LUCAS autoriza un gate posterior. No se amplía aquí J04 ni se transfieren garantías a J05.
-- J05_ENTRY_ASSESSMENT_ELIGIBLE: YES; J05 permanece NOT_OPENED y requiere autorización propia.
+- J05_ENTRY_ASSESSMENT_ELIGIBLE_AT_J04_CLOSURE: YES; J05 seguía NOT_OPENED en ese checkpoint y se abrió después mediante autorización expresa de HUMAN-LUCAS.
 - EVIDENCE_REUSABLE_IF: identidad S15, propietario, fuente y revisión del contexto coinciden con el gate receptor.
 - REVALIDATE_IF: cambian identidad, estructura, fuentes, operación que consume contexto o reglas de selección/revisión.
 - DEPENDENCIES: S15 y acceso gobernado al proyecto.
@@ -123,9 +127,10 @@ Los propósitos y dependencias conservan la intención del roadmap maestro. Salv
 ### J05 — Project Memory
 
 - ORIGINAL_PURPOSE: memoria durable por owner/proyecto con procedencia, recuperación, vigencia y resolución de supersession/contradicciones.
-- CURRENT_STATUS: NOT_DEMONSTRATED.
-- ACCREDITED_EVIDENCE: recuperación durable de pending work en Journey 03 no acredita Project Memory.
-- WHAT_REMAINS: taxonomía, persistencia, retrieval y reglas de actualidad/contradicción.
+- CURRENT_STATUS: COMPLETED; TECHNICAL_STATUS=PASS; TECHNICAL_PASS=YES para el contrato J05 descrito aquí. No representa precisión semántica perfecta ni cierre de capacidades de jornadas posteriores.
+- ACCREDITED_EVIDENCE: V1 se integró mediante PR #99 (commit de rama `a12a3407cc5a859581e3079e3e1dba1c31239bac`; main después del merge `1d54e3da98069a131439dd9fb7048b7e38f072cf`) y proyecta `projects.refine_answers` al recorrido existente de Blueprint conservando identidad/revisión/procedencia interna. V2 se integró mediante PR #100 (commit `82dcd06301f2e19610a7efc576dec95beccd9c20`; main después del merge `2352c93aaf2f81415b69c6df6e801818578dc37b`) con validación frente a preguntas autorizadas, aislamiento owner/proyecto, revisión/CAS, rechazo de stale, supersession determinista por ID y compatibilidad histórica. V3 se integró mediante PR #101 (commit de rama `5c15d7f78b1dbbaa3243e81053ae0a9196e18dab`; main publicado `c14a36959d59a06f30d572cce7d27da0efe7e3a1`) para clasificación semántica acotada entre IDs distintos, bloqueo sin mutación ante conflicto/incertidumbre/error y corrección conjunta en la UI existente, preservando IDs históricos. SM-QA y SM-SEC aprobaron con riesgos sobre el candidato V3 R4 (`f52ef038efedb21eb8d00e44b59613b777d1ae7d2c0f4ec620aabe5241929fd6`). Validación Atlas Testing V3: 8/8 PASS, 0 fallos, limpieza `PASS_DELETED_AND_VERIFIED`, con clasificador mock y sin llamada real a OpenAI. Railway deployment `e2f74071-4505-45c0-8247-85c849d492ea` reportó SUCCESS sobre `c14a36959d59a06f30d572cce7d27da0efe7e3a1`; GET `/health` respondió HTTP 200. Esto verifica publicación y salud, no un recorrido funcional de J05 en producción.
+- RESIDUAL_LIMITATIONS: la clasificación semántica puede producir falsos positivos/negativos y no se afirma detección perfecta; el clasificador real del proveedor no se ejercitó en Atlas; QA registró cobertura UI centrada en helpers y build frontend no disponible; el test basal `test_project_bound_output_has_server_identity` y la suite amplia quedaron fuera de la evidencia final completa; el estado de disponibilidad del modelo puede cambiar. Las reservas QA/SEC se conservan como riesgos, no como defectos bloqueantes ni garantías universales.
+- WHAT_REMAINS: no hay ausencia contractual material acreditada para el alcance original de J05. Revalidar riesgos únicamente ante cambio de clasificador/modelo, flujo de corrección, identidad/CAS, esquema, proveedor o evidencia contradictoria.
 - EVIDENCE_REUSABLE_IF: identidad y revisión del proyecto están demostradas y la evidencia cubre memoria.
 - REVALIDATE_IF: cambia identidad, persistencia, retrieval o política de vigencia.
 - DEPENDENCIES: S15 y J04.
@@ -133,9 +138,11 @@ Los propósitos y dependencias conservan la intención del roadmap maestro. Salv
 ### J06 — Intent + Planning
 
 - ORIGINAL_PURPOSE: convertir intención en contrato de trabajo, aclarar incertidumbre y mantener plan/replan trazables.
-- CURRENT_STATUS: NOT_DEMONSTRATED.
+- CURRENT_STATUS: NOT_OPENED; TECHNICAL_STATUS=NOT_DEMONSTRATED.
+- ENTRY_ASSESSMENT_ELIGIBLE: NO_PENDING_POST_J05_GOLD; reevaluar cuando el checkpoint Gold POST-J05 esté publicado/verificado y HUMAN-LUCAS decida. Esto no abre J06.
 - ACCREDITED_EVIDENCE: decisiones/rationale de Builder son acotados; no acreditan planificación general.
 - WHAT_REMAINS: contrato de intención, clarificación, plan, progreso y replanning.
+- ENTRY_CONDITIONS: primero reconciliar/publicar el cierre J05 y verificar el Gold POST-J05; después conservar identidad S15 y el contexto J04 dentro de sus límites aceptados; definir contrato, incertidumbres, exclusiones y criterios de aceptación propios de J06 antes de cualquier implementación; autorización expresa de HUMAN-LUCAS para abrir J06.
 - EVIDENCE_REUSABLE_IF: casos y decisiones cubren el scope de J06.
 - REVALIDATE_IF: cambian contratos, criterios o tratamiento de incertidumbre.
 - DEPENDENCIES: J04; identidad S15.

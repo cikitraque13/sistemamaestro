@@ -15,6 +15,8 @@ HUMAN-LUCAS conserva la autoridad para producción: un resultado técnico favora
 5. Mantener un escritor por archivo y un owner por subproblema.
 6. No repetir investigaciones ya cerradas si la evidencia conserva validez.
 
+Cada unidad se limita al menor cambio reversible que satisfaga criterios observables acordados antes de editar. Antes de revisión se sella un único candidato con identidad y evidencia; QA y Security revisan independientemente ese mismo candidato cuando aplique. Publicación, despliegue y efectos económicos requieren la autoridad correspondiente. Tras verificar una publicación se reconcilian los documentos propietarios y se registra cualquier lección o incidencia comprobada. El Gold Freeze se crea en el checkpoint semántico aprobado, conforme a la sección Gold Freeze de este documento.
+
 ## Regla central de delta
 
 ```text

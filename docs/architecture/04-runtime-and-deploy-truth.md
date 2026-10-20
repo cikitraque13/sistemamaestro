@@ -4,6 +4,19 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`), no un SHA que este documento deba mantener actualizado en cada cambio documental. Los identificadores siguientes son una observación fechada y un historial de publicaciones; no afirman cuál es el estado live en una fecha posterior.
 
+### Observación posterior a PR #101 — 2026-10-20
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `c14a36959d59a06f30d572cce7d27da0efe7e3a1` |
+| PR J05-V3 #101 | MERGED; fuente `5c15d7f78b1dbbaa3243e81053ae0a9196e18dab`; merge commit en main `c14a36959d59a06f30d572cce7d27da0efe7e3a1` |
+| Railway deployment | `e2f74071-4505-45c0-8247-85c849d492ea`; SUCCESS; source commit `c14a36959d59a06f30d572cce7d27da0efe7e3a1` |
+| Health | GET `/health` respondió HTTP 200 |
+| Build provenance | UNVERIFIED |
+| J05 funcional en producción | No se ejecutó; la validación funcional fue contra Atlas Testing |
+
+La observación acredita correspondencia de identidad del deployment, estado reportado y health HTTP en esa fecha. No acredita pruebas funcionales de memoria en producción ni llamadas al proveedor real. La validación Atlas V3 de 8/8 y la limpieza verificada pertenecen al entorno aislado de testing y se detallan en el [Inventario técnico](../control/03-INVENTARIO-TECNICO.md).
+
 ### Observación anterior — 2026-10-17, después de PR #96
 
 | Plano | Identidad y estado observado |
@@ -37,7 +50,7 @@ No se comprobó HTTP health para el deployment `d143f96c-d2c6-462b-a2b5-4ed9c10c
 
 Esta es una observación fechada, no una identidad permanente de `main` ni una afirmación sobre deployments posteriores. `SUCCESS` y HTTP 200 se limitan a las comprobaciones indicadas; no acreditan otros recorridos de producción. La procedencia efectiva del build continúa sin verificarse.
 
-J04 permanece `CLOSED_BY_HUMAN_ACCEPTANCE`, `TECHNICAL_STATUS=PARTIAL` y `TECHNICAL_PASS=NO`. J05 permanece `NOT_OPENED`.
+En la observación histórica del 17-10-2026, J04 permanecía `CLOSED_BY_HUMAN_ACCEPTANCE`, `TECHNICAL_STATUS=PARTIAL` y `TECHNICAL_PASS=NO`, y J05 constaba como `NOT_OPENED`. Este estado de J05 corresponde únicamente a esa observación histórica y no representa su estado vigente.
 
 ## Release operativo de código J04 — histórico, 2026-10-17
 

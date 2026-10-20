@@ -654,3 +654,39 @@ Su función es evitar:
 - pérdida de memoria técnica;
 - falsa sensación de avance sin diagnóstico;
 - improvisación ante problemas ya vividos.
+
+---
+
+## INCIDENCIA 008 — CONTADOR PREMATURO DEL RUNNER DE INTEGRACIÓN J05-V3
+
+### Fase
+
+Validación aislada de Project Memory V3 contra MongoDB Atlas Testing.
+
+### Capa afectada
+
+Harness local de pruebas; el código funcional de J05-V3 no resultó afectado.
+
+### Síntoma observado
+
+Una primera salida del runner indicaba fallo pese a que la colección de pytest y la ejecución funcional no coincidían con el resumen mostrado.
+
+### Diagnóstico y causa raíz
+
+El agregador leía `session.testscollected` antes de que pytest finalizara la colección. La corrección usó `len(session.items)` en `pytest_collection_finish`; se validaron sintéticamente escenarios PASS, FAIL, cero pruebas y error de colección. Esta causa corresponde al conteo del runner, no a fallos de memoria del producto.
+
+### Impacto
+
+El resumen del harness podía informar conteos incompletos y clasificar incorrectamente el resultado final.
+
+### Estado
+
+Resuelta para la ejecución final documentada; no se afirma que esta fuese la causa de fallos de conexión anteriores, cuya raíz no quedó establecida.
+
+### Resolución aplicada
+
+Se ajustó el agregador local, preservando validación, exit code y limpieza. La ejecución final de Atlas V3 registró ocho pruebas recopiladas y aprobadas y limpieza `PASS_DELETED_AND_VERIFIED`. El runner y el acceso directo permanecen fuera del código funcional y no se presentan como artefactos versionados de producto.
+
+### Aprendizaje operativo
+
+Los harnesses deben separar fase de conexión, colección, ejecución y limpieza; un conteo mostrado por una fase intermedia no equivale a evidencia final.
