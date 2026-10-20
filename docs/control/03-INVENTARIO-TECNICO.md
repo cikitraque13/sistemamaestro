@@ -36,7 +36,11 @@ El entorno de integración informado y utilizado para J05 es el proyecto Atlas i
 
 Para J05-V3 se registró `TESTS_COLLECTED=8`, `TESTS_PASSED=8`, `TESTS_FAILED=0`, clasificador mock y `CLEANUP=PASS_DELETED_AND_VERIFIED`. Esto acredita las operaciones de memoria probadas contra MongoDB de testing y la limpieza sintética; no acredita precisión del proveedor real, ejecución funcional en producción ni exclusión absoluta de secretos del Gold. No se consultó Project 0 / Cluster0 como parte de la validación.
 
-El inventario local observado antes de esta reconciliación conserva cinco directorios Gold y dos paquetes Evidence; el detalle, hashes y limitaciones de cada backup son los registrados anteriormente en este documento. La misma carpeta `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` aparece bajo Gold y Evidence en la estructura observada. No se inspeccionaron ni alteraron contenidos de backup durante esta tarea. No existe aún un Gold Freeze POST-J05 acreditado en este checkpoint (`POST_J05_GOLD=NOT_CREATED`).
+El inventario local observado el 2026-10-17 conservaba cinco directorios Gold y dos paquetes Evidence; la misma carpeta `GOLD_FREEZE_POST_S17_PRE_S18_PUBLISHED_2026-10-11` aparecía bajo Gold y Evidence. Esa observación precede al checkpoint POST-J05 descrito a continuación y no representa el conteo vigente.
+
+## Gold Freeze POST-J05 — 2026-10-20
+
+GOLD=PASS. `GOLD_FREEZE_POST_J05_2026-10-20` está creado en `Backups/GOLD/GOLD_FREEZE_POST_J05_2026-10-20`, desde GitHub main commit `e7370c323267f5c2f105a3c3b7265ea9723719a7` (tree `55e676ebe60ac26ffa7a779a32ad897e56e02c47`). El checkpoint registró 422 / 422 archivos copiados y verificados, SHA-256 coincidentes, digest global `1186BD5225FBBC7537E0BB0C5D143E35FFFBFF38259FF1F1B9BED85750E4154F`, SHA-256 del manifiesto `85F936A0BBF22950206A62E0C2B68ED4DA3F658BACE2494AE6D9377988482585` y restauración aislada PASS. El filtro de exclusión retiró `.env*`, dependencias, cachés, temporales y backups anteriores del conjunto; el escaneo de patrones no encontró coincidencias, pero no constituye certificación absoluta de ausencia de secretos. Los Gold y Evidence anteriores se conservaron.
 
 Como antecedente histórico, el checkout usado para el Gold post-S15 estaba en la rama del candidato S15 y limpio; su tree coincide con el commit de GitHub main e0f93c22bf9ac9fd1f4f005ad9dc1fb7b9ae2279. La identidad productiva vigente y el deployment pertenecen exclusivamente a Runtime and Deploy Truth.
 
