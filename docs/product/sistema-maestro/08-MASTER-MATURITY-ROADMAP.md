@@ -138,11 +138,12 @@ Los propósitos y dependencias conservan la intención del roadmap maestro. Salv
 ### J06 — Intent + Planning
 
 - ORIGINAL_PURPOSE: convertir intención en contrato de trabajo, aclarar incertidumbre y mantener plan/replan trazables.
-- CURRENT_STATUS: NOT_OPENED; TECHNICAL_STATUS=NOT_DEMONSTRATED.
-- ENTRY_ASSESSMENT_ELIGIBLE: YES; el checkpoint `GOLD_FREEZE_POST_J05_2026-10-20`, con origen `e7370c323267f5c2f105a3c3b7265ea9723719a7`, tiene integridad y restauración PASS según el inventario técnico, conservando allí las limitaciones de exclusión de secretos. J06=READY / NOT_OPENED; esta elegibilidad no abre J06 y su apertura requiere decisión expresa de HUMAN-LUCAS.
-- ACCREDITED_EVIDENCE: decisiones/rationale de Builder son acotados; no acreditan planificación general.
-- WHAT_REMAINS: contrato de intención, clarificación, plan, progreso y replanning.
-- ENTRY_CONDITIONS: cierre J05 y checkpoint Gold POST-J05 verificados; conservar identidad S15 y el contexto J04 dentro de sus límites aceptados; definir contrato, incertidumbres, exclusiones y criterios de aceptación propios de J06 antes de cualquier implementación; autorización expresa de HUMAN-LUCAS para abrir J06.
+- CURRENT_STATUS: OPEN (HUMAN-LUCAS); TECHNICAL_STATUS=PARTIAL; J06.1=PASS_WITH_LIMITATIONS. J06 en conjunto no está completada ni tiene TECHNICAL_PASS.
+- ENTRY_CHECKPOINT: al evaluar la entrada, J05 estaba cerrada y el checkpoint `GOLD_FREEZE_POST_J05_2026-10-20`, con origen `e7370c323267f5c2f105a3c3b7265ea9723719a7`, tenía integridad y restauración PASS según el inventario técnico, conservando allí las limitaciones de exclusión de secretos. HUMAN-LUCAS abrió J06 posteriormente; la elegibilidad de entrada no constituyó por sí misma su apertura.
+- ACCREDITED_EVIDENCE: J06.1 — intención y aclaración gobernadas para proyectos existentes — se publicó mediante PR #106; commit de rama `c763bc6f9cc3e6dc8b1a125eab7bef5107da27a8`; GitHub main y Railway source SHA `8c33d500e8cd1b6b6c46e121142166637191c541`. Atlas Testing: 10/10 PASS, limpieza verificada; SM-QA y SM-SEC=APPROVED_WITH_RISKS; veredicto productivo=PASS_WITH_LIMITATIONS. Esta evidencia acredita solo el alcance J06.1, no planificación general.
+- RESIDUAL_LIMITATIONS: retención física sin máximo absoluto; tombstones conservados indefinidamente; inferencia real no activada ni validada; dos limitaciones basales de fixtures de consumo. No atribuir a J06.1 ejecución de Builder ni consumo comercial.
+- WHAT_REMAINS: contrato y capacidad de plan, progreso y replanteamiento trazables. La intención y aclaración están acreditadas únicamente dentro del alcance y las limitaciones de J06.1.
+- ENTRY_CONDITIONS: las condiciones de entrada —cierre J05 y checkpoint Gold POST-J05 verificados— quedaron satisfechas antes de la apertura autorizada de J06. Conservar identidad S15 y el contexto J04 dentro de sus límites aceptados. Antes de implementar el trabajo pendiente, definir su contrato, incertidumbres, exclusiones y criterios de aceptación, y obtener la autorización del gate correspondiente.
 - EVIDENCE_REUSABLE_IF: casos y decisiones cubren el scope de J06.
 - REVALIDATE_IF: cambian contratos, criterios o tratamiento de incertidumbre.
 - DEPENDENCIES: J04; identidad S15.
