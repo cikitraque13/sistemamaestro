@@ -11,7 +11,7 @@ export function IntentProjection({ projection }) {
   </div>;
 }
 
-export default function IntentClarification({ project, ownerId, apiBaseUrl = '' }) {
+export default function IntentClarification({ project, ownerId, apiBaseUrl = '', onSaved }) {
   const [intent, setIntent] = useState(project.active_j06_1_intent || null);
   const [revision, setRevision] = useState(project.updated_at || '0');
   const [text, setText] = useState(intent?.text || '');
@@ -36,6 +36,7 @@ export default function IntentClarification({ project, ownerId, apiBaseUrl = '' 
       if (binding.current !== requestBinding) return;
       if (result.user_id !== ownerId || result.project_id !== project.project_id) throw new Error('ACCESS_DENIED');
       setIntent(result.intent); setRevision(result.updated_at); setAnswers({}); pending.current = null;
+      onSaved?.(result);
     } catch (e) {
       if (binding.current !== requestBinding) return;
       const code = e.code || 'PERSISTENCE_UNAVAILABLE';

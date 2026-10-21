@@ -9,6 +9,7 @@ import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
 import IntentClarification from '../panels/IntentClarification';
+import ProjectPlan from '../panels/ProjectPlan';
 
 import builderProjects from '../data/builderProjects';
 import builderWorkspaceTabs from '../data/builderWorkspaceTabs';
@@ -349,7 +350,8 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}
       contextBody={contextBody}
     >
-      {resolved && !selectionError && <IntentClarification key={`${ownerId}:${resolved.project_id}`} project={resolved} ownerId={ownerId} />}
+      {resolved && !selectionError && <IntentClarification key={`${ownerId}:${resolved.project_id}`} project={resolved} ownerId={ownerId} onSaved={result => setProject(current => current?.project_id === result.project_id && current?.user_id === result.user_id ? { ...current, updated_at: result.updated_at, active_j06_1_intent: result.intent, ...(current.j06_2_plan ? { j06_2_plan: { ...current.j06_2_plan, status: 'STALE', confirmation_challenge: null } } : {}) } : current)} />}
+      {resolved && !selectionError && <ProjectPlan key={`plan:${ownerId}:${resolved.project_id}:${resolved.updated_at}`} project={resolved} ownerId={ownerId} />}
       <BuilderWorkspaceLayout
         key={JSON.stringify([ownerId, selectionKey, resolved?.updated_at])}
         ownerId={ownerId}

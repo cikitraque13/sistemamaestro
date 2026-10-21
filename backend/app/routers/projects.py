@@ -5,6 +5,8 @@ from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
+from starlette.responses import JSONResponse
+from backend.app.services.project_plan import project_plan_view, PlanError, HISTORY_ERROR, HISTORY_RESPONSE
 
 from backend.app.ai.memory.project_memory import (
     ProjectMemoryError,
@@ -492,6 +494,14 @@ async def get_projects(request: Request):
         {"_id": 0},
     ).sort("created_at", -1).to_list(100)
 
+    try:
+        for project in projects:
+            if "j06_2_plan" in project:
+                project["j06_2_plan"] = project_plan_view(project, user["user_id"])
+    except PlanError as exc:
+        if exc.code == HISTORY_ERROR:
+            return JSONResponse(status_code=409, content=HISTORY_RESPONSE)
+        raise HTTPException(409, detail={"code": exc.code}) from None
     return projects
 
 
@@ -513,6 +523,13 @@ async def get_project(project_id: str, request: Request):
             detail="Project not found",
         )
 
+    if "j06_2_plan" in project:
+        try:
+            project["j06_2_plan"] = project_plan_view(project, user["user_id"])
+        except PlanError as exc:
+            if exc.code == HISTORY_ERROR:
+                return JSONResponse(status_code=409, content=HISTORY_RESPONSE)
+            raise HTTPException(409, detail={"code": exc.code}) from None
     return project
 
 

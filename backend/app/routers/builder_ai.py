@@ -6,10 +6,13 @@ from typing import Any, Dict, Optional, Union, Annotated
 from pydantic import Discriminator, Tag
 
 from fastapi import APIRouter, HTTPException, Request
+from starlette.responses import JSONResponse
 
 from backend.app.ai.agents.builder_agent import run_builder_agent
 from backend.app.ai.schemas.intent_clarification import IntentOperation
 from backend.app.services.intent_clarification import apply_intent, IntentError
+from backend.app.schemas.project_plan import PlanOperation
+from backend.app.services.project_plan import apply_plan, PlanError, HISTORY_ERROR, HISTORY_RESPONSE
 from backend.app.ai.guards.cost_guard import assess_cost
 from backend.app.ai.guards.output_guard import validate_output_shape
 from backend.app.ai.guards.policy_guard import evaluate_policy
@@ -29,11 +32,12 @@ from backend.app.services.economic_operation import (
 
 
 def _builder_input_kind(value):
+    if isinstance(value, PlanOperation): return "plan"
     if isinstance(value, IntentOperation): return "intent"
-    if isinstance(value, dict): return "intent" if value.get("kind") == "intent" else "build"
+    if isinstance(value, dict): return value.get("kind") if value.get("kind") in {"intent", "plan"} else "build"
     return "build"
 
-BuilderEndpointInput = Annotated[Union[Annotated[IntentOperation, Tag("intent")], Annotated[BuilderAIInput, Tag("build")]], Discriminator(_builder_input_kind)]
+BuilderEndpointInput = Annotated[Union[Annotated[IntentOperation, Tag("intent")], Annotated[PlanOperation, Tag("plan")], Annotated[BuilderAIInput, Tag("build")]], Discriminator(_builder_input_kind)]
 
 router = APIRouter(prefix="/api/builder", tags=["builder-ai"])
 logger = logging.getLogger(__name__)
@@ -219,6 +223,17 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 @router.post("/build")
 async def build_with_ai(payload: BuilderEndpointInput, request: Request):
     from backend.app.routers.projects import expected_project_revision, assert_project_revision, next_project_revision
+
+    if isinstance(payload, PlanOperation):
+        user = await get_current_user(request)
+        expected = expected_project_revision(request)
+        try:
+            return await apply_plan(db.projects, user["user_id"], payload, expected)
+        except PlanError as exc:
+            if exc.code == HISTORY_ERROR:
+                return JSONResponse(status_code=409, content=HISTORY_RESPONSE)
+            status = 404 if exc.code == "PROJECT_NOT_FOUND_OR_NOT_OWNED" else 422 if exc.code == "INVALID_PLAN" else 503 if exc.code == "PERSISTENCE_UNAVAILABLE" else 409
+            raise HTTPException(status, detail={"code": exc.code}) from None
 
     if isinstance(payload, IntentOperation):
         user = await get_current_user(request)
