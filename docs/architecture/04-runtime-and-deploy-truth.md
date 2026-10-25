@@ -4,6 +4,19 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`). Las entradas siguientes son observaciones históricas fechadas, no un indicador exhaustivo de la última PR ni de cada deployment. Una PR exclusivamente documental y su autodeployment no obligan por sí solos a actualizar esta sección. Se registra una observación nueva cuando un gate requiere ese checkpoint o se verifica un cambio operativo relevante; el estado live actual debe comprobarse en GitHub y Railway cuando corresponda.
 
+### Observación posterior a PR #109 — 2026-10-25
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `e584edc63bcfad801daefcac40311d84cba122f7` |
+| PR funcional #109 | MERGED; head `a758d02bb1ceec491d636922b1de2f3b9c3347e5`; merge commit `e584edc63bcfad801daefcac40311d84cba122f7` |
+| Railway deployment | `81ef2934-930f-4d58-8d11-76efd61982b0`; SUCCESS; vía GitHub y enlazado al commit de merge de PR #109 |
+| Health y arranque | GET `/health` respondió HTTP 200; logs muestran `Application startup complete` |
+| Build provenance | UNVERIFIED |
+| Alcance | J06 Phase 3B; no se lanzó un despliegue manual |
+
+La evidencia funcional asociada se reportó como backend 75/75, frontend 10/10 y Atlas Testing 19/19 con limpieza verificada. Los veredictos SM-QA y SM-SEC fueron `APPROVED_WITH_RISKS`; sus limitaciones se conservan en el roadmap y en el registro acumulativo. Esta observación no afirma pruebas funcionales ejecutadas en producción ni verifica build provenance.
+
 ### Observación posterior a PR #104 — 2026-10-20
 
 | Plano | Identidad y estado observado |
