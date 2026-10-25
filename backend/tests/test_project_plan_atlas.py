@@ -18,6 +18,7 @@ import pytest
 from backend.app.schemas.project_plan import PlanOperation
 from backend.app.ai.schemas.intent_clarification import IntentOperation
 from backend.app.services.intent_clarification import apply_intent, digest
+from backend.app.services import project_plan as service
 from backend.app.services.project_plan import apply_plan, read_plan, PlanError, verify_history
 
 pytestmark = pytest.mark.skipif(os.environ.get('SM_J063A_ATLAS_AUTHORIZED') != 'YES', reason='isolated Atlas authorization required')
@@ -37,6 +38,80 @@ def op(pid, kind='CREATE', plan=None, **values):
         raw.update({k: plan[k] for k in ('plan_id', 'generation', 'plan_revision', 'state_revision')})
         raw['expected_status'] = plan['status']
     return PlanOperation(**{**raw, **values})
+
+
+def phase3b_op(pid, plan, kind, **values):
+    raw = {'kind': 'plan', 'projectId': pid, 'operation_id': str(uuid4()), 'operation_type': kind,
+           'plan_id': plan['plan_id'], 'generation': plan['generation'], 'plan_revision': plan['plan_revision'],
+           'state_revision': plan['state_revision'], 'expected_status': plan['status'],
+           'expected_progress_revision': plan.get('progress_revision', 0)}
+    raw.update(values)
+    return PlanOperation(**raw)
+
+
+DIAGNOSTIC_STAGE_ENV = 'SM_J063B_DIAG_STAGE'
+DIAGNOSTIC_CODE_ENV = 'SM_J063B_DIAG_CODE'
+DIAGNOSTIC_CODES = {
+    'PREPARATION': {'REPLAN_PLAN_SETUP', 'REPLAN_CONFIRM_PREDECESSOR', 'REPLAY_PLAN_SETUP', 'REPLAY_CONFIRM_PLAN'},
+    'OPERATION': {'REPLAN_PROGRESS', 'REPLAN_APPLY', 'REPLAY_PROGRESS', 'REPLAY_REPLAN', 'REPLAY_EVICTION_EDITS', 'REPLAY_CORRUPT_RECEIPT', 'REPLAY_APPLY'},
+    'RESPONSE': {'REPLAN_LOAD_PREDECESSOR', 'REPLAN_LOAD_SUCCESSOR', 'REPLAY_LOAD_PREDECESSOR', 'REPLAY_LOAD_RECEIPTS', 'REPLAY_CAPTURE_BEFORE', 'REPLAY_VERIFY_UNCHANGED',
+                 'REPLAN_SUCCESSOR_QUERY_FAILED', 'REPLAN_SUCCESSOR_DOCUMENT_ABSENT', 'REPLAN_SUCCESSOR_FIELD_ABSENT', 'REPLAN_SUCCESSOR_ACCESS_TYPE_INVALID',
+                 'REPLAY_RECEIPTS_QUERY_FAILED', 'REPLAY_RECEIPTS_DOCUMENT_ABSENT', 'REPLAY_RECEIPTS_FIELD_ABSENT', 'REPLAY_RECEIPTS_ACCESS_TYPE_INVALID'},
+    'ASSERTION': {'P3B_REPLAN_RESULT', 'P3B_REPLAN_GENERATION', 'P3B_REPLAN_CONTENT', 'P3B_REPLAN_SOURCE_BINDING', 'P3B_REPLAN_HISTORY', 'P3B_REPLAN_CONFIRMATION', 'P3B_REPLAY_RECEIPT_EVICTED', 'P3B_REPLAY_ERROR_CODE', 'P3B_REPLAY_NO_MUTATION'},
+}
+
+
+def mark_diagnostic(stage, code):
+    if stage not in DIAGNOSTIC_CODES or code not in DIAGNOSTIC_CODES[stage]:
+        raise ValueError('Invalid diagnostic marker')
+    os.environ[DIAGNOSTIC_STAGE_ENV] = stage
+    os.environ[DIAGNOSTIC_CODE_ENV] = code
+
+
+def assert_stable(condition, assertion_id):
+    """Expose only a fixed diagnostic ID to the temporary Atlas harness."""
+    if not condition:
+        mark_diagnostic('ASSERTION', assertion_id)
+        raise AssertionError('Stable assertion failed')
+
+
+async def diagnostic_plan_read(collection, query, operation):
+    """Read a plan for the two diagnosed response boundaries without exposing driver details."""
+    codes = {
+        'REPLAN_SUCCESSOR': ('REPLAN_SUCCESSOR_QUERY_FAILED', 'REPLAN_SUCCESSOR_DOCUMENT_ABSENT',
+                             'REPLAN_SUCCESSOR_FIELD_ABSENT', 'REPLAN_SUCCESSOR_ACCESS_TYPE_INVALID'),
+        'REPLAY_RECEIPTS': ('REPLAY_RECEIPTS_QUERY_FAILED', 'REPLAY_RECEIPTS_DOCUMENT_ABSENT',
+                            'REPLAY_RECEIPTS_FIELD_ABSENT', 'REPLAY_RECEIPTS_ACCESS_TYPE_INVALID'),
+    }
+    if operation not in codes:
+        raise ValueError('Invalid diagnostic operation')
+    query_failed, document_absent, field_absent, type_invalid = codes[operation]
+    try:
+        document = await collection.find_one(query)
+    except Exception:
+        mark_diagnostic('RESPONSE', query_failed)
+        raise RuntimeError('SAFE_RESPONSE_QUERY_FAILURE') from None
+    if document is None:
+        mark_diagnostic('RESPONSE', document_absent)
+        raise RuntimeError('SAFE_RESPONSE_DOCUMENT_ABSENT')
+    if not isinstance(document, dict):
+        mark_diagnostic('RESPONSE', type_invalid)
+        raise RuntimeError('SAFE_RESPONSE_TYPE_INVALID')
+    if 'j06_2_plan' not in document:
+        mark_diagnostic('RESPONSE', field_absent)
+        raise RuntimeError('SAFE_RESPONSE_FIELD_ABSENT')
+    plan = document['j06_2_plan']
+    if not isinstance(plan, dict):
+        mark_diagnostic('RESPONSE', type_invalid)
+        raise RuntimeError('SAFE_RESPONSE_TYPE_INVALID')
+    if operation == 'REPLAY_RECEIPTS':
+        if 'receipts' not in plan:
+            mark_diagnostic('RESPONSE', 'REPLAY_RECEIPTS_FIELD_ABSENT')
+            raise RuntimeError('SAFE_RESPONSE_FIELD_ABSENT')
+        if not isinstance(plan['receipts'], list):
+            mark_diagnostic('RESPONSE', 'REPLAY_RECEIPTS_ACCESS_TYPE_INVALID')
+            raise RuntimeError('SAFE_RESPONSE_TYPE_INVALID')
+    return document, plan
 
 
 async def scenario(body):
@@ -301,5 +376,178 @@ def test_real_invalid_input_and_size_rejection_no_mutation():
         r = await apply(c, p, o, base); before = await c.find_one({'project_id': p, 'user_id': o})
         for invalid in (content(' '), content('x' * 121)):
             with pytest.raises(PlanError): await apply(c, p, o, base, 'EDIT', r['plan'], content=invalid)
+        assert await c.find_one({'project_id': p, 'user_id': o}) == before
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_progress_persists_recovers_and_replays_without_second_write():
+    async def body(c, p, o, base):
+        result = await ready(c, p, o, base)
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        plan = result['plan']; step_id = plan['content']['steps'][0]['step_id']
+        request = phase3b_op(p, plan, 'PROGRESS_UPDATE', step_id=step_id, status='IN_PROGRESS')
+        saved_result = await apply_plan(c, o, request, base['updated_at'])
+        assert saved_result['code'] == 'PLAN_PROGRESS_RECORDED'
+        saved = await c.find_one({'project_id': p, 'user_id': o})
+        assert saved['j06_2_plan']['progress_snapshot']['step_statuses'][step_id] == 'IN_PROGRESS'
+        recovered = await read_plan(c, o, p)
+        assert recovered['plan']['progress_revision'] == 1 and recovered['plan']['step_statuses'][step_id] == 'IN_PROGRESS'
+        before_replay = deepcopy(saved['j06_2_plan'])
+        replay = await apply_plan(c, o, request, base['updated_at'])
+        assert replay['code'] == 'PLAN_PROGRESS_RECORDED'
+        assert (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan'] == before_replay
+        assert {k: v for k, v in saved.items() if k != 'j06_2_plan'} == base
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_progress_same_revision_cas_has_one_winner():
+    async def body(c, p, o, base):
+        result = await ready(c, p, o, base)
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        plan = result['plan']; step = plan['content']['steps'][0]['step_id']
+        requests = [phase3b_op(p, plan, 'PROGRESS_UPDATE', step_id=step, status=status) for status in ('BLOCKED', 'COMPLETED')]
+        results = await asyncio.gather(*(apply_plan(c, o, request, base['updated_at']) for request in requests), return_exceptions=True)
+        assert len([x for x in results if isinstance(x, dict) and x.get('code') == 'PLAN_PROGRESS_RECORDED']) == 1
+        assert len([x for x in results if isinstance(x, PlanError) and x.code == 'PLAN_REVISION_CONFLICT']) == 1
+        saved = (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan']
+        assert saved['progress_snapshot']['progress_revision'] == 1
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_replan_links_predecessor_and_requires_new_confirmation():
+    async def body(c, p, o, base):
+        mark_diagnostic('PREPARATION', 'REPLAN_PLAN_SETUP')
+        result = await ready(c, p, o, base)
+        mark_diagnostic('PREPARATION', 'REPLAN_CONFIRM_PREDECESSOR')
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        predecessor = result['plan']; step = predecessor['content']['steps'][0]['step_id']
+        progress = phase3b_op(p, predecessor, 'PROGRESS_UPDATE', step_id=step, status='COMPLETED')
+        mark_diagnostic('OPERATION', 'REPLAN_PROGRESS')
+        await apply_plan(c, o, progress, base['updated_at'])
+        mark_diagnostic('RESPONSE', 'REPLAN_LOAD_PREDECESSOR')
+        predecessor = (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan']
+        request = phase3b_op(p, predecessor, 'REPLAN')
+        mark_diagnostic('OPERATION', 'REPLAN_APPLY')
+        result = await apply_plan(c, o, request, base['updated_at'])
+        mark_diagnostic('RESPONSE', 'REPLAN_LOAD_SUCCESSOR')
+        _, successor = await diagnostic_plan_read(c, {'project_id': p, 'user_id': o}, 'REPLAN_SUCCESSOR')
+        os.environ.pop(DIAGNOSTIC_STAGE_ENV, None); os.environ.pop(DIAGNOSTIC_CODE_ENV, None)
+        assert_stable(isinstance(result, dict) and result.get('code') == 'PLAN_REPLANNED' and successor.get('status') == 'DRAFT', 'P3B_REPLAN_RESULT')
+        assert_stable(successor.get('generation') == predecessor.get('generation', 0) + 1 and successor.get('plan_id') != predecessor.get('plan_id'), 'P3B_REPLAN_GENERATION')
+        assert_stable(successor.get('content') == predecessor.get('content'), 'P3B_REPLAN_CONTENT')
+        assert_stable('progress_snapshot' not in successor and 'progress_checkpoint' not in successor, 'P3B_REPLAN_CONTENT')
+        predecessor_ref = successor.get('predecessor_reference') or {}
+        assert_stable(predecessor_ref.get('progress_snapshot_digest') == service._digest('progress-snapshot', predecessor.get('progress_snapshot')), 'P3B_REPLAN_HISTORY')
+        projection = result.get('plan') or {}
+        statuses = projection.get('step_statuses') or {}
+        assert_stable(projection.get('progress_revision') == 0 and statuses.get(step) == 'NOT_STARTED', 'P3B_REPLAN_HISTORY')
+        assert_stable(projection.get('status') == 'DRAFT', 'P3B_REPLAN_CONFIRMATION')  # requires review and confirmation
+        try:
+            history_valid = verify_history(successor) is None
+        except PlanError:
+            history_valid = False
+        assert_stable(history_valid, 'P3B_REPLAN_HISTORY')
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_replan_from_stale_predecessor_uses_current_confirmed_binding():
+    async def body(c, p, o, base):
+        result = await ready(c, p, o, base)
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        await c.update_one({'project_id': p, 'user_id': o}, {'$set': {
+            'j06_2_plan.source_binding.source_revision': '2026-10-23T12:00:00+00:00'}})
+        predecessor = (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan']
+        assert (await read_plan(c, o, p))['plan']['status'] == 'STALE'
+        result = await apply_plan(c, o, phase3b_op(p, predecessor, 'REPLAN', expected_status='STALE'), base['updated_at'])
+        successor = (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan']
+        assert_stable(result['code'] == 'PLAN_REPLANNED' and successor['status'] == 'DRAFT', 'P3B_REPLAN_RESULT')
+        assert_stable(successor['generation'] == predecessor['generation'] + 1, 'P3B_REPLAN_GENERATION')
+        assert_stable(successor['source_binding']['source_revision'] == base['updated_at'], 'P3B_REPLAN_SOURCE_BINDING')
+        assert_stable(verify_history(successor) is None, 'P3B_REPLAN_HISTORY')
+        assert_stable(not successor.get('confirmation_challenge'), 'P3B_REPLAN_CONFIRMATION')
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_checkpoint_cannot_skip_later_retained_progress_event():
+    async def body(c, p, o, base):
+        result = await ready(c, p, o, base)
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        step = result['plan']['content']['steps'][0]['step_id']
+        await apply_plan(c, o, phase3b_op(p, result['plan'], 'PROGRESS_UPDATE', step_id=step, status='IN_PROGRESS'), base['updated_at'])
+        first_raw = (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan']
+        first_view = (await read_plan(c, o, p))['plan']
+        await apply_plan(c, o, phase3b_op(p, first_view, 'PROGRESS_UPDATE', step_id=step, status='BLOCKED'), base['updated_at'])
+        await c.update_one({'project_id': p, 'user_id': o}, {'$set': {
+            'j06_2_plan.progress_snapshot': first_raw['progress_snapshot'],
+            'j06_2_plan.progress_checkpoint': first_raw['progress_checkpoint']}})
+        before = await c.find_one({'project_id': p, 'user_id': o})
+        with pytest.raises(PlanError, match='PLAN_HISTORY_INTEGRITY_ERROR'):
+            await read_plan(c, o, p)
+        assert await c.find_one({'project_id': p, 'user_id': o}) == before
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_evicted_receipt_replay_rejects_cross_operation_success_code():
+    async def body(c, p, o, base):
+        mark_diagnostic('PREPARATION', 'REPLAY_PLAN_SETUP')
+        result = await ready(c, p, o, base)
+        mark_diagnostic('PREPARATION', 'REPLAY_CONFIRM_PLAN')
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        step = result['plan']['content']['steps'][0]['step_id']
+        progress = phase3b_op(p, result['plan'], 'PROGRESS_UPDATE', step_id=step, status='BLOCKED')
+        mark_diagnostic('OPERATION', 'REPLAY_PROGRESS')
+        await apply_plan(c, o, progress, base['updated_at'])
+        mark_diagnostic('RESPONSE', 'REPLAY_LOAD_PREDECESSOR')
+        predecessor = (await c.find_one({'project_id': p, 'user_id': o}))['j06_2_plan']
+        mark_diagnostic('OPERATION', 'REPLAY_REPLAN')
+        await apply_plan(c, o, phase3b_op(p, predecessor, 'REPLAN'), base['updated_at'])
+        mark_diagnostic('OPERATION', 'REPLAY_EVICTION_EDITS')
+        for index in range(20):
+            result = await read_plan(c, o, p)
+            await apply(c, p, o, base, 'EDIT', result['plan'], content=content(f'Revision {index}'))
+        mark_diagnostic('RESPONSE', 'REPLAY_LOAD_RECEIPTS')
+        _, saved = await diagnostic_plan_read(c, {'project_id': p, 'user_id': o}, 'REPLAY_RECEIPTS')
+        os.environ.pop(DIAGNOSTIC_STAGE_ENV, None); os.environ.pop(DIAGNOSTIC_CODE_ENV, None)
+        try:
+            receipts = saved['receipts']
+        except KeyError:
+            mark_diagnostic('RESPONSE', 'REPLAY_RECEIPTS_FIELD_ABSENT')
+            raise RuntimeError('SAFE_RESPONSE_FIELD_ABSENT') from None
+        if not isinstance(receipts, list):
+            mark_diagnostic('RESPONSE', 'REPLAY_RECEIPTS_ACCESS_TYPE_INVALID')
+            raise RuntimeError('SAFE_RESPONSE_TYPE_INVALID') from None
+        key = service._hash({'domain': 'SM/J06.2/OPERATION/V1', 'owner_id': o,
+                             'project_id': p, 'operation_id': progress.operation_id})
+        receipt = next((item for item in receipts if isinstance(item, dict) and item.get('key') == key), None)
+        assert_stable(receipt is not None, 'P3B_REPLAY_RECEIPT_EVICTED')
+        assert_stable(not any(event['operation_fingerprint'] == receipt['fingerprint'] for event in saved['transitions']), 'P3B_REPLAY_RECEIPT_EVICTED')
+        mark_diagnostic('OPERATION', 'REPLAY_CORRUPT_RECEIPT')
+        await c.update_one({'project_id': p, 'user_id': o}, {'$set': {
+            f"j06_2_plan.receipts.{saved['receipts'].index(receipt)}.result_code": 'PLAN_REPLANNED'}})
+        mark_diagnostic('RESPONSE', 'REPLAY_CAPTURE_BEFORE')
+        before = await c.find_one({'project_id': p, 'user_id': o})
+        mark_diagnostic('OPERATION', 'REPLAY_APPLY')
+        try:
+            await apply_plan(c, o, progress, base['updated_at'])
+        except PlanError as exc:
+            assert_stable(exc.code == 'PLAN_HISTORY_INTEGRITY_ERROR', 'P3B_REPLAY_ERROR_CODE')
+        else:
+            assert_stable(False, 'P3B_REPLAY_ERROR_CODE')
+        mark_diagnostic('RESPONSE', 'REPLAY_VERIFY_UNCHANGED')
+        current = await c.find_one({'project_id': p, 'user_id': o})
+        assert_stable(current == before, 'P3B_REPLAY_NO_MUTATION')
+    asyncio.run(scenario(body))
+
+
+def test_real_phase3b_checkpoint_corruption_fails_closed_without_mutation():
+    async def body(c, p, o, base):
+        result = await ready(c, p, o, base)
+        result = await apply(c, p, o, base, 'CONFIRM', result['plan'], digest=result['plan']['confirmation_challenge']['digest'])
+        plan = result['plan']; step = plan['content']['steps'][0]['step_id']
+        await apply_plan(c, o, phase3b_op(p, plan, 'PROGRESS_UPDATE', step_id=step, status='BLOCKED'), base['updated_at'])
+        await c.update_one({'project_id': p, 'user_id': o}, {'$set': {'j06_2_plan.progress_checkpoint.last_event_seq': 0}})
+        before = await c.find_one({'project_id': p, 'user_id': o})
+        with pytest.raises(PlanError, match='PLAN_HISTORY_INTEGRITY_ERROR'):
+            await read_plan(c, o, p)
         assert await c.find_one({'project_id': p, 'user_id': o}) == before
     asyncio.run(scenario(body))

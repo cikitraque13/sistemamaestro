@@ -82,3 +82,32 @@ test('recovery uses owner-checked existing project GET and never submits a mutat
   expect(recoverProjectPlan).toHaveBeenCalledWith('p', ''); expect(submitPlanOperation).not.toHaveBeenCalled();
   expect(node.textContent).toContain('Estado del plan: DRAFT'); act(() => root.unmount());
 });
+
+test('confirmed plan exposes declared progress and submits the progress revision', async () => {
+  const confirmed = { ...ready, status: 'CONFIRMED', progress_revision: 2,
+    step_statuses: { 'step-a': 'IN_PROGRESS', 'step-b': 'NOT_STARTED' }, confirmation_challenge: null };
+  submitPlanOperation.mockResolvedValue(response({ ...confirmed, progress_revision: 3,
+    step_statuses: { 'step-a': 'BLOCKED', 'step-b': 'NOT_STARTED' } }));
+  const { node, root } = mount(<ProjectPlan project={{ ...project, j06_2_plan: confirmed }} ownerId="owner" />);
+  expect(node.textContent).toContain('no verifica que el trabajo se haya ejecutado');
+  act(() => Simulate.change(node.querySelector('[aria-label="Progreso de First"]'), { target: { value: 'BLOCKED' } }));
+  await act(async () => button(node, 'Guardar progreso del paso').click());
+  expect(submitPlanOperation.mock.calls[0][0]).toMatchObject({ operation_type: 'PROGRESS_UPDATE',
+    projectId: 'p', expected_progress_revision: 2, step_id: 'step-a', status: 'BLOCKED' });
+  act(() => root.unmount());
+});
+
+test('replan is explicit, distinct from restart, and states progress is not carried', async () => {
+  const confirmed = { ...ready, status: 'CONFIRMED', progress_revision: 1,
+    step_statuses: { 'step-a': 'COMPLETED', 'step-b': 'NOT_STARTED' }, confirmation_challenge: null };
+  submitPlanOperation.mockResolvedValue(response({ ...confirmed, plan_id: 'successor', generation: 2,
+    plan_revision: 1, state_revision: 1, status: 'DRAFT', progress_revision: 0,
+    step_statuses: { 'step-a': 'NOT_STARTED', 'step-b': 'NOT_STARTED' } }));
+  const { node, root } = mount(<ProjectPlan project={{ ...project, j06_2_plan: confirmed }} ownerId="owner" />);
+  expect(node.textContent).toContain('no se transfiere');
+  await act(async () => button(node, 'Crear replanteamiento').click());
+  expect(submitPlanOperation.mock.calls[0][0]).toMatchObject({ operation_type: 'REPLAN',
+    plan_id: 'plan', generation: 1, expected_progress_revision: 1 });
+  expect(submitPlanOperation.mock.calls[0][0]).not.toHaveProperty('content');
+  act(() => root.unmount());
+});

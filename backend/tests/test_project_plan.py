@@ -4,6 +4,7 @@ from copy import deepcopy
 from types import SimpleNamespace
 from uuid import uuid4
 import pytest
+from pydantic import ValidationError
 
 from backend.app.ai.schemas.intent_clarification import IntentOperation
 from backend.app.schemas.project_plan import PlanOperation
@@ -90,6 +91,22 @@ def operation(c, kind="CREATE", **values):
         raw["expected_status"] = project_plan_view(c.doc, c.doc["user_id"])["status"]
     raw.update(values)
     return PlanOperation(**raw)
+
+
+def phase3b_operation(c, kind, plan=None, **values):
+    plan = plan or c.doc["j06_2_plan"]
+    raw = {"kind": "plan", "projectId": c.doc["project_id"], "operation_id": str(uuid4()),
+           "operation_type": kind, "plan_id": plan["plan_id"], "generation": plan["generation"],
+           "plan_revision": plan["plan_revision"], "state_revision": plan["state_revision"],
+           "expected_status": project_plan_view(c.doc, c.doc["user_id"])["status"],
+           "expected_progress_revision": project_plan_view(c.doc, c.doc["user_id"])["progress_revision"]}
+    raw.update(values)
+    return PlanOperation(**raw)
+
+
+def confirm_plan(c):
+    result = ready(c)
+    return run(c, "CONFIRM", digest=result["plan"]["confirmation_challenge"]["digest"])
 
 
 def run(c, kind="CREATE", **values):
@@ -391,3 +408,272 @@ def test_prepared_atlas_remediation_scenarios_offline(scenario_name):
         c.doc['_sm_j063a_run'] = '0' * 32
         await getattr(atlas, scenario_name)(c, 'p', 'owner', deepcopy(c.doc))
     asyncio.run(execute())
+
+
+def test_phase3b_progress_materializes_snapshot_checkpoint_and_replays_without_write():
+    c = collection(); confirmed = confirm_plan(c)["plan"]; step_id = confirmed["content"]["steps"][0]["step_id"]
+    operation = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step_id, status="IN_PROGRESS")
+    result = asyncio.run(apply_plan(c, "owner", operation, c.doc["updated_at"]))
+    stored = c.doc["j06_2_plan"]
+    assert result["code"] == "PLAN_PROGRESS_RECORDED"
+    assert stored["progress_snapshot"] == {"progress_revision": 1, "step_statuses": {step_id: "IN_PROGRESS"}}
+    checkpoint = stored["progress_checkpoint"]
+    assert checkpoint["snapshot_digest"] == service._digest("progress-snapshot", stored["progress_snapshot"])
+    assert checkpoint["checkpoint_digest"] == service._digest("progress-checkpoint", {k: v for k, v in checkpoint.items() if k != "checkpoint_digest"})
+    writes = c.writes
+    replay = asyncio.run(apply_plan(c, "owner", operation, c.doc["updated_at"]))
+    assert replay["code"] == "PLAN_PROGRESS_RECORDED" and c.writes == writes
+    changed = operation.model_copy(update={"status": "COMPLETED"})
+    with pytest.raises(PlanError, match="IDEMPOTENCY_KEY_REUSE"):
+        asyncio.run(apply_plan(c, "owner", changed, c.doc["updated_at"]))
+
+
+def test_phase3b_same_status_progress_is_recorded_as_a_new_declaration():
+    c = collection(); confirmed = confirm_plan(c)["plan"]
+    step_id = confirmed["content"]["steps"][0]["step_id"]
+    first = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step_id, status="IN_PROGRESS")
+    asyncio.run(apply_plan(c, "owner", first, c.doc["updated_at"]))
+    second = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step_id, status="IN_PROGRESS")
+    result = asyncio.run(apply_plan(c, "owner", second, c.doc["updated_at"]))
+
+    plan = c.doc["j06_2_plan"]
+    event = plan["transitions"][-1]
+    assert result["code"] == "PLAN_PROGRESS_RECORDED"
+    assert plan["progress_snapshot"]["progress_revision"] == 2
+    assert plan["progress_snapshot"]["step_statuses"][step_id] == "IN_PROGRESS"
+    assert event["status_before"] == event["status_after"] == "IN_PROGRESS"
+    assert event["progress_revision_before"] == 1 and event["progress_revision_after"] == 2
+    assert verify_history(plan) is None
+
+
+def test_phase3b_legacy_confirmed_plan_reads_derived_progress_without_write():
+    c = collection(); plan = confirm_plan(c)["plan"]; before = deepcopy(c.doc); writes = c.writes
+    recovered = run(c, "READ")["plan"]
+    assert recovered["progress_revision"] == 0
+    assert recovered["step_statuses"] == {plan["content"]["steps"][0]["step_id"]: "NOT_STARTED"}
+    assert c.writes == writes and c.doc == before
+    step_id = plan["content"]["steps"][0]["step_id"]
+    operation = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step_id, status="BLOCKED")
+    asyncio.run(apply_plan(c, "owner", operation, c.doc["updated_at"]))
+    assert c.doc["j06_2_plan"]["progress_snapshot"]["progress_revision"] == 1
+
+
+def test_phase3b_progress_rejects_unknown_step_and_stale_revision_without_mutation():
+    c = collection(); confirm_plan(c); plan = c.doc["j06_2_plan"]; before = deepcopy(c.doc)
+    invalid = phase3b_operation(c, "PROGRESS_UPDATE", step_id=str(uuid4()), status="COMPLETED")
+    with pytest.raises(PlanError, match="INVALID_PLAN"):
+        asyncio.run(apply_plan(c, "owner", invalid, c.doc["updated_at"]))
+    assert c.doc == before
+    valid = phase3b_operation(c, "PROGRESS_UPDATE", step_id=plan["content"]["steps"][0]["step_id"], status="COMPLETED")
+    stale = valid.model_copy(update={"expected_progress_revision": 1})
+    with pytest.raises(PlanError, match="PLAN_REVISION_CONFLICT"):
+        asyncio.run(apply_plan(c, "owner", stale, c.doc["updated_at"]))
+    assert c.doc == before
+
+
+def test_phase3b_progress_cas_race_has_single_winner():
+    c = collection(); r = ready(c)
+    r = run(c, "CONFIRM", digest=r["plan"]["confirmation_challenge"]["digest"])
+    step = r["plan"]["content"]["steps"][0]["step_id"]
+    async def execute():
+        ops = [phase3b_operation(c, "PROGRESS_UPDATE", step_id=step, status=status) for status in ("IN_PROGRESS", "BLOCKED")]
+        before = c.writes; c.barrier = asyncio.Event()
+        results = await asyncio.gather(*(apply_plan(c, "owner", op, c.doc["updated_at"]) for op in ops), return_exceptions=True)
+        assert len([x for x in results if isinstance(x, dict) and x.get("code") == "PLAN_PROGRESS_RECORDED"]) == 1
+        assert len([x for x in results if isinstance(x, PlanError) and x.code == "PLAN_REVISION_CONFLICT"]) == 1
+        assert c.writes == before + 1 and c.doc["j06_2_plan"]["progress_snapshot"]["progress_revision"] == 1
+    asyncio.run(execute())
+
+
+def test_phase3b_replan_links_predecessor_and_resets_progress_without_copying_snapshot():
+    c = collection(); confirmed = confirm_plan(c)["plan"]
+    step_id = confirmed["content"]["steps"][0]["step_id"]
+    progress = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step_id, status="COMPLETED")
+    asyncio.run(apply_plan(c, "owner", progress, c.doc["updated_at"]))
+    predecessor = deepcopy(c.doc["j06_2_plan"])
+    replan = phase3b_operation(c, "REPLAN")
+    result = asyncio.run(apply_plan(c, "owner", replan, c.doc["updated_at"]))
+    successor = c.doc["j06_2_plan"]
+    assert result["code"] == "PLAN_REPLANNED" and successor["status"] == "DRAFT"
+    assert successor["plan_id"] != predecessor["plan_id"] and successor["generation"] == predecessor["generation"] + 1
+    assert successor["plan_revision"] == successor["state_revision"] == 1
+    assert successor["content"] == predecessor["content"]
+    assert "progress_snapshot" not in successor and "progress_checkpoint" not in successor
+    reference = successor["predecessor_reference"]
+    assert reference["plan_id"] == predecessor["plan_id"] and reference["progress_revision"] == 1
+    assert reference["progress_snapshot_digest"] == service._digest("progress-snapshot", predecessor["progress_snapshot"])
+    assert result["plan"]["progress_revision"] == 0 and result["plan"]["step_statuses"][step_id] == "NOT_STARTED"
+    event = successor["transitions"][-1]
+    assert event["event_type"] == "REPLAN" and event["from"]["plan_id"] == predecessor["plan_id"]
+    assert event["to"]["plan_id"] == successor["plan_id"]
+    assert verify_history(successor) is None
+    writes = c.writes
+    assert asyncio.run(apply_plan(c, "owner", replan, c.doc["updated_at"]))["code"] == "PLAN_REPLANNED"
+    assert c.writes == writes
+
+
+def test_phase3b_replan_without_current_confirmed_intent_fails_closed():
+    c = collection(); confirm_plan(c); c.doc["updated_at"] = "2026-10-24T13:00:00+00:00"
+    before = deepcopy(c.doc)
+    request = phase3b_operation(c, "REPLAN")
+    with pytest.raises(PlanError, match="INTENT_STALE"):
+        asyncio.run(apply_plan(c, "owner", request, c.doc["updated_at"]))
+    assert c.doc == before
+
+
+def test_phase3b_replan_rejects_self_consistent_wrong_predecessor_generation_without_mutation():
+    c = collection(); confirm_plan(c)
+    replan = phase3b_operation(c, "REPLAN")
+    asyncio.run(apply_plan(c, "owner", replan, c.doc["updated_at"]))
+    plan = c.doc["j06_2_plan"]
+    request = PlanOperation(kind="plan", projectId="p", operation_id=str(uuid4()), operation_type="REPLAN",
+                            plan_id=plan["plan_id"], generation=plan["generation"],
+                            plan_revision=plan["plan_revision"], state_revision=plan["state_revision"],
+                            expected_status="STALE", expected_progress_revision=0)
+
+    # Keep all hashes internally consistent so this exercises the generation
+    # relationship check rather than merely detecting a stale digest.
+    plan["predecessor_reference"]["generation"] = plan["generation"]
+    plan["predecessor_reference_digest"] = service._digest(
+        "predecessor-reference", plan["predecessor_reference"])
+    event = next(event for event in reversed(plan["transitions"])
+                 if event["event_type"] == "REPLAN" and event["to"]["plan_id"] == plan["plan_id"])
+    event["predecessor_reference_digest"] = plan["predecessor_reference_digest"]
+    event["record_hash"] = service._record_hash(event)
+    plan["transition_chain_head"] = event["record_hash"]
+    before = deepcopy(c.doc); writes = c.writes
+
+    with pytest.raises(PlanError, match="PLAN_HISTORY_INTEGRITY_ERROR"):
+        asyncio.run(apply_plan(c, "owner", request, c.doc["updated_at"]))
+    assert c.doc == before and c.writes == writes
+
+
+def test_phase3b_router_progress_bypasses_builder_and_economics():
+    import sys
+    from pathlib import Path
+    from unittest.mock import AsyncMock, patch
+    sys.path.insert(0, str(Path(__file__).parent))
+    import test_consumption_callers as fixture
+    c = Collection({"project_id": "project_test", "user_id": "user_test", "updated_at": REV,
+                    "input_type": "text", "input_content": "Synthetic source", "route": "idea",
+                    "refine_answers": {}, "builder_state": {}})
+    asyncio.run(confirm_intent(c)); confirmed = confirm_plan(c)["plan"]
+    request = phase3b_operation(c, "PROGRESS_UPDATE", step_id=confirmed["content"]["steps"][0]["step_id"], status="IN_PROGRESS")
+    with patch.object(fixture.builder_ai, "db", SimpleNamespace(projects=c)), \
+         patch.object(fixture.builder_ai, "run_builder_agent", new=AsyncMock()) as builder, \
+         patch.object(fixture.builder_ai, "run_economic_operation", new=AsyncMock()) as economic:
+        result = asyncio.run(fixture.builder_ai.build_with_ai(request, SimpleNamespace(headers={"If-Match": c.doc["updated_at"]})))
+    assert result["code"] == "PLAN_PROGRESS_RECORDED"
+    builder.assert_not_awaited(); economic.assert_not_awaited()
+
+
+def test_phase3b_replan_from_stale_predecessor_uses_separately_valid_current_binding():
+    c = collection(); confirm_plan(c)
+    c.doc["j06_2_plan"]["source_binding"]["source_revision"] = "2026-10-23T12:00:00+00:00"
+    assert project_plan_view(c.doc, "owner")["status"] == "STALE"
+    assert service._binding(c.doc, "owner") != c.doc["j06_2_plan"]["source_binding"]
+    predecessor = deepcopy(c.doc["j06_2_plan"])
+    result = asyncio.run(apply_plan(c, "owner", phase3b_operation(c, "REPLAN"), c.doc["updated_at"]))
+    successor = c.doc["j06_2_plan"]
+    assert result["code"] == "PLAN_REPLANNED"
+    assert successor["generation"] == predecessor["generation"] + 1 and successor["status"] == "DRAFT"
+    assert successor["source_binding"] == service._binding(c.doc, "owner")
+    assert verify_history(successor) is None
+
+
+def test_phase3b_checkpoint_must_point_to_latest_retained_progress_event():
+    c = collection(); confirmed = confirm_plan(c)["plan"]
+    step = confirmed["content"]["steps"][0]["step_id"]
+    first = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step, status="IN_PROGRESS")
+    asyncio.run(apply_plan(c, "owner", first, c.doc["updated_at"]))
+    plan = c.doc["j06_2_plan"]
+    prior_snapshot = deepcopy(plan["progress_snapshot"])
+    prior_checkpoint = deepcopy(plan["progress_checkpoint"])
+    second = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step, status="BLOCKED")
+    asyncio.run(apply_plan(c, "owner", second, c.doc["updated_at"]))
+    plan = c.doc["j06_2_plan"]
+    assert len([event for event in plan["transitions"] if event["event_type"] == "PROGRESS_UPDATE"]) == 2
+    # Both checkpoint and snapshot are independently well-formed and hash-valid,
+    # but they point to the earlier update while a later one remains retained.
+    plan["progress_snapshot"] = prior_snapshot
+    plan["progress_checkpoint"] = prior_checkpoint
+    before = deepcopy(c.doc); writes = c.writes
+    with pytest.raises(PlanError, match="PLAN_HISTORY_INTEGRITY_ERROR"):
+        run(c, "READ")
+    assert c.doc == before and c.writes == writes
+
+
+def test_phase3b_progress_continuity_remains_valid_after_prior_events_are_truncated():
+    c = collection(); confirmed = confirm_plan(c)["plan"]
+    step_id = confirmed["content"]["steps"][0]["step_id"]
+    # Twenty-one accepted declarations force the earlier lifecycle and first
+    # progress event out of the 20-record window while retaining a contiguous
+    # suffix and its opaque predecessor anchor.
+    for _ in range(21):
+        operation = phase3b_operation(c, "PROGRESS_UPDATE", step_id=step_id, status="IN_PROGRESS")
+        asyncio.run(apply_plan(c, "owner", operation, c.doc["updated_at"]))
+
+    plan = c.doc["j06_2_plan"]
+    retained = plan["transitions"]
+    assert len(retained) == 20 and retained[0]["seq"] > 1
+    assert retained[0]["event_type"] == "PROGRESS_UPDATE"
+    assert retained[0]["previous_hash"] != "0" * 64
+    assert all(previous["seq"] + 1 == current["seq"]
+               and previous["record_hash"] == current["previous_hash"]
+               and previous["progress_revision_after"] == current["progress_revision_before"]
+               and previous["snapshot_after_digest"] == current["snapshot_before_digest"]
+               for previous, current in zip(retained, retained[1:]))
+    assert plan["progress_snapshot"]["progress_revision"] == 21
+    assert plan["progress_checkpoint"]["last_event_seq"] == plan["transition_sequence"]
+    assert retained[-1]["record_hash"] == plan["progress_checkpoint"]["last_event_hash"]
+    assert verify_history(plan) is None
+
+
+def test_phase3b_success_receipt_cannot_cross_operation_types_after_event_eviction():
+    c = collection(); confirmed = confirm_plan(c)["plan"]
+    progress = phase3b_operation(c, "PROGRESS_UPDATE", step_id=confirmed["content"]["steps"][0]["step_id"], status="BLOCKED")
+    asyncio.run(apply_plan(c, "owner", progress, c.doc["updated_at"]))
+    replan = phase3b_operation(c, "REPLAN")
+    asyncio.run(apply_plan(c, "owner", replan, c.doc["updated_at"]))
+    for index in range(20):
+        run(c, "EDIT", content=content(f"Revision {index}"))
+    plan = c.doc["j06_2_plan"]
+    progress_key = service._hash({"domain": "SM/J06.2/OPERATION/V1", "owner_id": "owner",
+                                  "project_id": "p", "operation_id": progress.operation_id})
+    receipt = next(item for item in plan["receipts"] if item["key"] == progress_key)
+    assert not any(event["operation_fingerprint"] == receipt["fingerprint"] for event in plan["transitions"])
+    receipt["result_code"] = "PLAN_REPLANNED"
+    before = deepcopy(c.doc); writes = c.writes
+    with pytest.raises(PlanError, match="PLAN_HISTORY_INTEGRITY_ERROR"):
+        asyncio.run(apply_plan(c, "owner", progress, c.doc["updated_at"]))
+    assert c.doc == before and c.writes == writes
+
+
+def test_phase3b_checkpoint_mismatch_and_partial_presence_fail_closed_on_read():
+    c = collection(); confirmed = confirm_plan(c)["plan"]
+    update = phase3b_operation(c, "PROGRESS_UPDATE", step_id=confirmed["content"]["steps"][0]["step_id"], status="BLOCKED")
+    asyncio.run(apply_plan(c, "owner", update, c.doc["updated_at"]))
+    c.doc["j06_2_plan"]["progress_checkpoint"]["last_event_seq"] = 0
+    before = deepcopy(c.doc)
+    with pytest.raises(PlanError, match="PLAN_HISTORY_INTEGRITY_ERROR"):
+        run(c, "READ")
+    assert c.doc == before
+    c.doc["j06_2_plan"].pop("progress_checkpoint")
+    before = deepcopy(c.doc)
+    with pytest.raises(PlanError, match="PLAN_HISTORY_INTEGRITY_ERROR"):
+        run(c, "READ")
+    assert c.doc == before
+
+
+@pytest.mark.parametrize("override", [
+    {"project_id": "p"}, {"extra": True}, {"status": None}, {"generation": True}, {"generation": 1.0},
+    {"expected_progress_revision": -1}, {"step_id": "ABC"},
+])
+def test_phase3b_request_schema_is_closed_and_strict(override):
+    raw = {"kind": "plan", "projectId": "p", "operation_id": str(uuid4()), "operation_type": "PROGRESS_UPDATE",
+           "plan_id": str(uuid4()), "generation": 1, "plan_revision": 1, "state_revision": 1,
+           "expected_status": "CONFIRMED", "expected_progress_revision": 0,
+           "step_id": str(uuid4()), "status": "IN_PROGRESS"}
+    raw.update(override)
+    with pytest.raises(ValidationError):
+        PlanOperation(**raw)

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { submitPlanOperation, recoverProjectPlan } from '../api/builderAiClient';
 
 const empty = () => ({ title: '', objective: '', steps: [] });
+const progressStatuses = ['NOT_STARTED', 'IN_PROGRESS', 'BLOCKED', 'COMPLETED'];
 
 export function PlanProjection({ projection }) {
   if (!projection) return null;
@@ -16,6 +17,7 @@ export function PlanProjection({ projection }) {
 export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
   const [plan, setPlan] = useState(project.j06_2_plan || null);
   const [content, setContent] = useState(project.j06_2_plan?.content || empty());
+  const [progressDraft, setProgressDraft] = useState(project.j06_2_plan?.step_statuses || {});
   const [revision, setRevision] = useState(project.updated_at || '0');
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const pending = useRef(null), binding = useRef(null);
@@ -25,7 +27,7 @@ export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
   const dirty = JSON.stringify(content) !== JSON.stringify(plan?.content || empty());
   const terminal = ['CONFIRMED', 'CANCELLED', 'STALE'].includes(plan?.status);
   const locked = busy || Boolean(pending.current) || terminal || !plan;
-  async function send(type, retry = false) {
+  async function send(type, retry = false, phase3b = {}) {
     if (busy || (pending.current && !retry)) return;
     const requestIdentity = identity;
     if (!pending.current) pending.current = {
@@ -33,6 +35,8 @@ export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
       body: { projectId: project.project_id, operation_id: crypto.randomUUID(), operation_type: type,
         ...(plan ? { plan_id: plan.plan_id, generation: plan.generation, plan_revision: plan.plan_revision,
           state_revision: plan.state_revision, expected_status: plan.status } : {}),
+        ...(['PROGRESS_UPDATE', 'REPLAN'].includes(type) ? { expected_progress_revision: plan.progress_revision || 0 } : {}),
+        ...(type === 'PROGRESS_UPDATE' ? { step_id: phase3b.step_id, status: phase3b.status } : {}),
         ...(type === 'EDIT' ? { content } : {}),
         ...(type === 'CONFIRM' ? { digest: plan.confirmation_challenge.digest } : {}),
       },
@@ -44,7 +48,7 @@ export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
         : await submitPlanOperation(pending.current.body, pending.current.revision, apiBaseUrl);
       if (binding.current !== requestIdentity) return;
       if (result.user_id !== ownerId || result.project_id !== project.project_id) throw Object.assign(new Error(), { code: 'PROJECT_NOT_FOUND_OR_NOT_OWNED' });
-      setPlan(result.plan); setContent(result.plan?.content || empty()); setRevision(result.updated_at); pending.current = null;
+      setPlan(result.plan); setContent(result.plan?.content || empty()); setProgressDraft(result.plan?.step_statuses || {}); setRevision(result.updated_at); pending.current = null;
     } catch (e) {
       if (binding.current !== requestIdentity) return;
       const code = e.code || 'PERSISTENCE_UNAVAILABLE'; setError(code);
@@ -75,6 +79,22 @@ export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
       <button disabled={busy || Boolean(pending.current) || dirty || plan.status !== 'DRAFT'} onClick={() => send('REVIEW')}>Revisar plan guardado</button>
       {dirty && <p>Guarda tus cambios y revisa la nueva propuesta antes de confirmar.</p>}
       {plan.status === 'READY_FOR_CONFIRMATION' && !dirty && <><PlanProjection projection={plan.confirmation_challenge?.display_projection} /><button disabled={busy || Boolean(pending.current)} onClick={() => send('CONFIRM')}>Confirmo este plan exacto</button></>}
+      {['CONFIRMED', 'STALE'].includes(plan.status) && <section aria-label="Progreso declarado">
+        <h3>Progreso declarado</h3><p>Este estado lo declaras tú; no verifica que el trabajo se haya ejecutado.</p>
+        {content.steps.map(step => <label key={step.step_id}>{step.title}
+          <select aria-label={`Progreso de ${step.title}`} value={progressDraft[step.step_id] || plan.step_statuses?.[step.step_id] || 'NOT_STARTED'} disabled={plan.status !== 'CONFIRMED' || busy || Boolean(pending.current)}
+            onChange={e => setProgressDraft({ ...progressDraft, [step.step_id]: e.target.value })}>
+            {progressStatuses.map(status => <option key={status} value={status}>{status}</option>)}
+          </select>
+          {plan.status === 'CONFIRMED' && <button disabled={busy || Boolean(pending.current) || (progressDraft[step.step_id] || plan.step_statuses?.[step.step_id] || 'NOT_STARTED') === (plan.step_statuses?.[step.step_id] || 'NOT_STARTED')}
+            onClick={() => send('PROGRESS_UPDATE', false, { step_id: step.step_id, status: progressDraft[step.step_id] })}>Guardar progreso del paso</button>
+          }
+        </label>)}
+      </section>}
+      {['CONFIRMED', 'STALE'].includes(plan.status) && <>
+        <p>Replan crea un borrador nuevo desde el contenido confirmado; el progreso anterior permanece en el predecesor y no se transfiere.</p>
+        <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('REPLAN')}>Crear replanteamiento</button>
+      </>}
       {plan.stored_status !== 'CANCELLED' && ['DRAFT', 'READY_FOR_CONFIRMATION', 'STALE'].includes(plan.status) && <button disabled={busy || Boolean(pending.current)} onClick={() => send('CANCEL')}>Cancelar plan</button>}
       {['CANCELLED', 'STALE'].includes(plan.status) && <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('RESTART')}>Iniciar nuevo borrador</button>}
       {plan.status === 'STALE' && <p>La intención fuente cambió. El plan se conserva. Solo podrás iniciar otro borrador cuando exista una intención vigente confirmada en este proyecto.</p>}
