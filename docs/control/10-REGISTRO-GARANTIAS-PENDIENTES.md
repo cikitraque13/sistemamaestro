@@ -91,3 +91,14 @@ J05 está `COMPLETED` con `TECHNICAL_PASS=YES` para el contrato original de Proj
 - Limitación: la disponibilidad/estado del modelo configurado puede cambiar y build provenance permanece `UNVERIFIED` según Runtime and Deploy Truth.
 - Riesgo: futura operación real del clasificador puede verse afectada por disponibilidad, retiro o comportamiento del modelo.
 - Condición de revalidación: cualquier cambio de modelo/configuración o gate que dependa de ejecución real debe verificar compatibilidad y límites antes de actualizar esta entrada.
+
+## J06 Phase 3B — riesgos residuales de revisión y evidencia
+
+### J06-P3B-R1 — Evidencia Atlas reutilizada por revisiones independientes
+
+- Evidencia demostrada: el paquete final de assurance R2 (`J06-PHASE3B-FINAL-ASSURANCE-20261025-R2`, SHA-256 `efba15d74822454c043ca619b39fb97d4d96a9ea6e8ae6893d9af3e7b9216f1b`) fue revisado por SM-QA y SM-SEC, ambos `APPROVED_WITH_RISKS`. La evidencia asociada reportó 75 pruebas backend, 10 frontend y Atlas 19/19 con limpieza; posteriormente se publicó PR #109 y Railway verificó el deployment y `/health`.
+- Riesgo QA preservado literalmente: “La evidencia de ejecución se revisó como artefactos sellados, no se reprodujo. El resultado Atlas está sanitizado y se reutiliza por coincidencia de hashes del servicio, esquema y suite Atlas; no se volvió a ejecutar.”
+- Riesgo SEC preservado literalmente: “El resultado Atlas es evidencia local sanitizada reutilizada, no una repetición para este gate. La integridad del paquete queda verificada, pero esta revisión no certifica de forma independiente la ejecución histórica representada en ese artefacto.”
+- Limitación de historial: el truncamiento conserva continuidad verificable mediante el ancla/hash, pero no recupera los cuerpos de eventos ya eliminados.
+- Decisión: conservar ambos veredictos `APPROVED_WITH_RISKS`; no reinterpretarlos como una certificación independiente de la ejecución Atlas ni como recuperación de eventos truncados.
+- Condición de revalidación: repetir solo la evidencia que un gate futuro necesite verificar de manera independiente o cuando cambien el contrato, los bytes funcionales o el mecanismo de persistencia.

@@ -1,12 +1,12 @@
 # 02-PENDIENTES-PRIORIZADOS
 
-## Estado operativo vigente — 2026-10-20
+## Estado operativo vigente — 2026-10-25
 
-Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 conservan sus cierres humanos con limitaciones; J03 está cerrado con limitaciones. J04 permanece CLOSED_BY_HUMAN_ACCEPTANCE, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato, conservando riesgos residuales en el [registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md). El roadmap es propietario de estados y dependencias; [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) conserva las observaciones históricas y registra la observación más reciente posterior a PR #103; el [inventario técnico](03-INVENTARIO-TECNICO.md) posee Gold/Evidence y Atlas Testing.
+Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 conservan sus cierres humanos con limitaciones; J03 está cerrado con limitaciones. J04 permanece CLOSED_BY_HUMAN_ACCEPTANCE, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está COMPLETED con TECHNICAL_PASS=YES para su contrato, conservando riesgos residuales en el [registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md). J06 sigue OPEN para la reconciliación de su cierre global; Phase 3A y Phase 3B están publicadas y verificadas. No se identifica otro incremento funcional pendiente dentro del alcance J06 vigente. El roadmap es propietario de estados y dependencias; [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) conserva observaciones históricas de publicación; el [inventario técnico](03-INVENTARIO-TECNICO.md) posee Gold/Evidence y Atlas Testing.
 
-### Frente elegible, no abierto
+### J06 — cierre global pendiente de reconciliación
 
-J06 — Intent + Planning: `READY / NOT_OPENED`; `ENTRY_ASSESSMENT_ELIGIBLE=YES`. El checkpoint `GOLD_FREEZE_POST_J05_2026-10-20` está creado y registrado en el [inventario técnico](03-INVENTARIO-TECNICO.md), con origen `e7370c323267f5c2f105a3c3b7265ea9723719a7`; integridad y restauración PASS, con las limitaciones de exclusión de secretos allí consignadas. La apertura de J06 sigue requiriendo decisión expresa de HUMAN-LUCAS. J05 no queda en backlog activo salvo aparición de evidencia material que invalide su cierre.
+J06 — Intent + Planning: `OPEN`; Phase 3A y Phase 3B están implementadas y publicadas. El siguiente gate es la reconciliación canónica y la evaluación formal del cierre global de J06. No abrir J07 hasta resolver ese gate. J05 no queda en backlog activo salvo aparición de evidencia material que invalide su cierre.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 
