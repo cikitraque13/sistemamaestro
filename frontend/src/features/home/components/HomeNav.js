@@ -101,7 +101,7 @@ const HomeNav = () => {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             to="/login"
-            className="inline-flex whitespace-nowrap rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,rgba(255,242,204,0.16),rgba(242,180,90,0.11),rgba(244,114,182,0.11))] px-3 py-2 text-xs font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_24px_rgba(245,158,11,0.08)] transition hover:border-amber-200/45 hover:bg-amber-200/[0.12] sm:px-5 sm:py-2.5 sm:text-sm"
+            className="inline-flex whitespace-nowrap rounded-2xl border border-[#E9D5FF]/60 bg-[linear-gradient(135deg,rgba(216,180,254,0.42),rgba(167,139,250,0.30))] px-3 py-2 text-xs font-semibold text-[#F5F3FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_0_1px_rgba(196,181,253,0.18),0_8px_26px_rgba(167,139,250,0.38)] transition duration-300 hover:border-[#E9D5FF]/80 hover:bg-[linear-gradient(135deg,rgba(216,180,254,0.52),rgba(167,139,250,0.38))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_0_0_1px_rgba(196,181,253,0.28),0_10px_34px_rgba(167,139,250,0.52)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DDD6FE]/80 motion-reduce:transition-none sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Iniciar sesión
           </Link>
