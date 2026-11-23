@@ -37,7 +37,7 @@ const AudienceSection = () => {
           </h2>
 
           <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-            Si trabajas con ideas, webs, crecimiento o producto, este sistema está pensado para darte una entrada más útil.
+            Si trabajas con ideas, webs, crecimiento o producto, este sistema está pensado para ti.
           </p>
         </div>
 
