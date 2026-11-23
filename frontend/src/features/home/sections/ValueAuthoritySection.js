@@ -33,7 +33,7 @@ const cards = [
 
 const ValueAuthoritySection = () => {
   return (
-    <section id="como-funciona" className="relative overflow-hidden px-6 py-14 md:px-10 md:py-18">
+    <section id="como-funciona" className="relative overflow-hidden px-6 pb-14 pt-6 md:px-10 md:pb-18 md:pt-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(6,182,212,0.05),transparent_18%),radial-gradient(circle_at_82%_18%,rgba(16,185,129,0.05),transparent_18%)]" />
 
       <div className="relative mx-auto max-w-7xl">

@@ -1,29 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-
-import { useAuth } from '../../../context/AuthContext';
-
-const cards = [
-  {
-    eyebrow: 'Entrada',
-    title: 'Empieza con una idea o una web',
-    text: 'El sistema interpreta el punto de partida.',
-    classes:
-      'border-amber-500/15 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(255,255,255,0.02))]',
-  },
-];
 
 const HeroSection = () => {
-  const { user, loading } = useAuth();
-
-  const isAuthenticated = !loading && !!user && user !== false;
-  const primaryCtaTarget = isAuthenticated ? '/dashboard' : '/register';
-
   return (
     <section className="relative overflow-hidden px-6 pb-6 pt-8 md:px-10 md:pb-8 md:pt-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(245,158,11,0.10),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(244,114,182,0.08),transparent_20%)]" />
 
-      <div className="relative mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[1fr_1fr] xl:items-center">
+      <div className="relative mx-auto max-w-7xl">
         <div className="max-w-3xl">
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
             Sistema Maestro
@@ -36,36 +18,6 @@ const HeroSection = () => {
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300 md:text-[1.08rem] md:leading-8">
             Sistema Maestro interpreta tu idea o tu web y ordena prioridades.
           </p>
-        </div>
-
-        <div className="rounded-[28px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.025),rgba(255,255,255,0.01))] p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] md:p-5">
-          <div className="space-y-3">
-            {cards.map((card) => (
-              <div
-                key={card.eyebrow}
-                className={`rounded-[20px] border p-4 ${card.classes}`}
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                  {card.eyebrow}
-                </p>
-                <h3 className="mt-2 text-[1.4rem] font-semibold leading-tight text-white md:text-[1.5rem]">
-                  {card.title}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-300">
-                  {card.text}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <Link
-              to={primaryCtaTarget}
-              className="inline-flex items-center justify-center rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
-            >
-              Pon tu idea
-            </Link>
-          </div>
         </div>
       </div>
     </section>
