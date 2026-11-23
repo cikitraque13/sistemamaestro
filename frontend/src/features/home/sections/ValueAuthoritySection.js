@@ -4,7 +4,7 @@ const cards = [
   {
     step: '01',
     eyebrow: 'Analiza',
-    title: 'Analiza y ordena prioridades',
+    title: 'Una web que convierte',
     text: 'Sistema Maestro interpreta el contexto, detecta fricciones y organiza por dónde conviene avanzar primero.',
     classes: 'bg-[linear-gradient(180deg,rgba(249,115,22,0.30),rgba(249,115,22,0.12))]',
     accent: 'text-[#FDBA74]',
@@ -14,7 +14,7 @@ const cards = [
   {
     step: '02',
     eyebrow: 'Construye',
-    title: 'Convierte una idea en una base real de proyecto',
+    title: 'Un agente que contesta',
     text: 'No se limita a describir. Ordena una idea o una URL para dejarla lista para avanzar con más sentido.',
     classes: 'bg-[linear-gradient(180deg,rgba(198,244,50,0.22),rgba(198,244,50,0.08))]',
     accent: 'text-[#C6F432]',
@@ -24,7 +24,7 @@ const cards = [
   {
     step: '03',
     eyebrow: 'Despliega',
-    title: 'Prepara salida y despliegue en la nube',
+    title: 'Todo conectado sin que toques nada',
     text: 'El sistema no se queda encerrado. El proyecto puede avanzar hacia una salida real cuando toque.',
     classes: 'bg-[linear-gradient(180deg,rgba(216,180,254,0.26),rgba(167,139,250,0.12))]',
     accent: 'text-[#E9D5FF]',
@@ -34,7 +34,7 @@ const cards = [
   {
     step: '04',
     eyebrow: 'Extrae',
-    title: 'Saca tu proyecto y sigue con continuidad',
+    title: 'Tu agencia en piloto automático',
     text: 'Si quieres extracción o una operación premium, el sistema también lo contempla dentro de su economía.',
     classes: 'bg-[linear-gradient(180deg,rgba(56,189,248,0.26),rgba(56,189,248,0.10))]',
     accent: 'text-[#7DD3FC]',
