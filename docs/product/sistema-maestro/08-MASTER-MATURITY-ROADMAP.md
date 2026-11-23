@@ -258,6 +258,16 @@ La intención original es que una persona nueva describa una aplicación complej
 
 V1 candidata a mercado requiere evidencia integral de contexto, memoria, intención/planning, orquestación, capacidades especializadas, routing de modelos, autonomía gobernada, validación estructural/funcional/semántica/visual/seguridad, trazabilidad y reversibilidad, autorización server-side, multi-proyecto/multi-device, exportación/deploy/portabilidad, gobierno de Gems/costes, observabilidad, recuperación y Golden Journey. Ningún elemento se da por cerrado por presencia de módulos o por releases parciales.
 
+## Propuestas registradas el 2026-11-24
+
+Son propuestas, no decisiones. No cambian el estado de ninguna jornada ni autorizan gates. Salen de la lectura literal del roadmap del 2026-11-24 y de los informes de herramientas externas y de referencia de mercado resumidos en el [registro de jornada 2026-11-23/24](../../control/11-REGISTRO-JORNADA-20261123-24.md).
+
+- Lectura de partida: J06 sigue OPEN con TECHNICAL_STATUS=PARTIAL. J07, J08 y J14 recogen la capa de builder y de agentes y siguen NOT_DEMONSTRATED. J17 no existe; este roadmap cubre J04 a J16.
+- Propuesta 1: concretar J12 con la publicación de cada proyecto en una dirección HTTPS propia, en un origen aparte de la app en producción, y después el dominio del cliente.
+- Propuesta 2: estudiar una jornada nueva de agencia de IA (agentes web, WhatsApp por la API oficial, voz, citas y automatizaciones), con dependencias de J07, J12 y J14. Hoy no existe en el roadmap.
+- Propuesta 3: revisar la [decisión cerrada 56](../../control/01-DECISIONES-CERRADAS.md), que hoy impide abrir n8n, deploy final y nuevas capas de producto, antes de cualquier trabajo de la propuesta 2.
+- Decisión pendiente de Lucas: cerrar J06 de verdad antes de abrir J07.
+
 ## Regla de cierre
 
 Cada gate conserva su propio owner de ejecución y evidencia. El estado canónico se actualiza aquí tras la revisión correspondiente. Para reglas de operación, evidencia y checkpoints, consultar [Journey Gate Operating Rules](../../control/09-JOURNEY-GATE-OPERATING-RULES.md).
