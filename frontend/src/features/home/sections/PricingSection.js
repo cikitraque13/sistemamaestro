@@ -2,8 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   pricingPlans,
-  pricingSection,
-  pricingTrustSignals
+  pricingSection
 } from '../../../content/pricingContent';
 
 const planToneClasses = {
@@ -111,76 +110,6 @@ const PricingSection = () => {
                 </article>
               );
             })}
-          </div>
-
-          <div className="mt-8 grid gap-5 lg:grid-cols-[1.02fr_0.98fr]">
-            <div className="relative overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[radial-gradient(circle_at_top_left,rgba(6,182,212,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-6 shadow-[0_0_40px_rgba(6,182,212,0.06)]">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-cyan-300/10 blur-3xl" />
-
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100/70">
-                Gema Maestra
-              </p>
-
-              <h4 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-                Capacidad operativa visible.
-              </h4>
-
-              <p className="mt-4 text-sm leading-7 text-zinc-300">
-                Las gemas muestran el margen real disponible para construir, iterar y avanzar
-                dentro de Sistema Maestro. No escondemos la capacidad: la hacemos visible para que
-                el usuario entienda cuándo puede probar, cuándo debe continuar y cuándo conviene escalar.
-              </p>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/8 bg-black/25 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                    Inicio
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-white">10 gemas</p>
-                </div>
-
-                <div className="rounded-2xl border border-white/8 bg-black/25 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                    Continuidad
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-white">Pro y Growth</p>
-                </div>
-
-                <div className="rounded-2xl border border-white/8 bg-black/25 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                    Escala
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-white">AI Master</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.012))] p-6 shadow-[0_0_40px_rgba(255,255,255,0.035)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-                Señales de confianza
-              </p>
-
-              <h4 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-                Un modelo claro antes de pedir más.
-              </h4>
-
-              <div className="mt-5 grid gap-3">
-                {pricingTrustSignals.slice(0, 4).map((signal, index) => (
-                  <div
-                    key={signal}
-                    className="flex items-start gap-4 rounded-2xl border border-white/8 bg-black/25 p-4"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-emerald-300/20 bg-emerald-300/10 text-xs font-semibold text-emerald-100">
-                      {index + 1}
-                    </span>
-
-                    <p className="text-sm leading-6 text-zinc-200">
-                      {signal}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
