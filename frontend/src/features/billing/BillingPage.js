@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { entryOffer, pricingPlans } from '../../content/pricingContent';
+import { pricingPlans } from '../../content/pricingContent';
 
 import { API_BASE } from './billing.constants';
 import { isPaymentProvisionComplete } from './paymentCompletion.mjs';
@@ -22,7 +22,6 @@ import SuggestedPlanBanner from './components/SuggestedPlanBanner';
 import CreditSummaryCard from './components/CreditSummaryCard';
 import CurrentPlanCard from './components/CurrentPlanCard';
 import PlansGrid from './components/PlansGrid';
-import EntryOfferCard from './components/EntryOfferCard';
 import PaymentHistoryTable from './components/PaymentHistoryTable';
 
 const CHECKOUT_CONTEXT_KEY = 'sm_billing_checkout_context';
@@ -76,7 +75,7 @@ const BillingHero = ({ fromProjectId, onReturnToProject }) => (
         </h1>
 
         <p className="max-w-2xl text-sm leading-6 text-[#D4D4D4] sm:text-base">
-          Gestiona tu entrada puntual, tu plan, tus Gemas Maestras y la continuidad
+          Gestiona tu plan, tus Gemas Maestras y la continuidad
           de trabajo dentro de Sistema Maestro Builder sin perder el hilo del proyecto.
         </p>
       </div>
@@ -88,22 +87,12 @@ const BillingHero = ({ fromProjectId, onReturnToProject }) => (
           className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
         >
           <ArrowLeft size={16} />
-          Volver al informe
+          Volver al proyecto
         </button>
       )}
     </div>
 
-    <div className="mt-6 grid gap-3 md:grid-cols-3">
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-amber-100">
-          Informe Gold
-        </p>
-        <p className="text-sm leading-6 text-[#D4D4D4]">
-          Entrada puntual para validar una idea, ordenar el diagnóstico, recibir
-          un prompt preparado y activar 10 gemas iniciales hacia Builder.
-        </p>
-      </div>
-
+    <div className="mt-6 grid gap-3 md:grid-cols-2">
       <div className="rounded-2xl border border-cyan-300/12 bg-cyan-400/[0.06] p-4">
         <p className="mb-1 text-xs uppercase tracking-[0.14em] text-cyan-100">
           Gema Maestra
@@ -149,8 +138,8 @@ const ProjectContextCard = ({ fromProjectId, onReturnToProject }) => {
               Vienes desde un proyecto activo
             </p>
             <p className="text-sm leading-6 text-[#D4D4D4]">
-              Si completas una compra puntual o un plan desde aquí, el sistema conserva
-              el contexto para devolverte al informe o al proyecto correspondiente.
+              Si activas un plan desde aquí, el sistema conserva el contexto para
+              devolverte al proyecto correspondiente.
             </p>
           </div>
         </div>
@@ -172,7 +161,6 @@ const BillingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const entryOfferRef = useRef(null);
 
   const restoredContext = useMemo(() => readCheckoutContext(), []);
 
@@ -192,28 +180,10 @@ const BillingPage = () => {
     restoredContext?.fromProjectId ||
     null;
 
-  const entryOfferId =
-    location.state?.entryOfferId ||
-    restoredContext?.entryOfferId ||
-    null;
-
-  const focusSection =
-    location.state?.focusSection ||
-    restoredContext?.focusSection ||
-    null;
-
-  const entryOfferFocused =
-    entryOfferId === 'single_report' || focusSection === 'entry-offer';
-
   const suggestedPlan = useMemo(
     () => pricingPlans.find((plan) => plan.id === suggestedPlanId) || null,
     [suggestedPlanId]
   );
-
-  const selectedEntryOffer = useMemo(() => {
-    if (entryOfferId && entryOffer?.id === entryOfferId) return entryOffer;
-    return entryOffer;
-  }, [entryOfferId]);
 
   const currentPlanId = billingData?.current_plan?.id || user?.plan || 'free';
 
@@ -236,7 +206,7 @@ const BillingPage = () => {
 
   const handleReturnToProject = () => {
     if (!fromProjectId) return;
-    navigate(`/dashboard/project/${fromProjectId}/report-preview`);
+    navigate(`/dashboard/project/${fromProjectId}`);
   };
 
   const fetchBillingData = async () => {
@@ -269,34 +239,15 @@ const BillingPage = () => {
         withCredentials: true
       });
 
-      const { item_type, item_id, status } = response.data || {};
+      const { status } = response.data || {};
 
       if (isPaymentProvisionComplete(response.data)) {
-        const checkoutContext = readCheckoutContext();
-
-        if (item_type === 'one_time_offer' && item_id === 'single_report') {
-          toast.success('Pago completado. Tu Informe Gold ha quedado registrado.');
-        } else {
-          toast.success('Pago completado. Tu plan ha sido actualizado.');
-        }
+        toast.success('Pago completado. Tu plan ha sido actualizado.');
 
         await checkAuth();
         await fetchBillingData();
         window.history.replaceState({}, '', window.location.pathname);
         setCheckingPayment(false);
-
-        if (
-          item_type === 'one_time_offer' &&
-          item_id === 'single_report' &&
-          checkoutContext?.fromProjectId
-        ) {
-          clearCheckoutContext();
-          navigate(
-            `/dashboard/project/${checkoutContext.fromProjectId}/report-preview`,
-            { replace: true }
-          );
-          return;
-        }
 
         clearCheckoutContext();
         return;
@@ -364,57 +315,6 @@ const BillingPage = () => {
     }
   };
 
-  const handleEntryOfferCheckout = async () => {
-    const offerId = selectedEntryOffer?.id;
-
-    if (!offerId) {
-      const message = 'La oferta puntual no está bien configurada.';
-      setCheckoutError(message);
-      toast.error(message);
-      return;
-    }
-
-    const processingId = `offer:${offerId}`;
-    setProcessingKey(processingId);
-    setCheckoutError('');
-
-    writeCheckoutContext({
-      kind: 'entry-offer',
-      entryOfferId: offerId,
-      fromProjectId: fromProjectId || null,
-      focusSection: 'entry-offer'
-    });
-
-    try {
-      const response = await axios.post(
-        `${API_BASE}/payments/checkout`,
-        {
-          item_type: 'one_time_offer',
-          item_id: offerId,
-          origin_url: window.location.origin
-        },
-        { withCredentials: true }
-      );
-
-      const checkoutUrl = response?.data?.url;
-
-      if (!isValidCheckoutUrl(checkoutUrl)) {
-        throw new Error('Stripe no devolvió una URL de checkout válida');
-      }
-
-      redirectToCheckout(checkoutUrl);
-    } catch (error) {
-      clearCheckoutContext();
-      const message = getErrorMessage(
-        error,
-        'No se pudo iniciar el checkout del Informe Gold.'
-      );
-      setCheckoutError(message);
-      toast.error(message);
-      setProcessingKey(null);
-    }
-  };
-
   useEffect(() => {
     fetchBillingData();
 
@@ -424,19 +324,6 @@ const BillingPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
-
-  useEffect(() => {
-    if (!entryOfferFocused || !entryOfferRef.current) return;
-
-    const timer = setTimeout(() => {
-      entryOfferRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }, 180);
-
-    return () => clearTimeout(timer);
-  }, [entryOfferFocused]);
 
   if (loading) {
     return (
@@ -495,15 +382,6 @@ const BillingPage = () => {
           processingKey={processingKey}
           onPlanCheckout={handlePlanCheckout}
         />
-
-        <div ref={entryOfferRef}>
-          <EntryOfferCard
-            selectedEntryOffer={selectedEntryOffer}
-            processingKey={processingKey}
-            onEntryOfferCheckout={handleEntryOfferCheckout}
-            isFocused={entryOfferFocused}
-          />
-        </div>
 
         <CreditSummaryCard creditSummary={creditSummary} />
 

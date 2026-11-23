@@ -12,7 +12,7 @@ export const ROUTE_NAMES = {
 export const PLAN_VISUALS = {
   blueprint: {
     label: '29',
-    name: 'Blueprint',
+    name: 'Pro',
     badgeClass: 'bg-[#0F5257]/20 text-[#8DE1D0]',
     borderClass: 'border-[#0F5257]/30',
     boxClass: 'bg-[#0F5257]/10'
@@ -67,33 +67,4 @@ export const PRIORITY_META = {
     label: 'Baja',
     badgeClass: 'bg-[#1B2A20] text-[#8BE3A1]'
   }
-};
-
-export const CONTINUITY_PATH_META = {
-  stay: {
-    label: 'Seguir analizando',
-    cta: null,
-    badgeClass: 'bg-[#262626] text-[#D4D4D4]'
-  },
-  blueprint: {
-    label: 'Entrar en Pro',
-    cta: 'Entrar en Pro',
-    badgeClass: 'bg-[#0F5257]/20 text-[#8DE1D0]'
-  },
-  sistema: {
-    label: 'Entrar en Growth',
-    cta: 'Entrar en Growth',
-    badgeClass: 'bg-amber-500/20 text-amber-300'
-  },
-  premium: {
-    label: 'Acceder a AI Master 199',
-    cta: 'Acceder a AI Master 199',
-    badgeClass: 'bg-fuchsia-500/20 text-fuchsia-300'
-  }
-};
-
-export const CONTINUITY_PATH_TO_PLAN = {
-  blueprint: 'blueprint',
-  sistema: 'sistema',
-  premium: 'premium'
 };

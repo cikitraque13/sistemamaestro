@@ -22,7 +22,7 @@ const steps = [
   {
     id: '04',
     title: 'Prepara continuidad real',
-    text: 'El objetivo no es cerrar un informe, sino dejar el proyecto listo para el siguiente paso con mas criterio y menos friccion.',
+    text: 'El objetivo es dejar el proyecto listo para el siguiente paso con mas criterio y menos friccion.',
     tone: 'pink',
   },
 ];

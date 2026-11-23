@@ -38,14 +38,6 @@ const MODES = [
     starter:
       'https://miweb.com — analiza la web y reconstruye una versión más premium, más clara y más orientada a conversión.',
   },
-  {
-    id: 'blueprint',
-    label: 'Blueprint',
-    inputType: 'text',
-    placeholder: 'Describe la idea para generar estructura, módulos, lógica y ruta de construcción...',
-    starter:
-      'Quiero convertir esta idea en un blueprint con estructura, módulos, monetización y siguientes pasos claros.',
-  },
 ];
 
 const PROJECT_CONTEXTS = [
@@ -243,7 +235,6 @@ const resolveLauncherMode = (launcherState = null) => {
     url: 'url',
     improve: 'url',
     improve_existing: 'url',
-    blueprint: 'blueprint',
   };
 
   return modeMap[rawMode] || 'landing';

@@ -81,14 +81,10 @@ async def get_user_stats(request: Request):
     user = await get_current_user(request)
 
     project_count = await db.projects.count_documents({"user_id": user["user_id"]})
-    blueprint_count = await db.projects.count_documents(
-        {"user_id": user["user_id"], "status": "blueprint_generated"}
-    )
     credit_summary = await get_user_credit_summary(user["user_id"])
 
     return {
         "total_projects": project_count,
-        "blueprints_generated": blueprint_count,
         "plan": user.get("plan", "free"),
         "credit_balance": credit_summary["credit_balance"]
     }

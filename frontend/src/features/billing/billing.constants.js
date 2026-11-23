@@ -3,7 +3,7 @@ export const API_BASE = '/api';
 export const FEATURE_LABELS = {
   diagnosis: 'Diagnóstico',
   route: 'Ruta recomendada',
-  blueprint: 'Blueprint',
+  blueprint: 'Base estructural',
   priorities: 'Prioridades',
   continuity: 'Continuidad guiada',
   deployment: 'Activación y despliegue',
@@ -53,7 +53,7 @@ export const PLAN_SIGNAL_META = {
       'bg-[rgba(255,255,255,0.035)] text-[#DCE7E4] border border-[#0F5257]/14'
   },
   blueprint: {
-    chips: ['Activación', 'Blueprint', 'Prioridades'],
+    chips: ['Activación', 'Builder base', 'Prioridades'],
     chipClass:
       'bg-[#0F5257]/10 text-[#8DE1D0] border border-[#0F5257]/20'
   },

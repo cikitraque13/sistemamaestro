@@ -16,7 +16,7 @@ const PLAN_ROLE_META = {
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
     description:
-      'Idea, diagnostico o informe convertidos en base operativa lista para Builder.',
+      'Idea o diagnostico convertidos en base operativa lista para Builder.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
     glow: 'bg-[#0F5257]/26',

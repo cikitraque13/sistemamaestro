@@ -8,12 +8,6 @@ const outcomes = [
       'Aclara qué está fallando, qué falta y qué prioridad real tiene cada frente.',
   },
   {
-    id: 'blueprint',
-    title: 'Blueprint operativo',
-    description:
-      'Convierte la información en una base más útil para construir, corregir o escalar.',
-  },
-  {
     id: 'priority-route',
     title: 'Ruta de prioridades',
     description:
@@ -36,7 +30,7 @@ const OutcomesSection = () => {
             Qué obtienes
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Resultados pensados para avanzar, no solo para mirar un informe y parar.
+            Resultados pensados para avanzar, no para quedarse en la teoría.
           </h2>
           <p className="mt-4 text-base leading-7 text-zinc-300 md:text-lg">
             El valor del sistema está en traducir análisis y criterio en una salida útil para construir, mejorar o tomar decisiones con más claridad.

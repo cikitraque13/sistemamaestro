@@ -21,7 +21,7 @@
     id: 'continuity',
     title: 'Prepara continuidad',
     description:
-      'Evita que el proyecto se quede bloqueado entre ideas sueltas, informes aislados o tareas sin direccion.',
+      'Evita que el proyecto se quede bloqueado entre ideas sueltas o tareas sin direccion.',
   },
 ];
 

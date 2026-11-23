@@ -18,12 +18,6 @@ const faqItems = [
       'Sí. Puedes partir de una URL existente para detectar fricciones, mejorar estructura, reforzar conversión y ordenar la siguiente fase.',
   },
   {
-    id: 'only-reports',
-    question: '¿Solo genera informes?',
-    answer:
-      'No. El objetivo es ir más allá del informe y preparar rutas útiles de mejora, construcción, continuidad y despliegue.',
-  },
-  {
     id: 'how-ai-is-used',
     question: '¿Cómo utiliza la IA?',
     answer:

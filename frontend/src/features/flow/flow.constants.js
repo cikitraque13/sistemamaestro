@@ -35,7 +35,7 @@ export const ROUTE_DESCRIPTIONS = {
 export const PLAN_VISUALS = {
   blueprint: {
     label: '29',
-    name: 'Blueprint',
+    name: 'Pro',
     badgeClass: 'bg-[#0F5257]/20 text-[#0F5257]',
     borderClass: 'border-[#0F5257]/30',
     boxClass: 'bg-[#0F5257]/10'

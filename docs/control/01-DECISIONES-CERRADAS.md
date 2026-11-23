@@ -860,6 +860,9 @@ La monetización interna gana coherencia premium y deja de parecer una pantalla 
 
 ## 37. Informe Maestro Gold como entrada puntual conectada a Builder
 
+> **Retirado el 2026-11-23:** el Informe puntual / Informe Maestro Gold (6,99 €, `single_report`) y su exportación PDF se eliminaron del producto (ver decisión 69 en `docs/control/01-DECISIONES-CERRADAS.md`). Esta decisión queda SUPERADA y se conserva solo como registro histórico.
+
+
 ### Decisión cerrada 34
 
 Fecha: 2026-04-28
@@ -2611,3 +2614,13 @@ HUMAN-LUCAS autorizó HUMAN_GATE_2. El candidato validado `a370f219fbcc569a0cee8
 Railway production deployment `61140c2c-e5be-4e86-9b2d-fb2b6d7a8ca0` terminó `SUCCESS` sobre ese mismo SHA. QA y Security reconciliaron la evidencia como `APPROVED_WITH_RISKS`.
 La autenticación OAuth E2E y las superficies privadas fueron verificadas funcionalmente. La respuesta directa de `/api/auth/me` no se observó por `ERR_BLOCKED_BY_CLIENT`; esta limitación se conserva como riesgo de observabilidad, no como fallo demostrado del producto.
 El release PRE-S14 queda `CLOSED / DEPLOYED / VERIFIED`. S14 permanece `NOT_STARTED`. Las restricciones de no despliegue de decisiones anteriores se conservan como registro histórico y quedan supersedidas para este release por HUMAN_GATE_2.
+
+## 69. Retirada del informe puntual, del PDF y del blueprint visible — 2026-11-23
+
+HUMAN-LUCAS ordena eliminar el flujo del informe PDF y del blueprint como gancho de producto. Supera la decisión 37.
+
+- Se eliminan del frontend las pantallas de vista previa e impresión del informe (`features/reports`, `components/reports/premium`), sus rutas, pestañas, botones "Ver informe" y textos del dashboard, proyectos, flujo, facturación y landing.
+- Se retira la oferta puntual `single_report` (6,99 €) del catálogo `ONE_TIME_OFFERS` y de la UI; el checkout la rechaza. Las transacciones históricas se conservan en base de datos y el historial de pagos las muestra como "Pago puntual".
+- Se elimina el endpoint `GET /api/projects/{id}/report-print` (PR #113) y la tarjeta/estadística de blueprints del dashboard.
+- Se conserva la generación de blueprint que usa el Builder (`POST /api/projects/{id}/blueprint`, `services/blueprint.py`) y el identificador de plan `blueprint` (plan Pro de Stripe), porque Builder, pagos y gemas dependen de ellos. Retirarlos exige una decisión aparte.
+

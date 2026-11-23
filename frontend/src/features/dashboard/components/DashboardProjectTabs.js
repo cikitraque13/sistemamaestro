@@ -36,20 +36,6 @@ const TAB_META = [
     to: '/dashboard/billing'
   },
   {
-    match: (pathname) =>
-      pathname.startsWith('/dashboard/project/') && pathname.includes('/report-preview'),
-    key: 'report-preview',
-    label: 'Informe',
-    to: null
-  },
-  {
-    match: (pathname) =>
-      pathname.startsWith('/dashboard/project/') && pathname.includes('/report-print'),
-    key: 'report-print',
-    label: 'Impresion',
-    to: null
-  },
-  {
     match: (pathname) => pathname.startsWith('/dashboard/project/'),
     key: 'project',
     label: 'Proyecto activo',
@@ -67,7 +53,7 @@ const isValidTab = (tab) => {
   if (!tab || typeof tab !== 'object') return false;
   if (!tab.to || typeof tab.to !== 'string') return false;
 
-  return !tab.to.startsWith('/flow');
+  return !tab.to.startsWith('/flow') && !tab.to.includes('/report-');
 };
 
 const getTabForPath = (pathname, search = '') => {

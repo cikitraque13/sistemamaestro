@@ -106,12 +106,9 @@ export const getOperationalAccentClasses = (label) => {
   };
 };
 
-export const getConceptLabel = (tx, plans, entryOffer) => {
+export const getConceptLabel = (tx, plans) => {
   if (tx.item_type === 'one_time_offer') {
-    if (tx.offer_id === 'single_report' || tx.item_id === 'single_report') {
-      return entryOffer.name;
-    }
-    return tx.offer_id || tx.item_id || 'Oferta puntual';
+    return 'Pago puntual';
   }
 
   const matchedPlan =

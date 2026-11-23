@@ -1,11 +1,12 @@
 import React from 'react';
 import {
   FolderOpen,
-  Lightning,
   TrendUp,
   ArrowSquareOut
 } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
+
+const PLAN_LABELS = { free: 'Gratis', blueprint: 'Pro' };
 
 const DashboardStatusPanel = ({ loading, stats, user }) => {
   const cards = [
@@ -16,14 +17,10 @@ const DashboardStatusPanel = ({ loading, stats, user }) => {
       tone: 'amber'
     },
     {
-      label: 'Blueprints',
-      value: loading ? '-' : stats?.blueprints_generated || 0,
-      icon: Lightning,
-      tone: 'cyan'
-    },
-    {
       label: 'Plan actual',
-      value: user?.plan ? String(user.plan).charAt(0).toUpperCase() + String(user.plan).slice(1) : 'Gratis',
+      value: user?.plan
+        ? PLAN_LABELS[user.plan] || String(user.plan).charAt(0).toUpperCase() + String(user.plan).slice(1)
+        : 'Gratis',
       icon: TrendUp,
       tone: 'fuchsia'
     }
@@ -37,7 +34,7 @@ const DashboardStatusPanel = ({ loading, stats, user }) => {
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1.12fr_0.88fr] xl:items-start">
-      <div className="grid content-start gap-4 md:grid-cols-3">
+      <div className="grid content-start gap-4 md:grid-cols-2">
         {cards.map((card) => {
           const Icon = card.icon;
 

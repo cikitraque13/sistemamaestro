@@ -16,7 +16,7 @@ const HomeOutputsPreview = ({ items = [] }) => {
         </p>
 
         <h3 className="mt-3 text-xl font-semibold leading-tight text-white">
-          El sistema devuelve una base util para avanzar, no un informe muerto.
+          El sistema devuelve una base util para avanzar.
         </h3>
       </div>
 

@@ -21,7 +21,7 @@
     id: 'enable-continuity',
     title: 'Activa continuidad real',
     description:
-      'Deja el proyecto mejor orientado para informe, builder, decisiones y avance sin dispersion.',
+      'Deja el proyecto mejor orientado para builder, decisiones y avance sin dispersion.',
   },
 ];
 

@@ -24,12 +24,6 @@ const capabilityItems = [
       'Refuerza mensaje, recorrido del usuario y puntos de decisión para vender mejor.',
   },
   {
-    id: 'blueprint',
-    title: 'Blueprint operativo',
-    description:
-      'Transforma la información en una ruta clara de construcción y mejora.',
-  },
-  {
     id: 'builder',
     title: 'Construcción guiada',
     description:

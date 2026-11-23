@@ -318,7 +318,7 @@ Adaptar el sistema comercial actual a la nueva doctrina.
 ### Debe cerrar
 
 - papel de Gratis;
-- papel del informe 6,99;
+- papel del informe 6,99 (retirado el 2026-11-23, decisión 69);
 - papel real de Pro 29;
 - papel real de Growth 79;
 - papel real de Master 199;

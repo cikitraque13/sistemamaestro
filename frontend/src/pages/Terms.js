@@ -41,7 +41,7 @@ const Terms = () => {
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li>Análisis de necesidades y activos digitales</li>
               <li>Diagnósticos y recomendaciones personalizadas</li>
-              <li>Blueprints y planes de acción</li>
+              <li>Planes de acción</li>
               <li>Herramientas de planificación de proyectos digitales</li>
             </ul>
           </section>
@@ -66,7 +66,7 @@ const Terms = () => {
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li><strong>Gratis:</strong> Acceso limitado a funcionalidades básicas</li>
-              <li><strong>Blueprint (€29/mes):</strong> Acceso a estructuras completas y prioridades</li>
+              <li><strong>Pro (€29/mes):</strong> Acceso a estructuras completas y prioridades</li>
               <li><strong>Sistema (€79/mes):</strong> Continuidad guiada y activación</li>
               <li><strong>Premium (€199/mes):</strong> Soporte prioritario y acceso completo</li>
             </ul>

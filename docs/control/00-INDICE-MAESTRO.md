@@ -33,7 +33,7 @@
 | Economía | [Créditos y Economía](../product/sistema-maestro/03-CREDITOS-Y-ECONOMIA.md) | Doctrina comercial |
 | Créditos técnicos | [Política](../system/credits/00-POLITICA-CANONICA-CREDITOS-V1.md), [Matriz](../system/credits/01-MATRIZ-OPERATIVA-CREDITOS-V1.md), [Motor](../system/credits/02-MOTOR-CONSUMO-V1.md), [Contrato](../system/credits/03-CONTRATO-TECNICO-V1.md) | SUPPORTING_CANONICAL, sin cambios en esta reconciliación |
 | Operación del despliegue | [DEPLOY_RAILWAY](../../DEPLOY_RAILWAY.md) | Guía de verificación previa; distinguir la observación live de la configuración declarada y verificar procedencia antes de futuros despliegues; consultar [Runtime and Deploy Truth](../architecture/04-runtime-and-deploy-truth.md) |
-| Informe puntual | [Contrato](../product/01-INFORME-PUNTUAL-CANONICO.md), [Salida PDF](../product/02-PDF-INFORME-PUNTUAL-SALIDA-VISUAL.md) | Contratos de producto existentes |
+| Informe puntual | Retirado el 2026-11-23 (decisión 69); sus contratos se borraron del repo y quedan en el historial de Git | Sin superficie activa |
 | Diseño | [README de diseño](../design/README.md), [Guías](../design/design_guidelines.json) | SUPPORTING_CANONICAL; no impone una dirección visual genérica a todo proyecto |
 | Seguridad | [Decisiones cerradas](01-DECISIONES-CERRADAS.md), [código](../../backend/app/core/security.py), [pruebas](../../backend/tests/test_security_jwt.py) | Reglas y evidencia de implementación; no certificación nueva de seguridad |
 
