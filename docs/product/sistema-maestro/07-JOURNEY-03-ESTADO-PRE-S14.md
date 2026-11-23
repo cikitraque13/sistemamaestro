@@ -1,5 +1,7 @@
 # Journey 03 — Estado canónico tras el cierre operacional de S15
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: registro histórico de Journey 03 y el release PRE-S14. Última modificación de contenido en Git: 2026-10-05 (`3b77e96`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md).
+
 ## Estado de release y autoridad — 2026-10-05
 
 Este documento es el propietario canónico de los cierres y validaciones de Journey 03. El frente siguiente se conserva en el [backlog canónico](../../control/02-PENDIENTES-PRIORIZADOS.md).

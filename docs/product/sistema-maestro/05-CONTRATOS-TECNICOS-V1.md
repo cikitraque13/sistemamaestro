@@ -1,5 +1,7 @@
 # 05 — Contratos Técnicos V1
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: contratos técnicos V1 entre frontend, backend y datos. Última modificación de contenido en Git: 2026-10-02 (`0dac376`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md).
+
 Lectura PRE-S14: las recomendaciones V1 no son prueba de implementación universal.
 La extensión 19 delimita el contrato local validado; el estado y sus pruebas pertenecen
 al [propietario Journey 03](07-JOURNEY-03-ESTADO-PRE-S14.md). No activa backend ni economía nuevos.

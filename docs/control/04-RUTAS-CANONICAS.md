@@ -1,5 +1,7 @@
 ﻿# 04-RUTAS-CANONICAS
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: fijar las rutas canónicas de la aplicación y del repositorio. Última modificación de contenido en Git: 2026-04-26 (`15a32a5`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Estado del documento
 
 - Estado: activo

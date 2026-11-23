@@ -4,6 +4,17 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`). Las entradas siguientes son observaciones históricas fechadas, no un indicador exhaustivo de la última PR ni de cada deployment. Una PR exclusivamente documental y su autodeployment no obligan por sí solos a actualizar esta sección. Se registra una observación nueva cuando un gate requiere ese checkpoint o se verifica un cambio operativo relevante; el estado live actual debe comprobarse en GitHub y Railway cuando corresponda.
 
+### Observación posterior a PR #110 y verificación operativa — 2026-10-25 / 2026-11-23
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `69f61e4ca3f085c07ab29f39478a746023919dc4` (merge de PR #110, solo documentación: README y cinco documentos canónicos) |
+| Railway deployment | `3eb6804f-0be4-4350-81bc-14c659a46e91`; SUCCESS; creado 2026-10-25T01:05:54Z vía GitHub, rama `main`, commit `69f61e4` |
+| Build | Los logs de build cargan la definición desde el `Dockerfile` versionado (etapas frontend con Node y backend con Python). La configuración live sigue reportando builder `RAILPACK`. La procedencia exacta del build no se declara verificada por esta observación |
+| Health y arranque | Healthcheck de Railway en `/health` correcto en el primer intento (2026-10-25). El 2026-11-23, `GET /` y `GET /health` responden HTTP 200 y `/health` devuelve `{"status":"ok"}` |
+| Deployments posteriores | Ninguno hasta 2026-11-23: no hay commits nuevos en `main` desde `69f61e4` |
+| Alcance | Observación documental y operativa; no se lanzó ningún despliegue manual ni se cambió configuración. No modifica estados de madurez |
+
 ### Observación posterior a PR #109 — 2026-10-25
 
 | Plano | Identidad y estado observado |

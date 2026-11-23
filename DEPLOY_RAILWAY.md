@@ -7,6 +7,10 @@
 - Alcance: despliegue y mantenimiento de `Sistema Maestro` en Railway
 - Objetivo: referencia de verificación previa a despliegues; no acredita por sí sola la configuración efectiva de Railway.
 
+> **Estado operativo observado — 2026-11-23 (vigente):** la identidad de producción y su historial viven en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md). Configuración leída en Railway el 2026-11-23, solo lectura: servicio `sistemamaestro` en `production`, fuente `cikitraque13/sistemamaestro`, rama `main`, sin directorio raíz ni rutas vigiladas (cualquier merge a `main` despliega), `checkSuites` desactivado, dominio `sistemamaestro.com` en puerto `8080`, una réplica. Último deployment: `3eb6804f` SUCCESS (commit `69f61e4`, 2026-10-25). Los logs de ese build cargan el `Dockerfile` versionado y el healthcheck `/health`; la configuración live sigue mostrando builder `RAILPACK`. No se listan variables ni valores.
+>
+> El bloque siguiente se conserva como observación histórica.
+
 > **Estado operativo observado — 2026-10-10:** GitHub main y el SHA del deployment observado son `ead9f4e796f9e2be89a8d0b7948364edbf67066b`; el deployment terminó SUCCESS y `/health` respondió HTTP 200. Los metadatos live reportan builder `RAILPACK` y target port `8080`; no muestran `startCommand` ni healthcheck. El `railway.json` versionado declara `DOCKERFILE`, `Dockerfile` y healthcheck `/health`. La procedencia efectiva del build permanece UNVERIFIED. Esta discrepancia debe verificarse antes de cualquier despliegue futuro. Este documento no prescribe cambiar builder, start command ni configuración live.
 
 ---

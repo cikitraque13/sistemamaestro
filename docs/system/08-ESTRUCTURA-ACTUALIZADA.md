@@ -1,5 +1,7 @@
 # 08 — ESTRUCTURA ACTUALIZADA
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: estructura validada del adaptador de IA. Última modificación de contenido en Git: 2026-05-04 (`71245f9`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Cierre estructural validado — Adaptador IA
 
 ### Estado
