@@ -21,6 +21,7 @@ const ReportPrintPage = () => {
   const [loading, setLoading] = useState(true);
   const [billingChecked, setBillingChecked] = useState(false);
   const [printFinished, setPrintFinished] = useState(false);
+  const [serverDenied, setServerDenied] = useState(false);
 
   const hasTriggeredPrintRef = useRef(false);
   const finishTriggeredRef = useRef(false);
@@ -41,9 +42,11 @@ const ReportPrintPage = () => {
       setProject(null);
       setBillingData(null);
       setBillingChecked(false);
+      setServerDenied(false);
 
       try {
-        const projectResponse = await axios.get(`${API_BASE}/projects/${id}`, {
+        // El backend valida el permiso PDF (admin o informe puntual pagado) y responde 403 si no.
+        const projectResponse = await axios.get(`${API_BASE}/projects/${id}/report-print`, {
           withCredentials: true
         });
 
@@ -68,6 +71,10 @@ const ReportPrintPage = () => {
         }
       } catch (error) {
         if (cancelled) return;
+        if (error?.response?.status === 403) {
+          setServerDenied(true);
+          return;
+        }
         console.error('Error cargando proyecto para ReportPrintPage', error);
         toast.error('No se pudo cargar el documento para imprimir');
         navigate('/dashboard/projects');
@@ -132,6 +139,7 @@ const ReportPrintPage = () => {
 
   useEffect(() => {
     if (loading) return;
+    if (serverDenied) return;
     if (!project) return;
     if (!isAdmin && billingChecked && !canExportPdf) return;
     if (hasTriggeredPrintRef.current) return;
@@ -162,7 +170,7 @@ const ReportPrintPage = () => {
       document.title = originalTitle;
       window.removeEventListener('afterprint', finishPrintFlow);
     };
-  }, [billingChecked, canExportPdf, finishPrintFlow, isAdmin, loading, project]);
+  }, [billingChecked, canExportPdf, finishPrintFlow, isAdmin, loading, project, serverDenied]);
 
   if (loading) {
     return (
@@ -170,6 +178,26 @@ const ReportPrintPage = () => {
         <div className="px-6 text-center">
           <p className="mb-2 text-lg font-medium">Preparando Informe Maestro Gold</p>
           <p className="text-sm text-zinc-400">Generando vista de impresion premium...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (serverDenied || (!isAdmin && billingChecked && !canExportPdf)) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-white">
+        <div className="max-w-xl px-6 text-center">
+          <p className="mb-2 text-lg font-semibold">La exportacion PDF no esta disponible</p>
+          <p className="mb-4 text-sm text-zinc-400">
+            Este documento requiere la activacion puntual o acceso administrador para imprimirse.
+          </p>
+
+          <Link
+            to={`/dashboard/project/${id}/report-preview`}
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/10"
+          >
+            Volver a la vista previa
+          </Link>
         </div>
       </div>
     );
@@ -189,26 +217,6 @@ const ReportPrintPage = () => {
             className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/10"
           >
             Volver a proyectos
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin && billingChecked && !canExportPdf) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] text-white">
-        <div className="max-w-xl px-6 text-center">
-          <p className="mb-2 text-lg font-semibold">La exportacion PDF no esta disponible</p>
-          <p className="mb-4 text-sm text-zinc-400">
-            Este documento requiere la activacion puntual o acceso administrador para imprimirse.
-          </p>
-
-          <Link
-            to={`/dashboard/project/${id}/report-preview`}
-            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/10"
-          >
-            Volver a la vista previa
           </Link>
         </div>
       </div>
