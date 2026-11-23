@@ -36,18 +36,18 @@ const ValueAuthoritySection = () => {
     <section id="como-funciona" className="relative overflow-hidden px-6 pb-14 pt-6 md:px-10 md:pb-18 md:pt-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(6,182,212,0.05),transparent_18%),radial-gradient(circle_at_82%_18%,rgba(16,185,129,0.05),transparent_18%)]" />
 
-      <div className="relative mx-auto max-w-7xl">
-        <div className="max-w-4xl">
+      <div className="relative mx-auto grid max-w-7xl items-start gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12">
+        <div className="max-w-4xl lg:max-w-none">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
             Lo que hace de verdad
           </p>
 
-          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3.8rem] md:leading-[0.96]">
+          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3.8rem] md:leading-[0.96] lg:text-[3.1rem] xl:text-[3.4rem]">
             Analiza, construye, despliega y mantiene continuidad real.
           </h2>
         </div>
 
-        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2">
           {cards.map((card) => (
             <article
               key={card.eyebrow}
