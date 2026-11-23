@@ -266,7 +266,7 @@ Dentro de ella existen estas subcapas:
 La referencia canónica de runtime del backend es:
 
 ```bash
-uvicorn backend.app.main:app --reload --port 8001
+uvicorn backend.app.main:app --reload --port 8000
 ```
 
 La app canónica de runtime queda fijada como:
@@ -370,9 +370,9 @@ npm run build
 ### Backend
 
 ```bash
-cd backend
+# desde la raíz del repositorio (backend.app.main necesita la raíz en el path)
 python -m pip install -r requirements.txt
-uvicorn backend.app.main:app --reload --port 8001
+uvicorn backend.app.main:app --reload --port 8000
 ```
 
 ### Frontend
@@ -422,13 +422,13 @@ STRIPE_SECRET_KEY=sk_xxx
 MONGO_URL=[MongoDB Atlas connection URI removed; configure credentials privately.]/sistemamaestro
 DB_NAME=sistemamaestro
 JWT_SECRET=clave_segura_larga
-ALLOWED_ORIGINS=http://localhost:3000,https://tu-dominio.com
+ALLOWED_ORIGINS=http://localhost:5173,https://tu-dominio.com
 ```
 
 Y el frontend:
 
 ```env
-VITE_BACKEND_URL=http://localhost:8001
+VITE_API_BASE_URL=http://127.0.0.1:8000
 VITE_GOOGLE_CLIENT_ID=
 ```
 
