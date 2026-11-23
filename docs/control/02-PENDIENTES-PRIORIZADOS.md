@@ -15,7 +15,7 @@ Detalle y verificación en el [registro de jornada 2026-11-23/24](11-REGISTRO-JO
 1. Cierre real de J06: el panel de intención y plan del builder se ve sin estilo. Criterio propuesto: con estilo, funcionando de punta a punta y verificado en producción; después, el cierre en el roadmap por un PR normal.
 2. Recorte de pestañas del builder (GitHub, Deploy, Estructura y Código): no está hecho. Hoy siguen las seis pestañas.
 3. Coste o plan de Extracción: por definir.
-4. Rótulo `'Entrada'` de la tarjeta del titular de la portada: quitarlo o dejarlo.
+4. Rótulo `'Entrada'` de la portada: resuelto, quitado junto con su bloque en #125 (2026-11-24). Ya no es pendiente.
 5. Cuentas de prueba `shadowtest_…@example.com` y `user@example.com` (esta con 3 proyectos de prueba): ninguna borrada.
 6. Propuestas sobre el roadmap (nueva jornada de agencia de IA, publicación concreta en J12, revisión de la decisión cerrada 56): registradas en el roadmap como propuestas, sin decidir.
 
