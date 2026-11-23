@@ -4,6 +4,17 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`). Las entradas siguientes son observaciones históricas fechadas, no un indicador exhaustivo de la última PR ni de cada deployment. Una PR exclusivamente documental y su autodeployment no obligan por sí solos a actualizar esta sección. Se registra una observación nueva cuando un gate requiere ese checkpoint o se verifica un cambio operativo relevante; el estado live actual debe comprobarse en GitHub y Railway cuando corresponda.
 
+### Observación posterior a PR #123 — 2026-11-23
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `7b8b00916e4cb4c3cce9ca8f99dce7c3681e6622` (merge de PR #123) |
+| PRs publicados el 2026-11-23 | #111 a #123; detalle en el [registro de jornada 2026-11-23/24](../control/11-REGISTRO-JORNADA-20261123-24.md) |
+| Railway deployment | `49032564-7783-4367-a6d4-3a8f8d21967d`; SUCCESS; creado 2026-11-23T22:49:36Z vía GitHub, rama `main`, commit `7b8b009` |
+| Health | `GET /` y `GET /health` respondieron HTTP 200 tras el despliegue |
+| Build provenance | UNVERIFIED |
+| Alcance | Cambios funcionales de portada y de la retirada del flujo del informe PDF (#114). No modifica estados de madurez |
+
 ### Observación posterior a PR #110 y verificación operativa — 2026-10-25 / 2026-11-23
 
 | Plano | Identidad y estado observado |

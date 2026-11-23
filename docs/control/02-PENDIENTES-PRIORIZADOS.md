@@ -8,6 +8,17 @@ Propietario del backlog operativo. S14, S15 y S16 están COMPLETED; S17 y S18 co
 
 J06 — Intent + Planning: `OPEN`; Phase 3A y Phase 3B están implementadas y publicadas. El siguiente gate es la reconciliación canónica y la evaluación formal del cierre global de J06. No abrir J07 hasta resolver ese gate. J05 no queda en backlog activo salvo aparición de evidencia material que invalide su cierre.
 
+### Pendientes registrados el 2026-11-24
+
+Detalle y verificación en el [registro de jornada 2026-11-23/24](11-REGISTRO-JORNADA-20261123-24.md). Ninguno está autorizado por este registro; todos esperan decisión de Lucas.
+
+1. Cierre real de J06: el panel de intención y plan del builder se ve sin estilo. Criterio propuesto: con estilo, funcionando de punta a punta y verificado en producción; después, el cierre en el roadmap por un PR normal.
+2. Recorte de pestañas del builder (GitHub, Deploy, Estructura y Código): no está hecho. Hoy siguen las seis pestañas.
+3. Coste o plan de Extracción: por definir.
+4. Rótulo `'Entrada'` de la tarjeta del titular de la portada: quitarlo o dejarlo.
+5. Cuentas de prueba `shadowtest_…@example.com` y `user@example.com` (esta con 3 proyectos de prueba): ninguna borrada.
+6. Propuestas sobre el roadmap (nueva jornada de agencia de IA, publicación concreta en J12, revisión de la decisión cerrada 56): registradas en el roadmap como propuestas, sin decidir.
+
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 
 CURRENT_PENDING_FRONT=S17_ENTRY_GATE

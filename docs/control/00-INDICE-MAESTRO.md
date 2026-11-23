@@ -22,6 +22,7 @@
 | Git, backups y entrega | [Git, deploy e higiene](07-GIT-DEPLOY-HIGIENE.md) | Higiene Git/deploy; enlaza las reglas transversales |
 | Roadmap y estado de madurez | [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) | SOURCE_OF_TRUTH de S14–S18 y J04–J16 |
 | Garantías pendientes S17/S18 y riesgos residuales J05 | [Registro acumulativo](10-REGISTRO-GARANTIAS-PENDIENTES.md) | SOURCE_OF_TRUTH del detalle de evidencia, limitación, riesgo, decisión, dependencia y revalidación; no declara PASS ni reabre gates |
+| Registro fechado del 23 y 24 de noviembre de 2026 | [Registro de jornada 2026-11-23/24](11-REGISTRO-JORNADA-20261123-24.md) | Registro de trabajo y estado real; no cambia estados ni autoriza gates |
 | Reglas de gates | [Journey Gate Operating Rules](09-JOURNEY-GATE-OPERATING-RULES.md) | SOURCE_OF_TRUTH de proceso, evidencia y checkpoints; no duplica estados de gates |
 | QA comercial de plantillas | [QA Builder 10 plantillas](08-QA-BUILDER-10-PLANTILLAS.md) | QA específica; no duplica el cierre de Journey 03 |
 | Contrato actual de la transacción local | [Contratos Técnicos V1](../product/sistema-maestro/05-CONTRATOS-TECNICOS-V1.md) | Extensión PRE-S14 validada y límites de aplicación |

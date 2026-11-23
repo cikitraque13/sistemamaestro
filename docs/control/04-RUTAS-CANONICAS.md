@@ -535,3 +535,11 @@ A partir de este documento:
 - `docs/control` gobierna la memoria estructural;
 - lo regenerable deja oficialmente de confundirse con producto;
 - y Builder deja de poder evolucionar como pantalla aislada: toda construcción real debe acabar alineada con estado vivo, preview, código y estructura.
+
+## 26. Piezas del equipo registradas fuera del código
+
+Esta sección no define rutas de código. Registra piezas del equipo que no viven en este repositorio, para que no se confundan con módulos del producto.
+
+| Pieza | Función prevista | Estado | Regla |
+|---|---|---|---|
+| Neo (n8n) | Automatizaciones con n8n | No activado (registrado el 2026-11-24) | La [decisión cerrada 56](01-DECISIONES-CERRADAS.md) sigue vigente: no se abre n8n ni se crean rutas para él hasta que se revise esa decisión |
