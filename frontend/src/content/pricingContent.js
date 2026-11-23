@@ -430,14 +430,6 @@ const pricingContent = {
         premium: 'Preparación seria'
       }
     }
-  ],
-
-  trustSignals: [
-    'Escalera de valor clara',
-    'Activación como capa real del producto',
-    'Gemas visibles como capacidad operativa',
-    'De idea o URL a base de trabajo accionable',
-    'Útil para proyecto propio u oportunidad real'
   ]
 };
 
@@ -449,7 +441,6 @@ export const pricingPlansMap = Object.fromEntries(
 export const pricingUpgradeLogic = pricingContent.upgradeLogic;
 export const pricingOutputDoctrine = pricingContent.outputDoctrine;
 export const pricingComparisonRows = pricingContent.comparisonRows;
-export const pricingTrustSignals = pricingContent.trustSignals;
 export const pricingMessagingRules = pricingContent.messagingRules;
 
 export const getPricingPlanById = (id) => pricingPlansMap[id] || null;
