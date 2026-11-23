@@ -10,19 +10,19 @@ const steps = [
   {
     id: '02',
     title: 'Analiza y ordena prioridades',
-    text: 'Sistema Maestro interpreta el contexto, detecta fricciones y organiza por dónde conviene avanzar primero.',
+    text: 'Sistema Maestro interpreta el contexto, detecta fricciones y organiza por donde conviene avanzar primero.',
     tone: 'green',
   },
   {
     id: '03',
     title: 'Genera estructura y ruta',
-    text: 'No se limita a describir. Devuelve una base más clara para construir, corregir o escalar con lógica de sistema.',
+    text: 'No se limita a describir. Devuelve una base mas clara para construir, corregir o escalar con logica de sistema.',
     tone: 'cyan',
   },
   {
     id: '04',
     title: 'Prepara continuidad real',
-    text: 'El objetivo es dejar el proyecto listo para el siguiente paso con más criterio y menos fricción.',
+    text: 'El objetivo es dejar el proyecto listo para el siguiente paso con mas criterio y menos friccion.',
     tone: 'pink',
   },
 ];
@@ -42,16 +42,16 @@ const HowItWorksSection = () => {
       <div className="relative mx-auto max-w-7xl">
         <div className="max-w-4xl">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
-            Cómo funciona
+            Como funciona
           </p>
 
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">
-            Escribes tu idea, el builder empieza a construirla y tú sigues avanzando.
+            Una entrada clara, una lectura util y una ruta mas ordenada para avanzar.
           </h2>
 
           <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-300 md:text-xl">
-            La lógica del sistema no está pensada para generar ruido. Está pensada para convertir
-            una necesidad en análisis, criterio y continuidad operativa.
+            La logica del sistema no esta pensada para generar ruido. Esta pensada para convertir
+            una necesidad en analisis, criterio y continuidad operativa.
           </p>
         </div>
 
