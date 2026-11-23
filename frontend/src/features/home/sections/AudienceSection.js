@@ -2,23 +2,23 @@ import React from 'react';
 
 const items = [
   {
-    title: 'Fundadores y duenos de proyecto',
-    text: 'Ordenan idea, web o producto con mas criterio.',
+    title: 'Fundadores y dueños de proyecto',
+    text: 'Ordenan idea, web o producto con más criterio.',
     classes: 'border-amber-500/15 bg-amber-500/10',
   },
   {
     title: 'Agencias y freelancers',
-    text: 'Trabajan proyectos de cliente con una capa mas util de sistema.',
+    text: 'Trabajan proyectos de cliente con una capa más útil de sistema.',
     classes: 'border-cyan-500/15 bg-cyan-500/10',
   },
   {
     title: 'SEO, creadores y operadores',
-    text: 'Unen crecimiento, contenido y continuidad en una ruta mas clara.',
+    text: 'Unen crecimiento, contenido y continuidad en una ruta más clara.',
     classes: 'border-emerald-500/15 bg-emerald-500/10',
   },
   {
     title: 'Equipos que quieren escalar',
-    text: 'Reducen dispersion y aumentan capacidad real dentro del sistema.',
+    text: 'Reducen dispersión y aumentan capacidad real dentro del sistema.',
     classes: 'border-fuchsia-500/15 bg-fuchsia-500/10',
   },
 ];
@@ -29,15 +29,15 @@ const AudienceSection = () => {
       <div className="relative mx-auto max-w-7xl">
         <div className="max-w-4xl">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
-            Para quien es
+            Para quién es
           </p>
 
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3rem] md:leading-[0.97]">
-            Pensado para quien necesita mas claridad, mas criterio y mas continuidad.
+            Pensado para quien necesita más claridad, más criterio y más continuidad.
           </h2>
 
           <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-            Si trabajas con ideas, webs, crecimiento o producto, este sistema esta pensado para darte una entrada mas util.
+            Si trabajas con ideas, webs, crecimiento o producto, este sistema está pensado para darte una entrada más útil.
           </p>
         </div>
 

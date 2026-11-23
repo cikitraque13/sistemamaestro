@@ -4,7 +4,7 @@ const cards = [
   {
     eyebrow: 'Construye',
     title: 'Convierte una idea en una base real de proyecto',
-    text: 'No se limita a describir. Ordena una idea o una URL para dejarla lista para avanzar con mas sentido.',
+    text: 'No se limita a describir. Ordena una idea o una URL para dejarla lista para avanzar con más sentido.',
     classes: 'border-cyan-500/15 bg-cyan-500/10',
   },
   {
@@ -16,7 +16,7 @@ const cards = [
   {
     eyebrow: 'Extrae',
     title: 'Saca tu proyecto y sigue con continuidad',
-    text: 'Si quieres extraccion o una operacion premium, el sistema tambien lo contempla dentro de su economia.',
+    text: 'Si quieres extracción o una operación premium, el sistema también lo contempla dentro de su economía.',
     classes: 'border-fuchsia-500/15 bg-fuchsia-500/10',
   },
 ];
@@ -38,7 +38,7 @@ const ValueAuthoritySection = () => {
 
           <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-300">
             La promesa no es solo analizar. La promesa es meter al usuario dentro de una ruta seria
-            de proyecto, construccion y salida.
+            de proyecto, construcción y salida.
           </p>
         </div>
 
