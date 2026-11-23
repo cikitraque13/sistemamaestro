@@ -33,47 +33,41 @@ const cards = [
 
 const ValueAuthoritySection = () => {
   return (
-    <section id="como-funciona" className="relative overflow-hidden px-6 pb-14 pt-6 md:px-10 md:pb-18 md:pt-8">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(6,182,212,0.05),transparent_18%),radial-gradient(circle_at_82%_18%,rgba(16,185,129,0.05),transparent_18%)]" />
+    <div id="como-funciona" className="relative scroll-mt-24 pt-6 xl:pt-1">
+      <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
+        Lo que hace de verdad
+      </p>
 
-      <div className="relative mx-auto max-w-7xl">
-        <div className="max-w-4xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
-            Lo que hace de verdad
-          </p>
+      <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.02] xl:text-[2rem] xl:leading-[1.08]">
+        Analiza, construye, despliega y mantiene continuidad real.
+      </h2>
 
-          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3.8rem] md:leading-[0.96]">
-            Analiza, construye, despliega y mantiene continuidad real.
-          </h2>
-        </div>
-
-        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {cards.map((card) => (
-            <article
-              key={card.eyebrow}
-              className={`rounded-[28px] border p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] ${card.classes}`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/20 text-xs font-semibold text-white">
-                  {card.step}
-                </span>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                  {card.eyebrow}
-                </p>
-              </div>
-
-              <h3 className="mt-4 text-2xl font-semibold leading-tight text-white">
-                {card.title}
-              </h3>
-
-              <p className="mt-4 text-sm leading-7 text-zinc-200">
-                {card.text}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {cards.map((card) => (
+          <article
+            key={card.eyebrow}
+            className={`rounded-[24px] border p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] ${card.classes}`}
+          >
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/20 text-xs font-semibold text-white">
+                {card.step}
+              </span>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                {card.eyebrow}
               </p>
-            </article>
-          ))}
-        </div>
+            </div>
+
+            <h3 className="mt-3 text-lg font-semibold leading-snug text-white">
+              {card.title}
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-zinc-200">
+              {card.text}
+            </p>
+          </article>
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
 
