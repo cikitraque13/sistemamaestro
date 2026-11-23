@@ -1,23 +1,70 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useAuth } from '../../../context/AuthContext';
+import HomePlansPanel from './HomePlansPanel';
+
+const PLANS_PANEL_ID = 'home-plans-panel';
+const PLANS_HASH = '#pricing';
 
 const navItems = [
   { label: 'Cómo funciona', href: '#como-funciona' },
   { label: 'Para quién es', href: '#para-quien-es' },
-  { label: 'Pricing', href: '#pricing' },
   { label: 'Radar IA', href: '#radar-ia' },
 ];
 
 const HomeNav = () => {
-  const { user, loading } = useAuth();
+  const headerRef = useRef(null);
+  const [plansOpen, setPlansOpen] = useState(false);
 
-  const isAuthenticated = !loading && !!user && user !== false;
-  const primaryCtaTarget = isAuthenticated ? '/dashboard' : '/register';
+  const closePlans = useCallback(() => setPlansOpen(false), []);
+
+  useEffect(() => {
+    const openFromHash = () => {
+      if (window.location.hash !== PLANS_HASH) return;
+      setPlansOpen(true);
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}`
+      );
+    };
+
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+    return () => window.removeEventListener('hashchange', openFromHash);
+  }, []);
+
+  useEffect(() => {
+    if (!plansOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!headerRef.current?.contains(event.target)) {
+        setPlansOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setPlansOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [plansOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#080808]/88 backdrop-blur-xl">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-40 border-b border-white/5 bg-[#080808]/88 backdrop-blur-xl"
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-10">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_28px_rgba(245,158,11,0.10)] md:h-12 md:w-12">
@@ -59,14 +106,21 @@ const HomeNav = () => {
             Iniciar sesión
           </Link>
 
-          <Link
-            to={primaryCtaTarget}
-            className="inline-flex whitespace-nowrap rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-3 py-2 text-xs font-semibold text-black shadow-[0_10px_30px_rgba(245,158,11,0.18)] transition hover:scale-[1.01] hover:shadow-[0_12px_34px_rgba(244,114,182,0.22)] sm:px-5 sm:py-2.5 sm:text-sm"
+          <button
+            type="button"
+            aria-expanded={plansOpen}
+            aria-controls={PLANS_PANEL_ID}
+            onClick={() => setPlansOpen((open) => !open)}
+            className="inline-flex whitespace-nowrap rounded-2xl border border-lime-200/70 bg-[#C6F432] px-3 py-2 text-xs font-semibold text-zinc-950 shadow-[0_0_0_1px_rgba(198,244,50,0.25),0_10px_28px_rgba(198,244,50,0.35)] transition hover:-translate-y-0.5 hover:bg-[#D4FF4F] hover:shadow-[0_0_0_1px_rgba(198,244,50,0.35),0_14px_34px_rgba(198,244,50,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-200/80 aria-expanded:bg-[#D4FF4F] sm:px-5 sm:py-2.5 sm:text-sm"
           >
-            Empezar con mi proyecto
-          </Link>
+            Planes
+          </button>
         </div>
       </div>
+
+      {plansOpen ? (
+        <HomePlansPanel id={PLANS_PANEL_ID} onSelect={closePlans} />
+      ) : null}
     </header>
   );
 };

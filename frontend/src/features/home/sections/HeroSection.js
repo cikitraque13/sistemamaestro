@@ -7,23 +7,9 @@ const cards = [
   {
     eyebrow: 'Entrada',
     title: 'Empieza con una idea o una web',
-    text: 'El sistema interpreta el punto de partida y lo convierte en una lectura útil.',
+    text: 'El sistema interpreta el punto de partida.',
     classes:
       'border-amber-500/15 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(255,255,255,0.02))]',
-  },
-  {
-    eyebrow: 'Ruta',
-    title: 'Recibe foco y siguiente paso',
-    text: 'Ordena prioridades y prepara una entrada seria al sistema.',
-    classes:
-      'border-cyan-500/15 bg-[linear-gradient(180deg,rgba(6,182,212,0.08),rgba(255,255,255,0.02))]',
-  },
-  {
-    eyebrow: 'Continuidad',
-    title: 'Construye, despliega y sigue',
-    text: 'Te mete en una ruta real de proyecto, no en una demo suelta.',
-    classes:
-      'border-fuchsia-500/15 bg-[linear-gradient(180deg,rgba(244,114,182,0.08),rgba(255,255,255,0.02))]',
   },
 ];
 
@@ -37,7 +23,7 @@ const HeroSection = () => {
     <section className="relative overflow-hidden px-6 pb-6 pt-8 md:px-10 md:pb-8 md:pt-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(245,158,11,0.10),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(244,114,182,0.08),transparent_20%)]" />
 
-      <div className="relative mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[1fr_1fr]">
+      <div className="relative mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[1fr_1fr] xl:items-center">
         <div className="max-w-3xl">
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
             Sistema Maestro
@@ -48,8 +34,7 @@ const HeroSection = () => {
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300 md:text-[1.08rem] md:leading-8">
-            Sistema Maestro interpreta tu idea o tu web, ordena prioridades y te mete en una ruta
-            real de construcción, despliegue y continuidad.
+            Sistema Maestro interpreta tu idea o tu web y ordena prioridades.
           </p>
         </div>
 
@@ -80,13 +65,6 @@ const HeroSection = () => {
             >
               Pon tu idea
             </Link>
-
-            <a
-              href="#pricing"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.05]"
-            >
-              Ver cómo entra al sistema
-            </a>
           </div>
         </div>
       </div>
