@@ -1,5 +1,31 @@
 # Sistema Maestro
 
+> **Orientación rápida (revisión 2026-11-23).**
+> - **Qué es:** plataforma guiada que convierte una necesidad, una idea, una URL o un activo existente en una estructura digital activable, construible y monetizable.
+> - **Papel en el ecosistema:** producto propio de Lucas Díaz; se trabaja para migrar su desarrollo a Claude.
+> - **Repositorio:** `cikitraque13/sistemamaestro`. Rama publicada: `main` (protegida).
+> - **Producción:** Railway, servicio `sistemamaestro`, despliega automáticamente desde `main` sin rutas vigiladas: cualquier merge a `main`, también solo de documentación, despliega. Web: https://sistemamaestro.com, salud en `/health`.
+> - **Stack:** backend FastAPI con MongoDB; frontend Vite con React 18; un solo contenedor definido en el `Dockerfile`.
+>
+> **Dónde está cada documento canónico**
+>
+> | Tema | Documento |
+> |---|---|
+> | Estado de madurez (S14–S18, J04–J16) | [Master Maturity Roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) |
+> | Índice de gobierno | [00-INDICE-MAESTRO](docs/control/00-INDICE-MAESTRO.md) |
+> | Backlog | [02-PENDIENTES-PRIORIZADOS](docs/control/02-PENDIENTES-PRIORIZADOS.md) |
+> | Garantías y limitaciones | [10-REGISTRO-GARANTIAS-PENDIENTES](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md) |
+> | Producción y despliegues | [04-runtime-and-deploy-truth](docs/architecture/04-runtime-and-deploy-truth.md) y [DEPLOY_RAILWAY](DEPLOY_RAILWAY.md) |
+> | Decisiones cerradas | [01-DECISIONES-CERRADAS](docs/control/01-DECISIONES-CERRADAS.md) |
+> | Inventario y backups | [03-INVENTARIO-TECNICO](docs/control/03-INVENTARIO-TECNICO.md) |
+> | Incidencias | [05-INCIDENCIAS-Y-DIAGNOSTICOS](docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md) |
+> | Procedimientos, Git y gates | [06](docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md), [07](docs/control/07-GIT-DEPLOY-HIGIENE.md), [09](docs/control/09-JOURNEY-GATE-OPERATING-RULES.md) |
+> | Arquitectura | [docs/architecture](docs/architecture/) |
+> | Producto y doctrina | [docs/product/sistema-maestro](docs/product/sistema-maestro/00-INDICE.md) |
+> | Créditos | [docs/system/credits](docs/system/credits/00-POLITICA-CANONICA-CREDITOS-V1.md) |
+>
+> El estado que sigue es el texto canónico vigente y no se modifica en esta revisión.
+
 ## Estado actual — 2026-10-25
 
 S14, S15 y S16 están COMPLETED. S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 permanece cerrado con limitaciones. J04 sigue CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está técnicamente completada frente a su contrato canónico (`TECHNICAL_PASS=YES`), con riesgos residuales de precisión semántica y cobertura descritos en el roadmap y el registro acumulativo. El checkpoint `GOLD_FREEZE_POST_J05_2026-10-20`, con origen `e7370c323267f5c2f105a3c3b7265ea9723719a7`, tiene integridad y restauración PASS; las limitaciones de exclusión de secretos constan en el inventario técnico. J06 permanece OPEN mientras se reconcilia y acepta formalmente su cierre global: Phase 3A y Phase 3B están publicadas y verificadas; J07 sigue NOT_OPENED. El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez; el [registro acumulativo](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md) conserva limitaciones y revalidación.

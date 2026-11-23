@@ -1,5 +1,7 @@
 # 04 — Experiencia Constructor Visible
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: experiencia visible del Builder. Última modificación de contenido en Git: 2026-05-04 (`9e32ce9`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](08-MASTER-MATURITY-ROADMAP.md).
+
 
 
 ## 1. Función de esta pieza

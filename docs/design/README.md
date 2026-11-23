@@ -1,5 +1,7 @@
 \# Sistema Maestro — Design Guidelines
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: guía de diseño visual e interfaz. Última modificación de contenido en Git: 2026-05-04 (`1c166ed`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 
 
 \## Estado del documento

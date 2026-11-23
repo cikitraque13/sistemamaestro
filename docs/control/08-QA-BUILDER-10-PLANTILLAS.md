@@ -1,5 +1,7 @@
 # 08-QA-BUILDER-10-PLANTILLAS
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: matriz de QA del Builder con 10 plantillas. Última modificación de contenido en Git: 2026-10-11 (`863530d`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 El release PRE-S14 y sus validaciones acreditadas pertenecen al registro histórico de [Journey 03](../product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md).
 Esta matriz es QA comercial de plantillas: ningún cierre de gate acredita 10/10 PASS ni ejecuta
 esta matriz. Su eventual ejecución necesita alcance propio. El estado vigente de S14–S18

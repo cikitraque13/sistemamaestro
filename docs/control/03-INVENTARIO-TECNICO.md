@@ -1,5 +1,9 @@
 # 03-INVENTARIO-TECNICO
 
+## Observación de organización local — 2026-11-23
+
+La carpeta de trabajo local que contiene este repositorio se reorganizó y se trasladó dentro de la carpeta de proyectos del ecosistema. Sus guías, assets, índice de copias de trabajo y archivo pasaron a carpetas hermanas fuera del repositorio. `Backups/` sigue junto al repositorio con su nombre, por lo que las rutas relativas `Backups/GOLD` y `Backups/EVIDENCE` citadas en este inventario siguen siendo válidas. Las copias de trabajo de Git se repararon con `git worktree repair` sin commits ni cambios de historial. La frase histórica que describe la raíz limitada a `sistemamaestro/` y `Backups/` se conserva como registro de su fecha. Esta observación no cambia ningún estado ni acredita integridad de checkpoints.
+
 ## Estado vigente — 2026-10-20
 
 Inventario de fuente y evidencia; no autoriza movimientos, borrados ni despliegues.

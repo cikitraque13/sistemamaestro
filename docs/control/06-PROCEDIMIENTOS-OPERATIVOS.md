@@ -1,5 +1,7 @@
 ﻿# 06-PROCEDIMIENTOS-OPERATIVOS
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: recoger los procedimientos operativos permanentes. Última modificación de contenido en Git: 2026-10-07 (`a3cab35`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Estado del documento
 
 - Estado: activo

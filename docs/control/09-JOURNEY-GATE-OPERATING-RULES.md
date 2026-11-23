@@ -1,5 +1,7 @@
 # Journey Gate Operating Rules
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: reglas para abrir, ejecutar, revisar y cerrar gates. Última modificación de contenido en Git: 2026-10-20 (`fe19463`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Autoridad y alcance
 
 Estas reglas gobiernan cómo abrir, ejecutar, revisar y cerrar gates. No describen el estado de cada gate ni autorizan una mutación. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es el único owner del roadmap y sus estados.

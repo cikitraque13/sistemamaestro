@@ -1,5 +1,7 @@
 ﻿# 05-INCIDENCIAS-Y-DIAGNOSTICOS
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: registrar incidencias reales, su diagnóstico y su estado. Última modificación de contenido en Git: 2026-10-20 (`fe19463`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Estado del documento
 
 - Estado: activo
@@ -690,3 +692,43 @@ Se ajustó el agregador local, preservando validación, exit code y limpieza. La
 ### Aprendizaje operativo
 
 Los harnesses deben separar fase de conexión, colección, ejecución y limpieza; un conteo mostrado por una fase intermedia no equivale a evidencia final.
+
+---
+
+## INCIDENCIA 009 — ERROR 500 EN ESTADÍSTICAS DE USUARIO POR MOVIMIENTO DE CRÉDITO DUPLICADO
+
+### Fase
+
+Producción, observada el 2026-11-17 (deployment `3eb6804f`, commit `69f61e4`). Registrada el 2026-11-23.
+
+### Capa afectada
+
+Backend: billing y servicio de créditos (`get_user_stats` en el router de billing; `ensure_user_credit_profile` y `_apply_credit_movement` en el servicio de créditos); colección `credit_ledger`.
+
+### Síntoma observado
+
+Una petición `GET /api/user/stats` respondió HTTP 500 (una ocurrencia en los logs HTTP consultados).
+
+### Diagnóstico
+
+Los logs muestran un `DuplicateKeyError` (E11000) al insertar en `credit_ledger` un movimiento de consumo cuyo `_id` ya existía, seguido de `CreditOperationBusyError: Credit operation is in progress or requires reconciliation`.
+
+### Causa raíz
+
+No establecida. Hipótesis a verificar: reintento o concurrencia sobre el mismo movimiento idempotente que deja el perfil en estado que requiere reconciliación, y que el endpoint de estadísticas propaga como 500 en lugar de degradar la respuesta.
+
+### Impacto
+
+La vista de estadísticas del usuario afectado falló en esa petición. No consta impacto en otros usuarios ni en cobros.
+
+### Estado
+
+ABIERTA — observada, sin diagnóstico completo ni corrección.
+
+### Resolución aplicada
+
+Ninguna. Pendiente de revisión del saldo y del ledger del usuario afectado y de decidir si el endpoint debe degradar con elegancia.
+
+### Aprendizaje operativo
+
+Las lecturas de resumen no deberían fallar por una operación de crédito en conflicto; conviene separar la reconciliación de la consulta.

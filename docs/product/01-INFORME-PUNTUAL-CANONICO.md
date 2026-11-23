@@ -1,5 +1,7 @@
 # INFORME PUNTUAL 6,99 € — CONTRATO CANÓNICO V1
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: contrato del producto Informe Puntual 6,99 €. Última modificación de contenido en Git: 2026-04-16 (`81c91c2`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## 1. FUNCIÓN DEL PRODUCTO
 
 El Informe Puntual 6,99 € no es una suscripción ni un mini plan paralelo.

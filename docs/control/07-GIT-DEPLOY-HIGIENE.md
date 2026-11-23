@@ -1,5 +1,7 @@
 # 07-GIT-DEPLOY-HIGIENE
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: fijar la higiene de Git, ramas, PR y despliegue. Última modificación de contenido en Git: 2026-10-02 (`6537852`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Estado del documento
 
 - Estado: activo

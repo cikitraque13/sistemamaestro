@@ -1,5 +1,7 @@
 # PDF INFORME PUNTUAL 6,99 € — SALIDA VISUAL CANÓNICA V1
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: salida visual del PDF del Informe Puntual. Última modificación de contenido en Git: 2026-04-16 (`9cf330e`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## 1. FUNCIÓN DEL PDF
 
 El PDF no es un añadido ornamental.

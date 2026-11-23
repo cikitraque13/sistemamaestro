@@ -1,5 +1,7 @@
 # 03 — Agent Contracts
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: fijar los contratos de entrada y salida de los agentes. Última modificación de contenido en Git: 2026-05-04 (`1dc8f9e`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Estado del documento
 
 - Estado: activo

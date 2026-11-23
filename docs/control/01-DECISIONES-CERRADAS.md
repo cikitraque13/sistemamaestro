@@ -1,5 +1,7 @@
 # 01-DECISIONES-CERRADAS
 
+> **Ficha del documento (revisión 2026-11-23).** Propósito: conservar las decisiones cerradas y fechadas del proyecto. Última modificación de contenido en Git: 2026-10-11 (`863530d`). Revisado el 2026-11-23 sin cambios de contenido. Los estados de madurez vigentes los fija el [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md).
+
 ## Lectura vigente — 2026-10-11
 
 Las decisiones fechadas conservan su contexto histórico; las restricciones de release anteriores no sustituyen los resultados de promociones posteriores. El [Master Maturity Roadmap](../product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es propietario de los estados S14–S18; [Pendientes](02-PENDIENTES-PRIORIZADOS.md) registra el frente vigente y [Runtime](../architecture/04-runtime-and-deploy-truth.md) distingue main, Railway observado y configuración declarada. El registro PRE-S14 y las decisiones anteriores a S14 que siguen en este documento son históricos, no el estado actual.
