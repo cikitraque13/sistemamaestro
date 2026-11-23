@@ -7,7 +7,7 @@ const cards = [
   {
     eyebrow: 'Entrada',
     title: 'Empieza con una idea o una web',
-    text: 'El sistema interpreta el punto de partida y lo convierte en una lectura útil.',
+    text: 'El sistema interpreta el punto de partida.',
     classes:
       'border-amber-500/15 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(255,255,255,0.02))]',
   },
@@ -34,8 +34,7 @@ const HeroSection = () => {
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300 md:text-[1.08rem] md:leading-8">
-            Sistema Maestro interpreta tu idea o tu web, ordena prioridades y te mete en una ruta
-            real de construcción, despliegue y continuidad.
+            Sistema Maestro interpreta tu idea o tu web y ordena prioridades.
           </p>
         </div>
 
@@ -66,13 +65,6 @@ const HeroSection = () => {
             >
               Pon tu idea
             </Link>
-
-            <a
-              href="#pricing"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.05]"
-            >
-              Ver cómo entra al sistema
-            </a>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ const items = [
   },
   {
     title: 'SEO, creadores y operadores',
-    text: 'Unen crecimiento, contenido y continuidad en una ruta más clara.',
+    text: 'Unen crecimiento, contenido y continuidad.',
     classes: 'border-emerald-500/15 bg-emerald-500/10',
   },
   {

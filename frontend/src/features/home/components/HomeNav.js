@@ -111,7 +111,7 @@ const HomeNav = () => {
             aria-expanded={plansOpen}
             aria-controls={PLANS_PANEL_ID}
             onClick={() => setPlansOpen((open) => !open)}
-            className="inline-flex whitespace-nowrap rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,rgba(255,242,204,0.16),rgba(242,180,90,0.11),rgba(244,114,182,0.11))] px-3 py-2 text-xs font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_24px_rgba(245,158,11,0.08)] transition hover:border-amber-200/45 hover:bg-amber-200/[0.12] sm:px-5 sm:py-2.5 sm:text-sm"
+            className="inline-flex whitespace-nowrap rounded-2xl border border-lime-200/70 bg-[#C6F432] px-3 py-2 text-xs font-semibold text-zinc-950 shadow-[0_0_0_1px_rgba(198,244,50,0.25),0_10px_28px_rgba(198,244,50,0.35)] transition hover:-translate-y-0.5 hover:bg-[#D4FF4F] hover:shadow-[0_0_0_1px_rgba(198,244,50,0.35),0_14px_34px_rgba(198,244,50,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-200/80 aria-expanded:bg-[#D4FF4F] sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Planes
           </button>
