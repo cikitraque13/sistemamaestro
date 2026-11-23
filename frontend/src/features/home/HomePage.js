@@ -2,7 +2,6 @@ import React from 'react';
 import HomeNav from './components/HomeNav';
 import HomeFooter from './components/HomeFooter';
 import HeroSection from './sections/HeroSection';
-import PricingSection from './sections/PricingSection';
 import ValueAuthoritySection from './sections/ValueAuthoritySection';
 import AudienceSection from './sections/AudienceSection';
 import LeadCaptureSection from './sections/LeadCaptureSection';
@@ -13,7 +12,6 @@ const HomePage = () => {
       <HomeNav />
       <HeroSection />
       <ValueAuthoritySection />
-      <PricingSection />
       <AudienceSection />
       <LeadCaptureSection />
       <HomeFooter />

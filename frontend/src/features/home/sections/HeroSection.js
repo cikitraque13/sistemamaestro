@@ -11,20 +11,6 @@ const cards = [
     classes:
       'border-amber-500/15 bg-[linear-gradient(180deg,rgba(245,158,11,0.08),rgba(255,255,255,0.02))]',
   },
-  {
-    eyebrow: 'Ruta',
-    title: 'Recibe foco y siguiente paso',
-    text: 'Ordena prioridades y prepara una entrada seria al sistema.',
-    classes:
-      'border-cyan-500/15 bg-[linear-gradient(180deg,rgba(6,182,212,0.08),rgba(255,255,255,0.02))]',
-  },
-  {
-    eyebrow: 'Continuidad',
-    title: 'Construye, despliega y sigue',
-    text: 'Te mete en una ruta real de proyecto, no en una demo suelta.',
-    classes:
-      'border-fuchsia-500/15 bg-[linear-gradient(180deg,rgba(244,114,182,0.08),rgba(255,255,255,0.02))]',
-  },
 ];
 
 const HeroSection = () => {
@@ -37,7 +23,7 @@ const HeroSection = () => {
     <section className="relative overflow-hidden px-6 pb-6 pt-8 md:px-10 md:pb-8 md:pt-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(245,158,11,0.10),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(244,114,182,0.08),transparent_20%)]" />
 
-      <div className="relative mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[1fr_1fr]">
+      <div className="relative mx-auto grid max-w-7xl items-start gap-6 xl:grid-cols-[1fr_1fr] xl:items-center">
         <div className="max-w-3xl">
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
             Sistema Maestro
