@@ -45,11 +45,6 @@ const ValueAuthoritySection = () => {
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3.8rem] md:leading-[0.96]">
             Analiza, construye, despliega y mantiene continuidad real.
           </h2>
-
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-zinc-300">
-            La promesa no es solo analizar. La promesa es meter al usuario dentro de una ruta seria
-            de proyecto, construcción y salida.
-          </p>
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">

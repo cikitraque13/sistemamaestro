@@ -29,10 +29,14 @@ const planToneClasses = {
 };
 
 const planBadgeLabels = {
-  free: 'Entrada',
-  blueprint: 'Entrada seria',
   sistema: 'Núcleo',
   premium: 'Superior'
+};
+
+const homeHiddenHighlights = ['Ruta recomendada', 'Preparación de salida'];
+
+const homeShortCopy = {
+  premium: 'Casos complejos y operador serio.'
 };
 
 const visiblePlans = pricingPlans.filter((plan) =>
@@ -75,9 +79,11 @@ const HomePlansPanel = ({ id, onSelect }) => {
                     {plan.visibleName}
                   </p>
 
-                  <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${tone.badge}`}>
-                    {planBadgeLabels[plan.id] || plan.badge}
-                  </span>
+                  {planBadgeLabels[plan.id] ? (
+                    <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${tone.badge}`}>
+                      {planBadgeLabels[plan.id]}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="mt-4 flex items-end gap-2">
@@ -88,11 +94,13 @@ const HomePlansPanel = ({ id, onSelect }) => {
                 </div>
 
                 <p className="mt-4 text-sm leading-7 text-zinc-200">
-                  {plan.bestForShort || plan.description}
+                  {homeShortCopy[plan.id] || plan.bestForShort || plan.description}
                 </p>
 
                 <ul className="mb-6 mt-5 space-y-3">
-                  {plan.billingHighlights.map((point) => (
+                  {plan.billingHighlights
+                    .filter((point) => !homeHiddenHighlights.includes(point))
+                    .map((point) => (
                     <li key={point} className="text-sm leading-6 text-zinc-100">
                       • {point}
                     </li>

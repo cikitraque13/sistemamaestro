@@ -37,7 +37,7 @@ const HomeFooter = () => {
               Radar IA
             </a>
             <a href="#pricing" className="transition hover:text-white">
-              Pricing
+              Precios
             </a>
           </div>
         </div>
