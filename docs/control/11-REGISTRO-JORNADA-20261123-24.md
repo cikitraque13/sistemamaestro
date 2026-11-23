@@ -42,6 +42,21 @@ Trabajo del día que no fue un PR:
 - Reorganización de S.Maestro dentro de `Ecosistema\Proyectos`: movimiento de carpetas en el PC, sin PR, con `git worktree repair` posterior.
 - Consolidación de documentos: en el repo corresponde a #111 (fichas de revisión en 31 documentos). La consolidación de carpetas de guías fuera del repo está en el mismo registro de movimientos del PC.
 
+### PRs fusionados el 24-11-2026 (después de #124)
+
+| PR | Hora | Merge | Título del merge commit | Deployment Railway |
+|---|---|---|---|---|
+| #124 | 00:23 | `689ec1d` | docs: registrar el estado real del 23 y 24 de noviembre de 2026 | `7fcdc561`, sustituido por el siguiente antes de verse terminar |
+| #125 | 00:24 | `07d00a2` | Portada: quitar el bloque Entrada y subir las tarjetas numeradas | `74d73660`, SUCCESS 00:25 |
+| #127 | 00:30 | `2446ba7` | Portada: quitar el hueco negro junto al titular y subir las tarjetas | `dc22969e` |
+| #126 | 00:32 | `432c979` | Portada: botón Iniciar sesión en lavanda claro con brillo suave | `9943d660`, SUCCESS 00:33 |
+
+- #125 quita de `HeroSection.js` el bloque Entrada completo: el rótulo `'Entrada'`, el cuadro "Empieza con una idea o una web" y el botón "Pon tu idea".
+- #127 corrige el hueco negro que quedó junto al titular. La causa era el ancho estrecho heredado del hero (`max-w-3xl` en el contenedor y `max-w-[11ch]` en el titular), pensado para compartir fila con el bloque quitado. Desde 768 px pasan a `md:max-w-5xl` y `md:max-w-[24ch]`; en móvil no cambia nada.
+- #126 cambia solo `frontend/src/features/home/components/HomeNav.js`: el botón Iniciar sesión pasa a lavanda claro con brillo suave. La rama se puso al día con "Update branch" de GitHub, que añadió el merge commit `416520e` firmado por cikitraque13, no por Lucas Díaz Arias.
+- Desde la portada, el acceso al builder queda solo por Iniciar sesión y por Planes.
+- Restos fuera de la home, sin tocar: `frontend/src/features/home/sections/FinalCtaSection.js` sigue en el repo sin montarse en la portada, y `DashboardPage.js` conserva sus textos; ninguno de los dos se ha tocado.
+
 ## 2. Estado del centro de mando
 
 - `Centro de Mando\centro_mando_estado.json` está en `"revision": 52` (leído el 2026-11-24 en el PC, sin modificarlo; última escritura 2026-11-23 21:59).
@@ -71,10 +86,10 @@ Hecho y publicado:
 - Planes en cápsula verde lima en la cabecera, con desplegable (#122).
 - Cuatro tarjetas 01 Analiza, 02 Construye, 03 Despliega, 04 Extrae justo debajo del titular (#119 y #121).
 - Una sola portada para móvil y escritorio (#117).
+- Bloque Entrada quitado (#125), hueco negro corregido (#127) y botón Iniciar sesión en lavanda (#126), el 24-11-2026.
 
 Pendiente:
 
-- Rótulo `'Entrada'` de la tarjeta del titular (`frontend/src/features/home/sections/HeroSection.js`, línea 8): decisión de Lucas.
 - Panel de intención y plan del builder (J06) que se ve sin estilo.
 - Recorte de las pestañas del builder: hoy siguen las seis (`Preview`, `Código`, `Extracción`, `Estructura`, `Deploy`, `GitHub`) en `frontend/src/features/builder/data/builderWorkspaceTabs.js`. No está hecho.
 - Coste o plan de Extracción: por definir.
