@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowRight,
-  FileText,
   FolderOpen,
   Plus
 } from '@phosphor-icons/react';
@@ -34,7 +33,7 @@ const STATUS_BADGES = {
   pending: { label: 'Pendiente', color: 'bg-yellow-500/20 text-yellow-400' },
   analyzed: { label: 'Analizado', color: 'bg-blue-500/20 text-blue-400' },
   refined: { label: 'Afinado', color: 'bg-purple-500/20 text-purple-400' },
-  blueprint_generated: { label: 'Blueprint', color: 'bg-[#0F5257]/30 text-[#6ee7d8]' }
+  blueprint_generated: { label: 'Estructurado', color: 'bg-[#0F5257]/30 text-[#6ee7d8]' }
 };
 
 const buildBuilderUrl = (projectId) =>
@@ -201,8 +200,7 @@ const DashboardPage = () => {
               </h3>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
-                Vuelve al Builder como acción principal. El informe queda disponible como
-                salida premium cuando quieras revisar o exportar el caso.
+                Vuelve al Builder como acción principal para seguir construyendo tu proyecto.
               </p>
             </div>
 
@@ -271,14 +269,6 @@ const DashboardPage = () => {
                           <FolderOpen size={17} />
                           Continuar en Builder
                           <ArrowRight size={14} />
-                        </Link>
-
-                        <Link
-                          to={`/dashboard/project/${projectId}/report-preview`}
-                          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.06]"
-                        >
-                          <FileText size={17} />
-                          Ver informe
                         </Link>
                       </div>
                     </div>

@@ -134,7 +134,7 @@ Los dos checkpoints siguientes corresponden a fuentes distintas y se conservan s
 | Área | Rutas y responsabilidad |
 |---|---|
 | Frontend | [src](../../frontend/src/), [public](../../frontend/public/): producto modular, assets y UI |
-| Módulos | [features](../../frontend/src/features/): Home, auth, app-shell, dashboard, Builder, oportunidades, proyectos, billing, informes y settings |
+| Módulos | [features](../../frontend/src/features/): Home, auth, app-shell, dashboard, Builder, oportunidades, proyectos, billing y settings (informes retirados el 2026-11-23) |
 | Backend | [app](../../backend/app/), [entrada](../../backend/app/main.py): FastAPI, routers, servicios, auth y persistencia |
 | IA | [backend/app/ai](../../backend/app/ai/): contratos, generador conectado y componentes preparados; no certifica orquestación multiagente completa |
 | Economía | [config/credits](../../backend/config/credits/): capa existente, no modificada por Journey 03 local |

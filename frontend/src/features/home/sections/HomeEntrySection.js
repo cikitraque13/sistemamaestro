@@ -95,9 +95,6 @@ const outputs = [
 const peachPrimaryButton =
   'inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-3.5 text-sm font-semibold text-black shadow-[0_14px_32px_rgba(245,158,11,0.20)] transition hover:scale-[1.01] hover:shadow-[0_16px_38px_rgba(244,114,182,0.24)]';
 
-const peachSecondaryButton =
-  'inline-flex items-center justify-center rounded-2xl border border-amber-200/24 bg-[linear-gradient(135deg,rgba(255,242,204,0.11),rgba(242,180,90,0.08),rgba(244,114,182,0.08))] px-5 py-3.5 text-sm font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:border-amber-200/40 hover:bg-amber-200/[0.10]';
-
 const MobileEntry = () => {
   return (
     <section
@@ -150,79 +147,6 @@ const MobileEntry = () => {
             <p className="text-center text-xs leading-5 text-zinc-500">
               Incluye 10 gemas iniciales para conocer el sistema.
             </p>
-          </div>
-        </div>
-
-        <div
-          id="informe-maestro-gold"
-          className="mt-4 overflow-hidden rounded-[32px] border border-amber-200/18 bg-[linear-gradient(135deg,rgba(255,228,163,0.09),rgba(244,114,182,0.065),rgba(6,182,212,0.035))] p-5 shadow-[0_0_38px_rgba(245,158,11,0.065)]"
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d5b16e]">
-            Entrada al sistema
-          </p>
-
-          <h2 className="mt-3 text-2xl font-semibold leading-tight text-white">
-            Empieza gratis. Entra mejor preparado con el informe.
-          </h2>
-
-          <div className="mt-4 space-y-3">
-            <div className="rounded-2xl border border-emerald-300/14 bg-emerald-300/[0.055] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100/75">
-                Registro gratis
-              </p>
-              <p className="mt-1 text-sm font-semibold text-white">
-                10 gemas iniciales
-              </p>
-              <p className="mt-1 text-xs leading-5 text-zinc-400">
-                Activa tu cuenta y entra al sistema para conocer la aplicación.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.085] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/85">
-                Informe Maestro Gold · 6,99 €
-              </p>
-              <p className="mt-1 text-sm font-semibold text-white">
-                Lectura guiada + 10 gemas extra
-              </p>
-              <p className="mt-1 text-xs leading-5 text-zinc-400">
-                Una entrada más clara antes de gastar tus gemas dentro del sistema.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-fuchsia-300/16 bg-fuchsia-300/[0.065] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fuchsia-100/78">
-                Arranque preparado
-              </p>
-              <p className="mt-1 text-sm font-semibold text-white">
-                Hasta 20 gemas para empezar
-              </p>
-              <p className="mt-1 text-xs leading-5 text-zinc-400">
-                Más margen para construir una primera base con dirección.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3">
-            <Link
-              to="/register"
-              className={peachPrimaryButton}
-              state={{
-                entryOfferId: 'single_report',
-                focusSection: 'entry-offer',
-                source: 'home-mobile-gold'
-              }}
-            >
-              Activar Informe Maestro Gold
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <Link
-              to="/register"
-              className={peachSecondaryButton}
-            >
-              Crear cuenta y recibir 10 gemas
-            </Link>
           </div>
         </div>
 
@@ -282,7 +206,7 @@ const DesktopEntry = () => {
               Describe una idea, pega una URL o explica qué quieres mejorar. Sistema Maestro prepara una primera lectura útil para avanzar sin ruido.
             </p>
 
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <div className="mt-4 grid gap-3">
               <div className="rounded-2xl border border-emerald-300/14 bg-emerald-300/[0.055] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-100/70">
                   Registro gratis
@@ -291,34 +215,12 @@ const DesktopEntry = () => {
                   10 gemas iniciales
                 </p>
               </div>
-
-              <div className="rounded-2xl border border-amber-300/18 bg-amber-300/[0.075] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-100/80">
-                  Informe 6,99 €
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">
-                  Lectura guiada + 10 gemas
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-fuchsia-300/16 bg-fuchsia-300/[0.065] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-fuchsia-100/75">
-                  Arranque
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">
-                  Hasta 20 gemas de entrada
-                </p>
-              </div>
             </div>
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <a href="#pricing" className={peachPrimaryButton}>
-                Ver informe de entrada
-                <ArrowRight className="h-4 w-4" />
-              </a>
-
-              <Link to="/register" className={peachSecondaryButton}>
+              <Link to="/register" className={peachPrimaryButton}>
                 Registrarme gratis
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -431,13 +333,9 @@ const DesktopEntry = () => {
               </div>
 
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <a href="#pricing" className={peachPrimaryButton}>
-                  Informe 6,99 € + 10 gemas
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-
-                <Link to="/register" className={peachSecondaryButton}>
+                <Link to="/register" className={peachPrimaryButton}>
                   Empezar gratis con 10 gemas
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>

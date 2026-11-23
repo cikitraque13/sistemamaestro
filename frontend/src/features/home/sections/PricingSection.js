@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  entryOffer,
   pricingPlans,
   pricingSection,
   pricingTrustSignals
@@ -49,69 +48,6 @@ const PricingSection = () => {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(245,158,11,0.12),transparent_22%),radial-gradient(circle_at_80%_18%,rgba(244,114,182,0.06),transparent_18%)]" />
 
       <div className="relative mx-auto max-w-7xl">
-        <div className="rounded-[34px] border border-amber-500/18 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.16),transparent_28%),linear-gradient(180deg,#18120B_0%,#0B0A09_100%)] p-6 shadow-[0_0_40px_rgba(245,158,11,0.10)] md:p-8">
-          <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
-            <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-amber-200">
-                  Informe Maestro Gold
-                </span>
-                <span className="inline-flex rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-fuchsia-200">
-                  10 gemas iniciales
-                </span>
-              </div>
-
-              <h2 className="mt-5 max-w-[13ch] text-4xl font-semibold leading-[0.95] tracking-tight text-white md:text-[4.3rem]">
-                Valida una oportunidad y entra al sistema con dirección.
-              </h2>
-
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-[#F4E8D2]">
-                No es un PDF suelto. Es una primera lectura útil, un enfoque inicial,
-                un prompt de arranque y 10 gemas iniciales para empezar en Builder.
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                {entryOffer.billingHighlights.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-amber-200"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col rounded-[28px] border border-white/8 bg-black/35 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                Activación puntual
-              </p>
-
-              <div className="mt-4 flex items-end gap-3">
-                <span className="text-5xl font-light text-white">
-                  {entryOffer.priceLabel}
-                </span>
-                <span className="pb-1 text-zinc-400">pago único</span>
-              </div>
-
-              <ul className="mt-6 space-y-3">
-                {entryOffer.features.map((feature) => (
-                  <li key={feature} className="text-sm leading-6 text-zinc-200">
-                    • {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                to="/register"
-                className="mt-6 inline-flex items-center justify-center rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_28px_rgba(245,158,11,0.18)] transition hover:scale-[1.01]"
-              >
-                Entrar y validar con 10 gemas
-              </Link>
-            </div>
-          </div>
-        </div>
-
         <div className="mt-10">
           <div className="max-w-4xl">
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">

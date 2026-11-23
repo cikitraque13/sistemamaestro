@@ -12,8 +12,6 @@ import Dashboard from './features/dashboard/DashboardPage';
 import BuilderWorkspacePage from './features/builder/workspace/BuilderWorkspacePage';
 import Projects from './features/projects/ProjectsPage';
 import ProjectDetail from './features/projects/detail/ProjectDetailPage';
-import ReportPreview from './features/reports/ReportPreviewPage';
-import ReportPrintPage from './features/reports/ReportPrintPage';
 import Opportunities from './features/opportunities/OpportunitiesPage';
 import Billing from './features/billing/BillingPage';
 import Settings from './features/settings/SettingsPage';
@@ -81,8 +79,6 @@ const AppRouter = () => {
       <Route path="/dashboard/builder" element={<ProtectedRoute><BuilderWorkspacePage /></ProtectedRoute>} />
       <Route path="/dashboard/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
-      <Route path="/dashboard/project/:id/report-preview" element={<ProtectedRoute><ReportPreview /></ProtectedRoute>} />
-      <Route path="/dashboard/project/:id/report-print" element={<ProtectedRoute><ReportPrintPage /></ProtectedRoute>} />
       <Route path="/dashboard/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
       <Route path="/dashboard/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
       <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

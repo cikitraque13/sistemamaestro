@@ -30,9 +30,6 @@ export const buildFlowUrl = (step, projectId) => {
 
 export const resolveStepFromProject = (projectData) => {
   if (!projectData) return 'input';
-  if (projectData.blueprint || projectData.status === 'blueprint_generated') {
-    return 'blueprint';
-  }
   return 'result';
 };
 
@@ -40,7 +37,7 @@ export const resolveRestoredStep = (requestedStep, projectData) => {
   const fallbackStep = resolveStepFromProject(projectData);
 
   if (!requestedStep) return fallbackStep;
-  if (requestedStep === 'blueprint' && !projectData?.blueprint) return fallbackStep;
+  if (requestedStep === 'blueprint') return fallbackStep;
   if (requestedStep === 'refine' && !(projectData?.refine_questions?.length > 0)) {
     return fallbackStep;
   }

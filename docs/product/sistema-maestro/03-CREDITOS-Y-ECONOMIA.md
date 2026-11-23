@@ -470,6 +470,8 @@ Debe demostrar valor sin abrir consumo intensivo descontrolado.
 
 ## 9.2 Informe puntual 6,99
 
+> **Retirado el 2026-11-23:** el Informe puntual / Informe Maestro Gold (6,99 €, `single_report`) y su exportación PDF se eliminaron del producto (ver decisión 69 en `docs/control/01-DECISIONES-CERRADAS.md`). Este apartado se conserva solo como registro histórico.
+
 
 
 ### Rol

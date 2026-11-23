@@ -20,84 +20,6 @@ const pricingContent = {
     ]
   },
 
-  entryOffer: {
-    id: 'single_report',
-    type: 'one_time_offer',
-    backendId: 'single_report',
-    visible: true,
-    name: 'Informe puntual',
-    shortName: '6,99',
-    badge: 'Bloque puente',
-    price: 6.99,
-    priceLabel: '6,99 €',
-    periodLabel: 'PAGO ÚNICO',
-    headline: 'Valida una oportunidad antes de entrar al sistema.',
-    description:
-      'Compra puntual para convertir una idea, una URL o una oportunidad en una lectura útil, una primera dirección seria y 10 gemas iniciales para empezar en Builder.',
-    bestFor:
-      'Usuario que aún no necesita continuidad, pero sí una validación mejor enfocada.',
-    valuePromise:
-      'Reduce dudas, ordena el caso y prepara el siguiente paso.',
-    features: [
-      'Informe breve con criterio',
-      'Lectura más concreta',
-      'Enfoque inicial de mejora',
-      '10 gemas iniciales para Builder'
-    ],
-    billingHighlights: [
-      'Validación puntual',
-      'Lectura más útil',
-      'Primer foco de mejora',
-      '10 gemas iniciales'
-    ],
-    promptLayer: {
-      label: 'Prompt de avance',
-      description:
-        'Incluye un prompt práctico para seguir trabajando la idea o el activo analizado.'
-    },
-    psychology: {
-      role: 'micro_bridge',
-      perceptionGoal:
-        'Reducir fricción de primera compra y demostrar valor antes de la entrada seria al sistema.',
-      narrative:
-        'Es el paso entre curiosear y empezar a tomarse el proyecto en serio.'
-    },
-    visual: {
-      role: 'bridge_block',
-      emphasis: 'entry_offer',
-      recommendedPlacement: 'between_free_and_pro',
-      note:
-        'No debe presentarse como una quinta suscripción. Debe verse como un puente transaccional.'
-    },
-    cta: {
-      label: 'Comprar informe',
-      variant: 'bridge',
-      target: 'billing',
-      itemType: 'one_time_offer',
-      itemId: 'single_report'
-    },
-    conceptualGraphic: {
-      type: 'progress_steps',
-      steps: ['Explorar', 'Validar', 'Activar', 'Continuar', 'Escalar'],
-      activeStep: 'Validar',
-      stepDetails: {
-        Explorar: 'Gratis',
-        Validar: '6,99 € + 10 gemas',
-        Activar: '29 € Pro',
-        Continuar: '79 € Growth',
-        Escalar: '199 € AI Master'
-      },
-      note:
-        'La gráfica debe ser conceptual, no estadística. No inventar métricas.'
-    },
-    strategicRole: {
-      activationLevel: 'puntual',
-      builderAccess: 'limited',
-      creditsIncluded: 10,
-      exportAccess: 'not_included'
-    }
-  },
-
   plans: [
     {
       id: 'free',
@@ -187,15 +109,14 @@ const pricingContent = {
       bestForShort:
         'Primera activación seria dentro del sistema.',
       valuePromise:
-        'Activa blueprint, ruta, prompts y una bolsa inicial de gemas.',
+        'Activa ruta, prompts, Builder base y una bolsa inicial de gemas.',
       features: [
         'Todo lo del nivel Gratis',
-        'Blueprint estructural',
+        'Builder base',
         'Prioridades claras',
         '60 gemas incluidas'
       ],
       billingHighlights: [
-        'Blueprint estructural',
         'Prioridades claras',
         'Builder base',
         '60 gemas incluidas'
@@ -203,13 +124,12 @@ const pricingContent = {
       promptLayer: {
         label: 'Prompts estructurales base',
         description:
-          'Desbloquea prompts para arquitectura inicial, monetización base, blueprint y primeros pasos de activación.'
+          'Desbloquea prompts para arquitectura inicial, monetización base y primeros pasos de activación.'
       },
       prompts: [
         'Prompt de arquitectura inicial',
         'Prompt de validación de idea',
-        'Prompt de monetización base',
-        'Prompt de blueprint inicial'
+        'Prompt de monetización base'
       ],
       perceptionGoal:
         'Hacer sentir al usuario que ya no solo entiende mejor su caso: ahora puede empezar.',
@@ -374,7 +294,6 @@ const pricingContent = {
 
   upgradeLogic: {
     primaryVisualPlanId: 'blueprint',
-    entryBridgeId: 'single_report',
     optimizationPlanId: 'sistema',
     strategicPlanId: 'premium',
     progressionModel: 'earned_or_direct',
@@ -402,7 +321,7 @@ const pricingContent = {
 
   outputDoctrine: {
     principle:
-      'La IA no debe devolver informes blandos. Debe detectar potencial real, activar base de trabajo y preparar continuidad dentro del sistema.',
+      'La IA no debe devolver lecturas blandas. Debe detectar potencial real, activar base de trabajo y preparar continuidad dentro del sistema.',
     ideaAnalysis: {
       goals: [
         'Detectar potencial real',
@@ -438,7 +357,7 @@ const pricingContent = {
         'Servicios locales'
       ],
       outputs: [
-        'Mini informe de mejora',
+        'Mini lectura de mejora',
         'Propuesta de estructura web',
         'Base de captación',
         'Orden operativo',
@@ -450,7 +369,6 @@ const pricingContent = {
 
   messagingRules: {
     free: 'Reducir fricción y permitir prueba real con Builder limitado.',
-    single_report: 'Convertir curiosidad en primera compra útil.',
     blueprint: 'Presentarse como la entrada seria al sistema.',
     sistema: 'Transmitir continuidad operativa y construcción real.',
     premium:
@@ -461,7 +379,6 @@ const pricingContent = {
     {
       label: 'Tipo de acceso',
       values: {
-        single_report: 'Pago único',
         free: 'Registro gratuito',
         blueprint: 'Mensual',
         sistema: 'Mensual',
@@ -471,7 +388,6 @@ const pricingContent = {
     {
       label: 'Función principal',
       values: {
-        single_report: 'Validar',
         free: 'Probar',
         blueprint: 'Activar',
         sistema: 'Continuar',
@@ -481,7 +397,6 @@ const pricingContent = {
     {
       label: 'Capa de activación',
       values: {
-        single_report: 'Puntual',
         free: 'Inicial',
         blueprint: 'Base',
         sistema: 'Operativa',
@@ -491,7 +406,6 @@ const pricingContent = {
     {
       label: 'Gemas',
       values: {
-        single_report: '10 iniciales',
         free: '10 iniciales',
         blueprint: '60 incluidas',
         sistema: '220 incluidas',
@@ -501,7 +415,6 @@ const pricingContent = {
     {
       label: 'Builder',
       values: {
-        single_report: 'Builder limitado',
         free: 'Builder limitado',
         blueprint: 'Builder base',
         sistema: 'Builder continuo',
@@ -511,7 +424,6 @@ const pricingContent = {
     {
       label: 'Salida del sistema',
       values: {
-        single_report: 'No incluida',
         free: 'No incluida',
         blueprint: 'Valoración futura',
         sistema: 'Valoración prioritaria',
@@ -530,7 +442,6 @@ const pricingContent = {
 };
 
 export const pricingSection = pricingContent.section;
-export const entryOffer = pricingContent.entryOffer;
 export const pricingPlans = pricingContent.plans;
 export const pricingPlansMap = Object.fromEntries(
   pricingContent.plans.map((plan) => [plan.id, plan])

@@ -11,7 +11,7 @@ const trustItems = [
     id: 'continuity',
     title: 'Continuidad real',
     description:
-      'No está pensado para dejarte en un informe aislado, sino para preparar el siguiente paso con más claridad.',
+      'Está pensado para preparar el siguiente paso con más claridad.',
   },
   {
     id: 'professional-logic',

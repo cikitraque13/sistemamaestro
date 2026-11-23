@@ -119,7 +119,7 @@ const SuggestedPlanBanner = ({
                 to={`/dashboard/project/${fromProjectId}`}
                 className="text-sm text-[#8DE1D0] transition-colors hover:text-white"
               >
-                Volver al informe del proyecto
+                Volver al proyecto
               </Link>
             </div>
           )}

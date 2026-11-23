@@ -6,7 +6,6 @@ import {
   ArrowRight,
   CaretDown,
   Check,
-  FileText,
   FolderOpen,
   Plus,
   Trash,
@@ -54,7 +53,7 @@ const STATUS_BADGES = {
   pending: { label: 'Pendiente', color: 'bg-yellow-500/20 text-yellow-400' },
   analyzed: { label: 'Analizado', color: 'bg-blue-500/20 text-blue-400' },
   refined: { label: 'Afinado', color: 'bg-purple-500/20 text-purple-400' },
-  blueprint_generated: { label: 'Blueprint', color: 'bg-[#0F5257]/30 text-[#6ee7d8]' }
+  blueprint_generated: { label: 'Estructurado', color: 'bg-[#0F5257]/30 text-[#6ee7d8]' }
 };
 
 const normalizeRoute = (route) => String(route || '').trim();
@@ -260,13 +259,12 @@ const ProjectsPage = () => {
               </p>
 
               <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-white md:text-4xl">
-                Vuelve al Builder, revisa tus informes y continúa donde lo dejaste.
+                Vuelve al Builder y continúa donde lo dejaste.
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400 md:text-base">
                 Proyectos centraliza tus construcciones activas. La acción principal es
-                continuar en Builder. El informe premium y la exportación PDF quedan como
-                salidas secundarias cuando proceda.
+                continuar en Builder.
               </p>
             </div>
 
@@ -414,8 +412,7 @@ const ProjectsPage = () => {
                       </h3>
 
                       <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
-                        Continúa la construcción en Builder o abre la vista del informe
-                        premium si quieres revisar la salida estratégica del proyecto.
+                        Continúa la construcción en Builder para mantener vivo el proyecto.
                       </p>
                     </div>
 
@@ -431,14 +428,6 @@ const ProjectsPage = () => {
                         <FolderOpen size={17} />
                         Continuar en Builder
                         <ArrowRight size={14} />
-                      </Link>
-
-                      <Link
-                        to={`/dashboard/project/${projectId}/report-preview`}
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.06]"
-                      >
-                        <FileText size={17} />
-                        Ver informe
                       </Link>
 
                       <button

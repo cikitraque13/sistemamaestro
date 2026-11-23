@@ -417,89 +417,12 @@ const FlowPage = () => {
     navigate('/flow/input', { replace: true, state: { replacementRecovery: true } });
   };
 
-  const handleGenerateBlueprint = async () => {
-    if (!project?.project_id) return;
-
-    if (user?.plan === 'free') {
-      toast.error('Necesitas el plan Blueprint o superior');
-      navigate('/dashboard/billing', {
-        state: {
-          suggestedPlan: normalizedPlanRecommendation?.planId || 'blueprint',
-          fromProjectId: project.project_id,
-          focusSection: 'plans'
-        }
-      });
-      return;
-    }
-
-    if (voice.isSpeaking) {
-      voice.stopSpeaking();
-    }
-
-    setLoading(true);
-    setTransitionOverlay({
-      visible: true,
-      title: 'Generando blueprint',
-      detail:
-        'Construyendo prioridades, arquitectura, despliegue y secuencia de trabajo para el proyecto.',
-      status: 'Compilando blueprint'
-    });
-
-    try {
-      const response = await economicPost(axios,
-        `${API_BASE}/projects/${project.project_id}/blueprint`,
-        {},
-        { withCredentials: true, headers: { 'If-Match': serverRevision(project) } }
-      );
-
-      const nextProject = response?.data;
-
-      if (!isValidProjectPayload(nextProject)) {
-        throw new Error('Respuesta de proyecto no válida');
-      }
-
-      setProject(nextProject);
-      window.history.replaceState(
-        null,
-        '',
-        buildFlowUrl('blueprint', nextProject.project_id)
-      );
-
-      await wait(1000);
-      setStep('blueprint');
-    } catch (error) {
-      const detail = error.response?.data?.detail;
-      const memoryError = parseMemoryReviewError(detail);
-      if (memoryError?.code === 'project_memory_conflict' || memoryError?.code === 'project_memory_uncertain') {
-        setMemoryReview(memoryError);
-        setStep('refine');
-      } else if (memoryError?.code === 'memory_review_legacy_unmapped') {
-        setMemoryReview(memoryError);
-      } else {
-        toast.error(formatApiErrorDetail(detail) || error.message || 'Error al generar blueprint');
-      }
-    } finally {
-      setTransitionOverlay({
-        visible: false,
-        title: '',
-        detail: '',
-        status: ''
-      });
-      setLoading(false);
-    }
-  };
-
   const goToProject = () => {
     if (project?.project_id) {
       navigate(`/dashboard/project/${project.project_id}`);
     } else {
       navigate('/dashboard/projects');
     }
-  };
-
-  const goToPremiumPreview = () => {
-    if (!project?.project_id) return;
-    navigate(`/dashboard/project/${project.project_id}/report-preview`);
   };
 
   const openStrategicBilling = () => {
@@ -556,13 +479,13 @@ const FlowPage = () => {
       <div className="border-b border-[#262626]">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
-            {['input', 'interpreting', 'refine', 'result', 'blueprint'].map((stepName, index) => (
+            {['input', 'interpreting', 'refine', 'result'].map((stepName, index) => (
               <React.Fragment key={stepName}>
                 <div
                   className={`flex items-center gap-2 ${
                     step === stepName
                       ? 'text-[#0F5257]'
-                      : ['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > index
+                      : ['input', 'interpreting', 'refine', 'result'].indexOf(step) > index
                         ? 'text-[#0F5257]'
                         : 'text-[#A3A3A3]'
                   }`}
@@ -571,12 +494,12 @@ const FlowPage = () => {
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
                       step === stepName
                         ? 'bg-[#0F5257] text-white'
-                        : ['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > index
+                        : ['input', 'interpreting', 'refine', 'result'].indexOf(step) > index
                           ? 'bg-[#0F5257]/30 text-[#0F5257]'
                           : 'bg-[#262626] text-[#A3A3A3]'
                     }`}
                   >
-                    {['input', 'interpreting', 'refine', 'result', 'blueprint'].indexOf(step) > index ? (
+                    {['input', 'interpreting', 'refine', 'result'].indexOf(step) > index ? (
                       <CheckCircle size={14} weight="fill" />
                     ) : (
                       index + 1
@@ -590,13 +513,11 @@ const FlowPage = () => {
                         ? 'Interpretando'
                         : stepName === 'refine'
                           ? 'Afinado'
-                          : stepName === 'result'
-                            ? 'Resultado'
-                            : 'Blueprint'}
+                          : 'Resultado'}
                   </span>
                 </div>
 
-                {index < 4 && <div className="flex-1 h-px bg-[#262626]"></div>}
+                {index < 3 && <div className="flex-1 h-px bg-[#262626]"></div>}
               </React.Fragment>
             ))}
           </div>
@@ -859,9 +780,7 @@ const FlowPage = () => {
                   isSpeaking={voice.isSpeaking}
                   onPlayDiagnosis={handlePlayDiagnosis}
                   onGoToProject={goToProject}
-                  onOpenPremiumPreview={goToPremiumPreview}
                   onOpenStrategicBilling={openStrategicBilling}
-                  onGenerateBlueprint={handleGenerateBlueprint}
                 />
               ) : (
                 <motion.div
@@ -897,85 +816,6 @@ const FlowPage = () => {
               )
             )}
 
-            {step === 'blueprint' && project?.blueprint && (
-              <motion.div
-                key="blueprint"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <div className="text-center mb-8">
-                  <CheckCircle size={48} weight="fill" className="text-[#0F5257] mx-auto mb-4" />
-                  <h2
-                    className="text-2xl font-light text-white mb-2"
-                    data-testid="blueprint-title"
-                  >
-                    Tu Blueprint está listo
-                  </h2>
-                </div>
-
-                <div className="bg-[#171717] border border-white/10 rounded-2xl p-6 space-y-6">
-                  <div>
-                    <h3 className="text-xl text-white mb-2">{project.blueprint.title}</h3>
-                    <p className="text-[#A3A3A3]">{project.blueprint.summary}</p>
-                  </div>
-
-                  {project.blueprint.priorities && (
-                    <div>
-                      <p className="text-sm text-[#A3A3A3] mb-3">Prioridades</p>
-                      <ol className="space-y-2">
-                        {project.blueprint.priorities.map((priority, index) => (
-                          <li
-                            key={`priority-${index}-${priority.substring(0, 20)}`}
-                            className="flex items-start gap-3 text-white"
-                          >
-                            <span className="w-6 h-6 rounded-full bg-[#0F5257]/20 text-[#0F5257] text-sm flex items-center justify-center flex-shrink-0">
-                              {index + 1}
-                            </span>
-                            {priority}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-
-                  {project.blueprint.deployment_steps && (
-                    <div>
-                      <p className="text-sm text-[#A3A3A3] mb-3">Plan de despliegue</p>
-                      <ol className="space-y-2">
-                        {project.blueprint.deployment_steps.map((deploymentStep, index) => (
-                          <li
-                            key={`deploy-${index}-${deploymentStep.substring(0, 20)}`}
-                            className="flex items-center gap-2 text-white"
-                          >
-                            <CheckCircle size={16} className="text-[#0F5257]" />
-                            {deploymentStep}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-
-                  {project.blueprint.timeline_estimate && (
-                    <div className="p-4 bg-[#0F5257]/10 rounded-lg">
-                      <p className="text-sm text-[#0F5257]">Tiempo estimado</p>
-                      <p className="text-white font-medium">
-                        {project.blueprint.timeline_estimate}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={goToProject}
-                  className="w-full btn-primary mt-6 flex items-center justify-center gap-2"
-                  data-testid="go-to-project-btn"
-                >
-                  Ver proyecto completo
-                  <ArrowRight weight="bold" />
-                </button>
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
       </main>

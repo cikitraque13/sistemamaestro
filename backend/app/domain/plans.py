@@ -21,10 +21,6 @@ PLANS = {
     }
 }
 
-ONE_TIME_OFFERS = {
-    "single_report": {
-        "name": "Informe puntual",
-        "price": 6.99,
-        "description": "Informe inicial de validación y orientación"
-    }
-}
+# Sin ofertas puntuales activas: el informe puntual (single_report) se retiró el 2026-11-23.
+# Las transacciones históricas siguen en payment_transactions; el checkout rechaza la oferta.
+ONE_TIME_OFFERS = {}

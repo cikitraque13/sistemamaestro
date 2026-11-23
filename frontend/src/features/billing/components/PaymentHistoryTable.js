@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, CreditCard } from '@phosphor-icons/react';
 
-import { entryOffer, pricingPlans } from '../../../content/pricingContent';
+import { pricingPlans } from '../../../content/pricingContent';
 import { formatBillingDate, getConceptLabel } from '../billing.utils';
 
 const PaymentHistoryTable = ({ transactions }) => {
@@ -50,7 +50,7 @@ const PaymentHistoryTable = ({ transactions }) => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-white capitalize">
-                        {getConceptLabel(tx, pricingPlans, entryOffer)}
+                        {getConceptLabel(tx, pricingPlans)}
                       </span>
                     </td>
                     <td className="px-6 py-4">

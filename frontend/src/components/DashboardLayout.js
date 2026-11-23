@@ -30,7 +30,7 @@ const BUILDER_LAUNCHER_STATE = {
 const getPlanBadge = (plan) => {
   const badges = {
     free: { label: 'Gratis', color: 'bg-[#262626] text-[#A3A3A3]' },
-    blueprint: { label: 'Blueprint', color: 'bg-blue-500/20 text-blue-400' },
+    blueprint: { label: 'Pro', color: 'bg-blue-500/20 text-blue-400' },
     sistema: { label: 'Sistema', color: 'bg-[#0F5257]/30 text-[#6ee7d8]' },
     premium: { label: 'Premium', color: 'bg-yellow-500/20 text-yellow-300' }
   };

@@ -64,7 +64,7 @@ consumption_type_allowed → consumption_type
 | `url_analysis` | analysis | free | standard | Analizar URL existente |
 | `refine_round` | analysis | free | standard | Afinar respuestas |
 | `premium_preview_view` | conversion | free | none | Vista previa premium sin consumo |
-| `single_report_purchase` | single_report | free | none | Compra puntual |
+| `single_report_purchase` | single_report | free | none | Compra puntual (oferta retirada el 2026-11-23; la entrada sigue en `action_catalog.json` sin consumo) |
 | `builder_first_run` | builder | free | standard | Primera construcción guiada |
 | `builder_light_iteration` | builder | blueprint | standard | Iteración ligera |
 | `builder_structural_iteration` | builder | blueprint | standard | Iteración estructural |

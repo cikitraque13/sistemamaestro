@@ -13,7 +13,6 @@ from backend.app.ai.memory.project_memory import (
     build_project_memory,
 )
 from backend.app.core.security import get_current_user
-from backend.app.routers.opportunities import ADMIN_ROLES
 from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
 from backend.app.schemas.projects import ProjectCreate, RefineInput
@@ -532,42 +531,6 @@ async def get_project(project_id: str, request: Request):
                 return JSONResponse(status_code=409, content=HISTORY_RESPONSE)
             raise HTTPException(409, detail={"code": exc.code}) from None
     return project
-
-
-async def _user_can_export_pdf(user) -> bool:
-    """Server-side PDF gate: admin role or a paid `single_report` one-time offer.
-
-    Mirrors the rule the frontend already applied (isAdmin || hasPaidSingleReport)
-    using the same source of truth: `payment_transactions`. No plan in PLANS
-    declares a PDF feature, so plans do not unlock it.
-    """
-    role = str(user.get("role") or "").strip().lower()
-    if role in ADMIN_ROLES:
-        return True
-
-    paid = await db.payment_transactions.find_one(
-        {
-            "user_id": user["user_id"],
-            "payment_status": "paid",
-            "item_type": "one_time_offer",
-            "$or": [{"item_id": "single_report"}, {"offer_id": "single_report"}],
-        },
-        {"_id": 1},
-    )
-    return paid is not None
-
-
-@router.get("/{project_id}/report-print")
-async def get_project_report_print(project_id: str, request: Request):
-    user = await get_current_user(request)
-
-    if not await _user_can_export_pdf(user):
-        raise HTTPException(
-            status_code=403,
-            detail="La exportacion PDF requiere el informe puntual pagado o acceso administrador.",
-        )
-
-    return await get_project(project_id, request)
 
 
 @router.post("/{project_id}/refine")
