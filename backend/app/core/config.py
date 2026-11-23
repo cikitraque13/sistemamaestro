@@ -35,7 +35,7 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 ALLOWED_ORIGINS = [
     origin.strip()
-    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
     if origin.strip()
 ]
 
