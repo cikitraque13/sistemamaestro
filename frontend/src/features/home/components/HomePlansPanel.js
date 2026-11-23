@@ -45,7 +45,7 @@ const HomePlansPanel = ({ id, onSelect }) => {
   return (
     <div
       id={id}
-      className="absolute left-0 right-0 top-full max-h-[calc(100vh-5rem)] overflow-y-auto border-b border-white/10 bg-[#080808]/95 shadow-[0_30px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+      className="absolute left-0 right-0 top-full max-h-[calc(100vh-5rem)] overflow-y-auto border-b border-white/10 bg-[#080808] shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
     >
       <div className="mx-auto max-w-7xl px-5 py-6 md:px-10 md:py-8">
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
