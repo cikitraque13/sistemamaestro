@@ -11,6 +11,11 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/apiClient';
 
+import {
+  buildHomeIdeaLauncherState,
+  clearHomeIdea,
+  readHomeIdea,
+} from '../home/homeIdeaHandoff';
 import DashboardBuilderLauncher from './components/DashboardBuilderLauncher';
 import DashboardWelcomePanel from './components/DashboardWelcomePanel';
 import DashboardStatusPanel from './components/DashboardStatusPanel';
@@ -71,7 +76,17 @@ const DashboardPage = () => {
   const [billingSummary, setBillingSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const shouldFocusLauncher = location.state?.focus === 'builder-launcher';
+  const [homeIdeaState] = useState(() => {
+    const idea = readHomeIdea();
+    return idea ? buildHomeIdeaLauncherState(idea) : null;
+  });
+
+  useEffect(() => {
+    if (homeIdeaState) clearHomeIdea();
+  }, [homeIdeaState]);
+
+  const launcherState = location.state || homeIdeaState;
+  const shouldFocusLauncher = launcherState?.focus === 'builder-launcher';
 
   useEffect(() => {
     if (!shouldFocusLauncher) return;
@@ -138,7 +153,7 @@ const DashboardPage = () => {
         >
           <DashboardBuilderLauncher
             user={user}
-            launcherState={location.state || null}
+            launcherState={launcherState || null}
           />
         </motion.div>
 
