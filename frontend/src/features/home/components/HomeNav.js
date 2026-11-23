@@ -54,14 +54,14 @@ const HomeNav = () => {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             to="/login"
-            className="inline-flex rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,rgba(255,242,204,0.16),rgba(242,180,90,0.11),rgba(244,114,182,0.11))] px-3 py-2 text-xs font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_24px_rgba(245,158,11,0.08)] transition hover:border-amber-200/45 hover:bg-amber-200/[0.12] sm:px-5 sm:py-2.5 sm:text-sm"
+            className="inline-flex whitespace-nowrap rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,rgba(255,242,204,0.16),rgba(242,180,90,0.11),rgba(244,114,182,0.11))] px-3 py-2 text-xs font-semibold text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_8px_24px_rgba(245,158,11,0.08)] transition hover:border-amber-200/45 hover:bg-amber-200/[0.12] sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Iniciar sesión
           </Link>
 
           <Link
             to={primaryCtaTarget}
-            className="hidden rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-5 py-2.5 text-sm font-semibold text-black shadow-[0_10px_30px_rgba(245,158,11,0.18)] transition hover:scale-[1.01] hover:shadow-[0_12px_34px_rgba(244,114,182,0.22)] md:inline-flex"
+            className="inline-flex whitespace-nowrap rounded-2xl border border-amber-200/30 bg-[linear-gradient(135deg,#FFF2CC_0%,#F2B45A_58%,#F472B6_100%)] px-3 py-2 text-xs font-semibold text-black shadow-[0_10px_30px_rgba(245,158,11,0.18)] transition hover:scale-[1.01] hover:shadow-[0_12px_34px_rgba(244,114,182,0.22)] sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Empezar con mi proyecto
           </Link>
