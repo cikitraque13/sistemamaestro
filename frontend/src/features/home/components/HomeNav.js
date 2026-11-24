@@ -9,7 +9,6 @@ const PLANS_HASH = '#pricing';
 const navItems = [
   { label: 'Cómo funciona', href: '#como-funciona' },
   { label: 'Para quién es', href: '#para-quien-es' },
-  { label: 'Radar IA', href: '#radar-ia' },
 ];
 
 const HomeNav = () => {
