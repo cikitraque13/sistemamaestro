@@ -16,7 +16,24 @@ const HomeNav = () => {
   const headerRef = useRef(null);
   const [plansOpen, setPlansOpen] = useState(false);
 
-  const closePlans = useCallback(() => setPlansOpen(false), []);
+  const clearPlansHash = useCallback(() => {
+    if (window.location.hash !== PLANS_HASH) return;
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${window.location.search}`
+    );
+  }, []);
+
+  const closePlans = useCallback(() => {
+    setPlansOpen(false);
+    clearPlansHash();
+  }, [clearPlansHash]);
+
+  const handleLogoClick = useCallback(() => {
+    closePlans();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [closePlans]);
 
   useEffect(() => {
     const openFromHash = () => {
@@ -37,36 +54,43 @@ const HomeNav = () => {
   useEffect(() => {
     if (!plansOpen) return undefined;
 
-    const handlePointerDown = (event) => {
-      if (!headerRef.current?.contains(event.target)) {
-        setPlansOpen(false);
-      }
-    };
-
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        setPlansOpen(false);
+        closePlans();
       }
     };
 
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('touchstart', handlePointerDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('touchstart', handlePointerDown);
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [plansOpen]);
+  }, [plansOpen, closePlans]);
 
   return (
+    <>
+    {plansOpen ? (
+      <div
+        aria-hidden="true"
+        data-testid="home-plans-backdrop"
+        onClick={closePlans}
+        className="fixed inset-0 z-30 bg-black/60"
+      />
+    ) : null}
     <header
       ref={headerRef}
       className="sticky top-0 z-40 border-b border-white/5 bg-[#080808]/88 backdrop-blur-xl"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 md:gap-6 md:px-10">
-        <div className="flex min-w-0 items-center gap-3">
+        <Link
+          to="/"
+          onClick={handleLogoClick}
+          aria-label="Sistema Maestro, ir al inicio"
+          className="flex min-w-0 items-center gap-3 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+        >
           <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200/15 bg-[radial-gradient(circle_at_top,rgba(245,158,11,0.18),transparent_55%),linear-gradient(180deg,#17120B_0%,#050505_100%)] p-1.5 shadow-[0_0_28px_rgba(245,158,11,0.10)] md:h-12 md:w-12">
             <img
               src="/sistema_maestro_gold_logo.png"
@@ -84,7 +108,7 @@ const HomeNav = () => {
               Dirección, IA y continuidad
             </p>
           </div>
-        </div>
+        </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
           {navItems.map((item) => (
@@ -119,9 +143,10 @@ const HomeNav = () => {
       </div>
 
       {plansOpen ? (
-        <HomePlansPanel id={PLANS_PANEL_ID} onSelect={closePlans} />
+        <HomePlansPanel id={PLANS_PANEL_ID} onSelect={closePlans} onClose={closePlans} />
       ) : null}
     </header>
+    </>
   );
 };
 
