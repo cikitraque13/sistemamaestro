@@ -95,22 +95,22 @@ const AgencySection = () => {
                 <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
                   <span className="absolute inset-0 rounded-full bg-[#A78BFA]/25 blur-md motion-safe:animate-pulse" />
                   <span className="relative flex h-14 w-14 items-center justify-center rounded-full border border-[#E9D5FF]/50 bg-[linear-gradient(135deg,rgba(216,180,254,0.42),rgba(167,139,250,0.30))] text-base font-semibold text-[#F5F3FF]">
-                    LD
+                    N
                   </span>
                 </div>
 
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E9D5FF]">
-                    Demo con Lucas
+                    Demo con Nova
                   </p>
                   <p className="mt-1 text-lg font-semibold leading-tight text-white">
-                    Habla con el agente de Sistema Maestro
+                    Habla con la agente de Sistema Maestro
                   </p>
                 </div>
               </div>
 
               <p className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-[15px] leading-7 text-zinc-200">
-                «Hola, soy Lucas, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»
+                «Hola, soy Nova, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»
               </p>
 
               {VOICE_AGENT_URL ? (
@@ -124,7 +124,7 @@ const AgencySection = () => {
                 </a>
               ) : (
                 <p className="mt-4 text-sm leading-6 text-zinc-400">
-                  La conversación de voz en vivo con Lucas llegará muy pronto a esta sección.
+                  La conversación de voz en vivo con Nova llegará muy pronto a esta sección.
                 </p>
               )}
             </div>
