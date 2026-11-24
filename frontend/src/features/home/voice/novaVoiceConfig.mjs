@@ -36,5 +36,46 @@ export const novaStatusLabel = (status, agentMode) => {
   if (status === 'error') {
     return 'No se ha podido conectar con Nova. Inténtalo de nuevo en un momento.';
   }
+  if (status === 'dropped') {
+    return 'La llamada se ha cortado nada más empezar. Revisa el micrófono y vuelve a intentarlo.';
+  }
   return '';
+};
+
+// Fase visual de la demo (avatar, onda y pastilla de estado).
+export const novaPhase = (status, agentMode) => {
+  if (status === 'connecting') return 'connecting';
+  if (status === 'connected') return agentMode === 'speaking' ? 'speaking' : 'listening';
+  if (status === 'error' || status === 'mic-denied' || status === 'dropped') return 'error';
+  return 'idle';
+};
+
+// Una llamada que se cierra en menos de 3 s desde que conectó (o antes de
+// conectar) cuenta como corte temprano: se avisa en pantalla en vez de volver
+// al estado inicial en silencio.
+export const NOVA_EARLY_DROP_MS = 3000;
+
+export const isEarlyDrop = (connectedAt, now, thresholdMs = NOVA_EARLY_DROP_MS) =>
+  !connectedAt || now - connectedAt < thresholdMs;
+
+// Convierte el espectro real de la llamada (Uint8Array 0-255 del SDK) en
+// `bars` niveles 0-1 para la onda. Usa la mitad baja del espectro, que es
+// donde está la voz.
+export const levelsFromFrequency = (data, bars) => {
+  const out = new Array(bars).fill(0);
+  if (!data || !data.length || bars <= 0) return out;
+  const usable = Math.max(bars, Math.floor(data.length * 0.5));
+  const step = usable / bars;
+  for (let i = 0; i < bars; i += 1) {
+    const from = Math.floor(i * step);
+    const to = Math.max(from + 1, Math.floor((i + 1) * step));
+    let sum = 0;
+    let count = 0;
+    for (let j = from; j < to && j < data.length; j += 1) {
+      sum += data[j];
+      count += 1;
+    }
+    out[i] = count ? Math.min(1, sum / count / 255) : 0;
+  }
+  return out;
 };
