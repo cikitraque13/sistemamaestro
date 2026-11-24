@@ -6,10 +6,10 @@ Nova es la agente de voz (voz de mujer) del bloque «Demo con Nova» de la secci
 
 ## Base del agente
 
-El documento de configuración de Nova es el *system prompt* y la base de conocimiento que hay que cargar en el proveedor de voz al activarla: técnicas de venta, psicología, manejo de objeciones, espejo y etiqueta, micro-compromisos, lectura de silencios, capa emocional, flujo de captura de mail y llamadas cortas.
+El documento de configuración de Nova es el *system prompt* y la base de conocimiento que hay que cargar en el proveedor de voz al activarla.
 
-- Origen: `SM_guias` en el PC de Lucas (`Desktop\Ecosistema\Proyectos\SM_guias\notas\NOVA_CONFIGURACION_20261124.md`). Esa es la versión maestra; si cambia, se vuelve a copiar aquí.
-- Copia en este repo: [`NOVA_CONFIGURACION_20261124.md`](./NOVA_CONFIGURACION_20261124.md). Sus marcadores `[...]` necesitan datos reales de Lucas antes de activar la voz.
+- El documento de configuración (`NOVA_CONFIGURACION_20261124.md`) es privado y vive solo en `SM_guias\notas` del PC de Lucas. Este repositorio es público y no contiene contenido de ventas.
+- Al activar la voz, se carga directamente desde `SM_guias\notas` en el proveedor. Sus marcadores `[...]` necesitan datos reales de Lucas antes.
 
 Saludo publicado en la portada:
 
@@ -20,7 +20,7 @@ Saludo publicado en la portada:
 1. **Cuenta**: Lucas crea la cuenta en elevenlabs.io (plan Starter o superior para uso comercial).
 2. **Agente**: en *Agents*, crear el agente «Nova» con idioma principal español.
 3. **Voz**: elegir en la Voice Library una voz femenina de español de España (no clonar la voz de Lucas: es de hombre).
-4. **Base de conocimiento**: pegar `NOVA_CONFIGURACION_20261124.md` como *system prompt* (y/o subirlo a *Knowledge base*) y poner como primer mensaje el saludo de arriba.
+4. **Base de conocimiento**: cargar `NOVA_CONFIGURACION_20261124.md` desde `SM_guias\notas` (no desde este repo) como *system prompt* y/o *Knowledge base*, con el saludo de arriba como primer mensaje.
 5. **Captura de mail**: en *Analysis → Data collection*, campo `email` (string). El webhook al backend queda para la versión completa.
 6. **Seguridad**: en *Advanced*, autenticación desactivada (agente público); en *Security*, allowlist solo con `sistemamaestro.com` y `www.sistemamaestro.com`. Poner límite de llamadas/minutos si el plan lo permite.
 7. **Id público**: copiar el *agent id* (`agent_…`). No es una clave; la clave de API de ElevenLabs no se usa en este flujo y nunca va al repo ni al frontend.
