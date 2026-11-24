@@ -1406,7 +1406,6 @@ frontend/src/features/home/sections/LeadCaptureSection.js
 - Logo Gold en header, footer, legales y favicon.
 - Favicon usa `sistema_maestro_gold_logo.png`.
 - Páginas legales cargan desde arriba con `ScrollToTop`.
-- Radar IA usa dropdowns premium.
 - Home móvil queda compacta y validada.
 
 ### Efecto operativo
