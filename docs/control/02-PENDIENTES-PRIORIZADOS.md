@@ -21,7 +21,7 @@ Detalle y verificación en el [registro de jornada 2026-11-23/24](11-REGISTRO-JO
 7. Builder: publicación real de los proyectos. Hoy no publica nada.
 8. Back office, por fases.
 9. Contenedor de restos del 23-11 en el PC: por ordenar. Nada borrado.
-10. Demo de voz de Nova: código en `main` (#139) y variable en Railway. Falta probar la conversación en producción, cambiar la voz provisional por Cristina (la clave no tiene permiso de voces) y rellenar los marcadores de la configuración privada.
+10. Demo de voz de Nova: código en `main` (#139), variable en Railway y diseño premium (avatar, onda real, estado). Falta probar la conversación con micrófono real (en la prueba automática el agente corta la llamada al empezar), cambiar la voz provisional por Cristina (la clave no tiene permiso de voces y la cuenta está en plan gratuito, que no permite voces de la Voice Library por API) y rellenar los marcadores de la configuración privada.
 11. Manual de Nova en el historial público (commit `7c8a236`, PR #137): fuera de `main` desde #140. Decidir si basta o hace falta otra medida.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07

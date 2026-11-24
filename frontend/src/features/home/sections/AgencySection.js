@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import NovaVoiceButton from '../voice/NovaVoiceButton';
+import NovaVoiceDemo from '../voice/NovaVoiceDemo';
 
 const steps = [
   {
@@ -84,35 +84,14 @@ const AgencySection = () => {
           </div>
 
           <div
-            className={`rounded-[26px] bg-[linear-gradient(135deg,rgba(198,244,50,0.45),rgba(167,139,250,0.55))] p-px shadow-[0_18px_60px_rgba(167,139,250,0.10)] ${revealClasses(visible, 'delay-150')}`}
+            className={`rounded-[26px] bg-[linear-gradient(135deg,rgba(249,115,22,0.55),rgba(198,244,50,0.45)_35%,rgba(167,139,250,0.6)_70%,rgba(56,189,248,0.55))] p-px shadow-[0_18px_60px_rgba(167,139,250,0.16)] ${revealClasses(visible, 'delay-150')}`}
           >
-            <div className="h-full rounded-[25px] bg-[#0a0a0a] bg-[linear-gradient(180deg,rgba(216,180,254,0.10),rgba(10,10,10,0)_60%)] p-5 md:p-6">
-              <div className="flex items-center gap-4">
-                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
-                  <span className="absolute inset-0 rounded-full bg-[#A78BFA]/25 blur-md motion-safe:animate-pulse" />
-                  <span className="relative flex h-14 w-14 items-center justify-center rounded-full border border-[#E9D5FF]/50 bg-[linear-gradient(135deg,rgba(216,180,254,0.42),rgba(167,139,250,0.30))] text-base font-semibold text-[#F5F3FF]">
-                    N
-                  </span>
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E9D5FF]">
-                    Demo con Nova
-                  </p>
-                  <p className="mt-1 text-lg font-semibold leading-tight text-white">
-                    Habla con la agente de Sistema Maestro
-                  </p>
-                </div>
-              </div>
-
-              <p className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-[15px] leading-7 text-zinc-200">
-                «Hola, soy Nova, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»
-              </p>
-
-              {/* Botón de voz de Nova: oculto hasta que exista VITE_ELEVENLABS_AGENT_ID
-                  (o VITE_VOICE_AGENT_URL). El SDK de voz solo se carga al pulsarlo.
-                  La base del agente está en docs/agents/nova/. */}
-              <NovaVoiceButton />
+            <div className="relative h-full overflow-hidden rounded-[25px] bg-[#0a0a0a] p-5 md:p-6">
+              {/* Demo premium de Nova: avatar animado, onda con el volumen real de la
+                  llamada, estado pulsante y botón grande. El botón solo aparece con
+                  VITE_ELEVENLABS_AGENT_ID (o VITE_VOICE_AGENT_URL); el SDK de voz se
+                  carga al pulsarlo. La base del agente está en docs/agents/nova/. */}
+              <NovaVoiceDemo />
             </div>
           </div>
         </div>
