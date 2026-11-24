@@ -8,8 +8,8 @@ Nova es la agente de voz (voz de mujer) del bloque «Demo con Nova» de la secci
 
 El documento de configuración de Nova es el *system prompt* y la base de conocimiento que hay que cargar en el proveedor de voz al activarla: técnicas de venta, psicología, manejo de objeciones, espejo y etiqueta, micro-compromisos, lectura de silencios, capa emocional, flujo de captura de mail y llamadas cortas.
 
-- Origen: `SM_guias` en el PC de Lucas (`Desktop\Ecosistema\Proyectos\SM_guias\NOVA_CONFIGURACION_20261124.md`).
-- Copia en este repo: `docs/agents/nova/NOVA_CONFIGURACION_20261124.md` (**pendiente**: el documento aún no existía en `SM_guias` cuando se creó este README).
+- Origen: `SM_guias` en el PC de Lucas (`Desktop\Ecosistema\Proyectos\SM_guias\notas\NOVA_CONFIGURACION_20261124.md`). Esa es la versión maestra; si cambia, se vuelve a copiar aquí.
+- Copia en este repo: [`NOVA_CONFIGURACION_20261124.md`](./NOVA_CONFIGURACION_20261124.md). Sus marcadores `[...]` necesitan datos reales de Lucas antes de activar la voz.
 
 Saludo publicado en la portada:
 
