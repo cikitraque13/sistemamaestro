@@ -8,8 +8,8 @@ Nova es la agente de voz (voz de mujer) del bloque «Demo con Nova» de la secci
 
 El documento de configuración de Nova es el *system prompt* y la base de conocimiento que hay que cargar en el proveedor de voz al activarla: técnicas de venta, psicología, manejo de objeciones, espejo y etiqueta, micro-compromisos, lectura de silencios, capa emocional, flujo de captura de mail y llamadas cortas.
 
-- Origen: `SM_guias` en el PC de Lucas (`Desktop\Ecosistema\Proyectos\SM_guias\notas\NOVA_CONFIGURACION_20261124.md`). Esa es la versión maestra; si cambia, se vuelve a copiar aquí.
-- Copia en este repo: [`NOVA_CONFIGURACION_20261124.md`](./NOVA_CONFIGURACION_20261124.md). Sus marcadores `[...]` necesitan datos reales de Lucas antes de activar la voz.
+- El documento de configuración (`NOVA_CONFIGURACION_20261124.md`) es privado y vive solo en `SM_guias\notas` del PC de Lucas. Este repositorio es público y no contiene contenido de ventas.
+- Al activar la voz, se carga directamente desde `SM_guias\notas` en el proveedor. Sus marcadores `[...]` necesitan datos reales de Lucas antes.
 
 Saludo publicado en la portada:
 
@@ -19,7 +19,7 @@ Saludo publicado en la portada:
 
 1. **Proveedor**: elegir la plataforma de agente conversacional de voz (por ejemplo ElevenLabs Conversational AI, Vapi o Retell) y crear la cuenta. Lo hace Lucas.
 2. **Voz**: elegir o crear en el proveedor una voz femenina para Nova.
-3. **Base de conocimiento**: cargar `NOVA_CONFIGURACION_20261124.md` como *system prompt* y base de conocimiento, con el saludo de arriba como primer mensaje. Configurar la captura de mail según el documento.
+3. **Base de conocimiento**: cargar `NOVA_CONFIGURACION_20261124.md` (desde `SM_guias\notas`) como *system prompt* y base de conocimiento, con el saludo de arriba como primer mensaje. Configurar la captura de mail según el documento.
 4. **URL pública**: obtener del proveedor el enlace https de la conversación con Nova.
 5. **Railway**: añadir `VITE_VOICE_AGENT_URL` con ese enlace en el servicio de producción. La clave del proveedor la añade Lucas directamente en el proveedor o en Railway; nunca va al repo.
 6. **Dockerfile**: añadir `ARG VITE_VOICE_AGENT_URL` (y `ENV VITE_VOICE_AGENT_URL=$VITE_VOICE_AGENT_URL`) en la etapa `frontend-build`, antes de `RUN npm run build`. Sin esto la variable de Railway no llega al build de Vite.
