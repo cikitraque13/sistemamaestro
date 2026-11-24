@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@elevenlabs/client": "1.38.0",
     "@hookform/resolvers": "^5.0.1",
     "@phosphor-icons/react": "^2.1.10",
     "@radix-ui/react-accordion": "^1.2.8",
@@ -60,7 +61,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "test": "vitest run",
-    "test:mjs": "node --test src/lib/economicRequest.test.mjs src/features/billing/paymentCompletion.test.mjs src/features/builder/preview/functionalLandingValidation.test.mjs src/features/builder/state/authorizationBoundary.test.mjs src/features/builder/state/boundedLandingRepair.test.mjs src/features/builder/state/builderChangeReview.test.mjs src/features/builder/state/builderChangeTransaction.test.mjs src/features/builder/state/compositeChange.test.mjs src/features/builder/state/ctaDestinationIntent.test.mjs src/features/builder/state/ctaSemanticCoherence.test.mjs src/features/builder/state/durableLandingWorkspace.test.mjs src/features/builder/state/humanSemanticDecision.test.mjs src/features/builder/state/pendingWorkRecovery.test.mjs src/features/builder/state/staticSectionMutation.test.mjs"
+    "test:mjs": "node --test src/lib/economicRequest.test.mjs src/features/billing/paymentCompletion.test.mjs src/features/builder/preview/functionalLandingValidation.test.mjs src/features/builder/state/authorizationBoundary.test.mjs src/features/builder/state/boundedLandingRepair.test.mjs src/features/builder/state/builderChangeReview.test.mjs src/features/builder/state/builderChangeTransaction.test.mjs src/features/builder/state/compositeChange.test.mjs src/features/builder/state/ctaDestinationIntent.test.mjs src/features/builder/state/ctaSemanticCoherence.test.mjs src/features/builder/state/durableLandingWorkspace.test.mjs src/features/builder/state/humanSemanticDecision.test.mjs src/features/builder/state/pendingWorkRecovery.test.mjs src/features/builder/state/staticSectionMutation.test.mjs src/features/home/voice/novaVoiceConfig.test.mjs"
   },
   "browserslist": {
     "production": [
