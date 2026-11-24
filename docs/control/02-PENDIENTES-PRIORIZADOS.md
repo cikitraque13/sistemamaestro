@@ -18,6 +18,11 @@ Detalle y verificación en el [registro de jornada 2026-11-23/24](11-REGISTRO-JO
 4. Rótulo `'Entrada'` de la portada: resuelto, quitado junto con su bloque en #125 (2026-11-24). Ya no es pendiente.
 5. Cuentas de prueba `shadowtest_…@example.com` y `user@example.com` (esta con 3 proyectos de prueba): ninguna borrada.
 6. Propuestas sobre el roadmap (nueva jornada de agencia de IA, publicación concreta en J12, revisión de la decisión cerrada 56): registradas en el roadmap como propuestas, sin decidir.
+7. Builder: publicación real de los proyectos. Hoy no publica nada.
+8. Back office, por fases.
+9. Contenedor de restos del 23-11 en el PC: por ordenar. Nada borrado.
+10. Demo de voz de Nova: código en `main` (#139) y variable en Railway. Falta probar la conversación en producción, cambiar la voz provisional por Cristina (la clave no tiene permiso de voces) y rellenar los marcadores de la configuración privada.
+11. Manual de Nova en el historial público (commit `7c8a236`, PR #137): fuera de `main` desde #140. Decidir si basta o hace falta otra medida.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 

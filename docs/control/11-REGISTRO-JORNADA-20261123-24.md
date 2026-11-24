@@ -57,15 +57,40 @@ Trabajo del día que no fue un PR:
 - Desde la portada, el acceso al builder queda solo por Iniciar sesión y por Planes.
 - Restos fuera de la home, sin tocar: `frontend/src/features/home/sections/FinalCtaSection.js` sigue en el repo sin montarse en la portada, y `DashboardPage.js` conserva sus textos; ninguno de los dos se ha tocado.
 
+### PRs fusionados el 24-11-2026 (de #130 a #140)
+
+Comprobados en GitHub y en la lista de deployments de Railway el 2026-11-24 a la 01:45. Horas en Europe/Madrid.
+
+| PR | Hora | Merge | Título |
+|---|---|---|---|
+| #130 | 00:44 | `d0546a5` | Portada: texto del hero en su posición original y tarjetas a la derecha |
+| #131 | 00:50 | `3f93491` | Portada: tarjetas compactas centradas, sin título, borde lima a morado y colores nuevos |
+| #132 | 00:54 | `10ade12` | Portada: nuevos títulos de las cuatro tarjetas |
+| #133 | 01:00 | `d3f9743` | Portada: sección Agencia de IA tras el hero |
+| #134 | 01:01 | `898ef7f` | Portada: frases de las cuatro tarjetas acordes a sus títulos |
+| #135 | 01:06 | `c4f86a1` | Portada: la demo de Agencia de IA pasa a llamarse Nova |
+| #136 | 01:13 | `aa9cb44` | Portada: demo de Nova sin aviso de voz y activación preparada |
+| #137 | 01:15 | `d84a12f` | Docs: configuración de Nova desde SM_guias |
+| #138 | 01:17 | `309e0a5` | Portada: el panel de planes se puede cerrar (X, clic fuera, logo y Escape) |
+| #140 | 01:19 | `0396d95` | Docs: retira el manual de configuración de Nova del repo público |
+| #139 | 01:44 | `918a017` | Portada: voz en vivo de Nova preparada con ElevenLabs Agents |
+
+- #129 ("Lo que hace de verdad en dos columnas") se cerró sin fusionar.
+- Deployment de #139: `c26e56a1`, SUCCESS a las 01:45. Antes hubo un redespliegue de `0396d95` a las 01:42 (`3e0f155a`, SUCCESS).
+- Corrección a la entrada de #127: #130 devolvió el texto del hero a su posición original. Hoy el titular vuelve a tener `max-w-[11ch]` y el contenedor `max-w-3xl`, sin los anchos `md:` que añadió #127. La portada pasa a dos columnas (texto a la izquierda, tarjetas a la derecha) desde 1280 px (`xl:grid-cols-[1fr_1fr]`).
+- Estado de la portada en `main` (`918a017`): hero, Agencia de IA, Audiencia y Captación. Las cuatro tarjetas son 01 Analiza (naranja), 02 Construye (lima), 03 Despliega (morado) y 04 Extrae (azul cielo), con borde lima a morado y los títulos "Una web que convierte", "Un agente que contesta", "Todo conectado sin que toques nada" y "Tu agencia en piloto automático".
+
 ## 2. Estado del centro de mando
 
 - `Centro de Mando\centro_mando_estado.json` está en `"revision": 52` (leído el 2026-11-24 en el PC, sin modificarlo; última escritura 2026-11-23 21:59).
 - Existe la copia de la revisión 51 en `Centro de Mando\backups\Backups_estado_rev51_20261123`.
+- Actualización del 2026-11-24, madrugada: el JSON pasa a la revisión 53 con el bloque `jornada_20261124`, tras copiar la 52 en `Centro de Mando\backups\Backups_estado_rev52_20261124`. La oficina virtual se regenera a partir de ese estado.
 - Este repositorio no versiona ese JSON.
 
 ## 3. GrokBot Core
 
 - Lucas declara que está eliminada.
+- Comprobado el 2026-11-24 a la 01:45: `Desktop\Ecosistema\GrokBot Core` ya no existe. En la raíz de `Ecosistema` solo quedan `Archivo`, `Centro de Mando`, `Proyectos` e `INDICE_DE_RUTAS.md`. No se ha comprobado adónde fue su contenido.
 - En el PC queda `Ecosistema\Archivo\20261123_restos\para_borrar\GrokBot_Backup_2026-10-23` y su `.zip`. Es una copia de respaldo apartada para borrar, no una instalación activa. No se ha borrado nada.
 - No hay rastro de GrokBot en este repositorio.
 
@@ -93,6 +118,13 @@ Pendiente:
 - Panel de intención y plan del builder (J06) que se ve sin estilo.
 - Recorte de las pestañas del builder: hoy siguen las seis (`Preview`, `Código`, `Extracción`, `Estructura`, `Deploy`, `GitHub`) en `frontend/src/features/builder/data/builderWorkspaceTabs.js`. No está hecho.
 - Coste o plan de Extracción: por definir.
+
+Pendiente añadido el 24-11-2026 (madrugada), sin autorizar:
+
+- Builder: publicación real de los proyectos (hoy no publica nada).
+- Back office, por fases.
+- Contenedor de restos `Ecosistema\Archivo\20261123_restos`: por ordenar.
+- Demo de voz de Nova: ver la sección 11.
 
 ## 6. Roadmap
 
@@ -132,3 +164,16 @@ Declarada por Lucas el 24-11 y comprobada en solo lectura el mismo día en `Desk
   - `LEEME.md`.
 
 Diferencia con lo declarado: no existe una carpeta `Sistema Maestro` de soporte. Las guías, los assets, las copias y el archivo están directamente en `Proyectos` como `SM_guias`, `SM_assets`, `SM_copias_de_trabajo` y `SM_archivo`.
+
+## 11. Nova, agente de voz de la demo
+
+Comprobado el 2026-11-24 entre la 01:40 y la 01:45, en solo lectura.
+
+- Agente en ElevenLabs: `agent_4201m85fg3z3eb281fjjx0vhhg0h` (id público, no es una clave). Existe, se llama "Nova · Sistema Maestro (demo portada)", idioma español. Creado a la 01:32 y actualizado a la 01:43.
+- Su prompt se presenta solo como Nova y prohíbe usar otro nombre. Allowlist: `sistemamaestro.com` y `www.sistemamaestro.com`, sin autenticación.
+- Voz provisional: Sarah (`EXAVITQu4vr4xnSDxMaL`), modelo `eleven_flash_v2_5`.
+- Cristina (andaluza, `2VUqK4PEdMj16L6xTN4J`) sigue pendiente. La clave de la API no tiene permiso de lectura de voces (respuesta 401), así que no se pudo añadir.
+- Railway: el servicio de producción tiene la variable `VITE_ELEVENLABS_AGENT_ID` (comprobado solo el nombre). El JavaScript publicado tras el deployment de #139 contiene ese id y el botón "Habla con Nova".
+- La conversación de voz en el navegador no se ha probado en este registro.
+- Configuración: privada, en `SM_guias\notas\NOVA_CONFIGURACION_20261124.md` del PC de Lucas (26 906 bytes). Tiene siete bloques de trabajo de venta: técnicas de venta, psicología, detección avanzada, capa emocional, flujo de correo, perfiles y objeciones, y llamadas cortas. Quedan marcadores `[...]` que necesitan datos reales de Lucas. No se copia aquí.
+- Exposición: #137 publicó el documento en este repositorio público y #140 lo retiró de `main`. Sigue visible en el historial: commit `7c8a236`, pestaña Files del PR #137 y `refs/pull/137/head`. No se ha reescrito el historial.
