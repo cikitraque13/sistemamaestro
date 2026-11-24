@@ -128,9 +128,9 @@ const AgencySection = () => {
           </div>
 
           <div
-            className={`rounded-[26px] bg-[linear-gradient(135deg,rgba(249,115,22,0.55),rgba(198,244,50,0.45)_35%,rgba(167,139,250,0.6)_70%,rgba(56,189,248,0.55))] p-px shadow-[0_18px_60px_rgba(167,139,250,0.16)] ${revealClasses(visible, 'delay-150')}`}
+            className={`w-full rounded-[26px] lg:max-w-[480px] lg:justify-self-end bg-[linear-gradient(135deg,rgba(249,115,22,0.55),rgba(198,244,50,0.45)_35%,rgba(167,139,250,0.6)_70%,rgba(56,189,248,0.55))] p-px shadow-[0_18px_60px_rgba(167,139,250,0.16)] ${revealClasses(visible, 'delay-150')}`}
           >
-            <div className="relative h-full overflow-hidden rounded-[25px] bg-[#0a0a0a] p-5 md:p-6">
+            <div className="relative h-full overflow-hidden rounded-[25px] bg-[#0a0a0a] p-4 md:p-5">
               {/* Demo premium de Nova: avatar animado, onda con el volumen real de la
                   llamada, estado pulsante y botón grande. El botón solo aparece con
                   VITE_ELEVENLABS_AGENT_ID (o VITE_VOICE_AGENT_URL); el SDK de voz se

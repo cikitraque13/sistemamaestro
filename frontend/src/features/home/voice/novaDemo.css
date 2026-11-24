@@ -38,8 +38,8 @@
 .nova-avatar {
   position: relative;
   flex-shrink: 0;
-  width: 148px;
-  height: 148px;
+  width: 126px;
+  height: 126px;
   transform: scale(calc(1 + var(--nova-level) * 0.06));
   transition: transform 120ms linear;
 }
@@ -398,8 +398,8 @@
 
 @media (max-width: 639px) {
   .nova-avatar {
-    width: 128px;
-    height: 128px;
+    width: 108px;
+    height: 108px;
   }
 }
 
