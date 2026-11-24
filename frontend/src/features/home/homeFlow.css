@@ -1,0 +1,110 @@
+/* Portada como una sola página: entrada del titular, puente con luz y tarjetas flotantes. */
+
+.sm-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.45em);
+  animation: sm-word-rise 380ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes sm-word-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Línea fina con brillo que se mueve despacio bajo la frase puente. */
+.sm-bridge-line {
+  position: relative;
+  display: block;
+  height: 1px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.35), rgba(167, 139, 250, 0.35), rgba(34, 211, 238, 0.35));
+}
+
+.sm-bridge-line::after {
+  content: '';
+  position: absolute;
+  inset: -1px auto -1px 0;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  filter: blur(0.5px);
+  animation: sm-bridge-glow 5s ease-in-out infinite;
+}
+
+@keyframes sm-bridge-glow {
+  0% { transform: translateX(-110%); }
+  60%, 100% { transform: translateX(360%); }
+}
+
+/* Hilo de luz que "cae" hacia la sección de agencia. */
+.sm-fall {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 40px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(167, 139, 250, 0.45), rgba(34, 211, 238, 0));
+}
+
+.sm-fall::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 3px;
+  height: 14px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, transparent, #c4b5fd, #22d3ee);
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.8);
+  animation: sm-fall-drop 2.2s ease-in infinite;
+}
+
+@keyframes sm-fall-drop {
+  0% { transform: translateY(-14px); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(40px); opacity: 0; }
+}
+
+/* Tarjetas con vida: flotan ~4 px cada ~6 s y se elevan al pasar el ratón.
+   El hover usa `translate` para sumarse a la animación de `transform`. */
+.sm-float {
+  --sm-glow: rgba(167, 139, 250, 0.28);
+  animation: sm-float 6s ease-in-out infinite;
+  transition: translate 300ms ease, box-shadow 300ms ease;
+}
+
+.sm-float:hover {
+  translate: 0 -4px;
+  box-shadow: 0 12px 32px -8px var(--sm-glow), 0 0 22px var(--sm-glow);
+}
+
+@keyframes sm-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-word {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .sm-bridge-line::after,
+  .sm-fall::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .sm-float {
+    animation: none;
+    transition: none;
+  }
+
+  .sm-float:hover {
+    translate: none;
+  }
+}

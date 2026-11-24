@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import NovaVoiceDemo from '../voice/NovaVoiceDemo';
+import '../homeFlow.css';
 
 const steps = [
   {
@@ -66,12 +67,12 @@ const AgencySection = () => {
     <section
       id="agencia-ia"
       ref={ref}
-      className="relative scroll-mt-24 overflow-hidden px-6 py-12 md:px-10 md:py-16"
+      className="relative scroll-mt-24 overflow-hidden px-6 pb-6 pt-4 md:px-10 md:pb-6 md:pt-5"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_30%,rgba(198,244,50,0.06),transparent_28%),radial-gradient(circle_at_88%_40%,rgba(167,139,250,0.08),transparent_30%)]" />
 
       <div className="relative mx-auto max-w-7xl">
-        <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+        <div className="grid items-start gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
           <div className={revealClasses(visible)}>
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-zinc-400">
               Agencia de IA
@@ -88,7 +89,7 @@ const AgencySection = () => {
             <div className="mt-7 grid gap-5 sm:grid-cols-2 sm:gap-4">
               <div className="flex flex-col">
               <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-400/50">Antes</p>
-              <div className="flex-1 rounded-[20px] border border-white/[0.08] bg-[#111216] p-5" aria-label="Sin agente">
+              <div className="sm-float flex-1 rounded-[20px] border border-white/[0.08] bg-[#111216] p-5" style={{ '--sm-glow': 'rgba(161,161,170,0.18)' }} aria-label="Sin agente">
                 <p className="text-base font-semibold text-zinc-500">Sin agente</p>
                 <ul className="mt-3 space-y-2.5 text-[15px] leading-6 text-zinc-500 md:text-base">
                   {beforeItems.map((item) => (
@@ -106,7 +107,8 @@ const AgencySection = () => {
                 Después
               </p>
               <div
-                className="flex-1 rounded-[20px] bg-[linear-gradient(135deg,#A78BFA,#8B5CF6_50%,#22D3EE)] p-[1.5px] shadow-[0_0_28px_rgba(139,92,246,0.35)]"
+                className="sm-float flex-1 rounded-[20px] bg-[linear-gradient(135deg,#A78BFA,#8B5CF6_50%,#22D3EE)] p-[1.5px] shadow-[0_0_28px_rgba(139,92,246,0.35)]"
+                style={{ '--sm-glow': 'rgba(139,92,246,0.45)', animationDelay: '-3s' }}
                 aria-label="Con Sistema Maestro"
               >
                 <div className="h-full rounded-[18.5px] bg-[#12122a] bg-[linear-gradient(180deg,rgba(139,92,246,0.14),rgba(18,18,42,0)_70%)] p-5">
