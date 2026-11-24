@@ -108,3 +108,64 @@
     translate: none;
   }
 }
+
+/* Botón cápsula secundario: borde degradado violeta→azul, fondo tintado y brillo al pasar el ratón.
+   Lo usan «Crea tu cuenta gratis» (agencia) e «Iniciar sesión» (cabecera). */
+.sm-capsule {
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 1px;
+  background: linear-gradient(135deg, #a78bfa, #38bdf8);
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+.sm-capsule:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(139, 92, 246, 0.4);
+}
+
+.sm-capsule:focus-visible {
+  outline: 2px solid rgba(196, 181, 253, 0.7);
+  outline-offset: 2px;
+}
+
+.sm-capsule__inner {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.18), rgba(56, 189, 248, 0.12)), rgba(20, 17, 42, 0.9);
+  font-weight: 600;
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-capsule {
+    transition: none;
+  }
+
+  .sm-capsule:hover {
+    transform: none;
+  }
+}
+
+/* Pie: línea superior violeta→azul como la cápsula y enlaces con brillo suave. */
+.sm-footer-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(80rem, calc(100% - 3rem));
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.6), rgba(56, 189, 248, 0.6), transparent);
+}
+
+.sm-footer-link {
+  transition: color 200ms ease, text-shadow 200ms ease;
+}
+
+.sm-footer-link:hover,
+.sm-footer-link:focus-visible {
+  color: #fff;
+  text-shadow: 0 0 12px rgba(167, 139, 250, 0.65);
+}

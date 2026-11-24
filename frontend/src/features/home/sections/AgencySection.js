@@ -181,9 +181,9 @@ const AgencySection = () => {
           </a>
           <Link
             to="/register"
-            className="inline-flex rounded-full bg-[linear-gradient(135deg,#A78BFA,#38BDF8)] p-px shadow-[0_0_0_rgba(139,92,246,0)] transition hover:-translate-y-0.5 hover:shadow-[0_0_22px_rgba(139,92,246,0.40)] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/70 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            className="sm-capsule"
           >
-            <span className="inline-flex items-center whitespace-nowrap rounded-full bg-[#14112a]/90 bg-[linear-gradient(135deg,rgba(167,139,250,0.18),rgba(56,189,248,0.12))] px-6 py-3 text-sm font-semibold text-white">
+            <span className="sm-capsule__inner px-6 py-3 text-sm">
               Crea tu cuenta gratis
             </span>
           </Link>

@@ -2,14 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import HomePlansPanel from './HomePlansPanel';
+import '../homeFlow.css';
 
 const PLANS_PANEL_ID = 'home-plans-panel';
 const PLANS_HASH = '#pricing';
-
-const navItems = [
-  { label: 'Cómo funciona', href: '#como-funciona' },
-  { label: 'Para quién es', href: '#para-quien-es' },
-];
 
 const HomeNav = () => {
   const headerRef = useRef(null);
@@ -109,24 +105,12 @@ const HomeNav = () => {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex">
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="text-sm font-medium text-zinc-300 transition hover:text-white"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             to="/login"
-            className="inline-flex whitespace-nowrap rounded-2xl border border-[#E9D5FF]/60 bg-[linear-gradient(135deg,rgba(216,180,254,0.42),rgba(167,139,250,0.30))] px-3 py-2 text-xs font-semibold text-[#F5F3FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_0_1px_rgba(196,181,253,0.18),0_8px_26px_rgba(167,139,250,0.38)] transition duration-300 hover:border-[#E9D5FF]/80 hover:bg-[linear-gradient(135deg,rgba(216,180,254,0.52),rgba(167,139,250,0.38))] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_0_0_1px_rgba(196,181,253,0.28),0_10px_34px_rgba(167,139,250,0.52)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DDD6FE]/80 motion-reduce:transition-none sm:px-5 sm:py-2.5 sm:text-sm"
+            className="sm-capsule"
           >
-            Iniciar sesión
+            <span className="sm-capsule__inner px-3 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm">Iniciar sesión</span>
           </Link>
 
           <button
