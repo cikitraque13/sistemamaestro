@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import '../homeFlow.css';
+import { CAPSULE_GRADIENT_TEXT } from '../brandText';
 
 // «Planes» usa el hash #pricing, que la cabecera escucha para abrir el panel de planes.
 const navLinks = [
@@ -17,7 +18,7 @@ const legalLinks = [
   { label: 'Términos', to: '/terms' },
 ];
 
-const headingClass = 'text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-400';
+const headingClass = `w-fit text-xs font-bold uppercase tracking-[0.22em] ${CAPSULE_GRADIENT_TEXT}`;
 const linkClass = 'sm-footer-link w-fit text-sm text-zinc-300';
 
 const HomeFooter = () => {

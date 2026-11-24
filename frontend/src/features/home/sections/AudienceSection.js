@@ -1,6 +1,7 @@
 import React from 'react';
 
 import '../homeFlow.css';
+import { BRAND_GRADIENT_TEXT } from '../brandText';
 
 const items = [
   {
@@ -39,7 +40,8 @@ const AudienceSection = () => {
           </p>
 
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3rem] md:leading-[0.97]">
-            Para negocios que quieren su web y su agente trabajando por ellos.
+            Para negocios que quieren <span className={BRAND_GRADIENT_TEXT}>su web</span> y{' '}
+            <span className={BRAND_GRADIENT_TEXT}>su agente</span> trabajando por ellos.
           </h2>
 
           <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
