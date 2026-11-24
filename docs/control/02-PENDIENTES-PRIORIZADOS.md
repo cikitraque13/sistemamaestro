@@ -23,6 +23,9 @@ Detalle y verificación en el [registro de jornada 2026-11-23/24](11-REGISTRO-JO
 9. Contenedor de restos del 23-11 en el PC: por ordenar. Nada borrado.
 10. Demo de voz de Nova: código en `main` (#139), variable en Railway y diseño premium (avatar, onda real, estado). Falta probar la conversación con micrófono real (en la prueba automática el agente corta la llamada al empezar), cambiar la voz provisional por Cristina (la clave no tiene permiso de voces y la cuenta está en plan gratuito, que no permite voces de la Voice Library por API) y rellenar los marcadores de la configuración privada.
 11. Manual de Nova en el historial público (commit `7c8a236`, PR #137): fuera de `main` desde #140. Decidir si basta o hace falta otra medida.
+12. Nova (estado 2026-11-24 03:36): corte de llamadas resuelto (`require_origin_header` desactivado, llamada de prueba de 13 s correcta). Queda la prueba de Lucas con su micrófono real. Sustituye lo dicho en el punto 10 sobre el corte al empezar.
+13. Entornos antiguos de Railway (`romantic-luck` y `daring-empathy`): auditados, sin borrar. Borrarlos solo con OK de Lucas.
+14. Las tres discrepancias registradas en el centro de mando (`jornada_20261123`: dominio en null, ruta de `MOVIMIENTOS_20261123.md` en el LEEME de Proyectos y LEEME de Centro de Mando desfasado): por resolver.
 
 ## Registro histórico: cierre canónico de S16 — 2026-10-07
 

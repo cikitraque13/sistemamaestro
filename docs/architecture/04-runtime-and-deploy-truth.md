@@ -4,6 +4,18 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`). Las entradas siguientes son observaciones históricas fechadas, no un indicador exhaustivo de la última PR ni de cada deployment. Una PR exclusivamente documental y su autodeployment no obligan por sí solos a actualizar esta sección. Se registra una observación nueva cuando un gate requiere ese checkpoint o se verifica un cambio operativo relevante; el estado live actual debe comprobarse en GitHub y Railway cuando corresponda.
 
+### Observación posterior a PR #149 (2026-11-24)
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `f5197f6` (merge de PR #149, 03:33 Europe/Madrid) |
+| PRs publicados desde la observación anterior | #141 a #149; detalle en el [registro de jornada 2026-11-23/24](../control/11-REGISTRO-JORNADA-20261123-24.md) |
+| Railway deployment | `058b68b4`; SUCCESS; creado 2026-11-24T02:33Z vía GitHub, rama `main`, commit `f5197f6` |
+| Health | `GET /` y `GET /health` respondieron HTTP 200 a las 03:36 Europe/Madrid |
+| Bundle publicado | `index-ffjolunw.js`: contiene el titular nuevo, «su agente», el lema del pie y el id público de Nova; no contiene «Radar IA» |
+| Build provenance | UNVERIFIED |
+| Alcance | Portada de agencia de IA y demo de Nova; no modifica estados de madurez |
+
 ### Observación posterior a PR #139 (2026-11-24)
 
 | Plano | Identidad y estado observado |
