@@ -45,18 +45,33 @@ const visiblePlans = pricingPlans.filter((plan) =>
 
 const getTone = (planId) => planToneClasses[planId] || planToneClasses.free;
 
-const HomePlansPanel = ({ id, onSelect }) => {
+const HomePlansPanel = ({ id, onSelect, onClose }) => {
   return (
     <div
       id={id}
-      className="absolute left-0 right-0 top-full max-h-[calc(100vh-5rem)] overflow-y-auto border-b border-white/10 bg-[#080808] shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
+      role="dialog"
+      aria-label="Planes"
+      className="absolute left-0 right-0 top-full max-h-[calc(100vh-9rem)] overflow-y-auto overscroll-contain border-b border-white/10 bg-[#080808] shadow-[0_30px_80px_rgba(0,0,0,0.55)] md:max-h-[calc(100vh-5rem)]"
     >
-      <div className="mx-auto max-w-7xl px-5 py-6 md:px-10 md:py-8">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
+      <div className="relative mx-auto max-w-7xl px-5 py-6 md:px-10 md:py-8">
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar planes"
+            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-white transition hover:bg-white/[0.12] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 md:right-8 md:top-6"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        ) : null}
+
+        <p className="mb-2 pr-12 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
           {pricingSection.eyebrow}
         </p>
 
-        <p className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
+        <p className="pr-12 text-2xl font-semibold tracking-tight text-white md:text-3xl">
           {pricingSection.title}
         </p>
 
