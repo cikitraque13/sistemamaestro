@@ -33,9 +33,6 @@ const HomeFooter = () => {
             <a href="#como-funciona" className="transition hover:text-white">
               Cómo funciona
             </a>
-            <a href="#radar-ia" className="transition hover:text-white">
-              Radar IA
-            </a>
             <a href="#pricing" className="transition hover:text-white">
               Precios
             </a>

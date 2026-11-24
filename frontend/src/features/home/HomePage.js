@@ -4,7 +4,6 @@ import HomeFooter from './components/HomeFooter';
 import HeroSection from './sections/HeroSection';
 import AgencySection from './sections/AgencySection';
 import AudienceSection from './sections/AudienceSection';
-import LeadCaptureSection from './sections/LeadCaptureSection';
 
 const HomePage = () => {
   return (
@@ -13,7 +12,6 @@ const HomePage = () => {
       <HeroSection />
       <AgencySection />
       <AudienceSection />
-      <LeadCaptureSection />
       <HomeFooter />
     </div>
   );
