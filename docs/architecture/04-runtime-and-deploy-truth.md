@@ -4,6 +4,18 @@
 
 `GitHub main` es una referencia dinámica a la rama publicada (`refs/heads/main`). Las entradas siguientes son observaciones históricas fechadas, no un indicador exhaustivo de la última PR ni de cada deployment. Una PR exclusivamente documental y su autodeployment no obligan por sí solos a actualizar esta sección. Se registra una observación nueva cuando un gate requiere ese checkpoint o se verifica un cambio operativo relevante; el estado live actual debe comprobarse en GitHub y Railway cuando corresponda.
 
+### Observación posterior a PR #139 (2026-11-24)
+
+| Plano | Identidad y estado observado |
+|---|---|
+| GitHub main | `918a017` (merge de PR #139, 01:44 Europe/Madrid) |
+| PRs publicados desde la observación anterior | #128 y #130 a #140 (#129 cerrado sin fusionar); detalle en el [registro de jornada 2026-11-23/24](../control/11-REGISTRO-JORNADA-20261123-24.md) |
+| Railway deployment | `c26e56a1`; SUCCESS; creado 2026-11-24T00:44Z vía GitHub, rama `main`, commit `918a017` |
+| Variable de build | `VITE_ELEVENLABS_AGENT_ID` presente en el servicio (solo el nombre comprobado); el bundle publicado contiene el id público del agente |
+| Health | `GET /` y `GET /health` respondieron HTTP 200 a la 01:45 Europe/Madrid |
+| Build provenance | UNVERIFIED |
+| Alcance | Portada y demo de voz de Nova; no modifica estados de madurez |
+
 ### Observación posterior a PR #126 (2026-11-24)
 
 | Plano | Identidad y estado observado |
