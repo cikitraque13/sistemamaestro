@@ -2,6 +2,7 @@ import React from 'react';
 
 import ValueAuthoritySection from './ValueAuthoritySection';
 import '../homeFlow.css';
+import { BRAND_GRADIENT_TEXT } from '../brandText';
 
 const LEAD = ['Describe', 'tu', 'negocio:'];
 const REST = ['creamos', 'tu', 'web,', 'la', 'lanzamos', 'y', 'tu'];
@@ -35,7 +36,7 @@ const HeroSection = () => {
   const gradient = words(
     GRADIENT,
     n,
-    'bg-[linear-gradient(90deg,#F97316,#A78BFA_55%,#22D3EE)] bg-clip-text pb-1 text-transparent'
+    BRAND_GRADIENT_TEXT
   );
   n += GRADIENT.length;
   const tail = words(TAIL, n);
