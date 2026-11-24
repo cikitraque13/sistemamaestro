@@ -7,7 +7,8 @@ Nova es la agente de voz (voz de mujer) de la demo en vivo de la sección Agenci
 - **Activa en producción desde #139** (merge `918a017`, 2026-11-24 01:44 Europe/Madrid). Railway tiene `VITE_ELEVENLABS_AGENT_ID` y el build de Vite la recibe por el `ARG`/`ENV` del `Dockerfile`.
 - **Agente en ElevenLabs:** `agent_4201m85fg3z3eb281fjjx0vhhg0h` (id público, no es una clave), «Nova · Sistema Maestro (demo portada)», español. Se presenta siempre como Nova.
 - **Voz provisional: Sarah** (`EXAVITQu4vr4xnSDxMaL`, modelo `eleven_flash_v2_5`). Cristina (andaluza, `2VUqK4PEdMj16L6xTN4J`) sigue pendiente por dos bloqueos: la clave de la API no tiene permiso de voces y la cuenta está en plan gratuito, que no permite voces de la Voice Library por API (hace falta Starter o superior).
-- **Corte de llamadas resuelto (24/11/2026, 02:32):** ElevenLabs rechazaba las llamadas con «dominio no autorizado». Se desactivó `require_origin_header` en el agente; la allowlist sigue siendo `sistemamaestro.com` y `www.sistemamaestro.com`. Llamada de prueba desde sistemamaestro.com correcta (13 s, saludo completo). Falta la prueba de Lucas con micrófono real.
+- **Corte de llamadas resuelto (24/11/2026, 02:32):** ElevenLabs rechazaba las llamadas con «dominio no autorizado». Se desactivó `require_origin_header` en el agente; la allowlist sigue siendo `sistemamaestro.com` y `www.sistemamaestro.com`. Llamada de prueba desde sistemamaestro.com correcta (`conv_5601m85jyy21fcatkv9nzgm32hqa`, iniciada a las 02:33, 13 s, saludo completo). Falta la prueba de Lucas con micrófono real.
+- **Mira a los lados (#144)** con pausas al frente (animación `nova-head-look`) y **tarjeta un 15% más compacta (#145)**.
 - Sin `VITE_ELEVENLABS_AGENT_ID` ni `VITE_VOICE_AGENT_URL` la demo muestra el avatar y el saludo, pero ningún botón. El SDK de voz (`@elevenlabs/client`) solo se descarga cuando el visitante pulsa el botón.
 
 ## Diseño de la demo (24/11/2026)

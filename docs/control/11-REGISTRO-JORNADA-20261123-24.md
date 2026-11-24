@@ -85,6 +85,7 @@ Comprobados en GitHub y en la lista de deployments de Railway el 2026-11-24 a la
 - `Centro de Mando\centro_mando_estado.json` está en `"revision": 52` (leído el 2026-11-24 en el PC, sin modificarlo; última escritura 2026-11-23 21:59).
 - Existe la copia de la revisión 51 en `Centro de Mando\backups\Backups_estado_rev51_20261123`.
 - Actualización del 2026-11-24, madrugada: el JSON pasa a la revisión 53 con el bloque `jornada_20261124`, tras copiar la 52 en `Centro de Mando\backups\Backups_estado_rev52_20261124`. La oficina virtual se regenera a partir de ese estado.
+- Actualización del 2026-11-24, 03:37: el JSON pasa a la revisión 54 con el bloque `jornada_20261124_noche` (portada de agencia de IA y estado de Nova), tras copiar la 53 en `Centro de Mando\backups\Backups_estado_rev53_20261124`. Oficina virtual regenerada desde ese estado.
 - Este repositorio no versiona ese JSON.
 
 ## 3. GrokBot Core
@@ -183,3 +184,44 @@ Comprobado el 2026-11-24 entre la 01:40 y la 01:45, en solo lectura.
 - Prueba de #139 en producción (01:46, navegador sin pantalla con micrófono falso): el botón obtiene el token de ElevenLabs y conecta; muestra «Nova te escucha» y la sesión se cierra en menos de un segundo. La prueba repetida a las 02:20 en local da el mismo patrón, con motivo de desconexión `agent`: cierra el lado del agente, no el navegador. Pendiente: prueba de Lucas con micrófono real y, si se repite, revisar la conversación en ElevenLabs.
 - Cambio a Cristina intentado y rechazado: la clave guardada sigue sin permiso de voces y la cuenta de ElevenLabs está en plan gratuito, que no permite voces de la Voice Library por API («Free users cannot use library voices via the API»). Nova sigue con Sarah.
 - Demo premium de Nova (PR «Portada: demo premium de Nova con avatar animado y onda de voz real»): sustituye el bloque de texto por avatar animado, onda con el volumen real de la llamada, estado pulsante, botón grande, saludo en bocadillo y luz de fondo, con aviso visible si la llamada cae en menos de 3 s. Detalle en [docs/agents/nova/README.md](../agents/nova/README.md#diseño-de-la-demo-24112026). Solo toca la tarjeta de la demo; el resto de la portada no cambia.
+
+## 13. Portada nueva: agencia de IA (02:20 a 03:35)
+
+Comprobado el 2026-11-24 a las 03:36 en `main` (`f5197f6`), en la lista de deployments de Railway y en el JavaScript publicado (`index-ffjolunw.js`). Horas en Europe/Madrid.
+
+| PR | Hora | Merge | Título |
+|---|---|---|---|
+| #142 | 02:23 | `4418817` | Portada: demo premium de Nova con avatar animado y onda de voz real |
+| #143 | 02:37 | `2f88daa` | Portada: avatar híbrido de Nova y saludo igual al del agente |
+| #144 | 02:42 | `3720db7` | Portada: agencia con pregunta y antes/después; Nova mira a los lados |
+| #145 | 03:04 | `e333951` | Portada: tarjeta de Nova un 15% más compacta |
+| #146 | 03:17 | `3744e3c` | Portada en flujo: titular nuevo, puente, ritmo vertical y tarjetas flotantes |
+| #147 | 03:21 | `a18c446` | Portada: eliminar Radar IA, todas las tarjetas flotan, pasos con color y botón cápsula |
+| #148 | 03:26 | `ec762e9` | Cabecera y pie a nivel |
+| #149 | 03:33 | `f5197f6` | Portada: degradado en «su web» / «su agente» y títulos del pie |
+
+- Deployment vigente: `058b68b4`, SUCCESS a las 03:33 (commit `f5197f6`). Los anteriores de la noche quedaron REMOVED al ser sustituidos (#148: `1e8106d6`; #145: `0beba155`). `/` y `/health` en 200 a las 03:36.
+- Posicionamiento: Sistema Maestro se presenta como agencia de IA que construye tu web, la lanza y pone un agente de IA a atender a tus clientes por chat, web o WhatsApp.
+- Orden de la portada: hero, Agencia de IA (con la demo de Nova) y Para quién es.
+- Titular: «Describe tu negocio: creamos tu web, la lanzamos y tu agente de IA atiende», con «agente de IA» en el degradado de marca (naranja, violeta, cian; constante `BRAND_GRADIENT_TEXT` en `frontend/src/features/home/brandText.js`).
+- Puente: «Sistema Maestro interpreta tu idea o tu web y ordena prioridades.» y «Y además, un agente que trabaja por ti.», con una línea de luz.
+- Para quién es: «Para negocios que quieren su web y su agente trabajando por ellos.», con «su web» y «su agente» en el degradado de marca (#149). Texto: «Si atiendes clientes por chat, web o WhatsApp, Sistema Maestro construye tu web y pone un agente de IA a atenderlos por ti.» Tarjetas: Clínicas y consultas, Inmobiliarias, Restaurantes y comercios, Agencias y freelancers.
+- Radar IA eliminado (#147): se borra `frontend/src/features/home/sections/LeadCaptureSection.js` y su mención en [Decisiones cerradas](01-DECISIONES-CERRADAS.md). El endpoint `/newsletter/subscribe` se conserva. El JavaScript publicado no contiene «Radar IA».
+- Movimiento: todas las tarjetas flotan (`sm-float`), con animaciones `sm-word-rise`, `sm-bridge-glow` y `sm-fall-drop` en `frontend/src/features/home/homeFlow.css`, y respetan el movimiento reducido. Los pasos llevan color.
+- Botones cápsula: «Crea tu cuenta gratis» (a `/register`) e «Iniciar sesión» comparten la cápsula de borde violeta a azul.
+- Cabecera (#148): solo logo, «Iniciar sesión» y «Planes». Salen «Cómo funciona» y «Para quién es».
+- Pie (#148 y #149): lema «Dirección, IA y continuidad»; descripción «Construimos tu web, la lanzamos y ponemos un agente de IA a atender a tus clientes por chat, web o WhatsApp.»; Navegación (Agencia de IA, Cómo funciona, Para quién es y Planes, que usa `#pricing` para abrir el panel de planes); Legal; «© 2026 Sistema Maestro. Todos los derechos reservados.» con enlace pequeño «Crea tu cuenta gratis»; línea superior en degradado. Los títulos NAVEGACIÓN y LEGAL van en mayúsculas con degradado violeta a azul (`#A78BFA` a `#38BDF8`).
+- Rama `feat/home-value-two-columns-20261124` (del #129, sin fusionar) borrada en GitHub a las 03:22. Se puede recuperar desde `e1f6b02`.
+- Corrección a la sección 1: el titular «Dirige y acelera…» y las cuatro tarjetas 01 a 04 junto al titular ya no describen la portada actual.
+
+## 14. Nova: estado a las 03:36
+
+Comprobado en `main`, en el agente de ElevenLabs (lectura por API) y en el JavaScript publicado.
+
+- Agente: `agent_4201m85fg3z3eb281fjjx0vhhg0h`, voz provisional Sarah (`EXAVITQu4vr4xnSDxMaL`). Cristina sigue pendiente (clave sin permiso de voces y cuenta en plan gratuito).
+- Avatar híbrido (`frontend/src/features/home/voice/NovaAvatar.js`, #143) que mira a los lados con pausas al frente (animación `nova-head-look`, #144).
+- Saludo nuevo, igual en el primer mensaje del agente y en el bocadillo de la portada (`NovaVoiceDemo.js`): «Hola, soy Nova, asistente de inteligencia artificial de Sistema Maestro. Estoy aquí para explicarte el producto con claridad y resolver tus dudas. ¿Me cuentas en una frase qué negocio tienes y qué te trae por aquí?» El bocadillo no muestra ya el saludo antiguo.
+- Corte de llamadas resuelto: `require_origin_header` desactivado en el agente (comprobado en `false`); la allowlist sigue con `sistemamaestro.com` y `www.sistemamaestro.com`. Llamada de prueba `conv_5601m85jyy21fcatkv9nzgm32hqa`: iniciada a las 02:33, 13 s, estado `done`. El corte a menos de un segundo descrito en la sección 12 queda resuelto con este cambio.
+- Tarjeta de Nova un 15% más compacta (#145).
+- Pendiente: prueba de Lucas con su micrófono real.
+
