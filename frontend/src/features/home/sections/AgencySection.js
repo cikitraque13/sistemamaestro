@@ -11,6 +11,7 @@ const steps = [
     text: 'Clínica, inmobiliaria, restaurante o el tuyo.',
     accent: 'text-[#FDBA74]',
     badge: 'border-[#F97316]/40',
+    classes: 'bg-[linear-gradient(180deg,rgba(249,115,22,0.30),rgba(249,115,22,0.12))]',
   },
   {
     step: '02',
@@ -18,6 +19,7 @@ const steps = [
     text: 'Con tus palabras, en un par de minutos.',
     accent: 'text-[#C6F432]',
     badge: 'border-[#C6F432]/40',
+    classes: 'bg-[linear-gradient(180deg,rgba(198,244,50,0.22),rgba(198,244,50,0.08))]',
   },
   {
     step: '03',
@@ -25,6 +27,7 @@ const steps = [
     text: 'Tu web y tu agente, listos para trabajar.',
     accent: 'text-[#E9D5FF]',
     badge: 'border-[#E9D5FF]/40',
+    classes: 'bg-[linear-gradient(180deg,rgba(216,180,254,0.26),rgba(167,139,250,0.12))]',
   },
 ];
 
@@ -146,12 +149,13 @@ const AgencySection = () => {
           {steps.map((item, index) => (
             <li
               key={item.step}
-              className={`rounded-[22px] bg-[linear-gradient(135deg,rgba(198,244,50,0.40),rgba(167,139,250,0.40))] p-px transition-shadow duration-300 hover:shadow-[0_0_18px_rgba(167,139,250,0.14)] motion-reduce:transition-none ${revealClasses(
+              style={{ '--sm-glow': ['rgba(249,115,22,0.30)', 'rgba(198,244,50,0.26)', 'rgba(167,139,250,0.32)'][index], animationDelay: `${-index * 2}s` }}
+              className={`sm-float rounded-[22px] bg-[linear-gradient(135deg,rgba(198,244,50,0.55),rgba(167,139,250,0.55))] p-px transition-shadow duration-300 hover:shadow-[0_0_18px_rgba(167,139,250,0.14)] motion-reduce:transition-none ${revealClasses(
                 visible,
                 ['delay-200', 'delay-300', 'delay-500'][index]
               )}`}
             >
-              <div className="h-full rounded-[21px] bg-[#0a0a0a] p-4">
+              <div className={`h-full rounded-[21px] bg-[#0a0a0a] p-4 ${item.classes}`}>
                 <div className="flex items-center gap-2.5">
                   <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border bg-black/25 text-[11px] font-semibold ${item.badge} ${item.accent}`}>
                     {item.step}
@@ -177,9 +181,11 @@ const AgencySection = () => {
           </a>
           <Link
             to="/register"
-            className="text-sm font-medium text-zinc-300 underline-offset-4 transition hover:text-white hover:underline"
+            className="inline-flex rounded-full bg-[linear-gradient(135deg,#A78BFA,#38BDF8)] p-px shadow-[0_0_0_rgba(139,92,246,0)] transition hover:-translate-y-0.5 hover:shadow-[0_0_22px_rgba(139,92,246,0.40)] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/70 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
-            o crea tu cuenta gratis
+            <span className="inline-flex items-center whitespace-nowrap rounded-full bg-[#14112a]/90 bg-[linear-gradient(135deg,rgba(167,139,250,0.18),rgba(56,189,248,0.12))] px-6 py-3 text-sm font-semibold text-white">
+              Crea tu cuenta gratis
+            </span>
           </Link>
         </div>
       </div>

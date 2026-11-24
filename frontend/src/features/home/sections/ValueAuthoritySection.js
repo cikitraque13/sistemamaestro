@@ -1,5 +1,9 @@
 import React from 'react';
 
+import '../homeFlow.css';
+
+const HERO_GLOWS = ['rgba(249,115,22,0.30)', 'rgba(198,244,50,0.26)', 'rgba(167,139,250,0.32)', 'rgba(56,189,248,0.30)'];
+
 const cards = [
   {
     step: '01',
@@ -49,10 +53,11 @@ const ValueAuthoritySection = () => {
       id="como-funciona"
       className="relative grid scroll-mt-24 gap-3 pt-6 sm:grid-cols-2 xl:w-full xl:max-w-[540px] xl:self-center xl:justify-self-end xl:pt-0"
     >
-      {cards.map((card) => (
+      {cards.map((card, index) => (
         <div
           key={card.eyebrow}
-          className={`rounded-[22px] bg-[linear-gradient(135deg,rgba(198,244,50,0.55),rgba(167,139,250,0.55))] p-px transition-shadow duration-300 motion-reduce:transition-none ${card.glow}`}
+          style={{ '--sm-glow': HERO_GLOWS[index], animationDelay: `${-index * 1.5}s` }}
+          className={`sm-float rounded-[22px] bg-[linear-gradient(135deg,rgba(198,244,50,0.55),rgba(167,139,250,0.55))] p-px transition-shadow duration-300 motion-reduce:transition-none ${card.glow}`}
         >
           <article className={`h-full rounded-[21px] bg-[#0a0a0a] p-4 ${card.classes}`}>
             <div className="flex items-center gap-2.5">
