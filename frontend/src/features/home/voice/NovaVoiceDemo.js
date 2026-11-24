@@ -219,7 +219,7 @@ const NovaVoiceDemo = () => {
   }, []);
 
   const ctaBase =
-    'nova-cta group mt-5 inline-flex min-h-[3.5rem] w-full items-center justify-center gap-3 rounded-2xl px-6 text-base font-semibold transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] disabled:cursor-wait disabled:opacity-80 motion-reduce:transition-none md:min-h-[3.75rem] md:text-lg';
+    'nova-cta group mt-4 inline-flex min-h-[3.125rem] w-full items-center justify-center gap-3 rounded-2xl px-6 text-base font-semibold transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] disabled:cursor-wait disabled:opacity-80 motion-reduce:transition-none md:min-h-[3.25rem] md:text-[17px]';
   const ctaIdle = `${ctaBase} border border-white/20 bg-[linear-gradient(110deg,#F97316_0%,#A78BFA_55%,#38BDF8_100%)] text-white shadow-[0_0_0_1px_rgba(167,139,250,0.25),0_14px_40px_rgba(167,139,250,0.38)] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(198,244,50,0.35),0_18px_48px_rgba(167,139,250,0.5)] focus-visible:ring-[#DDD6FE] motion-reduce:hover:translate-y-0`;
   const ctaHang = `${ctaBase} border border-[#FDBA74]/50 bg-[#1a0f08] text-[#FED7AA] shadow-[0_10px_30px_rgba(249,115,22,0.22)] hover:bg-[#24140a] focus-visible:ring-[#FDBA74]`;
 
@@ -246,20 +246,20 @@ const NovaVoiceDemo = () => {
         </span>
       </div>
 
-      <div className="mt-5 flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
+      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
         <NovaAvatar rippleClass={ui.ripple} />
 
-        <figure className="relative w-full flex-1 rounded-2xl border border-[#A78BFA]/25 bg-[linear-gradient(135deg,rgba(167,139,250,0.14),rgba(56,189,248,0.06))] p-4 sm:rounded-tl-md">
+        <figure className="relative w-full flex-1 rounded-2xl border border-[#A78BFA]/25 bg-[linear-gradient(135deg,rgba(167,139,250,0.14),rgba(56,189,248,0.06))] p-3.5 sm:rounded-tl-md">
           <figcaption className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#C4B5FD]">
             Nova
             <span className="h-1 w-1 rounded-full bg-[#C4B5FD]/60" aria-hidden="true" />
             <span className="font-medium normal-case tracking-normal text-zinc-400">agente de Sistema Maestro</span>
           </figcaption>
-          <blockquote className="text-[15px] leading-6 text-zinc-100 md:text-base md:leading-7">{GREETING}</blockquote>
+          <blockquote className="text-[14px] leading-6 text-zinc-100 md:text-[15px]">{GREETING}</blockquote>
         </figure>
       </div>
 
-      <div className="mt-5 flex h-14 items-center justify-center gap-[5px] md:h-16" aria-hidden="true" data-testid="nova-wave">
+      <div className="mt-3 flex h-12 items-center justify-center gap-[5px] md:h-14" aria-hidden="true" data-testid="nova-wave">
         {Array.from({ length: BAR_COUNT }, (_, index) => (
           <span
             key={index}
@@ -302,7 +302,7 @@ const NovaVoiceDemo = () => {
         <p
           aria-live="polite"
           data-testid="nova-status-text"
-          className={`mt-3 min-h-[1.25rem] text-center text-[13px] leading-5 ${phase === 'error' ? 'text-[#FDBA74]' : 'text-zinc-400'}`}
+          className={`mt-2 min-h-[1.25rem] text-center text-[13px] leading-5 ${phase === 'error' ? 'text-[#FDBA74]' : 'text-zinc-400'}`}
         >
           {label}
         </p>
