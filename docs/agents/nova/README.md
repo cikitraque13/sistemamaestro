@@ -7,18 +7,18 @@ Nova es la agente de voz (voz de mujer) de la demo en vivo de la sección Agenci
 - **Activa en producción desde #139** (merge `918a017`, 2026-11-24 01:44 Europe/Madrid). Railway tiene `VITE_ELEVENLABS_AGENT_ID` y el build de Vite la recibe por el `ARG`/`ENV` del `Dockerfile`.
 - **Agente en ElevenLabs:** `agent_4201m85fg3z3eb281fjjx0vhhg0h` (id público, no es una clave), «Nova · Sistema Maestro (demo portada)», español. Se presenta siempre como Nova.
 - **Voz provisional: Sarah** (`EXAVITQu4vr4xnSDxMaL`, modelo `eleven_flash_v2_5`). Cristina (andaluza, `2VUqK4PEdMj16L6xTN4J`) sigue pendiente por dos bloqueos: la clave de la API no tiene permiso de voces y la cuenta está en plan gratuito, que no permite voces de la Voice Library por API (hace falta Starter o superior).
-- **Prueba en navegador (fake mic, sin pantalla):** la llamada conecta (token de ElevenLabs, sala WebRTC, «Nova te escucha») y se cierra a los pocos segundos con motivo `agent` (lo cierra el lado del agente). Falta la prueba de Lucas con micrófono real y, si se repite el corte, revisar el registro de la conversación en ElevenLabs.
+- **Corte de llamadas resuelto (24/11/2026, 02:32):** ElevenLabs rechazaba las llamadas con «dominio no autorizado». Se desactivó `require_origin_header` en el agente; la allowlist sigue siendo `sistemamaestro.com` y `www.sistemamaestro.com`. Llamada de prueba desde sistemamaestro.com correcta (13 s, saludo completo). Falta la prueba de Lucas con micrófono real.
 - Sin `VITE_ELEVENLABS_AGENT_ID` ni `VITE_VOICE_AGENT_URL` la demo muestra el avatar y el saludo, pero ningún botón. El SDK de voz (`@elevenlabs/client`) solo se descarga cuando el visitante pulsa el botón.
 
 ## Diseño de la demo (24/11/2026)
 
 Código en `frontend/src/features/home/voice/`: `NovaVoiceDemo.js` (componente), `novaDemo.css` (animaciones) y `novaVoiceConfig.mjs` (configuración y lógica pura, con tests en `novaVoiceConfig.test.mjs`).
 
-- **Avatar animado:** cara de Nova dentro de un anillo con los cuatro colores de la portada (naranja `#F97316`, lima `#C6F432`, morado `#A78BFA`, azul cielo `#38BDF8`). En reposo flota, se inclina un poco, parpadea y mira a los lados. En llamada, el halo, la boca y el tamaño siguen el volumen real.
+- **Avatar híbrido (desde el 24/11/2026, 02:40, elegido por Lucas):** `NovaAvatar.js`, SVG en línea + CSS, sin imágenes. Cabeza en forma de orbe brillante con violeta, cian, rosa y ámbar girando dentro, ojos ovalados, sonrisa y unos cascos con micrófono; halo suave. En reposo: remolino lento, flota, parpadea y guiña un ojo de vez en cuando. Conectando: brillo que cruza el orbe. Escuchando: ojos algo más grandes y asiente suave. Hablando: la boca se abre y se cierra con el volumen real de salida del SDK y el halo late con él. Sustituye al avatar simple de #142 (es el único sitio de la web donde aparece Nova).
 - **Onda de voz real:** 28 barras. En llamada, cada frame lee el espectro del SDK: el de salida cuando habla Nova y el del micrófono cuando escucha (`getOutputByteFrequencyData` / `getInputByteFrequencyData` y los volúmenes). En reposo, onda suave que respira; al conectar, barrido.
 - **Estado pulsante:** pastilla con punto que late: «Disponible ahora», «Conectando», «Te escucha», «Hablando», «Sin conexión».
 - **Botón grande:** «Habla con Nova» con icono de micrófono y degradado naranja → morado → azul cielo; en llamada pasa a «Colgar».
-- **Saludo integrado:** bocadillo de Nova junto al avatar (el texto de abajo).
+- **Saludo integrado:** bocadillo de Nova junto al avatar, con el mismo texto que el primer mensaje del agente (abajo).
 - **Fondo:** halos de luz que se desplazan despacio y seis motas de luz.
 - **Corte temprano:** si la llamada se cierra antes de 3 s desde que conectó (o antes de conectar), aparece el aviso «La llamada se ha cortado nada más empezar. Revisa el micrófono y vuelve a intentarlo.» en vez de volver al inicio en silencio. El motivo se deja en la consola como `[Nova] la llamada se cortó al empezar`.
 - **Responsive:** en móvil el avatar va arriba y el bocadillo debajo; desde 640 px, avatar a la izquierda y bocadillo a la derecha.
@@ -31,9 +31,9 @@ El documento de configuración de Nova es el *system prompt* y la base de conoci
 - El documento de configuración (`NOVA_CONFIGURACION_20261124.md`) es privado y vive solo en `SM_guias\notas` del PC de Lucas. Este repositorio es público y no contiene contenido de ventas.
 - Al activar la voz, se carga directamente desde `SM_guias\notas` en el proveedor. Sus marcadores `[...]` necesitan datos reales de Lucas antes.
 
-Saludo publicado en la portada (bocadillo de la demo):
+Saludo publicado en la portada (bocadillo de la demo), igual al primer mensaje del agente en ElevenLabs:
 
-> «Hola, soy Nova, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»
+> «Hola, soy Nova, asistente de inteligencia artificial de Sistema Maestro. Estoy aquí para explicarte el producto con claridad y resolver tus dudas. ¿Me cuentas en una frase qué negocio tienes y qué te trae por aquí?»
 
 ## Lista de activación (ElevenLabs Agents)
 

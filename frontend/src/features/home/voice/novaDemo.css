@@ -34,13 +34,13 @@
   animation: nova-mote-float 9s ease-in-out infinite;
 }
 
-/* Avatar: flota, se inclina y respira en reposo. */
+/* Avatar híbrido: orbe de color con ojos, sonrisa y cascos con micrófono. */
 .nova-avatar {
   position: relative;
   flex-shrink: 0;
-  width: 132px;
-  height: 132px;
-  transform: scale(calc(1 + var(--nova-level) * 0.08));
+  width: 148px;
+  height: 148px;
+  transform: scale(calc(1 + var(--nova-level) * 0.06));
   transition: transform 120ms linear;
 }
 
@@ -50,63 +50,143 @@
   animation: nova-idle-float 6s ease-in-out infinite;
 }
 
-.nova-avatar__ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background: conic-gradient(from 0deg, #f97316, #c6f432, #a78bfa, #38bdf8, #f97316);
-  animation: nova-spin 9s linear infinite;
-  filter: saturate(1.05);
+.nova-avatar__svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 10px 22px rgba(124, 58, 237, 0.35));
 }
 
 .nova-avatar__halo {
   position: absolute;
-  inset: -14px;
+  inset: 4%;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.45), transparent 65%);
-  opacity: calc(0.45 + var(--nova-level) * 0.55);
-  filter: blur(10px);
-  transition: opacity 120ms linear;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.55), rgba(56, 189, 248, 0.18) 55%, transparent 70%);
+  opacity: calc(0.5 + var(--nova-level) * 0.5);
+  transform: scale(calc(1.05 + var(--nova-level) * 0.25));
+  filter: blur(14px);
+  transition: opacity 100ms linear, transform 100ms linear;
 }
 
-.nova-avatar__core {
-  position: absolute;
-  inset: 4px;
-  overflow: hidden;
-  border-radius: 9999px;
-  background:
-    radial-gradient(circle at 35% 25%, rgba(233, 213, 255, 0.35), transparent 45%),
-    linear-gradient(160deg, #1b1430 0%, #0b0b12 70%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -10px 24px rgba(56, 189, 248, 0.12);
+.nova-avatar__head,
+.nova-avatar__swirl,
+.nova-avatar__eyes,
+.nova-avatar__eye,
+.nova-avatar__wink,
+.nova-avatar__mouth,
+.nova-avatar__smile {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-.nova-avatar__face {
-  position: absolute;
-  inset: 0;
-  animation: nova-look 11s ease-in-out infinite;
+.nova-avatar__head {
+  transform-box: view-box;
+  transform-origin: 70px 70px;
+}
+
+.nova-avatar__swirl {
+  transform-box: view-box;
+  transform-origin: 70px 70px;
+  animation: nova-spin 16s linear infinite;
+}
+
+.nova-avatar__swirl--counter {
+  animation-duration: 24s;
+  animation-direction: reverse;
+}
+
+.nova-avatar__sparkles {
+  animation: nova-twinkle 4s ease-in-out infinite;
+}
+
+.nova-avatar__shimmer {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .nova-avatar__eye {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: nova-blink 5.5s ease-in-out infinite;
 }
 
-.nova-avatar__eye--right {
-  animation-delay: 0.04s;
+/* Guiño de vez en cuando (ojo derecho). */
+.nova-avatar__wink {
+  animation: nova-wink 13s ease-in-out infinite;
+}
+
+.nova-avatar__eyes {
+  transition: transform 220ms ease-out;
 }
 
 .nova-avatar__mouth {
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: scaleY(calc(1 + var(--nova-level) * 2.2));
-  transition: transform 90ms linear;
+  opacity: 0;
+  transform: scaleY(calc(0.15 + var(--nova-level) * 1.1));
+  transition: transform 80ms linear, opacity 150ms ease-out;
+}
+
+.nova-avatar__smile {
+  transition: opacity 150ms ease-out;
+}
+
+.nova-avatar__mic-led {
+  fill: #6366f1;
+  transition: fill 200ms ease-out;
+}
+
+/* Conectando: brillo que cruza el orbe y remolino más rápido. */
+.nova-demo[data-phase='connecting'] .nova-avatar__shimmer {
+  animation: nova-shimmer 1.4s ease-in-out infinite;
+}
+
+.nova-demo[data-phase='connecting'] .nova-avatar__swirl {
+  animation-duration: 5s;
+}
+
+.nova-demo[data-phase='connecting'] .nova-avatar__mic-led {
+  fill: #38bdf8;
+}
+
+/* Escuchando: ojos un poco más grandes y asentir suave. */
+.nova-demo[data-phase='listening'] .nova-avatar__eyes {
+  transform: scale(1.14);
+}
+
+.nova-demo[data-phase='listening'] .nova-avatar__head {
+  animation: nova-nod 2.6s ease-in-out infinite;
+}
+
+.nova-demo[data-phase='listening'] .nova-avatar__mic-led {
+  fill: #c6f432;
+}
+
+/* Hablando: la boca se abre con el volumen real. */
+.nova-demo[data-phase='speaking'] .nova-avatar__mouth {
+  opacity: 1;
+}
+
+.nova-demo[data-phase='speaking'] .nova-avatar__smile {
+  opacity: 0;
+}
+
+.nova-demo[data-phase='speaking'] .nova-avatar__mic-led {
+  fill: #f472b6;
+}
+
+.nova-demo[data-phase='speaking'] .nova-avatar__body,
+.nova-demo[data-phase='listening'] .nova-avatar__body {
+  animation-duration: 4s;
+}
+
+.nova-demo[data-phase='error'] .nova-avatar__svg {
+  filter: saturate(0.45) drop-shadow(0 10px 22px rgba(249, 115, 22, 0.25));
 }
 
 /* Ondas que salen del avatar mientras escucha o habla. */
 .nova-avatar__ripple {
   position: absolute;
-  inset: 0;
+  inset: 14%;
   border-radius: 9999px;
   border: 1.5px solid currentColor;
   opacity: 0;
@@ -117,19 +197,6 @@
 .nova-demo[data-phase='speaking'] .nova-avatar__ripple,
 .nova-demo[data-phase='connecting'] .nova-avatar__ripple {
   animation: nova-ripple 2.4s ease-out infinite;
-}
-
-.nova-demo[data-phase='connecting'] .nova-avatar__ring {
-  animation-duration: 2.2s;
-}
-
-.nova-demo[data-phase='speaking'] .nova-avatar__body,
-.nova-demo[data-phase='listening'] .nova-avatar__body {
-  animation-duration: 4s;
-}
-
-.nova-demo[data-phase='error'] .nova-avatar__ring {
-  background: conic-gradient(from 0deg, #f97316, #fdba74, #f97316);
 }
 
 /* Onda de voz: la altura de cada barra la pone JS con el volumen real. */
@@ -222,12 +289,26 @@
   46% { transform: scaleY(0.1); }
 }
 
-@keyframes nova-look {
-  0%, 18%, 100% { transform: translateX(0); }
-  24%, 34% { transform: translateX(-4px); }
-  40%, 58% { transform: translateX(0); }
-  64%, 72% { transform: translateX(4px) translateY(-1px); }
-  78% { transform: translateX(0); }
+@keyframes nova-wink {
+  0%, 82%, 88%, 100% { transform: scaleY(1); }
+  85% { transform: scaleY(0.08); }
+}
+
+@keyframes nova-nod {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(2px) rotate(-2deg); }
+  60% { transform: translateY(-1px) rotate(1.5deg); }
+}
+
+@keyframes nova-twinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes nova-shimmer {
+  0% { transform: translateX(0) skewX(-20deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateX(190px) skewX(-20deg); opacity: 0; }
 }
 
 @keyframes nova-ripple {
@@ -256,8 +337,8 @@
 
 @media (max-width: 639px) {
   .nova-avatar {
-    width: 108px;
-    height: 108px;
+    width: 128px;
+    height: 128px;
   }
 }
 
@@ -275,7 +356,7 @@
   }
 
   .nova-avatar,
-  .nova-avatar__mouth {
+  .nova-avatar__halo {
     transform: none;
   }
 

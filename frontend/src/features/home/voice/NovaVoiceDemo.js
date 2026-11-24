@@ -7,6 +7,7 @@ import {
   novaStatusLabel,
   resolveNovaVoiceConfig,
 } from './novaVoiceConfig.mjs';
+import NovaAvatar from './NovaAvatar';
 import './novaDemo.css';
 
 // Demo de voz en vivo de Nova: avatar animado, onda con el volumen real de la
@@ -25,8 +26,9 @@ const BAR_BASE = Array.from({ length: BAR_COUNT }, (_, i) => {
   return Number((0.16 + envelope * (0.22 + ripple * 0.26)).toFixed(3));
 });
 
+// Mismo texto que el primer mensaje del agente en ElevenLabs.
 const GREETING =
-  '«Hola, soy Nova, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»';
+  '«Hola, soy Nova, asistente de inteligencia artificial de Sistema Maestro. Estoy aquí para explicarte el producto con claridad y resolver tus dudas. ¿Me cuentas en una frase qué negocio tienes y qué te trae por aquí?»';
 
 const PHASE_UI = {
   idle: { pill: 'Disponible ahora', color: 'text-[#C6F432]', ripple: 'text-[#A78BFA]' },
@@ -65,32 +67,6 @@ const HangUpIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 15.5c5-4.7 13-4.7 18 0l-2.4 2.4a1 1 0 0 1-1.3.1l-2.4-1.7a1 1 0 0 1-.4-.9l.2-1.9a10 10 0 0 0-5.4 0l.2 1.9a1 1 0 0 1-.4.9L6.7 18a1 1 0 0 1-1.3-.1z" />
   </svg>
-);
-
-const NovaAvatar = ({ rippleClass }) => (
-  <div className="nova-avatar" aria-hidden="true">
-    <div className="nova-avatar__body">
-      <span className="nova-avatar__halo" />
-      <span className={`nova-avatar__ripple ${rippleClass}`} />
-      <span className={`nova-avatar__ripple ${rippleClass}`} style={{ animationDelay: '1.2s' }} />
-      <span className="nova-avatar__ring" />
-      <span className="nova-avatar__core">
-        <svg viewBox="0 0 100 100" className="nova-avatar__face h-full w-full">
-          <defs>
-            <linearGradient id="nova-eye" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#F5F3FF" />
-              <stop offset="100%" stopColor="#C4B5FD" />
-            </linearGradient>
-          </defs>
-          <ellipse className="nova-avatar__eye" cx="38" cy="45" rx="5.5" ry="8" fill="url(#nova-eye)" />
-          <ellipse className="nova-avatar__eye nova-avatar__eye--right" cx="62" cy="45" rx="5.5" ry="8" fill="url(#nova-eye)" />
-          <ellipse cx="29" cy="58" rx="5" ry="2.6" fill="#F97316" opacity="0.35" />
-          <ellipse cx="71" cy="58" rx="5" ry="2.6" fill="#F97316" opacity="0.35" />
-          <path className="nova-avatar__mouth" d="M41 61 Q50 70 59 61" fill="none" stroke="#C6F432" strokeWidth="3.4" strokeLinecap="round" />
-        </svg>
-      </span>
-    </div>
-  </div>
 );
 
 const NovaVoiceDemo = () => {
