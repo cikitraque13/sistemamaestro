@@ -84,6 +84,15 @@
 .nova-avatar__head {
   transform-box: view-box;
   transform-origin: 70px 70px;
+  animation: nova-head-look 17s ease-in-out infinite;
+}
+
+/* Mirada: la cara se desplaza dentro del orbe (derecha, izquierda, arriba,
+   abajo) con pausas mirando al frente, para que no parezca un bucle. */
+.nova-avatar__face {
+  transform-box: view-box;
+  transform-origin: 70px 70px;
+  animation: nova-gaze 17s ease-in-out infinite;
 }
 
 .nova-avatar__swirl {
@@ -155,6 +164,20 @@
 
 .nova-demo[data-phase='listening'] .nova-avatar__head {
   animation: nova-nod 2.6s ease-in-out infinite;
+}
+
+/* Escuchando: mira al visitante. */
+.nova-demo[data-phase='listening'] .nova-avatar__face {
+  animation: none;
+}
+
+/* Hablando: miradas pequeñas y expresivas, sobre todo al frente. */
+.nova-demo[data-phase='speaking'] .nova-avatar__face {
+  animation: nova-gaze-small 7s ease-in-out infinite;
+}
+
+.nova-demo[data-phase='speaking'] .nova-avatar__head {
+  animation: nova-head-talk 5s ease-in-out infinite;
 }
 
 .nova-demo[data-phase='listening'] .nova-avatar__mic-led {
@@ -287,6 +310,44 @@
 @keyframes nova-blink {
   0%, 44%, 48%, 100% { transform: scaleY(1); }
   46% { transform: scaleY(0.1); }
+}
+
+@keyframes nova-gaze {
+  0%, 10% { transform: translate(0, 0); }
+  14%, 22% { transform: translate(6px, -1px); }
+  26%, 34% { transform: translate(0, 0); }
+  38%, 45% { transform: translate(-6px, 1px); }
+  49%, 56% { transform: translate(0, 0); }
+  60%, 67% { transform: translate(1px, -5px); }
+  71%, 77% { transform: translate(0, 0); }
+  81%, 87% { transform: translate(-2px, 4px); }
+  91%, 100% { transform: translate(0, 0); }
+}
+
+@keyframes nova-gaze-small {
+  0%, 30% { transform: translate(0, 0); }
+  38%, 48% { transform: translate(3px, -1px); }
+  56%, 72% { transform: translate(0, 0); }
+  80%, 88% { transform: translate(-3px, 0); }
+  96%, 100% { transform: translate(0, 0); }
+}
+
+@keyframes nova-head-look {
+  0%, 10% { transform: rotate(0deg) translateY(0); }
+  14%, 22% { transform: rotate(4deg) translateY(-1px); }
+  26%, 34% { transform: rotate(0deg) translateY(0); }
+  38%, 45% { transform: rotate(-4deg) translateY(0); }
+  49%, 56% { transform: rotate(0deg) translateY(0); }
+  60%, 67% { transform: rotate(0deg) translateY(-3px); }
+  71%, 77% { transform: rotate(0deg) translateY(0); }
+  81%, 87% { transform: rotate(-1deg) translateY(2px); }
+  91%, 100% { transform: rotate(0deg) translateY(0); }
+}
+
+@keyframes nova-head-talk {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(2deg) translateY(-1px); }
+  65% { transform: rotate(-1.5deg); }
 }
 
 @keyframes nova-wink {
