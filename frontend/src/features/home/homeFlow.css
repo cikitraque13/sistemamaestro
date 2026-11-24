@@ -68,7 +68,7 @@
   100% { transform: translateY(40px); opacity: 0; }
 }
 
-/* Tarjetas con vida: flotan ~4 px cada ~6 s y se elevan al pasar el ratón.
+/* Tarjetas con vida: flotan ~6 px cada ~6 s y se elevan al pasar el ratón.
    El hover usa `translate` para sumarse a la animación de `transform`. */
 .sm-float {
   --sm-glow: rgba(167, 139, 250, 0.28);
@@ -83,7 +83,7 @@
 
 @keyframes sm-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-6px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
