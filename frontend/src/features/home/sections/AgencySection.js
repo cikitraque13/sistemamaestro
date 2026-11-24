@@ -113,6 +113,9 @@ const AgencySection = () => {
                 «Hola, soy Nova, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»
               </p>
 
+              {/* Botón de voz de Nova: oculto hasta que exista VITE_VOICE_AGENT_URL (https).
+                  La base del agente (prompt, técnicas y flujo de captura de mail) y la lista
+                  de activación están en docs/agents/nova/README.md. */}
               {VOICE_AGENT_URL ? (
                 <a
                   href={VOICE_AGENT_URL}
@@ -120,13 +123,9 @@ const AgencySection = () => {
                   rel="noopener noreferrer"
                   className="mt-5 inline-flex w-full items-center justify-center rounded-2xl border border-[#E9D5FF]/60 bg-[linear-gradient(135deg,rgba(216,180,254,0.42),rgba(167,139,250,0.30))] px-5 py-3 text-sm font-semibold text-[#F5F3FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_8px_26px_rgba(167,139,250,0.30)] transition duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_10px_34px_rgba(167,139,250,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DDD6FE]/80 motion-reduce:transition-none sm:w-auto"
                 >
-                  Probar agente
+                  Habla con Nova
                 </a>
-              ) : (
-                <p className="mt-4 text-sm leading-6 text-zinc-400">
-                  La conversación de voz en vivo con Nova llegará muy pronto a esta sección.
-                </p>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
