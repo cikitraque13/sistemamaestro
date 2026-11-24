@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// La demo de voz en vivo solo aparece cuando existe un agente de voz real
-// configurado en el build (VITE_VOICE_AGENT_URL, https). Sin esa variable la
-// sección no muestra ningún botón que no funcione.
-const rawVoiceAgentUrl = (import.meta.env?.VITE_VOICE_AGENT_URL || '').trim();
-const VOICE_AGENT_URL = /^https:\/\//i.test(rawVoiceAgentUrl) ? rawVoiceAgentUrl : '';
+import NovaVoiceButton from '../voice/NovaVoiceButton';
 
 const steps = [
   {
@@ -113,19 +109,10 @@ const AgencySection = () => {
                 «Hola, soy Nova, de Sistema Maestro. Montamos tu web con inteligencia artificial y le conectamos un agente que atiende a tus clientes, para que tú te centres en tu negocio. ¿Qué te gustaría saber?»
               </p>
 
-              {/* Botón de voz de Nova: oculto hasta que exista VITE_VOICE_AGENT_URL (https).
-                  La base del agente (prompt, técnicas y flujo de captura de mail) y la lista
-                  de activación están en docs/agents/nova/README.md. */}
-              {VOICE_AGENT_URL ? (
-                <a
-                  href={VOICE_AGENT_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-2xl border border-[#E9D5FF]/60 bg-[linear-gradient(135deg,rgba(216,180,254,0.42),rgba(167,139,250,0.30))] px-5 py-3 text-sm font-semibold text-[#F5F3FF] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_8px_26px_rgba(167,139,250,0.30)] transition duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_10px_34px_rgba(167,139,250,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DDD6FE]/80 motion-reduce:transition-none sm:w-auto"
-                >
-                  Habla con Nova
-                </a>
-              ) : null}
+              {/* Botón de voz de Nova: oculto hasta que exista VITE_ELEVENLABS_AGENT_ID
+                  (o VITE_VOICE_AGENT_URL). El SDK de voz solo se carga al pulsarlo.
+                  La base del agente está en docs/agents/nova/. */}
+              <NovaVoiceButton />
             </div>
           </div>
         </div>
