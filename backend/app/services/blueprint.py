@@ -4,24 +4,25 @@ from typing import Dict
 
 import openai
 
-from backend.app.core.config import OPENAI_API_KEY
+from backend.app.core.llm_client import async_client_kwargs, chat_model
 
 logger = logging.getLogger(__name__)
 
 
 async def generate_blueprint(project: Dict) -> Dict:
-    if not OPENAI_API_KEY:
+    client_kwargs = async_client_kwargs()
+    if not client_kwargs:
         return {
             "title": "Blueprint no disponible",
-            "summary": "Configura OPENAI_API_KEY para generar blueprints",
-            "priorities": ["Configurar API key de OpenAI"],
+            "summary": "Configura GROK_API_KEY para generar blueprints",
+            "priorities": ["Configurar GROK_API_KEY"],
             "architecture": {"components": ["Por definir"]},
             "monetization": "Por definir",
             "deployment_steps": ["Configurar entorno"],
             "timeline_estimate": "Por definir"
         }
 
-    client_ai = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client_ai = openai.AsyncOpenAI(**client_kwargs)
 
     route_names = {
         "improve": "Mejorar algo existente",
@@ -57,7 +58,7 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
 
     try:
         response = await client_ai.chat.completions.create(
-            model="gpt-4o",
+            model=chat_model(),
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": context}

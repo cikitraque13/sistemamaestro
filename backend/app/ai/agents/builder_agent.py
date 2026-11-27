@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from openai import AsyncOpenAI
 
-from backend.app.core.config import OPENAI_API_KEY
+from backend.app.core.llm_client import async_client_kwargs, chat_model
 from backend.app.ai.schemas.builder_ai_output import (
     BuilderAIInput,
     BuilderAIOutput,
@@ -128,13 +128,14 @@ async def run_builder_agent(
     *,
     project_context: Dict[str, Any] | None = None,
 ) -> BuilderAIOutput:
-    if not OPENAI_API_KEY:
-        raise RuntimeError("OPENAI_API_KEY no está configurada en backend/.env")
+    client_kwargs = async_client_kwargs()
+    if not client_kwargs:
+        raise RuntimeError("GROK_API_KEY no está configurada (ni OPENAI_API_KEY de respaldo)")
 
-    client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client = AsyncOpenAI(**client_kwargs)
 
     response = await client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=chat_model(),
         temperature=0.35,
         response_format={"type": "json_object"},
         messages=[

@@ -24,7 +24,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Optional
 
-from backend.app.core.config import OPENAI_API_KEY
+from backend.app.core.llm_client import resolve_api_key
 from backend.app.services.ai_analysis_common import (
     ANALYSIS_ADAPTER_VERSION,
     ensure_string,
@@ -115,7 +115,7 @@ async def analyze_with_ai(
         has_url_analysis=context.get("has_url_analysis"),
     )
 
-    if not OPENAI_API_KEY:
+    if not resolve_api_key():
         return build_analysis_fallback(
             configured=False,
             trace=trace,

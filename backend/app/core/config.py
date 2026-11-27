@@ -32,6 +32,8 @@ STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY") or os.environ.get("STRIP
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+GROK_API_KEY = os.environ.get("GROK_API_KEY")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
 ALLOWED_ORIGINS = [
     origin.strip()
