@@ -54,6 +54,8 @@ app.include_router(consumption_router)
 
 @app.on_event("startup")
 async def startup_event():
+    from backend.app.core.llm_client import log_llm_startup
+    log_llm_startup()
     await db.users.create_index("email", unique=True)
     await db.users.create_index("user_id", unique=True)
     await db.projects.create_index("user_id")

@@ -13,23 +13,31 @@ from openai import AsyncOpenAI
 
 
 def _provider_key() -> str | None:
-    # Resolve the already configured provider key only when a real review is
-    # requested; importing the pure validator must have no configuration I/O.
-    from backend.app.core.config import OPENAI_API_KEY
+    # Resolve the provider key only when a real review is requested; importing
+    # the pure validator must have no configuration I/O.
+    from backend.app.core.llm_client import resolve_api_key
 
-    return OPENAI_API_KEY
+    return resolve_api_key()
 
 
-# This fixed model is already used by the Builder agent. The price record is
-# pinned to OpenAI's published model page (checked 2026-10-20); changing the
-# model or its rate requires an explicit code review before calls are allowed.
-MODEL = "gpt-4o-mini"
+def _provider_base_url() -> str | None:
+    from backend.app.core.llm_client import provider_base_url
+
+    return provider_base_url()
+
+
+# Model is env-configurable. Unknown names use the safe default rate so the
+# cost guard still bounds the call and never crashes on a missing price.
+from backend.app.core.llm_client import chat_model, safe_token_rates
+
+MODEL = chat_model()
+_INPUT_RATE, _OUTPUT_RATE = safe_token_rates(MODEL)
 MODEL_RATE_RECORD = {
     "model": MODEL,
-    "input_usd_per_million": 0.15,
-    "output_usd_per_million": 0.60,
-    "source": "https://developers.openai.com/api/docs/models/gpt-4o-mini",
-    "verified_on": "2026-10-20",
+    "input_usd_per_million": _INPUT_RATE,
+    "output_usd_per_million": _OUTPUT_RATE,
+    "source": "backend.app.core.llm_client.safe_token_rates",
+    "verified_on": "2026-11-27",
 }
 MAX_INPUT_TOKENS = 8_000
 MAX_OUTPUT_TOKENS = 512
@@ -190,7 +198,10 @@ async def review_project_memory(project: Dict[str, Any]) -> ReviewSnapshot:
     ]}
     user_content = _canonical_json(payload)
     try:
-        encoding = tiktoken.encoding_for_model(MODEL)
+        try:
+            encoding = tiktoken.encoding_for_model(MODEL)
+        except Exception:
+            encoding = tiktoken.get_encoding("cl100k_base")
         # Add a conservative allowance for Chat Completions framing tokens.
         input_tokens = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_content)) + 32
     except Exception:
@@ -201,7 +212,15 @@ async def review_project_memory(project: Dict[str, Any]) -> ReviewSnapshot:
     if not provider_key:
         raise MemoryReviewError("memory_review_unavailable")
 
-    client = AsyncOpenAI(api_key=provider_key, timeout=REQUEST_TIMEOUT_SECONDS, max_retries=0)
+    client_kwargs = {
+        "api_key": provider_key,
+        "timeout": REQUEST_TIMEOUT_SECONDS,
+        "max_retries": 0,
+    }
+    base_url = _provider_base_url()
+    if base_url:
+        client_kwargs["base_url"] = base_url
+    client = AsyncOpenAI(**client_kwargs)
     try:
         response = await client.chat.completions.create(
             model=MODEL,

@@ -25,7 +25,7 @@ from typing import Any, Dict, Optional
 
 import openai
 
-from backend.app.core.config import OPENAI_API_KEY
+from backend.app.core.llm_client import async_client_kwargs, chat_model
 from backend.app.services.ai_analysis_common import ensure_string
 from backend.app.services.ai_analysis_prompts import build_system_prompt, build_user_prompt
 
@@ -224,10 +224,11 @@ async def run_direct_analysis(
     - llama al proveedor
     - parsea JSON bruto
     """
-    if not OPENAI_API_KEY:
-        raise RuntimeError("openai_not_configured")
+    client_kwargs = async_client_kwargs()
+    if not client_kwargs:
+        raise RuntimeError("llm_not_configured")
 
-    client_ai = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client_ai = openai.AsyncOpenAI(**client_kwargs)
     system_prompt = build_system_prompt(lead_meta)
     user_prompt = build_user_prompt(context)
 
@@ -241,7 +242,7 @@ async def run_direct_analysis(
     )
 
     response = await client_ai.chat.completions.create(
-        model="gpt-4o",
+        model=chat_model(),
         response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": system_prompt},
