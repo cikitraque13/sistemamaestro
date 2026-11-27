@@ -292,7 +292,7 @@ const buildSummary = ({
 
   return {
     status: 'adapted_from_builder_ai',
-    source: 'builder_ai_openai',
+    source: 'builder_ai',
     projectKind: builderAIOutput.projectKind || '',
     sector: builderAIOutput.sector || '',
     objective: builderAIOutput.objective || '',
@@ -317,7 +317,7 @@ const mapSectionsToBlocks = (sections = []) =>
       type: pickFirstString(section.type, 'section'),
       label: title,
       order: Number.isFinite(section.order) ? section.order : 10 + index * 10,
-      source: 'builder_ai_openai',
+      source: 'builder_ai',
       props: {
         ...asObject(section.props),
         title,
@@ -371,7 +371,7 @@ const buildBuilderAIMutation = ({
     id: 'builder-ai-output',
     type: 'builder_ai_output',
     label: builderAIOutput.intent || builderAIOutput.assistantMessage || 'Builder AI output',
-    source: 'builder_ai_openai',
+    source: 'builder_ai',
     projectKind: builderAIOutput.projectKind || undefined,
     sector: builderAIOutput.sector || undefined,
     objective: builderAIOutput.objective || undefined,
@@ -434,7 +434,7 @@ export const adaptBuilderAIOutputToKernelResult = ({
 
   const baseOutput = {
     ...(asObject(previousKernelOutput) || {}),
-    source: 'builder_ai_openai',
+    source: 'builder_ai',
     copy,
     preview,
     code,
@@ -494,7 +494,7 @@ export const adaptBuilderAIOutputToKernelResult = ({
       lifecycle,
     }),
     ...getBuildStateSummary(state),
-    source: 'builder_ai_openai',
+    source: 'builder_ai',
   };
 
   const output = {
@@ -516,7 +516,7 @@ export const adaptBuilderAIOutputToKernelResult = ({
 
   return {
     ok: true,
-    source: 'builder_ai_openai',
+    source: 'builder_ai',
     input: userInput,
     output,
     state,

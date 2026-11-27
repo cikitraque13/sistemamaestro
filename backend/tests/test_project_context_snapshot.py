@@ -5,7 +5,6 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import test_credit_consumption_safety as credits_fixture
-credits_fixture.config_stub.OPENAI_API_KEY = None
 from backend.app.ai.agents.builder_agent import _build_prompt
 import test_consumption_callers as f
 from pydantic import ValidationError

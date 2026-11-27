@@ -349,7 +349,8 @@ La economía del sistema ya no es solo una idea comercial. Existe una base técn
 - Uvicorn
 - Motor / MongoDB
 - Stripe
-- OpenAI
+- xAI Grok
+- Anthropic Claude
 - JWT
 - bcrypt
 - httpx
@@ -417,7 +418,10 @@ Estos datos describen el runtime y los archivos versionados del repositorio, no 
 La configuración exacta puede evolucionar, pero a nivel mínimo el backend requiere una base como esta:
 
 ```env
-OPENAI_API_KEY=sk-xxx
+GROK_API_KEY=
+GROK_MODEL=grok-4.3
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-haiku-5-5
 STRIPE_SECRET_KEY=sk_xxx
 MONGO_URL=[MongoDB Atlas connection URI removed; configure credentials privately.]/sistemamaestro
 DB_NAME=sistemamaestro

@@ -135,7 +135,7 @@ class ClassifierCallTests(IsolatedAsyncioTestCase):
             "reason_code": "same_scope_incompatible",
         }]))
         with patch.object(memory_review, "_provider_key", return_value="synthetic-key"):
-            with patch.object(memory_review, "AsyncOpenAI", return_value=client) as constructor:
+            with patch.object(memory_review, "GrokChatClient", return_value=client) as constructor:
                 result = await memory_review.review_project_memory(project_fixture())
         self.assertEqual(result.groups, ({
             "kind": "conflict", "question_ids": ["q_audience", "q_goal"],
@@ -154,7 +154,7 @@ class ClassifierCallTests(IsolatedAsyncioTestCase):
         client.close.assert_awaited_once()
 
     async def test_token_overflow_and_unavailable_rate_fail_before_provider(self):
-        client_factory = patch.object(memory_review, "AsyncOpenAI")
+        client_factory = patch.object(memory_review, "GrokChatClient")
         with patch.object(memory_review, "_provider_key", return_value="synthetic-key"):
             with client_factory as client:
                 oversized = project_fixture()
@@ -176,7 +176,7 @@ class ClassifierCallTests(IsolatedAsyncioTestCase):
     async def test_invalid_provider_response_fails_closed_and_closes_client(self):
         client = self.fake_client('{"reviewed_labels":[],"groups":[]}')
         with patch.object(memory_review, "_provider_key", return_value="synthetic-key"):
-            with patch.object(memory_review, "AsyncOpenAI", return_value=client):
+            with patch.object(memory_review, "GrokChatClient", return_value=client):
                 with self.assertRaises(memory_review.MemoryReviewError) as error:
                     await memory_review.review_project_memory(project_fixture())
         self.assertEqual(error.exception.code, "memory_review_invalid_result")
@@ -186,7 +186,7 @@ class ClassifierCallTests(IsolatedAsyncioTestCase):
         client = self.fake_client(None)
         client.chat.completions.create.side_effect = TimeoutError()
         with patch.object(memory_review, "_provider_key", return_value="synthetic-key"):
-            with patch.object(memory_review, "AsyncOpenAI", return_value=client) as constructor:
+            with patch.object(memory_review, "GrokChatClient", return_value=client) as constructor:
                 with self.assertRaises(memory_review.MemoryReviewError) as error:
                     await memory_review.review_project_memory(project_fixture())
         self.assertEqual(error.exception.code, "memory_review_unavailable")

@@ -437,7 +437,8 @@ La aplicación documenta estas variables como requisitos de configuración cuand
 MONGO_URL
 DB_NAME
 JWT_SECRET
-OPENAI_API_KEY
+GROK_API_KEY
+ANTHROPIC_API_KEY
 STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
 GOOGLE_CLIENT_ID

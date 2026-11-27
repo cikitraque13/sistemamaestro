@@ -23,9 +23,7 @@ import json
 import logging
 from typing import Any, Dict, Optional
 
-import openai
-
-from backend.app.core.llm_client import async_client_kwargs, chat_model
+from backend.app.core.config import GROK_API_KEY, GROK_BASE_URL, GROK_MODEL
 from backend.app.services.ai_analysis_common import ensure_string
 from backend.app.services.ai_analysis_prompts import build_system_prompt, build_user_prompt
 
@@ -224,11 +222,12 @@ async def run_direct_analysis(
     - llama al proveedor
     - parsea JSON bruto
     """
-    client_kwargs = async_client_kwargs()
-    if not client_kwargs:
-        raise RuntimeError("llm_not_configured")
+    if not GROK_API_KEY or GROK_MODEL not in {"grok-4.3", "grok-4.7"}:
+        raise RuntimeError("grok_not_configured")
 
-    client_ai = openai.AsyncOpenAI(**client_kwargs)
+    from backend.app.ai.providers.grok_client import GrokChatClient
+
+    client_ai = GrokChatClient(api_key=GROK_API_KEY, timeout=60, max_retries=0, base_url=GROK_BASE_URL)
     system_prompt = build_system_prompt(lead_meta)
     user_prompt = build_user_prompt(context)
 
@@ -241,16 +240,20 @@ async def run_direct_analysis(
         envelope.get("request_id"),
     )
 
-    response = await client_ai.chat.completions.create(
-        model=chat_model(),
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.15,
-        max_tokens=2600,
-    )
+    try:
+        response = await client_ai.chat.completions.create(
+            model=GROK_MODEL,
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.15,
+            max_tokens=2600,
+            reasoning_effort="low",
+        )
+    finally:
+        await client_ai.close()
 
     response_text = response.choices[0].message.content or "{}"
     return parse_ai_json(response_text)

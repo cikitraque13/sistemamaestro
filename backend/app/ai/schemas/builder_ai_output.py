@@ -70,5 +70,5 @@ def get_builder_ai_output_contract() -> Dict[str, Any]:
             "component",
             "unknown",
         ],
-        "rule": "OpenAI devuelve patches/mutaciones. No sustituye BuilderBuildState completo.",
+        "rule": "El modelo devuelve patches/mutaciones. No sustituye BuilderBuildState completo.",
     }

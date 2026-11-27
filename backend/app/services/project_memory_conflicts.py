@@ -7,36 +7,29 @@ import json
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Tuple
 
-import tiktoken
-from openai import AsyncOpenAI
+from backend.app.ai.providers.grok_client import GrokChatClient
+from backend.app.ai.providers.model_pricing import GROK_RATES, estimate_tokens
 
 
 
 def _provider_key() -> str | None:
-    # Resolve the provider key only when a real review is requested; importing
-    # the pure validator must have no configuration I/O.
-    from backend.app.core.llm_client import resolve_api_key
+    # Resolve the already configured provider key only when a real review is
+    # requested; importing the pure validator must have no configuration I/O.
+    from backend.app.core.config import GROK_API_KEY
 
-    return resolve_api_key()
-
-
-def _provider_base_url() -> str | None:
-    from backend.app.core.llm_client import provider_base_url
-
-    return provider_base_url()
+    return GROK_API_KEY
 
 
-# Model is env-configurable. Unknown names use the safe default rate so the
-# cost guard still bounds the call and never crashes on a missing price.
-from backend.app.core.llm_client import chat_model, safe_token_rates
-
-MODEL = chat_model()
-_INPUT_RATE, _OUTPUT_RATE = safe_token_rates(MODEL)
+# Default is the cheapest current Grok text model. The price record is pinned
+# to the xAI models page (checked 2026-11-27). Changing the model or its rate
+# requires an explicit code review before calls are allowed. GROK_MODEL may
+# select another model only when that model is in GROK_RATES.
+MODEL = "grok-4.3"
 MODEL_RATE_RECORD = {
     "model": MODEL,
-    "input_usd_per_million": _INPUT_RATE,
-    "output_usd_per_million": _OUTPUT_RATE,
-    "source": "backend.app.core.llm_client.safe_token_rates",
+    "input_usd_per_million": 1.25,
+    "output_usd_per_million": 2.50,
+    "source": "https://docs.x.ai/developers/models",
     "verified_on": "2026-11-27",
 }
 MAX_INPUT_TOKENS = 8_000
@@ -126,10 +119,28 @@ def _review_items(project: Dict[str, Any]) -> List[Dict[str, str]]:
     ]
 
 
-def _max_cost() -> float:
-    rate = MODEL_RATE_RECORD
-    if rate.get("model") != MODEL or not isinstance(rate.get("source"), str) or not rate.get("verified_on"):
+def _active_model() -> str:
+    import os
+
+    override = os.environ.get("GROK_MODEL", "").strip()
+    return override or MODEL
+
+
+def _rate_for_call():
+    model = _active_model()
+    rate = MODEL_RATE_RECORD if model == MODEL else GROK_RATES.get(model)
+    if (
+        not isinstance(rate, dict)
+        or rate.get("model") != model
+        or not isinstance(rate.get("source"), str)
+        or not rate.get("verified_on")
+    ):
         raise MemoryReviewError("memory_review_limit_exceeded")
+    return model, rate
+
+
+def _max_cost() -> float:
+    _model, rate = _rate_for_call()
     try:
         return (
             MAX_INPUT_TOKENS * float(rate["input_usd_per_million"])
@@ -197,33 +208,30 @@ async def review_project_memory(project: Dict[str, Any]) -> ReviewSnapshot:
         for item in items
     ]}
     user_content = _canonical_json(payload)
+    # Conservative allowance for Chat Completions framing tokens.
+    input_tokens = estimate_tokens(SYSTEM_PROMPT) + estimate_tokens(user_content) + 32
     try:
-        try:
-            encoding = tiktoken.encoding_for_model(MODEL)
-        except Exception:
-            encoding = tiktoken.get_encoding("cl100k_base")
-        # Add a conservative allowance for Chat Completions framing tokens.
-        input_tokens = len(encoding.encode(SYSTEM_PROMPT)) + len(encoding.encode(user_content)) + 32
-    except Exception:
-        raise MemoryReviewError("memory_review_limit_exceeded") from None
+        model, _rate = _rate_for_call()
+    except MemoryReviewError:
+        raise
     if input_tokens > MAX_INPUT_TOKENS or _max_cost() > MAX_ATTEMPT_COST_USD:
         raise MemoryReviewError("memory_review_limit_exceeded")
     provider_key = _provider_key()
     if not provider_key:
         raise MemoryReviewError("memory_review_unavailable")
 
-    client_kwargs = {
-        "api_key": provider_key,
-        "timeout": REQUEST_TIMEOUT_SECONDS,
-        "max_retries": 0,
-    }
-    base_url = _provider_base_url()
-    if base_url:
-        client_kwargs["base_url"] = base_url
-    client = AsyncOpenAI(**client_kwargs)
+    import os
+
+    base_url = os.environ.get("GROK_BASE_URL", "https://api.x.ai/v1").strip() or "https://api.x.ai/v1"
+    client = GrokChatClient(
+        api_key=provider_key,
+        timeout=REQUEST_TIMEOUT_SECONDS,
+        max_retries=0,
+        base_url=base_url,
+    )
     try:
         response = await client.chat.completions.create(
-            model=MODEL,
+            model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_content},
@@ -231,6 +239,7 @@ async def review_project_memory(project: Dict[str, Any]) -> ReviewSnapshot:
             response_format={"type": "json_object"},
             temperature=0,
             max_tokens=MAX_OUTPUT_TOKENS,
+            reasoning_effort="none",
         )
         content = response.choices[0].message.content
     except asyncio.TimeoutError:

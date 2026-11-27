@@ -2,7 +2,7 @@
 system_architect_agent.py
 
 Agente fase 1 de arquitectura de Sistema Maestro.
-Función pura: no llama OpenAI, no escribe archivos, no toca runtime.
+Función pura: no llama a un proveedor externo, no escribe archivos, no toca runtime.
 """
 
 from dataclasses import dataclass, asdict, field

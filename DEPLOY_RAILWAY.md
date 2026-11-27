@@ -200,7 +200,10 @@ DB_NAME=sistemamaestro
 
 JWT_SECRET=una_cadena_larga_segura_de_minimo_32_caracteres
 
-OPENAI_API_KEY=sk-xxx
+GROK_API_KEY=
+GROK_MODEL=grok-4.3
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-haiku-5-5
 
 STRIPE_SECRET_KEY=sk_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
@@ -431,7 +434,8 @@ Cargar las variables mínimas del bloque de entorno:
 - `MONGO_URL`
 - `DB_NAME`
 - `JWT_SECRET`
-- `OPENAI_API_KEY`
+- `GROK_API_KEY`
+- `ANTHROPIC_API_KEY`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 - `GOOGLE_CLIENT_ID`
@@ -623,7 +627,8 @@ Si no pasa local, no lo mandes a producción esperando que Railway tenga magia. 
 [ ] STRIPE_SECRET_KEY configurado
 [ ] STRIPE_WEBHOOK_SECRET configurado
 [ ] GOOGLE_CLIENT_ID configurado si Google Sign-In está activo
-[ ] OPENAI_API_KEY configurado
+[ ] GROK_API_KEY configurado
+[ ] ANTHROPIC_API_KEY configurado
 [ ] MONGO_URL configurado
 ```
 

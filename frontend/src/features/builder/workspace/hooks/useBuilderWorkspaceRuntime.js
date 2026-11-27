@@ -905,7 +905,7 @@ export default function useBuilderWorkspaceRuntime({
             confidence: response.confidence,
             shouldAsk: response.shouldAsk,
             summary: response.summary,
-            source: atomicCommand ? 'builder_command_contract_v2' : builderAiResult ? 'builder_ai_openai' : response.source,
+            source: atomicCommand ? 'builder_command_contract_v2' : builderAiResult ? 'builder_ai' : response.source,
             hubSummary: response.hubSummary || null,
             delta: response.delta || null,
             operation: response.operation || null,
