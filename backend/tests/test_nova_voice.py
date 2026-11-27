@@ -51,6 +51,8 @@ class ResolveTests(unittest.TestCase):
             body["instructions"],
         )
         self.assertIn("por lo que me cuentas", body["instructions"])
+        self.assertIn("¿qué es lo que más te quita tiempo ahora mismo?", body["instructions"])
+        self.assertIn("vale, o sea que", body["instructions"])
         self.assertNotIn("acento neutro", body["instructions"])
         self.assertNotIn("No uses acento andaluz", body["instructions"])
         self.assertIn("llamada de teléfono natural", body["instructions"])
