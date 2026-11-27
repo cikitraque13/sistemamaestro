@@ -5,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 from starlette.responses import JSONResponse
 from backend.app.services.project_plan import project_plan_view, PlanError, HISTORY_ERROR, HISTORY_RESPONSE
 
@@ -19,6 +20,11 @@ from backend.app.schemas.consumption import ConsumptionRequest
 from backend.app.schemas.projects import ProjectCreate, RefineInput
 from backend.app.services.ai_analysis import analyze_with_ai
 from backend.app.services.blueprint import BlueprintGenerationError, generate_blueprint
+from backend.app.services.builder_landing_state import (
+    LandingStateError,
+    load_landing,
+    save_landing,
+)
 from backend.app.services.economic_operation import (
     EconomicPersistenceUncertain, request_fingerprint, request_operation_id, run_economic_operation,
 )
@@ -546,6 +552,48 @@ async def get_project(project_id: str, request: Request):
                 return JSONResponse(status_code=409, content=HISTORY_RESPONSE)
             raise HTTPException(409, detail={"code": exc.code}) from None
     return project
+
+
+class LandingRecordBody(BaseModel):
+    record: str
+
+
+def _landing_http_error(error: LandingStateError) -> HTTPException:
+    messages = {
+        "not_found": "No hay una landing guardada para este proyecto.",
+        "invalid_record": "El borrador de la landing no es válido.",
+        "record_too_large": "El borrador de la landing es demasiado grande.",
+    }
+    return HTTPException(
+        status_code=error.status,
+        detail={"code": error.code, "message": messages.get(error.code, "No se ha podido guardar la landing.")},
+    )
+
+
+@router.get("/{project_id}/landing")
+async def get_project_landing(project_id: str, request: Request):
+    await ensure_builder_available(request)
+    user = await get_current_user(request)
+    try:
+        return await load_landing(db.projects, db.builder_landing_states, user["user_id"], project_id)
+    except LandingStateError as error:
+        raise _landing_http_error(error) from None
+
+
+@router.put("/{project_id}/landing")
+async def put_project_landing(project_id: str, body: LandingRecordBody, request: Request):
+    await ensure_builder_available(request)
+    user = await get_current_user(request)
+    try:
+        return await save_landing(
+            db.projects,
+            db.builder_landing_states,
+            user["user_id"],
+            project_id,
+            body.record,
+        )
+    except LandingStateError as error:
+        raise _landing_http_error(error) from None
 
 
 @router.post("/{project_id}/refine")
