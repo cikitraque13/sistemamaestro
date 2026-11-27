@@ -186,7 +186,7 @@ export const buildInitialBuilderMessages = ({ project, initialPrompt, intent }) 
 export const createBuilderWorkspaceState = ({
   project = null,
   initialPrompt = '',
-  activeWorkspaceTab = 'preview',
+  activeWorkspaceTab = 'code',
   activeCodeTab = 'tsx',
 } = {}) => {
   const rawInput = getProjectInput(project, initialPrompt);

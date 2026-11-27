@@ -9,7 +9,7 @@ export default function BuilderWorkspaceDemo() {
     builderProjects[0]?.id || 'project-alpha'
   );
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState(
-    builderWorkspaceTabs[0]?.id || 'preview'
+    builderWorkspaceTabs[0]?.id || 'code'
   );
 
   const activeProjectData = useMemo(

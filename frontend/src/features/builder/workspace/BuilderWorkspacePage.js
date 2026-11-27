@@ -179,7 +179,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   const runtimeProjectId = selectionId;
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState(
-    builderWorkspaceTabs[0]?.id || 'preview'
+    builderWorkspaceTabs[0]?.id || 'code'
   );
 
   const [project, setProject] = useState(null);
@@ -343,8 +343,8 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}
       contextBody={contextBody}
     >
-      {resolved && !selectionError && <IntentClarification key={`${ownerId}:${resolved.project_id}`} project={resolved} ownerId={ownerId} onSaved={result => setProject(current => current?.project_id === result.project_id && current?.user_id === result.user_id ? { ...current, updated_at: result.updated_at, active_j06_1_intent: result.intent, ...(current.j06_2_plan ? { j06_2_plan: { ...current.j06_2_plan, status: 'STALE', confirmation_challenge: null } } : {}) } : current)} />}
-      {resolved && !selectionError && <ProjectPlan key={`plan:${ownerId}:${resolved.project_id}:${resolved.updated_at}`} project={resolved} ownerId={ownerId} />}
+      <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      <div className="min-h-0 flex-1">
       <BuilderWorkspaceLayout
         key={JSON.stringify([ownerId, selectionKey, resolved?.updated_at])}
         ownerId={ownerId}
@@ -359,6 +359,12 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         onGenerateBlueprint={handleGenerateBlueprint}
         generatingBlueprint={generatingBlueprint}
       />
+      </div>
+      {resolved && !selectionError && <div className="max-h-40 shrink-0 overflow-auto border-t border-white/10">
+        <IntentClarification key={`${ownerId}:${resolved.project_id}`} project={resolved} ownerId={ownerId} onSaved={result => setProject(current => current?.project_id === result.project_id && current?.user_id === result.user_id ? { ...current, updated_at: result.updated_at, active_j06_1_intent: result.intent, ...(current.j06_2_plan ? { j06_2_plan: { ...current.j06_2_plan, status: 'STALE', confirmation_challenge: null } } : {}) } : current)} />
+        <ProjectPlan key={`plan:${ownerId}:${resolved.project_id}:${resolved.updated_at}`} project={resolved} ownerId={ownerId} />
+      </div>}
+      </div>
     </AppShellLayout>
   );
 }

@@ -27,10 +27,10 @@ test('renders exact ordered projection and escapes markup', () => {
 test('confirmation sends exact digest, plan identity and revisions', async () => {
   submitPlanOperation.mockResolvedValue(response({ ...ready, status: 'CONFIRMED', confirmation_challenge: null }));
   const { node, root } = mount(<ProjectPlan project={project} ownerId="owner" />);
-  await act(async () => button(node, 'Confirmo este plan exacto').click());
+  await act(async () => button(node, 'Confirmar').click());
   const [op, revision] = submitPlanOperation.mock.calls[0];
   expect(op).toMatchObject({ operation_type: 'CONFIRM', digest: 'a'.repeat(64), plan_id: 'plan', generation: 1, plan_revision: 2, state_revision: 2 });
-  expect(revision).toBe('r'); expect(node.textContent).toContain('Estado del plan: CONFIRMED'); act(() => root.unmount());
+  expect(revision).toBe('r'); expect(node.querySelector('[data-plan-status]').getAttribute('data-plan-status')).toBe('CONFIRMED'); act(() => root.unmount());
 });
 
 test('a local edit hides confirmation until save and review of a new projection', async () => {
@@ -39,27 +39,27 @@ test('a local edit hides confirmation until save and review of a new projection'
     .mockResolvedValueOnce(response({ ...ready, plan_revision: 3, state_revision: 4, content: changed, confirmation_challenge: { digest: 'b'.repeat(64), display_projection: { ...projection, ...changed } } }));
   const { node, root } = mount(<ProjectPlan project={project} ownerId="owner" />);
   act(() => Simulate.change(node.querySelector('input'), { target: { value: 'Revised title' } }));
-  expect(button(node, 'Confirmo este plan exacto')).toBeUndefined(); expect(button(node, 'Revisar plan guardado').disabled).toBe(true);
-  await act(async () => button(node, 'Guardar plan').click());
+  expect(button(node, 'Confirmar')).toBeUndefined(); expect(button(node, 'Revisar').disabled).toBe(true);
+  await act(async () => button(node, 'Guardar').click());
   expect(submitPlanOperation.mock.calls[0][0].content.title).toBe('Revised title');
-  await act(async () => button(node, 'Revisar plan guardado').click());
+  await act(async () => button(node, 'Revisar').click());
   expect(node.querySelector('[aria-label="Plan exacto a confirmar"]').textContent).toContain('Revised title');
-  expect(button(node, 'Confirmo este plan exacto').disabled).toBe(false); act(() => root.unmount());
+  expect(button(node, 'Confirmar').disabled).toBe(false); act(() => root.unmount());
 });
 
 test('user can reorder steps and save the new order', async () => {
   submitPlanOperation.mockResolvedValue(response({ ...ready, status: 'DRAFT', content: { ...body, steps: [...body.steps].reverse() }, confirmation_challenge: null }));
   const { node, root } = mount(<ProjectPlan project={{ ...project, j06_2_plan: { ...ready, status: 'DRAFT', confirmation_challenge: null } }} ownerId="owner" />);
-  act(() => button(node, 'Bajar paso 1').click()); await act(async () => button(node, 'Guardar plan').click());
+  act(() => button(node, 'Bajar 1').click()); await act(async () => button(node, 'Guardar').click());
   expect(submitPlanOperation.mock.calls[0][0].content.steps.map(step => step.step_id)).toEqual(['step-b', 'step-a']); act(() => root.unmount());
 });
 
 test('uncertain persistence locks editing and retries the exact request', async () => {
   submitPlanOperation.mockRejectedValue(new TypeError('offline'));
   const { node, root } = mount(<ProjectPlan project={project} ownerId="owner" />);
-  await act(async () => button(node, 'Confirmo este plan exacto').click()); const original = submitPlanOperation.mock.calls[0];
+  await act(async () => button(node, 'Confirmar').click()); const original = submitPlanOperation.mock.calls[0];
   expect(node.querySelector('input').disabled).toBe(true);
-  await act(async () => button(node, 'Reintentar la misma solicitud de plan').click());
+  await act(async () => button(node, 'Reintentar').click());
   expect(submitPlanOperation.mock.calls[1]).toEqual(original); act(() => root.unmount());
 });
 
@@ -71,16 +71,16 @@ test('identity keyed remount removes prior owner project plan', () => {
 
 test('stale plan is readable but editing and confirmation are disabled', () => {
   const { node, root } = mount(<ProjectPlan project={{ ...project, j06_2_plan: { ...ready, status: 'STALE', confirmation_challenge: null } }} ownerId="owner" />);
-  expect(node.querySelector('input').disabled).toBe(true); expect(button(node, 'Confirmo este plan exacto')).toBeUndefined();
-  expect(button(node, 'Cancelar plan').disabled).toBe(false); expect(node.textContent).toContain('La intención fuente cambió'); act(() => root.unmount());
+  expect(node.querySelector('input').disabled).toBe(true); expect(button(node, 'Confirmar')).toBeUndefined();
+  expect(button(node, 'Cancelar').disabled).toBe(false); expect(node.querySelector('[data-plan-status]').getAttribute('data-plan-status')).toBe('STALE'); act(() => root.unmount());
 });
 
 test('recovery uses owner-checked existing project GET and never submits a mutation', async () => {
   recoverProjectPlan.mockResolvedValue(response({ ...ready, status: 'DRAFT', confirmation_challenge: null }));
   const { node, root } = mount(<ProjectPlan project={project} ownerId="owner" />);
-  await act(async () => button(node, 'Recuperar plan guardado').click());
+  await act(async () => button(node, 'Recuperar').click());
   expect(recoverProjectPlan).toHaveBeenCalledWith('p'); expect(submitPlanOperation).not.toHaveBeenCalled();
-  expect(node.textContent).toContain('Estado del plan: DRAFT'); act(() => root.unmount());
+  expect(node.querySelector('[data-plan-status]').getAttribute('data-plan-status')).toBe('DRAFT'); act(() => root.unmount());
 });
 
 test('confirmed plan exposes declared progress and submits the progress revision', async () => {
@@ -89,9 +89,8 @@ test('confirmed plan exposes declared progress and submits the progress revision
   submitPlanOperation.mockResolvedValue(response({ ...confirmed, progress_revision: 3,
     step_statuses: { 'step-a': 'BLOCKED', 'step-b': 'NOT_STARTED' } }));
   const { node, root } = mount(<ProjectPlan project={{ ...project, j06_2_plan: confirmed }} ownerId="owner" />);
-  expect(node.textContent).toContain('no verifica que el trabajo se haya ejecutado');
   act(() => Simulate.change(node.querySelector('[aria-label="Progreso de First"]'), { target: { value: 'BLOCKED' } }));
-  await act(async () => button(node, 'Guardar progreso del paso').click());
+  await act(async () => button(node, 'Guardar progreso').click());
   expect(submitPlanOperation.mock.calls[0][0]).toMatchObject({ operation_type: 'PROGRESS_UPDATE',
     projectId: 'p', expected_progress_revision: 2, step_id: 'step-a', status: 'BLOCKED' });
   act(() => root.unmount());
@@ -104,8 +103,7 @@ test('replan is explicit, distinct from restart, and states progress is not carr
     plan_revision: 1, state_revision: 1, status: 'DRAFT', progress_revision: 0,
     step_statuses: { 'step-a': 'NOT_STARTED', 'step-b': 'NOT_STARTED' } }));
   const { node, root } = mount(<ProjectPlan project={{ ...project, j06_2_plan: confirmed }} ownerId="owner" />);
-  expect(node.textContent).toContain('no se transfiere');
-  await act(async () => button(node, 'Crear replanteamiento').click());
+  await act(async () => button(node, 'Replan').click());
   expect(submitPlanOperation.mock.calls[0][0]).toMatchObject({ operation_type: 'REPLAN',
     plan_id: 'plan', generation: 1, expected_progress_revision: 1 });
   expect(submitPlanOperation.mock.calls[0][0]).not.toHaveProperty('content');

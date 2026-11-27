@@ -12,8 +12,8 @@ const DEFAULT_PROJECTS = [
 ];
 
 const DEFAULT_WORKSPACE_TABS = [
-  { id: 'preview', label: 'Preview' },
   { id: 'code', label: 'Código' },
+  { id: 'preview', label: 'Preview' },
   { id: 'extract', label: 'Extracción' },
   { id: 'structure', label: 'Estructura' },
 ];
@@ -93,7 +93,7 @@ export default function AppShellLayout({
   activeProjectId = 'project-alpha',
   onProjectChange = () => {},
   workspaceTabs = DEFAULT_WORKSPACE_TABS,
-  activeWorkspaceTab = 'preview',
+  activeWorkspaceTab = 'code',
   onWorkspaceTabChange = () => {},
   credits = 120,
   bonus = 25,

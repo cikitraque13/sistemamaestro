@@ -1,6 +1,6 @@
 const builderWorkspaceTabs = [
-  { id: 'preview', label: 'Preview' },
   { id: 'code', label: 'Código' },
+  { id: 'preview', label: 'Preview' },
   { id: 'extract', label: 'Extracción' },
   { id: 'structure', label: 'Estructura' },
 ];
