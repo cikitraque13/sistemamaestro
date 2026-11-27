@@ -44,7 +44,18 @@ class ResolveTests(unittest.TestCase):
         self.assertEqual(body["voice"], "ara")
         self.assertIn(nova_voice.NOVA_GREETING, body["instructions"])
         self.assertIn("es-ES", body["instructions"])
-        self.assertIn("acento neutro", body["instructions"])
+        self.assertIn("acento neutro de España", body["instructions"])
+        self.assertIn(
+            "No uses acento andaluz, malagueño ni de ninguna otra región.",
+            body["instructions"],
+        )
+        self.assertNotIn("acento malagueño", body["instructions"])
+        self.assertIn("29 € al mes", body["instructions"])
+        self.assertIn("Reglamento de IA", body["instructions"])
+        self.assertNotIn("[FECHA_CIERRE_REAL]", body["instructions"])
+        self.assertNotIn("[CASO_CERCANO_1]", body["instructions"])
+        self.assertNotIn("[TITULAR_DEL_TRATAMIENTO]", body["instructions"])
+        self.assertNotIn("[ENLACE_PRIVACIDAD]", body["instructions"])
         self.assertNotIn("session", body["websocket_url"])
 
     def test_rate_limit(self):
@@ -96,6 +107,29 @@ class MintTests(unittest.TestCase):
         client = _Client(_Response(401, {"error": "nope"}))
         with self.assertRaises(nova_voice.NovaVoiceUnavailable):
             asyncio.run(nova_voice.mint_ephemeral_token("k", client=client))
+
+
+class DiagTests(unittest.TestCase):
+    def test_diag_drops_tokens_and_unknown_fields(self):
+        clean = nova_voice.sanitize_nova_diag(
+            {
+                "stage": "ws",
+                "http_status": 503,
+                "ws_code": 1006,
+                "ws_reason": "bye",
+                "message": "Bearer super-secret-key xai-realtime-client-secret-abc",
+                "token": "xai-realtime-client-secret-abc",
+                "email": "lucas@example.com",
+            }
+        )
+        self.assertEqual(clean["stage"], "ws")
+        self.assertEqual(clean["http_status"], 503)
+        self.assertEqual(clean["ws_code"], 1006)
+        self.assertNotIn("super-secret-key", clean["message"])
+        self.assertNotIn("xai-realtime", clean["message"])
+        self.assertNotIn("token", clean)
+        self.assertNotIn("email", clean)
+        self.assertEqual(set(clean), {"stage", "http_status", "ws_code", "ws_reason", "message"})
 
 
 if __name__ == "__main__":

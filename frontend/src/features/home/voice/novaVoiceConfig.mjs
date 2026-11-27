@@ -131,3 +131,20 @@ export const levelsFromPcm16 = (samples, bars) => {
 
 export const isMicDenied = (error) =>
   Boolean(error && (error.name === 'NotAllowedError' || error.name === 'SecurityError'));
+
+const SECRET_PATTERN = /bearer\s+\S+|xai-[a-z0-9-]{6,}|client-secret\S*|sk-[a-z0-9]+/gi;
+
+export const sanitizeNovaDiag = (detail = {}) => {
+  const clip = (value, limit) =>
+    String(value == null ? '' : value).replace(SECRET_PATTERN, '[redacted]').slice(0, limit);
+  const httpStatus = Number.isInteger(detail.httpStatus) ? detail.httpStatus : null;
+  const wsCode = Number.isInteger(detail.wsCode) ? detail.wsCode : null;
+  const stage = clip(detail.stage || 'unknown', 32).trim().toLowerCase() || 'unknown';
+  return {
+    stage,
+    http_status: httpStatus != null && httpStatus >= 0 && httpStatus <= 599 ? httpStatus : null,
+    ws_code: wsCode != null && wsCode >= 0 && wsCode <= 4999 ? wsCode : null,
+    ws_reason: clip(detail.wsReason, 160),
+    message: clip(detail.message, 160),
+  };
+};
