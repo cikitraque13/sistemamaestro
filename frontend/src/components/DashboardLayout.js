@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   House,
+  Cube,
   FolderOpen,
   Lightbulb,
   CreditCard,
@@ -17,6 +18,7 @@ import DashboardProjectTabs from '../features/dashboard/components/DashboardProj
 
 const SIDEBAR_LINKS = [
   { path: '/dashboard', icon: House, label: 'Resumen' },
+  { path: '/dashboard/builder', icon: Cube, label: 'Builder' },
   { path: '/dashboard/projects', icon: FolderOpen, label: 'Proyectos' },
   { path: '/dashboard/opportunities', icon: Lightbulb, label: 'Oportunidades' },
   { path: '/dashboard/billing', icon: CreditCard, label: 'Facturación' }
@@ -79,7 +81,9 @@ const DashboardLayout = ({ children, title = 'Workspace' }) => {
 
         <nav className="flex-1 px-3 py-2">
           {SIDEBAR_LINKS.map((link) => {
-            const active = location.pathname === link.path;
+            const active = link.path === '/dashboard/builder'
+              ? location.pathname.startsWith('/dashboard/builder')
+              : location.pathname === link.path;
 
             return (
               <Link
@@ -161,7 +165,9 @@ const DashboardLayout = ({ children, title = 'Workspace' }) => {
 
         <nav className="px-3 py-2">
           {SIDEBAR_LINKS.map((link) => {
-            const active = location.pathname === link.path;
+            const active = link.path === '/dashboard/builder'
+              ? location.pathname.startsWith('/dashboard/builder')
+              : location.pathname === link.path;
 
             return (
               <Link

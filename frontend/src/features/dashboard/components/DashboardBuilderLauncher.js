@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { api } from '../../../lib/apiClient';
 import { economicPost } from '../../../lib/economicRequest';
+import { builderEntryIsOpen } from '../../builder/builderAccess';
 
 const MODES = [
   {
@@ -430,6 +431,19 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
       : 'Proyecto actual';
 
   const submitToBuilder = async () => {
+    setCreating(true);
+    try {
+      if (!(await builderEntryIsOpen(user))) {
+        navigate('/dashboard/builder');
+        return;
+      }
+    } catch {
+      navigate('/dashboard/builder');
+      return;
+    } finally {
+      setCreating(false);
+    }
+
     const cleanPrompt = prompt.trim();
 
     if (!cleanPrompt) {
