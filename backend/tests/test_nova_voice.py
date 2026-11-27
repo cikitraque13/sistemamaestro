@@ -1,0 +1,102 @@
+import asyncio
+import unittest
+
+from backend.app.services import nova_voice
+
+
+class ResolveTests(unittest.TestCase):
+    def test_without_key_the_provider_is_the_browser(self):
+        self.assertEqual(nova_voice.resolve_nova_voice_provider({}), "browser")
+
+    def test_key_selects_grok(self):
+        self.assertEqual(
+            nova_voice.resolve_nova_voice_provider({"GROK_API_KEY": "xai-secret"}),
+            "grok",
+        )
+
+    def test_off_disables_grok_and_keeps_browser_voice(self):
+        self.assertEqual(
+            nova_voice.resolve_nova_voice_provider(
+                {"NOVA_VOICE_PROVIDER": "off", "GROK_API_KEY": "xai-secret"}
+            ),
+            "browser",
+        )
+
+    def test_text_flag_skips_voice(self):
+        self.assertEqual(
+            nova_voice.resolve_nova_voice_provider(
+                {"NOVA_VOICE_PROVIDER": "text", "GROK_API_KEY": "xai-secret"}
+            ),
+            "text",
+        )
+
+    def test_unknown_voice_id_is_not_used(self):
+        self.assertEqual(nova_voice.nova_voice_id({"NOVA_GROK_VOICE": "library-voice"}), "ara")
+        self.assertEqual(nova_voice.nova_voice_id({"NOVA_GROK_VOICE": "Ara"}), "ara")
+
+    def test_public_session_does_not_include_the_api_key(self):
+        body = nova_voice.public_session("xai-realtime-client-secret-abc", 1700000000, "ara")
+        blob = str(body)
+        self.assertNotIn("xai-secret", blob)
+        self.assertNotIn("GROK_API_KEY", blob)
+        self.assertEqual(body["provider"], "grok")
+        self.assertEqual(body["language"], "es-ES")
+        self.assertEqual(body["voice"], "ara")
+        self.assertIn(nova_voice.NOVA_GREETING, body["instructions"])
+        self.assertIn("es-ES", body["instructions"])
+        self.assertIn("acento neutro", body["instructions"])
+        self.assertNotIn("session", body["websocket_url"])
+
+    def test_rate_limit(self):
+        limiter = nova_voice.RateLimiter(limit=2, window_seconds=10)
+        self.assertTrue(limiter.allow("203.0.113.5", now=100))
+        self.assertTrue(limiter.allow("203.0.113.5", now=101))
+        self.assertFalse(limiter.allow("203.0.113.5", now=102))
+        self.assertTrue(limiter.allow("203.0.113.5", now=120))
+
+
+class _Response:
+    def __init__(self, status_code, payload):
+        self.status_code = status_code
+        self._payload = payload
+
+    def json(self):
+        return self._payload
+
+
+class _Client:
+    def __init__(self, response):
+        self.response = response
+        self.calls = []
+
+    async def post(self, url, headers=None, json=None):
+        self.calls.append((url, headers, json))
+        return self.response
+
+
+class MintTests(unittest.TestCase):
+    def test_mint_uses_client_secrets_without_a_session_field(self):
+        client = _Client(_Response(200, {"value": "xai-realtime-client-secret-abc", "expires_at": 1700000000}))
+        result = asyncio.run(nova_voice.mint_ephemeral_token("super-secret-key", client=client))
+        self.assertEqual(result["token"], "xai-realtime-client-secret-abc")
+        self.assertEqual(result["expires_at"], 1700000000)
+        url, headers, body = client.calls[0]
+        self.assertEqual(url, nova_voice.XAI_CLIENT_SECRETS_URL)
+        self.assertEqual(headers["Authorization"], "Bearer super-secret-key")
+        self.assertEqual(body, {"expires_after": {"seconds": 60}})
+        self.assertNotIn("session", body)
+        self.assertNotIn("super-secret-key", result["token"])
+
+    def test_mint_refuses_to_return_the_api_key(self):
+        client = _Client(_Response(200, {"value": "super-secret-key", "expires_at": 1}))
+        with self.assertRaises(nova_voice.NovaVoiceUnavailable):
+            asyncio.run(nova_voice.mint_ephemeral_token("super-secret-key", client=client))
+
+    def test_mint_upstream_error_is_unavailable(self):
+        client = _Client(_Response(401, {"error": "nope"}))
+        with self.assertRaises(nova_voice.NovaVoiceUnavailable):
+            asyncio.run(nova_voice.mint_ephemeral_token("k", client=client))
+
+
+if __name__ == "__main__":
+    unittest.main()

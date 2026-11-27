@@ -1,81 +1,133 @@
-// Configuración pública de la voz en vivo de Nova (demo de la sección Agencia de IA).
-//
-// Solo se leen identificadores PÚBLICOS en el build:
-//   - VITE_ELEVENLABS_AGENT_ID: id público del agente de ElevenLabs (agent_...).
-//     Es público por diseño: el agente debe tener la autenticación desactivada
-//     y la lista de dominios permitidos (allowlist) limitada a sistemamaestro.com.
-//   - VITE_VOICE_AGENT_URL: alternativa, enlace https a una página de conversación
-//     alojada por el proveedor (se abre en otra pestaña).
-// Nunca se pone aquí una clave de API: la clave del proveedor no va al frontend.
+// Voz de Nova en la portada. La clave del proveedor no vive aquí.
+// El backend dice si toca Grok (`grok`), la voz del navegador (`browser`) o solo texto (`text`).
 
-const AGENT_ID_PATTERN = /^agent_[A-Za-z0-9]{8,64}$/;
+export const NOVA_GREETING =
+  'Hola, soy Nova, asistente de inteligencia artificial de Sistema Maestro. Estoy aquí para explicarte el producto con claridad y resolver tus dudas. ¿Me cuentas en una frase qué negocio tienes y qué te trae por aquí?';
 
-export const resolveNovaVoiceConfig = (env = {}) => {
-  const agentId = String(env.VITE_ELEVENLABS_AGENT_ID || '').trim();
-  if (AGENT_ID_PATTERN.test(agentId)) {
-    return { mode: 'elevenlabs', agentId };
-  }
+export const NOVA_GREETING_DISPLAY = `«${NOVA_GREETING}»`;
 
-  const url = String(env.VITE_VOICE_AGENT_URL || '').trim();
-  if (/^https:\/\/\S+$/i.test(url)) {
-    return { mode: 'link', url };
-  }
+export const BROWSER_FOLLOWUP =
+  'Gracias. Te he escuchado. Si la voz en directo no está disponible, el saludo de Nova sigue escrito aquí.';
 
-  return { mode: 'off' };
+export const PCM_RATES = [8000, 16000, 22050, 24000, 32000, 44100, 48000];
+
+export const choosePcmRate = (nativeRate) => {
+  const rate = Number(nativeRate);
+  return PCM_RATES.includes(rate) ? rate : 24000;
 };
 
-// Texto de estado que se muestra bajo el botón mientras dura la conversación.
+export const resolveNovaVoiceProvider = (config) => {
+  const provider = String((config && config.provider) || '').trim().toLowerCase();
+  if (provider === 'grok' || provider === 'browser' || provider === 'text') return provider;
+  return 'browser';
+};
+
+export const buildGrokSessionUpdate = ({ instructions, voice, inputRate, outputRate = 24000 }) => ({
+  type: 'session.update',
+  session: {
+    voice,
+    instructions,
+    turn_detection: { type: 'server_vad' },
+    audio: {
+      input: {
+        format: { type: 'audio/pcm', rate: inputRate },
+        transcription: { language_hint: 'es-ES' },
+      },
+      output: {
+        format: { type: 'audio/pcm', rate: outputRate },
+      },
+    },
+  },
+});
+
+export const greetingItem = () => ({
+  type: 'conversation.item.create',
+  item: {
+    type: 'message',
+    role: 'user',
+    content: [
+      {
+        type: 'input_text',
+        text: 'El visitante acaba de abrir la demo. Di ahora tu saludo exacto.',
+      },
+    ],
+  },
+});
+
 export const novaStatusLabel = (status, agentMode) => {
   if (status === 'connecting') return 'Conectando con Nova…';
   if (status === 'connected') {
     return agentMode === 'speaking' ? 'Nova está hablando' : 'Nova te escucha';
   }
-  if (status === 'mic-denied') {
-    return 'Para hablar con Nova, permite el acceso al micrófono.';
+  if (status === 'browser') {
+    return agentMode === 'speaking' ? 'Nova está hablando' : 'Voz del navegador. Nova te escucha.';
   }
-  if (status === 'error') {
-    return 'No se ha podido conectar con Nova. Inténtalo de nuevo en un momento.';
-  }
-  if (status === 'dropped') {
-    return 'La llamada se ha cortado nada más empezar. Revisa el micrófono y vuelve a intentarlo.';
-  }
+  if (status === 'mic-denied') return 'Para hablar con Nova, permite el acceso al micrófono.';
+  if (status === 'error') return 'No se ha podido conectar con Nova. Inténtalo de nuevo en un momento.';
+  if (status === 'dropped') return 'La llamada se ha cortado. Puedes intentarlo otra vez.';
+  if (status === 'text') return 'Nova está disponible por escrito.';
   return '';
 };
 
-// Fase visual de la demo (avatar, onda y pastilla de estado).
 export const novaPhase = (status, agentMode) => {
   if (status === 'connecting') return 'connecting';
-  if (status === 'connected') return agentMode === 'speaking' ? 'speaking' : 'listening';
+  if (status === 'connected' || status === 'browser') {
+    return agentMode === 'speaking' ? 'speaking' : 'listening';
+  }
   if (status === 'error' || status === 'mic-denied' || status === 'dropped') return 'error';
   return 'idle';
 };
 
-// Una llamada que se cierra en menos de 3 s desde que conectó (o antes de
-// conectar) cuenta como corte temprano: se avisa en pantalla en vez de volver
-// al estado inicial en silencio.
-export const NOVA_EARLY_DROP_MS = 3000;
+export const floatToPcm16 = (float32) => {
+  const pcm = new Int16Array(float32.length);
+  for (let i = 0; i < float32.length; i += 1) {
+    const sample = Math.max(-1, Math.min(1, float32[i] || 0));
+    pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+  }
+  return pcm;
+};
 
-export const isEarlyDrop = (connectedAt, now, thresholdMs = NOVA_EARLY_DROP_MS) =>
-  !connectedAt || now - connectedAt < thresholdMs;
+export const encodePcm16Base64 = (pcm) => {
+  const bytes = new Uint8Array(pcm.buffer, pcm.byteOffset, pcm.byteLength);
+  if (typeof Buffer !== 'undefined') return Buffer.from(bytes).toString('base64');
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+};
 
-// Convierte el espectro real de la llamada (Uint8Array 0-255 del SDK) en
-// `bars` niveles 0-1 para la onda. Usa la mitad baja del espectro, que es
-// donde está la voz.
-export const levelsFromFrequency = (data, bars) => {
+export const downsampleFloat32 = (input, inputRate, outputRate) => {
+  if (!input || inputRate === outputRate || !inputRate || !outputRate) return input;
+  const ratio = inputRate / outputRate;
+  const length = Math.max(1, Math.floor(input.length / ratio));
+  const out = new Float32Array(length);
+  for (let i = 0; i < length; i += 1) {
+    const pos = i * ratio;
+    const left = Math.floor(pos);
+    const right = Math.min(left + 1, input.length - 1);
+    const weight = pos - left;
+    out[i] = input[left] * (1 - weight) + input[right] * weight;
+  }
+  return out;
+};
+
+export const levelsFromPcm16 = (samples, bars) => {
   const out = new Array(bars).fill(0);
-  if (!data || !data.length || bars <= 0) return out;
-  const usable = Math.max(bars, Math.floor(data.length * 0.5));
-  const step = usable / bars;
+  if (!samples || !samples.length || bars <= 0) return out;
+  const step = samples.length / bars;
   for (let i = 0; i < bars; i += 1) {
     const from = Math.floor(i * step);
     const to = Math.max(from + 1, Math.floor((i + 1) * step));
     let sum = 0;
     let count = 0;
-    for (let j = from; j < to && j < data.length; j += 1) {
-      sum += data[j];
+    for (let j = from; j < to && j < samples.length; j += 1) {
+      const value = samples[j] / 32768;
+      sum += value * value;
       count += 1;
     }
-    out[i] = count ? Math.min(1, sum / count / 255) : 0;
+    out[i] = count ? Math.min(1, Math.sqrt(sum / count) * 2) : 0;
   }
   return out;
 };
+
+export const isMicDenied = (error) =>
+  Boolean(error && (error.name === 'NotAllowedError' || error.name === 'SecurityError'));

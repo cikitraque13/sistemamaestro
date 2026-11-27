@@ -21,6 +21,7 @@ from backend.app.routers.consumption import router as consumption_router
 from backend.app.routers.opportunities import router as opportunities_router
 from backend.app.routers.payments import router as payments_router
 from backend.app.routers.projects import router as projects_router
+from backend.app.routers.nova_voice import router as nova_voice_router
 from backend.app.routers.public import router as public_router
 
 logging.basicConfig(
@@ -46,6 +47,7 @@ app.include_router(projects_router)
 app.include_router(payments_router)
 app.include_router(billing_router)
 app.include_router(public_router)
+app.include_router(nova_voice_router)
 app.include_router(opportunities_router)
 app.include_router(consumption_router)
 

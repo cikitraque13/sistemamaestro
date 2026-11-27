@@ -8,13 +8,6 @@ RUN npm ci
 
 COPY frontend/ ./
 
-# Voz en vivo de Nova (portada, sección Agencia de IA). Solo identificadores
-# públicos: el agent id de ElevenLabs o un enlace https. Nunca una clave de API.
-ARG VITE_ELEVENLABS_AGENT_ID=""
-ARG VITE_VOICE_AGENT_URL=""
-ENV VITE_ELEVENLABS_AGENT_ID=$VITE_ELEVENLABS_AGENT_ID
-ENV VITE_VOICE_AGENT_URL=$VITE_VOICE_AGENT_URL
-
 RUN npm run build
 
 
