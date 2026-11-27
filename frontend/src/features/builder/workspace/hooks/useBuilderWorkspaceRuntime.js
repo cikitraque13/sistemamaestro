@@ -339,14 +339,14 @@ const buildSistemaMaestroDecisionOptions = () => [
     id: 'sm-gema',
     label: 'Mostrar Gema Maestra y crÃƒÂ©ditos',
     prompt:
-      'AÃƒÂ±ade una secciÃƒÂ³n clara de Gema Maestra, crÃƒÂ©ditos, iteraciones, exportaciÃƒÂ³n y deploy sin parecer una tabla de precios agresiva.',
+      'Añade una sección de Gema Maestra y de créditos. No es una tabla de precios. No habla de exportación ni de publicación.',
     creditTier: 'medium',
   }),
   createDecisionOption({
     id: 'sm-how-it-works',
     label: 'Crear secciÃƒÂ³n CÃƒÂ³mo funciona',
     prompt:
-      'AÃƒÂ±ade una secciÃƒÂ³n Ã¢â‚¬Å“CÃƒÂ³mo funcionaÃ¢â‚¬Â con tres pasos: describe tu idea, el Builder construye, iteras/exportas/despliegas.',
+      'Añade una sección «Cómo funciona» con tres pasos: describe la idea, el Builder prepara la preview, revisas el borrador.',
     creditTier: 'medium',
   }),
 ];

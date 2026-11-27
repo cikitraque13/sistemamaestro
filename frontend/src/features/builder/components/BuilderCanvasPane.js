@@ -706,15 +706,21 @@ const BlueprintCompact = ({ project }) => {
         </div>
 
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5">
-          <p className="text-sm font-semibold text-white">Salida</p>
+          <p className="text-sm font-semibold text-white">Publicación</p>
 
-          <ul className="mt-4 space-y-3">
-            {(steps.length ? steps : ['Pendiente de motor Builder']).map((item) => (
-              <li key={item} className="text-sm leading-6 text-zinc-400">
-                {item}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-4 text-sm leading-6 text-zinc-400">
+            Sistema Maestro prepara el diagnóstico, la preview y el borrador. Un tercero ejecuta la publicación.
+          </p>
+
+          {steps.length > 0 && (
+            <ul className="mt-4 space-y-3">
+              {steps.map((item) => (
+                <li key={item} className="text-sm leading-6 text-zinc-400">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

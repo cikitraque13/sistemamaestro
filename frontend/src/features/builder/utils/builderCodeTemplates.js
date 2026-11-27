@@ -388,8 +388,8 @@ const buildJsonTemplate = ({ copy = {}, project = {}, intent = {}, visualState =
     '  "next_actions": [',
     '    "iterate_copy",',
     '    "improve_visual_layer",',
-    '    "prepare_export",',
-    '    "connect_deploy"',
+    '    "revisar_borrador",',
+    '    "seguir_en_preview"',
     '  ]',
     '}',
   ];

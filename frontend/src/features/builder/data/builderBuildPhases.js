@@ -47,7 +47,7 @@ export const BUILDER_BUILD_PHASES = {
       id: 'ready',
       threshold: 96,
       label: 'Versión lista',
-      agent: 'Primera versión lista. Puedes pedir una mejora visual o seguir con la preview.',
+      agent: 'Primera versión en la preview. La preview está en prueba. El canal disponible es la web. WhatsApp, calendario y CRM están previstos.',
     },
   ],
 
@@ -99,7 +99,7 @@ export const BUILDER_BUILD_PHASES = {
       id: 'ready',
       threshold: 96,
       label: 'Rediseño listo',
-      agent: 'Primera reconstrucción lista. Puedes pedir cambios, mejorar fotos o reforzar el CTA. No publica la web.',
+      agent: 'Primera reconstrucción en la preview. La preview está en prueba. El canal disponible es la web. WhatsApp, calendario y CRM están previstos.',
     },
   ],
 
@@ -151,7 +151,7 @@ export const BUILDER_BUILD_PHASES = {
       id: 'ready',
       threshold: 96,
       label: 'Hub listo',
-      agent: 'Primera versión del hub lista para iterar tarjetas, enlaces o categorías.',
+      agent: 'Primera versión del hub en la preview. La preview está en prueba. El canal disponible es la web. WhatsApp, calendario y CRM están previstos.',
     },
   ],
 };

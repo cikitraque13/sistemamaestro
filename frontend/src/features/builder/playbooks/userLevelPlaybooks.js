@@ -153,7 +153,7 @@ export const USER_LEVEL_PLAYBOOKS = Object.freeze({
       'separar capas',
       'evitar deuda técnica',
       'definir arquitectura reusable',
-      'preparar integración con datos, APIs o deploy',
+      'anotar datos o APIs en el borrador',
       'documentar decisiones',
       'alinear conversión, operación y escalabilidad',
     ],
@@ -163,7 +163,7 @@ export const USER_LEVEL_PLAYBOOKS = Object.freeze({
       examples: [
         '¿Este sistema debe ser landing, herramienta operativa, dashboard o flujo automatizado?',
         '¿La prioridad es conversión inmediata, escalabilidad o integración técnica?',
-        '¿La salida esperada es preview, código exportable, GitHub, deploy o documentación?',
+        '¿La salida de esta versión es la preview o el borrador?',
       ],
     },
     builderBehavior: {
@@ -178,7 +178,7 @@ export const USER_LEVEL_PLAYBOOKS = Object.freeze({
       decision:
         'Voy a priorizar estructura modular, trazabilidad de cambios, CTA operativo y capacidad de iteración.',
       nextStep:
-        'La siguiente capa puede conectar preview, código, datos, automatización, GitHub o deploy.',
+        'La siguiente capa sigue en la preview y el borrador. Publicar queda fuera.',
     },
   },
 });

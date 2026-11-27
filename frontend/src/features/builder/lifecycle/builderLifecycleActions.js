@@ -557,9 +557,9 @@ export const BUILDER_LIFECYCLE_ACTIONS = {
 
   [BUILDER_LIFECYCLE_ACTION_IDS.STABILIZE_CODE_STRUCTURE]: defineAction({
     id: BUILDER_LIFECYCLE_ACTION_IDS.STABILIZE_CODE_STRUCTURE,
-    label: 'Estabilizar codigo y estructura',
+    label: 'Ordenar el borrador',
     prompt:
-      'Ordena archivos, componentes, rutas y estructura para que el proyecto sea exportable.',
+      'Ordena archivos, componentes y rutas del borrador. No exporta el proyecto.',
     stageId: BUILDER_LIFECYCLE_STAGE_IDS.TECHNICAL_EXIT,
     category: BUILDER_LIFECYCLE_ACTION_CATEGORIES.TECHNICAL_EXIT,
     projectTypes: ALL_PROJECTS,
@@ -581,9 +581,9 @@ export const BUILDER_LIFECYCLE_ACTIONS = {
 
   [BUILDER_LIFECYCLE_ACTION_IDS.PREPARE_EXPORT_PACKAGE]: defineAction({
     id: BUILDER_LIFECYCLE_ACTION_IDS.PREPARE_EXPORT_PACKAGE,
-    label: 'Preparar exportacion',
+    label: 'Revisar la salida',
     prompt:
-      'Prepara el proyecto para exportarlo con estructura, archivos y checklist de salida.',
+      'Deja una checklist del borrador. No exporta archivos.',
     stageId: BUILDER_LIFECYCLE_STAGE_IDS.TECHNICAL_EXIT,
     category: BUILDER_LIFECYCLE_ACTION_CATEGORIES.TECHNICAL_EXIT,
     projectTypes: ALL_PROJECTS,
@@ -601,9 +601,9 @@ export const BUILDER_LIFECYCLE_ACTIONS = {
 
   [BUILDER_LIFECYCLE_ACTION_IDS.PREPARE_GITHUB_SYNC]: defineAction({
     id: BUILDER_LIFECYCLE_ACTION_IDS.PREPARE_GITHUB_SYNC,
-    label: 'Preparar GitHub',
+    label: 'Nota de repositorio',
     prompt:
-      'Prepara sincronizacion con GitHub cuando la estructura ya este validada.',
+      'Anota que el repositorio lo prepara quien publique. Sistema Maestro no sincroniza GitHub.',
     stageId: BUILDER_LIFECYCLE_STAGE_IDS.TECHNICAL_EXIT,
     category: BUILDER_LIFECYCLE_ACTION_CATEGORIES.TECHNICAL_EXIT,
     projectTypes: ALL_PROJECTS,

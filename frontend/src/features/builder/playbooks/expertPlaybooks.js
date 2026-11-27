@@ -309,7 +309,7 @@ export const EXPERT_PLAYBOOKS = Object.freeze({
         id: 'retention-hook',
         label: 'Gancho de continuidad',
         action:
-          'Mostrar qué podrá iterar, guardar, exportar, conectar o mejorar después.',
+          'Mostrar qué podrá iterar y guardar en el borrador. Publicar queda fuera.',
       },
     ],
     conversionRules: [
@@ -379,7 +379,7 @@ export const EXPERT_PLAYBOOKS = Object.freeze({
         id: 'usage-ladder',
         label: 'Escalera de uso',
         action:
-          'Diferenciar prueba, creación, iteración, exportación, deploy y planes superiores.',
+          'Diferenciar prueba, creación, iteración y el borrador. Publicar queda fuera.',
       },
       {
         id: 'trust-layer',
@@ -409,7 +409,7 @@ export const EXPERT_PLAYBOOKS = Object.freeze({
       'Mantener estética premium pero funcional.',
     ],
     smartQuestions: [
-      '¿La monetización principal será suscripción, créditos, pago puntual o exportación?',
+      '¿La monetización principal será suscripción, créditos o pago puntual?',
       '¿Qué acciones deben consumir créditos y cuáles deben ser gratuitas?',
       '¿La salida principal será informe, código, web, automatización o contenido?',
     ],
@@ -523,7 +523,7 @@ export const EXPERT_PLAYBOOKS = Object.freeze({
       'solución poco replicable',
       'entrega manual excesiva',
       'falta de plantilla base',
-      'no hay salida exportable clara',
+      'no hay un borrador claro',
       'no hay estructura por cliente',
       'no hay proceso de diagnóstico',
       'no hay control de iteraciones',
@@ -545,7 +545,7 @@ export const EXPERT_PLAYBOOKS = Object.freeze({
         id: 'delivery-flow',
         label: 'Flujo de entrega',
         action:
-          'Ordenar diagnóstico, propuesta, construcción, revisión, exportación y despliegue.',
+          'Ordenar diagnóstico, propuesta, construcción y revisión. La publicación la hace un tercero.',
       },
       {
         id: 'monetization-package',
@@ -576,7 +576,7 @@ export const EXPERT_PLAYBOOKS = Object.freeze({
     ],
     smartQuestions: [
       '¿Esto se usará para tu propio negocio o para clientes?',
-      '¿La salida será informe, web, automatización, código, deploy o pack comercial?',
+      '¿La salida será informe, preview o borrador?',
       '¿Necesitas una plantilla replicable o una solución totalmente a medida?',
     ],
     agentResponsePattern:
