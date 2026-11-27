@@ -820,6 +820,8 @@ const BuilderStructureCompact = ({ project, builderIntelligence }) => {
   );
 };
 
+const SHOW_ENGINEERING_CANVAS = false;
+
 export default function BuilderCanvasPane({
   activeWorkspaceTab = 'code',
   copy,
@@ -849,7 +851,7 @@ export default function BuilderCanvasPane({
     codeSnapshot,
   } = getBuilderIntelligenceParts(builderIntelligence);
 
-  if (activeWorkspaceTab === 'code') {
+  if (SHOW_ENGINEERING_CANVAS && activeWorkspaceTab === 'code') {
     return (
       <CodeCanvas
         copy={landingCopy}
@@ -875,7 +877,7 @@ export default function BuilderCanvasPane({
     );
   }
 
-  if (activeWorkspaceTab === 'structure') {
+  if (SHOW_ENGINEERING_CANVAS && activeWorkspaceTab === 'structure') {
     return (
       <BuilderStructureCompact
         project={project}

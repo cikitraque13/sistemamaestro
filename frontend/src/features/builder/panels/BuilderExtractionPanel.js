@@ -82,7 +82,7 @@ export default function BuilderExtractionPanel({
       </h2>
 
       <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-400">
-        Esta capa no es informe. Es la lectura operativa que alimenta el Builder, el código y el preview.
+        Lectura del diagnóstico para la preview. No publica la web.
       </p>
 
       <div className="mt-5 grid gap-4">

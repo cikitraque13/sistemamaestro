@@ -1,155 +1,109 @@
-import HumanSemanticDecision from '../panels/HumanSemanticDecision';
-import CTADestinationSelector from '../panels/CTADestinationSelector';
-import BuilderChangeReview from '../panels/BuilderChangeReview';
-import StaticSectionEditor from '../panels/StaticSectionEditor';
-import LandingArtifactPreview from '../panels/LandingArtifactPreview';
-import { createBuilderOutputMap } from '../state/builderOutputMap';
 import React from 'react';
 
+import { GemaMaestra } from '../../app-shell/layout/AppShellLayout';
 import BuilderAgentPane from '../components/BuilderAgentPane';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 
+const HISTORY_LABELS = {
+  ACCEPT_WARNING: 'Aceptó la advertencia',
+  REJECT_CHANGE: 'Rechazó el cambio',
+  REQUIRES_CLARIFICATION: 'Pidió una aclaración',
+};
+
+const historyText = (item) => {
+  const label = HISTORY_LABELS[item?.type] || String(item?.type || 'Cambio');
+  const reason = String(item?.rationale || '').trim();
+  return reason ? `${label}. ${reason}` : label;
+};
+
 const LoadingState = () => (
-  <div className="flex h-full min-h-[520px] items-center justify-center rounded-[24px] border border-white/10 bg-[#08070D] p-6">
+  <div className="flex h-full min-h-[520px] items-center justify-center p-6">
     <div className="text-center">
       <div className="mx-auto mb-5 h-12 w-12 animate-pulse rounded-2xl bg-cyan-300/30" />
-
-      <h2 className="text-2xl font-semibold text-white">
-        Cargando proyecto real
-      </h2>
-
-      <p className="mt-3 text-sm text-zinc-400">
-        Leyendo diagnóstico y preparando Builder.
-      </p>
+      <h2 className="text-2xl font-semibold text-white">Cargando proyecto</h2>
+      <p className="mt-3 text-sm text-zinc-400">Leyendo el diagnóstico y la preview.</p>
     </div>
   </div>
 );
 
 const ErrorState = ({ projectError }) => (
-  <div className="flex h-full min-h-[520px] items-center justify-center rounded-[24px] border border-red-400/20 bg-red-950/20 p-6">
+  <div className="flex h-full min-h-[520px] items-center justify-center p-6">
     <div className="max-w-xl text-center">
-      <h2 className="text-2xl font-semibold text-white">
-        No se pudo cargar el proyecto
-      </h2>
-
-      <p className="mt-3 text-sm leading-6 text-red-200">
-        {projectError}
-      </p>
+      <h2 className="text-2xl font-semibold text-white">No se pudo cargar el proyecto</h2>
+      <p className="mt-3 text-sm leading-6 text-red-200">{projectError}</p>
     </div>
   </div>
 );
 
 const EmptyState = () => (
-  <div className="flex h-full min-h-[520px] items-center justify-center rounded-[24px] border border-white/10 bg-[#08070D] p-6">
+  <div className="flex h-full min-h-[520px] items-center justify-center p-6">
     <div className="max-w-xl text-center">
-      <h2 className="text-2xl font-semibold text-white">
-        Builder sin proyecto
-      </h2>
-
+      <h2 className="text-2xl font-semibold text-white">Builder sin proyecto</h2>
       <p className="mt-3 text-sm leading-6 text-zinc-400">
-        Vuelve al dashboard, escribe una idea o URL y abre Builder para crear un proyecto real.
+        Vuelve al dashboard, escribe una idea o URL y abre el Builder.
       </p>
     </div>
   </div>
 );
 
-export default function BuilderWorkspaceLayout({
-  ownerId = null,
-  activeWorkspaceTab = 'code',
-  initialPrompt = '',
-  project = null,
-  loadingProject = false,
-  projectError = '',
-}) {
-  const runtime = useBuilderWorkspaceRuntime({
-    project,
-    ownerId,
-    initialPrompt,
-    loadingProject,
-    projectError,
-  });
+const viewButtonClass = (active) =>
+  `rounded-full border px-3 py-2 text-sm font-semibold transition ${
+    active
+      ? 'border-cyan-300/50 bg-cyan-300/10 text-cyan-100'
+      : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20 hover:text-white'
+  }`;
 
-  if (loadingProject) return <LoadingState />;
-  if (projectError) return <ErrorState projectError={projectError} />;
-  if (!project) return <EmptyState />;
-
-  const transaction = runtime.landingTransaction;
-  const isLandingWorkspace = runtime.builderBuildState?.projectKind === 'landing';
-  if (transaction.status !== 'ready' && runtime.builderBuildState?.projectKind === 'landing') return <div role="status" className="p-6 text-white">{transaction.error || 'Recuperando el Builder…'}</div>;
-  const previewIntelligence = transaction.pending ? { ...runtime.builderIntelligence, builderBuildState: transaction.pending.candidate, builderKernelOutput: createBuilderOutputMap(transaction.pending.candidate) } : runtime.builderIntelligence;
+function ProjectHistory({ audit }) {
+  const items = Array.isArray(audit) ? audit.filter((item) => item && (item.type || item.rationale)) : [];
 
   return (
-    <section className="h-full min-h-0 overflow-hidden rounded-[24px] border border-white/10 bg-[#06080B] shadow-[0_0_90px_rgba(0,0,0,0.38)]">
-      <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[minmax(0,1.15fr)_minmax(0,0.85fr)] overflow-hidden xl:grid-cols-[minmax(560px,0.52fr)_1px_minmax(390px,0.48fr)] xl:grid-rows-1">
-        <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#08070D] xl:order-1">
-          <div className="min-h-0 flex-1 overflow-hidden">
-          {activeWorkspaceTab === 'code' ? (
-            <div className="flex h-full min-h-0 flex-col">
-              <div className="min-h-0 flex-1 overflow-hidden border-b border-white/10">
-                <BuilderCanvasPane
-                  activeWorkspaceTab="code"
-                  copy={runtime.copy}
-                  project={project}
-                  progress={runtime.progress}
-                  activeCodeTab={runtime.activeCodeTab}
-                  onCodeTabChange={runtime.setActiveCodeTab}
-                  builderIntelligence={previewIntelligence}
-                />
-              </div>
-              <div className="min-h-0 flex-1 overflow-hidden" aria-label="Preview del proyecto">
-                <BuilderCanvasPane
-                  activeWorkspaceTab="preview"
-                  copy={runtime.copy}
-                  project={project}
-                  progress={runtime.progress}
-                  activeCodeTab={runtime.activeCodeTab}
-                  onCodeTabChange={runtime.setActiveCodeTab}
-                  builderIntelligence={previewIntelligence}
-                />
-              </div>
-            </div>
-          ) : isLandingWorkspace && activeWorkspaceTab === 'preview' && (transaction.pending || transaction.revision > 0) ? (
-            <LandingArtifactPreview state={transaction.pending?.candidate || runtime.builderBuildState} artifact={transaction.pending?.artifact} isCandidate={Boolean(transaction.pending)} />
-          ) : <BuilderCanvasPane
-            activeWorkspaceTab={activeWorkspaceTab}
-            copy={runtime.copy}
-            project={project}
-            progress={runtime.progress}
-            activeCodeTab={runtime.activeCodeTab}
-            onCodeTabChange={runtime.setActiveCodeTab}
-            builderIntelligence={previewIntelligence}
-          />}
-          </div>
-          {isLandingWorkspace && <div className="max-h-[42%] shrink-0 overflow-auto border-t border-white/10">
-          <div className="border-b border-white/10 p-3 text-sm text-white" aria-label="Cambio de landing">
-            <p>{transaction.pending ? 'Vista previa del cambio · aún no aplicado' : `Landing activa · revisión local ${transaction.revision}`}</p>
-            {transaction.pending && <p>Propuesta: {transaction.pending.operations.map((op) => ({ insert_static_section: 'Añadir sección', update_static_section: 'Editar sección', move_static_section: 'Mover sección', remove_static_section: 'Eliminar sección', set_primary_cta: 'Cambiar CTA', set_accent: 'Cambiar acento' }[op.type])).join(', ')} · CTA: {transaction.pending.candidate.primaryCTA} · Acento: {transaction.pending.candidate.visualAccent}</p>}
-            <CTADestinationSelector state={runtime.builderBuildState} transaction={transaction} />
-            {transaction.audit?.length > 0 && <details><summary>Decisiones anteriores</summary>{transaction.audit.map(d => <div key={d.decisionId}><p>{d.ownerId} · {d.type} · {d.effectiveStatus}</p><p>{d.semanticAssessment?.promise} · {d.semanticAssessment?.status} · {d.semanticAssessment?.reason}</p><p>{d.rationale || 'Sin razón indicada'} · Revisión {d.baseRevision}</p><p className="break-all">Review: {d.reviewId} · Assessment: {d.semanticAssessmentId}</p></div>)}</details>}
-            <div aria-label="Borrador pendiente">
-              {transaction.pending && <button type="button" disabled={transaction.busy} onClick={transaction.savePending}>Guardar borrador</button>}
-              {transaction.hasSavedDraft && <><p>Hay un borrador guardado. Recuperarlo exige una nueva revisión; no recupera aceptaciones.</p><button type="button" disabled={transaction.busy || Boolean(transaction.pending)} onClick={transaction.recoverPending}>Recuperar borrador</button><button type="button" disabled={transaction.busy} onClick={transaction.discardPending}>Eliminar borrador guardado</button></>}
-            </div>
-            <BuilderChangeReview review={transaction.review} onRepair={transaction.repair} busy={transaction.busy} />
-            {transaction.review && transaction.requiresDecision && <HumanSemanticDecision key={transaction.review.reviewId} review={transaction.review} decision={transaction.decision} onDecide={transaction.decide} busy={transaction.busy} />}
-            {transaction.error && <p role="alert">{transaction.error}</p>}
-            {transaction.pending && <>
-              <button type="button" disabled={transaction.busy || transaction.review?.validation !== 'PASS' || (transaction.requiresDecision && transaction.decision?.type !== 'ACCEPT_WARNING')} onClick={transaction.apply}>Autorizar y aplicar cambio</button>{' '}
-              <button type="button" disabled={transaction.busy} onClick={transaction.discard}>Descartar propuesta</button>{' '}
-            </>}
-            <button type="button" disabled={transaction.busy || !transaction.canRevert || Boolean(transaction.pending)} onClick={transaction.revert}>Revertir último cambio</button>
-            <p className="text-xs text-zinc-400">Cambios locales de CTA, acento y secciones estáticas. No publica ni modifica créditos.</p>
-          </div>
-          <StaticSectionEditor state={runtime.builderBuildState} transaction={transaction} />
-          </div>}
-        </div>
+    <section aria-label="Historial" className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Historial</p>
+      {items.length === 0 ? (
+        <p className="mt-2 text-sm text-zinc-400">Aún no hay cambios</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {items.slice().reverse().map((item, index) => (
+            <li
+              key={item.decisionId || `${item.type}-${index}`}
+              className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm leading-6 text-zinc-200"
+            >
+              {historyText(item)}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
 
-        <div className="hidden bg-white/[0.08] xl:order-2 xl:block" />
+function WorkspaceSidePanel({
+  activeWorkspaceTab,
+  onWorkspaceTabChange,
+  credits,
+  bonus,
+  usageLabel,
+  runtime,
+}) {
+  const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
 
-        <div className="h-full min-h-0 xl:order-3">
+  return (
+    <aside className="flex min-h-0 flex-col gap-3 overflow-auto border-t border-white/10 bg-[#08070D] p-3 lg:border-l lg:border-t-0">
+      <div className="grid grid-cols-2 gap-2" aria-label="Vista del Builder">
+        <button type="button" className={viewButtonClass(visibleTab === 'preview')} onClick={() => onWorkspaceTabChange?.('preview')}>
+          Preview
+        </button>
+        <button type="button" className={viewButtonClass(visibleTab === 'extract')} onClick={() => onWorkspaceTabChange?.('extract')}>
+          Extracción
+        </button>
+      </div>
+
+      <GemaMaestra credits={credits} bonus={bonus} usageLabel={usageLabel} />
+
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
         <BuilderAgentPane
-          project={project}
+          project={runtime.project}
           copy={runtime.copy}
           progress={runtime.progress}
           activeCodeTab={runtime.activeCodeTab}
@@ -160,7 +114,65 @@ export default function BuilderWorkspaceLayout({
           onStartBuild={runtime.startBuild}
           builderIntelligence={runtime.builderIntelligence}
         />
+      </div>
+
+      <ProjectHistory audit={runtime.landingTransaction?.audit} />
+    </aside>
+  );
+}
+
+export default function BuilderWorkspaceLayout({
+  ownerId = null,
+  activeWorkspaceTab = 'preview',
+  initialPrompt = '',
+  project = null,
+  loadingProject = false,
+  projectError = '',
+  onWorkspaceTabChange = () => {},
+  credits = 0,
+  bonus = 0,
+  usageLabel = '',
+}) {
+  const runtime = useBuilderWorkspaceRuntime({
+    project,
+    ownerId,
+    initialPrompt,
+    loadingProject,
+    projectError,
+  });
+
+  const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
+  let main = <EmptyState />;
+  if (loadingProject) main = <LoadingState />;
+  else if (projectError) main = <ErrorState projectError={projectError} />;
+  else if (project) {
+    main = (
+      <BuilderCanvasPane
+        activeWorkspaceTab={visibleTab}
+        copy={runtime.copy}
+        project={project}
+        progress={100}
+        activeCodeTab={runtime.activeCodeTab}
+        onCodeTabChange={runtime.setActiveCodeTab}
+        builderIntelligence={runtime.builderIntelligence}
+      />
+    );
+  }
+
+  return (
+    <section className="h-full min-h-0 overflow-auto rounded-[24px] border border-white/10 bg-[#06080B] shadow-[0_0_90px_rgba(0,0,0,0.38)] lg:overflow-hidden">
+      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_20.5rem] lg:overflow-hidden">
+        <div className="min-h-[70vh] overflow-hidden lg:min-h-0 lg:h-full">
+          {main}
         </div>
+        <WorkspaceSidePanel
+          activeWorkspaceTab={visibleTab}
+          onWorkspaceTabChange={onWorkspaceTabChange}
+          credits={credits}
+          bonus={bonus}
+          usageLabel={usageLabel}
+          runtime={{ ...runtime, project }}
+        />
       </div>
     </section>
   );

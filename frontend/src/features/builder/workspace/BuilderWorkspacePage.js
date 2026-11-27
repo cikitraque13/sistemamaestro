@@ -8,10 +8,6 @@ import { api } from '../../../lib/apiClient';
 import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
-import IntentClarification from '../panels/IntentClarification';
-import ProjectPlan from '../panels/ProjectPlan';
-
-import builderWorkspaceTabs from '../data/builderWorkspaceTabs';
 
 const ACTIVE_BUILDER_PROJECT_STORAGE_KEY =
   'sistema_maestro.active_builder_project_id';
@@ -117,13 +113,33 @@ const resolveBuilderType = (mode) => {
   return typeMap[mode] || 'website';
 };
 
-const buildProjectLabel = (project, fallback) => {
-  if (!project?.input_content) return fallback || 'Proyecto activo';
+const clipLabel = (value) => (value.length > 72 ? `${value.slice(0, 69)}…` : value);
 
-  const clean = String(project.input_content).trim();
-  if (clean.length <= 48) return clean;
+const isRawProjectId = (value, projectId) => {
+  const text = String(value || '').trim();
+  if (!text) return true;
+  if (projectId && text === projectId) return true;
+  return /^proj_[a-z0-9]+$/i.test(text);
+};
 
-  return `${clean.slice(0, 48)}...`;
+export const projectHumanName = (project) => {
+  if (!project) return 'Proyecto sin nombre';
+  const projectId = String(project.project_id || '');
+  const named = [project.title, project.name, project.blueprint?.title]
+    .map((value) => String(value || '').trim())
+    .find((value) => value && !isRawProjectId(value, projectId));
+  if (named) return clipLabel(named);
+
+  const input = String(project.input_content || '').replace(/\s+/g, ' ').trim();
+  if (isRawProjectId(input, projectId)) return 'Proyecto sin nombre';
+  if (/^https?:\/\//i.test(input)) {
+    try {
+      return new URL(input).hostname.replace(/^www\./, '') || 'Proyecto sin nombre';
+    } catch {
+      return 'Proyecto sin nombre';
+    }
+  }
+  return clipLabel(input);
 };
 
 const getErrorMessage = (error) => {
@@ -178,9 +194,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   const selectionEpoch = selection.current.epoch;
   const runtimeProjectId = selectionId;
 
-  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState(
-    builderWorkspaceTabs[0]?.id || 'code'
-  );
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('preview');
 
   const [project, setProject] = useState(null);
   const [loadingProject, setLoadingProject] = useState(Boolean(runtimeProjectId));
@@ -240,7 +254,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
 
   const activeIntent = resolveBuilderIntent(initialMode || resolved?.route);
   const activeType = resolveBuilderType(initialMode || resolved?.input_type);
-  const projectLabel = buildProjectLabel(resolved, 'Proyecto activo');
+  const projectLabel = resolved ? projectHumanName(resolved) : 'Proyecto activo';
 
   const currentBuilderProjectId =
     resolved?.project_id ||
@@ -302,7 +316,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       if (selection.current?.key !== requestSelection.key || selection.current?.epoch !== requestSelection.epoch) return;
       validatedProjectIdentity(response.data, ownerId, projectId);
       setProject(response.data);
-      setActiveWorkspaceTab('structure');
+      setActiveWorkspaceTab('preview');
       toast.success('Blueprint generado.');
     } catch (error) {
       const detail = error?.response?.data?.detail;
@@ -315,11 +329,12 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     }
   };
 
+  const diagnosisSummary = String(resolved?.diagnosis?.summary || '').trim();
   const contextBody = resolved
-    ? `Proyecto real ${resolved.project_id}. Estado: ${resolved.status || 'sin estado'}. Aquí están el diagnóstico, la preview y el borrador.`
+    ? (diagnosisSummary && diagnosisSummary !== 'Sin resumen disponible.' ? diagnosisSummary : 'Preview del proyecto.')
     : initialPrompt
       ? `Entrada recibida: "${initialPrompt}". El Builder espera un proyecto guardado.`
-      : 'Builder para el diagnóstico, la preview y el borrador.';
+      : 'Builder para el diagnóstico y la preview.';
   return (
     <AppShellLayout
       productLabel="Sistema Maestro"
@@ -327,30 +342,30 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       onNavChange={handleNavChange}
       projectItems={
         currentBuilderProjectId
-          ? [{ id: currentBuilderProjectId, label: projectLabel, status: resolved?.status || 'Abierto', accent: 'cyan' }]
+          ? [{ id: currentBuilderProjectId, label: projectLabel, status: 'Abierto', accent: 'cyan' }]
           : []
       }
       activeProjectId={selectionError ? '' : (runtimeProjectId || resolved?.project_id || '')}
       onProjectChange={(id) => navigate(buildBuilderProjectRoute(id), { state: { projectId: id } })}
-      workspaceTabs={builderWorkspaceTabs}
+      workspaceTabs={[]}
       activeWorkspaceTab={activeWorkspaceTab}
       onWorkspaceTabChange={setActiveWorkspaceTab}
+      showHeaderGema={false}
       credits={user?.credit_balance ?? 0}
       bonus={user?.credit_lifetime_granted ?? 0}
       usageLabel="Créditos visibles para análisis, Builder y blueprint."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
-      contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}
+      contextTitle={resolved ? projectHumanName(resolved) : 'Builder activo'}
       contextBody={contextBody}
     >
-      <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="min-h-0 flex-1">
       <BuilderWorkspaceLayout
         key={JSON.stringify([ownerId, selectionKey, resolved?.updated_at])}
         ownerId={ownerId}
         activeIntent={activeIntent}
         activeType={activeType}
         activeWorkspaceTab={activeWorkspaceTab}
+        onWorkspaceTabChange={setActiveWorkspaceTab}
         projectLabel={projectLabel}
         initialPrompt={resolved?.input_content || initialPrompt || ''}
         project={resolved}
@@ -358,13 +373,10 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         projectError={selectionError || projectError || (!resolved ? 'Proyecto no validado.' : '')}
         onGenerateBlueprint={handleGenerateBlueprint}
         generatingBlueprint={generatingBlueprint}
+        credits={user?.credit_balance ?? 0}
+        bonus={user?.credit_lifetime_granted ?? 0}
+        usageLabel="Créditos visibles para análisis, Builder y blueprint."
       />
-      </div>
-      {resolved && !selectionError && <div className="max-h-40 shrink-0 overflow-auto border-t border-white/10">
-        <IntentClarification key={`${ownerId}:${resolved.project_id}`} project={resolved} ownerId={ownerId} onSaved={result => setProject(current => current?.project_id === result.project_id && current?.user_id === result.user_id ? { ...current, updated_at: result.updated_at, active_j06_1_intent: result.intent, ...(current.j06_2_plan ? { j06_2_plan: { ...current.j06_2_plan, status: 'STALE', confirmation_challenge: null } } : {}) } : current)} />
-        <ProjectPlan key={`plan:${ownerId}:${resolved.project_id}:${resolved.updated_at}`} project={resolved} ownerId={ownerId} />
-      </div>}
-      </div>
     </AppShellLayout>
   );
 }
