@@ -61,8 +61,27 @@ class ResolveTests(unittest.TestCase):
         self.assertNotIn("No uses acento andaluz", body["instructions"])
         self.assertIn("llamada de teléfono natural", body["instructions"])
         self.assertIn("No repitas la misma fórmula.", body["instructions"])
-        self.assertIn("No tienes ninguna herramienta para registrar", body["instructions"])
-        self.assertIn("Nunca digas que ya lo has registrado", body["instructions"])
+        self.assertIn(
+            "No tienes ninguna herramienta para crear la cuenta ni el proyecto",
+            body["instructions"],
+        )
+        self.assertIn(
+            "Nunca digas que ya has creado la cuenta, el proyecto o el alta del negocio.",
+            body["instructions"],
+        )
+        self.assertNotIn(
+            "No tienes ninguna herramienta para registrar ni crear el negocio",
+            body["instructions"],
+        )
+        self.assertIn("# Solicitud de análisis de la web", body["instructions"])
+        self.assertIn("register_website_analysis", body["instructions"])
+        self.assertIn("queda registrado para el análisis", body["instructions"])
+        self.assertIn("sistemamaestro.com/privacy", body["instructions"])
+        self.assertEqual(body["tools"][0]["name"], "register_website_analysis")
+        self.assertEqual(
+            body["tools"][0]["parameters"]["required"],
+            ["business_name", "website_url", "consent"],
+        )
         self.assertIn("29 € al mes", body["instructions"])
         self.assertIn("Reglamento de IA", body["instructions"])
         self.assertNotIn("[", body["instructions"])

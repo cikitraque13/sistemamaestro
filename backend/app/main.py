@@ -66,6 +66,7 @@ async def startup_event():
     await db.payment_transactions.create_index("stripe_session_id")
     await db.login_attempts.create_index("identifier")
     await db.newsletter_subscribers.create_index("email", unique=True)
+    await db.analysis_requests.create_index("created_at")
     app.state.j06_receipt_compaction_task = asyncio.create_task(run_receipt_compaction_worker(db.projects))
 
 

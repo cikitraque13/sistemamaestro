@@ -10,7 +10,9 @@ import {
   choosePcmRate,
   downsampleFloat32,
   encodePcm16Base64,
+  executeWebsiteAnalysisTool,
   floatToPcm16,
+  functionCallOutputItem,
   greetingItem,
   isMicDenied,
   levelsFromPcm16,
@@ -409,6 +411,37 @@ const NovaVoiceDemo = () => {
         settled = true;
         resolve(result);
       };
+      let openToolCalls = 0;
+      const toolNotRegistered = {
+        ok: false,
+        registered: false,
+        message: 'No se ha podido registrar la solicitud. No digas que quedó registrada.',
+      };
+      const handleNovaToolCall = (event) => {
+        const callId = event && event.call_id;
+        if (!callId) return;
+        openToolCalls += 1;
+        executeWebsiteAnalysisTool(event, { fetchImpl: fetch, apiBase: API_BASE })
+          .then((output) => {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            ws.send(JSON.stringify(functionCallOutputItem(callId, output)));
+          })
+          .catch(() => {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            ws.send(JSON.stringify(functionCallOutputItem(callId, toolNotRegistered)));
+          })
+          .finally(() => {
+            openToolCalls -= 1;
+            if (openToolCalls === 0 && ws && ws.readyState === WebSocket.OPEN) {
+              try {
+                ws.send(JSON.stringify({ type: 'response.create' }));
+              } catch {
+                /* la llamada puede haber colgado */
+              }
+            }
+          });
+      };
+
       const timer = window.setTimeout(() => {
         if (!ready) {
           note({ stage: 'timeout', message: 'session.updated timeout' });
@@ -444,6 +477,7 @@ const NovaVoiceDemo = () => {
               voice: payload.voice || 'ara',
               inputRate,
               outputRate,
+              tools: payload.tools,
             })));
           } catch (error) {
             note({ stage: 'ws', message: (error && error.message) || 'session.update send' });
@@ -472,6 +506,9 @@ const NovaVoiceDemo = () => {
             setAgentMode('listening');
           });
           finish('ok');
+        }
+        if (type === 'response.function_call_arguments.done') {
+          handleNovaToolCall(event);
         }
         if (type === 'response.output_audio.delta' || type === 'response.audio.delta') {
           playDelta(event.delta);
