@@ -760,13 +760,13 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN]: defineMutation({
     type: BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
-    label: "Preparar plan de exportación",
-    description: "Prepara salida profesional sin ejecutar exportación todavía.",
+    label: "Anotar la salida",
+    description: "Deja una nota en el borrador. No exporta ni publica.",
     matchers: ["exportar", "sacar", "descargar", "zip", "github", "transferir"],
     creditTier: CREDIT_TIERS.PREMIUM,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN,
-      label: "Preparar plan de exportación",
+      label: "Anotar la salida",
       source,
       creditTier: CREDIT_TIERS.PREMIUM,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
@@ -776,15 +776,15 @@ export const BUILDER_MUTATION_REGISTRY = {
           path: "export/README.md",
           type: "documentation",
           language: "markdown",
-          description: "Plan inicial de exportación.",
-          content: "# Exportación\n\nPendiente de valoración, empaquetado y entrega profesional.\n",
+          description: "Nota de salida. No hay exportación.",
+          content: "# Salida\n\nSistema Maestro deja el borrador. No exporta ni publica.\n",
         }),
       ],
       structureModel: {
         folders: ["export"],
         files: ["export/README.md"],
       },
-      creditEstimate: creditEstimate(CREDIT_TIERS.PREMIUM, "Preparar salida profesional."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.PREMIUM, "Anotar la salida del borrador."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
         BUILDER_MUTATION_TYPES.ADD_API_LAYER,
@@ -907,30 +907,30 @@ export const BUILDER_MUTATION_REGISTRY = {
 
   [BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT]: defineMutation({
     type: BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
-    label: "Validar listo para exportar",
-    description: "Valida si el proyecto está listo para salida técnica sin exportar, desplegar ni crear endpoints.",
+    label: "Revisar el borrador",
+    description: "Revisa el borrador. No exporta, no publica y no crea endpoints.",
     matchers: ["validar", "listo", "exportar", "export", "salida", "preparado", "ready"],
     creditTier: CREDIT_TIERS.LOW,
     build: ({ source = "user" } = {}) => ({
       type: BUILDER_MUTATION_TYPES.VALIDATE_READY_FOR_EXPORT,
-      label: "Validar listo para exportar",
+      label: "Revisar el borrador",
       source,
       agentSpecId: "trust_agent",
       creditTier: CREDIT_TIERS.LOW,
       nextStatus: BUILD_STATUS.AWAITING_USER_DECISION,
-      statusMessage: "Validación completada: revisión lista/no lista para salida técnica.",
+      statusMessage: "Revisión del borrador. No hay exportación ni publicación.",
       userFeedback: {
-        message: "Validación completada: revisión lista/no lista para salida técnica.",
+        message: "Revisión del borrador. No hay exportación ni publicación.",
         tone: "warning",
         details: ["No se exportó código", "No se desplegó", "No se activó backend runtime"],
       },
       warnings: [
         { code: "backend_runtime_not_enabled", message: "Backend runtime nuevo no activado.", severity: "info" },
-        { code: "export_not_executed", message: "Export real no ejecutado desde esta validación.", severity: "warning" },
-        { code: "deploy_not_executed", message: "Deploy real no ejecutado desde esta validación.", severity: "warning" },
+        { code: "export_not_executed", message: "No hay exportación desde esta revisión.", severity: "warning" },
+        { code: "deploy_not_executed", message: "No hay publicación desde esta revisión.", severity: "warning" },
       ],
       blockers: [
-        { code: "missing_structure_model", message: "Confirmar estructura final antes de exportar.", severity: "blocker" },
+        { code: "missing_structure_model", message: "Falta la estructura del borrador. No hay exportación.", severity: "blocker" },
       ],
       readiness: {
         ready: false,
@@ -944,11 +944,11 @@ export const BUILDER_MUTATION_REGISTRY = {
         ],
         warnings: [
           { code: "backend_runtime_not_enabled", message: "Backend runtime nuevo no activado.", severity: "info" },
-          { code: "export_not_executed", message: "Export real no ejecutado.", severity: "warning" },
-          { code: "deploy_not_executed", message: "Deploy real no ejecutado.", severity: "warning" },
+          { code: "export_not_executed", message: "No hay exportación.", severity: "warning" },
+          { code: "deploy_not_executed", message: "No hay publicación.", severity: "warning" },
         ],
         blockers: [
-          { code: "missing_structure_model", message: "Confirmar estructura final antes de exportar.", severity: "blocker" },
+          { code: "missing_structure_model", message: "Falta la estructura del borrador. No hay exportación.", severity: "blocker" },
         ],
         exportExecuted: false,
         deployExecuted: false,
@@ -972,7 +972,7 @@ export const BUILDER_MUTATION_REGISTRY = {
             "Estructura técnica preparada",
             "Sin despliegue ejecutado",
           ],
-          message: "Proyecto revisable, pero no exportado ni desplegado desde esta mutación.",
+          message: "Borrador revisable. Esta revisión no exporta ni publica.",
         }),
       ],
       structureModel: {
@@ -981,7 +981,7 @@ export const BUILDER_MUTATION_REGISTRY = {
         routes: ["/"],
       },
       previewModel: { activeSectionId: "export-readiness" },
-      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Validar preparación para salida técnica sin exportar."),
+      creditEstimate: creditEstimate(CREDIT_TIERS.LOW, "Revisar el borrador sin exportar."),
       availableActions: nextActions([
         BUILDER_MUTATION_TYPES.IMPROVE_COPY,
         BUILDER_MUTATION_TYPES.APPLY_VISUAL_HIERARCHY,

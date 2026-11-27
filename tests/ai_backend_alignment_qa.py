@@ -33,14 +33,17 @@ EXPECTED_AGENT_STATUS = {
     "copy_agent": "spec_only",
     "visual_agent": "spec_only",
     "trust_agent": "spec_only",
-    "discovery_agent": "empty",
-    "audit_agent": "empty",
-    "cro_agent": "empty",
-    "seo_architect_agent": "empty",
-    "growth_agent": "empty",
-    "deploy_agent": "empty",
-    "rescue_sre_agent": "empty",
-    "algorithmic_auditor_agent": "empty",
+    "cro_agent": "spec_only",
+}
+
+REMOVED_EMPTY_AGENTS = {
+    "discovery_agent",
+    "audit_agent",
+    "seo_architect_agent",
+    "growth_agent",
+    "deploy_agent",
+    "rescue_sre_agent",
+    "algorithmic_auditor_agent",
 }
 
 LIVE_GUARDS = {
@@ -197,6 +200,10 @@ def validate_agent_alignment(specs: Dict[str, dict], orchestrator_agents: Dict[s
         actual = matrix.get(agent_key)
         if actual != expected:
             fail(f"unexpected agent status for {agent_key}: expected={expected} actual={actual}")
+
+    revived = sorted(REMOVED_EMPTY_AGENTS & (set(files) | set(orchestrator_agents)))
+    if revived:
+        fail(f"empty agents must stay removed: {revived}")
 
     specs_without_logic = sorted(key for key, status in matrix.items() if status == "spec_only")
     if not {"copy_agent", "visual_agent", "trust_agent"}.issubset(specs_without_logic):

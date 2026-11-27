@@ -628,7 +628,7 @@ export const BASIC_PLAYBOOKS = Object.freeze({
         id: 'trust',
         label: 'Confianza y control',
         purpose:
-          'Explicar límites, privacidad, calidad, exportación o soporte.',
+          'Explicar límites, privacidad y calidad. No hay exportación.',
       },
       {
         id: 'activation',

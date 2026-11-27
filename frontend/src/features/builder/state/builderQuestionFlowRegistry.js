@@ -67,7 +67,7 @@ const actionToPrompt = {
   [BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE]:
     "Genera estructura de carpetas frontend/backend coherente.",
   [BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN]:
-    "Prepara plan de exportación profesional sin ejecutar salida todavía.",
+    "Deja una nota de salida. Sistema Maestro no exporta el proyecto.",
 };
 
 const createOptionFromMutation = (type, index = 0) => ({
@@ -116,7 +116,7 @@ const LANDING_CAPTURE_PHASES = [
   },
   {
     id: "seguimiento_export_ready",
-    label: "Seguimiento / export-ready",
+    label: "Seguimiento",
     types: [
       BUILDER_MUTATION_TYPES.ADD_LEADS_FORM,
       BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE,
@@ -158,13 +158,13 @@ const landingActionMeta = {
   },
   [BUILDER_MUTATION_TYPES.GENERATE_FOLDER_STRUCTURE]: {
     label: "Ordenar estructura",
-    description: "Carpetas y archivos listos para salida.",
+    description: "Carpetas y archivos del borrador.",
     impact: "Estructura",
   },
   [BUILDER_MUTATION_TYPES.PREPARE_EXPORT_PLAN]: {
-    label: "Preparar export",
-    description: "Plan técnico sin desbloquear deploy.",
-    impact: "Export-ready",
+    label: "Anotar la salida",
+    description: "Nota de salida. No hay publicación.",
+    impact: "Salida",
   },
 };
 

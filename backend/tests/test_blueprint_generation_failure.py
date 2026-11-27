@@ -42,10 +42,12 @@ class FakeClient:
         self.error = error
         self.calls = 0
         self.closed = False
+        self.messages = []
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self.create))
 
     async def create(self, **kwargs):
         self.calls += 1
+        self.messages = kwargs.get("messages") or []
         if self.error is not None:
             raise self.error
         return SimpleNamespace(
@@ -133,3 +135,21 @@ class BlueprintChargeTests(f.ChargedCallerFixture):
         self.assertLess(self.db.users.document["credit_balance"], 100)
         self.assertEqual(client.calls, 1)
         self.assertTrue(client.closed)
+
+    async def test_prompt_does_not_ask_for_deployment_and_drops_the_field(self):
+        payload = {
+            "title": "Plan concreto",
+            "summary": "Resumen concreto del proyecto",
+            "priorities": ["Validar oferta"],
+            "deployment_steps": ["Publicar la web", "Configurar el dominio"],
+        }
+        client = FakeClient(content=json.dumps(payload))
+        with patch("backend.app.ai.providers.grok_client.GrokChatClient", return_value=client):
+            result = await f.projects.create_blueprint("project_test", self._headers("blueprint-no-deploy-steps"))
+        prompt = client.messages[0]["content"]
+        self.assertNotIn("deployment_steps", prompt)
+        self.assertIn("Un tercero ejecuta", prompt)
+        stored = self.db.projects.documents["project_test"]["blueprint"]
+        self.assertNotIn("deployment_steps", stored)
+        self.assertNotIn("deployment_steps", result["blueprint"])
+        self.assertEqual(stored["title"], "Plan concreto")

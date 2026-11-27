@@ -404,7 +404,7 @@ const resolveRisks = (classificationResult = {}) => {
       id: BUILDER_RISK_IDS.TECHNICAL_SCOPE_AMBIGUOUS,
       label: 'Alcance técnico amplio',
       mitigation:
-        'Separar primera versión, iteraciones, integración, exportación y deploy.',
+        'Separar la primera versión y las iteraciones. Publicar queda fuera.',
     });
   }
 

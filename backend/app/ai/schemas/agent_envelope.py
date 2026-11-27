@@ -139,7 +139,7 @@ AGENT_SPEC_V1_REGISTRY: Dict[str, AgentSpecV1] = {
         userFeedback="He reforzado la conversión y el siguiente paso del usuario.",
         gemCostTier="low",
         currentState="spec_only",
-        supportingFiles=["backend/app/ai/agents/cro_agent.py", "frontend/src/features/builder/components/BuilderAgentPane.js"],
+        supportingFiles=["frontend/src/features/builder/components/BuilderAgentPane.js"],
         activationMissing=["función viva", "mapeo AgentRail", "tests de mutación"],
     ),
     "copy_agent": AgentSpecV1(

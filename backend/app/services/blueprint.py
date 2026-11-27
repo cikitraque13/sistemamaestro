@@ -59,22 +59,26 @@ async def generate_blueprint(project: Dict) -> Dict:
         "idea": "Idea a proyecto"
     }
 
-    system_prompt = """Eres el arquitecto de Sistema Maestro. Genera un Blueprint (plan de acción) en JSON exacto:
+    system_prompt = """Eres el arquitecto de Sistema Maestro. Genera un Blueprint en JSON exacto:
 {
     "title": "Título del blueprint",
-    "summary": "Resumen ejecutivo del plan",
+    "summary": "Resumen del diagnóstico y de la preview",
     "priorities": ["Prioridad 1", "Prioridad 2", "Prioridad 3"],
     "architecture": {
         "components": ["Componente 1", "Componente 2"],
         "tech_stack": ["Tecnología 1", "Tecnología 2"]
     },
-    "monetization": "Estrategia de monetización recomendada",
-    "deployment_steps": ["Paso 1", "Paso 2", "Paso 3", "Paso 4"],
-    "timeline_estimate": "Estimación temporal",
-    "key_metrics": ["Métrica 1 a seguir", "Métrica 2 a seguir"]
+    "monetization": "Nota de monetización. No cobra ni publica.",
+    "timeline_estimate": "Estimación sin fecha de publicación",
+    "key_metrics": ["Métrica 1", "Métrica 2"],
+    "prepared_by_sistema_maestro": ["Diagnóstico", "Preview", "Borrador"],
+    "executed_by_third_party": ["Publicación", "Dominio", "Despliegue"]
 }
 
-Sé específico y práctico. Evita generalidades."""
+Sistema Maestro prepara el diagnóstico, la preview y el borrador.
+Un tercero ejecuta la publicación, el dominio y el despliegue.
+No pidas pasos de publicación ni de despliegue.
+Frases cortas. Sin urgencia."""
 
     context = f"""
 Ruta: {route_names.get(project.get('route', ''), 'General')}
@@ -111,6 +115,7 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
         if not _has_minimum_blueprint(parsed):
             logger.error("Blueprint invalid output: missing minimum keys")
             raise BlueprintGenerationError(INVALID_OUTPUT)
+        parsed.pop("deployment_steps", None)
         return parsed
     finally:
         try:
