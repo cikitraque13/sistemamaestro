@@ -286,6 +286,8 @@ def test_compaction_exact_tombstone_live_retention_and_revision_stability():
     assert c.docs[1]["updated_at"]==before["updated_at"]
     assert c.docs[1]["active_j06_1_intent"]==before["active_j06_1_intent"]
     assert all("response" not in projection and "j06_1_operation_receipts.response" not in projection for _,projection in c.queries)
+    due_query=c.queries[0][0]
+    assert due_query["j06_1_operation_receipts.completed_at"]["$lte"]==due_query["j06_1_operation_receipts"]["$elemMatch"]["completed_at"]["$lte"]
     assert [r["scope_key"] for r in c.docs[1]["j06_1_operation_receipts"]]==["scope","live"]
 def test_compaction_keyset_more_than_page_progresses_past_failures_and_misses(caplog):
     c=MaintenanceCollection([maintenance_project(i) for i in range(1,206)])
@@ -353,12 +355,13 @@ def test_worker_cadence_and_shutdown_cancellation_before_close():
         finally:events.append("cancelled")
     def close():events.append("close")
     index=AsyncMock();collection=SimpleNamespace(create_index=index)
-    db=SimpleNamespace(**{name:collection for name in ("users","projects","user_sessions","payment_transactions","login_attempts","newsletter_subscribers")})
+    db=SimpleNamespace(**{name:collection for name in ("users","projects","user_sessions","payment_transactions","login_attempts","newsletter_subscribers","analysis_requests","builder_landing_states")})
     namespace={"asyncio":asyncio,"suppress":contextlib.suppress,"app":SimpleNamespace(state=SimpleNamespace()),"db":db,"client":SimpleNamespace(close=close),"run_receipt_compaction_worker":fake_worker}
     exec(compile(ast.Module(body=functions,type_ignores=[]),str(main),"exec"),namespace)
     async def execute():
         await namespace["startup_event"]();await asyncio.sleep(0);await namespace["shutdown_db_client"]()
     asyncio.run(execute());assert events==["start","cancelled","close"]
+    assert any(call.args[0]==[("j06_1_operation_receipts.completed_at",1)] for call in index.await_args_list)
     intervals=[]
     async def stop_sleep(seconds):intervals.append(seconds);raise asyncio.CancelledError()
     with patch.object(service.asyncio,"sleep",stop_sleep):
@@ -382,3 +385,79 @@ def test_compaction_identity_cas_rejects_changed_owner_or_project(field,value):
     c.docs[1][field]=value
     assert asyncio.run(compact_project_receipts(c,selected,NOW-timedelta(days=30)))==0
     assert "response" in c.docs[1]["j06_1_operation_receipts"][0]
+
+
+class CapCollection(Collection):
+    """Applies the array-filter tombstone the receipt cap writes with the new receipt."""
+    async def update_one(self, q, update, array_filters=None):
+        result = await super().update_one(q, update)
+        if result.modified_count != 1 or not array_filters:
+            return result
+        for key in list(self.doc):
+            if "$[" in key:
+                del self.doc[key]
+        for filt in array_filters:
+            ident = next(iter(filt)).split(".", 1)[0]
+            token = f"$[{ident}]."
+            for receipt in self.doc["j06_1_operation_receipts"]:
+                if not self._matches(receipt, filt):
+                    continue
+                for path, value in update["$set"].items():
+                    if token in path:
+                        receipt[path.split(token, 1)[1]] = deepcopy(value)
+                for path in update.get("$unset", {}):
+                    if token in path:
+                        receipt.pop(path.split(token, 1)[1], None)
+        return result
+
+    @staticmethod
+    def _matches(receipt, filt):
+        for path, expected in filt.items():
+            field = path.split(".", 1)[1]
+            if isinstance(expected, dict) and expected.get("$exists") is True:
+                if field not in receipt:
+                    return False
+            elif receipt.get(field) != expected:
+                return False
+        return True
+
+
+def test_full_responses_cap_keeps_recent_replay_and_hashes_the_oldest():
+    from backend.app.services.intent_clarification import MAX_FULL_OPERATION_RECEIPTS
+    c = CapCollection()
+    first = op(text="Page")
+    created = run(c, first)
+    current = created
+    latest_op = first
+    latest_expected = REV
+    for _ in range(MAX_FULL_OPERATION_RECEIPTS):
+        latest_expected = current["updated_at"]
+        latest_op = op("SAVE_DRAFT", current)
+        current = run(c, latest_op, latest_expected)
+    receipts = c.doc["j06_1_operation_receipts"]
+    assert len(receipts) == MAX_FULL_OPERATION_RECEIPTS + 1
+    assert sum("response" in receipt for receipt in receipts) == MAX_FULL_OPERATION_RECEIPTS
+    evicted = receipts[0]
+    assert evicted["expired"] is True
+    assert "response" not in evicted and "completed_at" not in evicted and "operation_type" not in evicted
+    assert evicted["response_sha256"] == digest(created)
+    assert set(evicted) == {"scope_key", "fingerprint", "original_code", "resulting_ids", "resulting_revisions", "expired", "response_sha256"}
+    before = deepcopy(c.doc)
+    with pytest.raises(IntentError, match="IDEMPOTENCY_RESULT_EXPIRED"):
+        run(c, first)
+    assert c.doc == before and c.writes == MAX_FULL_OPERATION_RECEIPTS + 1
+    async def must_not_call(_):
+        raise AssertionError("replay must not classify")
+    assert run(c, latest_op, latest_expected, classifier=must_not_call) == current
+    assert c.writes == MAX_FULL_OPERATION_RECEIPTS + 1
+
+
+def test_project_byte_guard_rejects_without_writing():
+    from backend.app.services.intent_clarification import MAX_PROJECT_BYTES
+    c = Collection()
+    c.doc["padding"] = "x" * MAX_PROJECT_BYTES
+    before = deepcopy(c.doc)
+    with pytest.raises(IntentError, match="INVALID_REQUEST"):
+        run(c, op(text="Page"))
+    assert c.writes == 0
+    assert c.doc == before

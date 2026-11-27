@@ -62,6 +62,7 @@ async def startup_event():
     await db.projects.create_index("user_id")
     await db.projects.create_index("project_id", unique=True)
     await db.projects.create_index([("user_id", 1), ("created_at", -1), ("project_id", -1)])
+    await db.projects.create_index([("j06_1_operation_receipts.completed_at", 1)])
     await db.user_sessions.create_index("session_token")
     await db.user_sessions.create_index("user_id")
     await db.payment_transactions.create_index("stripe_session_id")

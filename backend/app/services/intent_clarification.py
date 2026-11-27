@@ -7,12 +7,17 @@ import hashlib
 import hmac
 import json
 from uuid import UUID, uuid4
+from bson import BSON
 from backend.app.ai.schemas.intent_clarification import LABELS, POLICY_VERSION, Inference
 from backend.app.ai.agents.intent_clarification import classify_intent
 from backend.app.services.project_context_snapshot import build_project_context_snapshot
 
 TERMINAL={"CONFIRMED","CANCELLED","SUPERSEDED"}
 PROJECT_PATHS={"project.input_type","project.input_content","project.route"}
+# Recent replays keep the full response. Older receipts keep a hash and the
+# tombstone metadata the 30-day compactor already accepts.
+MAX_FULL_OPERATION_RECEIPTS = 8
+MAX_PROJECT_BYTES = 15 * 1024 * 1024
 class IntentError(Exception):
     def __init__(self,code): self.code=code
 
@@ -47,9 +52,44 @@ def _receipts(p,key,fingerprint):
     for x in receipts:
         if x["scope_key"]==key:
             if x["fingerprint"]!=fingerprint:raise IntentError("IDEMPOTENCY_KEY_REUSED")
-            if x.get("expired") or datetime.now(timezone.utc)-datetime.fromisoformat(x["completed_at"])>=timedelta(days=30):raise IntentError("IDEMPOTENCY_RESULT_EXPIRED")
+            if x.get("expired") or "response" not in x:raise IntentError("IDEMPOTENCY_RESULT_EXPIRED")
+            if datetime.now(timezone.utc)-datetime.fromisoformat(x["completed_at"])>=timedelta(days=30):raise IntentError("IDEMPOTENCY_RESULT_EXPIRED")
             return deepcopy(x["response"])
     return None
+
+def _full_operation_receipts(receipts):
+    if not isinstance(receipts, list):
+        return []
+    return [receipt for receipt in receipts if isinstance(receipt, dict) and "response" in receipt and receipt.get("expired") is not True]
+
+def _response_sha256(response):
+    return digest(response)
+
+def _admit_intent_document(project, intent, revision, receipt, evicted_keys):
+    """Reject a write that would push the project document near the 16MB ceiling."""
+    candidate = deepcopy(project)
+    candidate["active_j06_1_intent"] = intent
+    candidate["updated_at"] = revision
+    receipts = []
+    for item in candidate.get("j06_1_operation_receipts") or []:
+        if isinstance(item, dict) and item.get("scope_key") in evicted_keys and "response" in item:
+            response = item["response"]
+            kept = {name: deepcopy(item[name]) for name in ("scope_key", "fingerprint", "original_code", "resulting_ids", "resulting_revisions") if name in item}
+            kept["expired"] = True
+            kept["response_sha256"] = _response_sha256(response)
+            receipts.append(kept)
+        else:
+            receipts.append(deepcopy(item))
+    receipts.append(deepcopy(receipt))
+    candidate["j06_1_operation_receipts"] = receipts
+    try:
+        encoded = BSON.encode(candidate)
+    except IntentError:
+        raise
+    except Exception:
+        raise IntentError("PERSISTENCE_UNAVAILABLE") from None
+    if len(encoded) > MAX_PROJECT_BYTES:
+        raise IntentError("INVALID_REQUEST")
 
 def _sources(project,request_id,text,questions,answers):
     try:snapshot=build_project_context_snapshot(project,project_id=project["project_id"],expected_revision=_revision(project),context_use="project_overview")
@@ -221,8 +261,35 @@ async def apply_intent(collection,owner,op,expected,classifier=None,revision_fac
         if operation=="CONFIRM":
             predicate["active_j06_1_intent.confirmation_challenge.digest"]=op.digest
             predicate["active_j06_1_intent.source_revision_vector"]=old["source_revision_vector"]
+    stored_receipts = project.get("j06_1_operation_receipts") or []
+    full_receipts = _full_operation_receipts(stored_receipts)
+    overflow = len(full_receipts) + 1 - MAX_FULL_OPERATION_RECEIPTS
+    evicted = full_receipts[:overflow] if overflow > 0 else []
+    _admit_intent_document(project, intent, revision, receipt, {item["scope_key"] for item in evicted})
+    update={"$set":{"active_j06_1_intent":intent,"updated_at":revision},"$push":{"j06_1_operation_receipts":receipt}}
+    array_filters=None
+    if evicted:
+        array_filters=[]
+        unset={}
+        for index, old_receipt in enumerate(evicted):
+            ident=f"e{index}"
+            prefix=f"j06_1_operation_receipts.$[{ident}]"
+            update["$set"][prefix+".expired"]=True
+            update["$set"][prefix+".response_sha256"]=_response_sha256(old_receipt["response"])
+            unset[prefix+".response"]=""
+            unset[prefix+".operation_type"]=""
+            unset[prefix+".completed_at"]=""
+            array_filters.append({
+                ident+".scope_key": old_receipt["scope_key"],
+                ident+".fingerprint": old_receipt["fingerprint"],
+                ident+".response": {"$exists": True},
+            })
+        update["$unset"]=unset
     try:
-        result=await collection.update_one(predicate,{"$set":{"active_j06_1_intent":intent,"updated_at":revision},"$push":{"j06_1_operation_receipts":receipt}})
+        if array_filters:
+            result=await collection.update_one(predicate, update, array_filters=array_filters)
+        else:
+            result=await collection.update_one(predicate, update)
     except Exception:raise IntentError("PERSISTENCE_UNAVAILABLE") from None
     if result.modified_count==1:return deepcopy(response)
     current=await read()
@@ -315,7 +382,12 @@ class ReceiptCompactionPass:
         projection = {"_id": 1, "project_id": 1, "user_id": 1, "updated_at": 1,
             **{"j06_1_operation_receipts." + name: 1 for name in _RECEIPT_METADATA}}
         async def page():
-            query = {"j06_1_operation_receipts": {"$elemMatch": due}}
+            # The multikey completed_at predicate is what the startup index serves.
+            # $elemMatch still requires that same element to carry a response body.
+            query = {
+                "j06_1_operation_receipts.completed_at": {"$lte": cutoff.isoformat()},
+                "j06_1_operation_receipts": {"$elemMatch": due},
+            }
             if self.cursor is not None:query["_id"] = {"$gt": self.cursor}
             return await collection.find(query, projection).sort("_id", 1).limit(COMPACTION_PAGE_SIZE).to_list(length=COMPACTION_PAGE_SIZE)
         try:
