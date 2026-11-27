@@ -814,42 +814,6 @@ const BuilderStructureCompact = ({ project, builderIntelligence }) => {
   );
 };
 
-const DeployPanel = ({ project, kind = 'deploy' }) => (
-  <div className="h-full overflow-y-auto p-5">
-    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-      {kind === 'github' ? 'GitHub' : 'Deploy'}
-    </p>
-
-    <h2 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
-      {kind === 'github'
-        ? 'Conexión GitHub pendiente del motor Builder'
-        : 'Salida técnica pendiente del motor Builder'}
-    </h2>
-
-    <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-400">
-      El proyecto {project?.project_id || 'actual'} ya tiene diagnóstico. La siguiente fase debe generar archivos reales antes de activar salida técnica.
-    </p>
-
-    <div className="mt-5 grid gap-4 md:grid-cols-3">
-      {(kind === 'github'
-        ? ['Generar archivos', 'Crear repositorio', 'Sincronizar cambios']
-        : ['Generar archivos', 'Preparar entorno', 'Publicar versión']
-      ).map((item) => (
-        <div
-          key={item}
-          className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5"
-        >
-          <p className="text-sm font-semibold text-white">{item}</p>
-
-          <p className="mt-3 text-sm leading-6 text-zinc-500">
-            Pendiente de salida técnica validada.
-          </p>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
 export default function BuilderCanvasPane({
   activeWorkspaceTab = 'preview',
   copy,
@@ -912,14 +876,6 @@ export default function BuilderCanvasPane({
         builderIntelligence={builderIntelligence}
       />
     );
-  }
-
-  if (activeWorkspaceTab === 'deploy') {
-    return <DeployPanel project={project} kind="deploy" />;
-  }
-
-  if (activeWorkspaceTab === 'github') {
-    return <DeployPanel project={project} kind="github" />;
   }
 
   return (

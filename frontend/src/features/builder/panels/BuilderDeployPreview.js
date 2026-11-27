@@ -24,7 +24,6 @@ const BuilderDeployPreview = ({ projectLabel }) => {
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
             Entorno
           </p>
-          <p className="mt-2 text-sm font-semibold text-white">Producción preparada</p>
           <p className="mt-2 text-sm leading-6 text-zinc-300">
             Configuración estable, validación previa y salida lista para siguiente fase.
           </p>

@@ -79,7 +79,7 @@ test('recovery uses owner-checked existing project GET and never submits a mutat
   recoverProjectPlan.mockResolvedValue(response({ ...ready, status: 'DRAFT', confirmation_challenge: null }));
   const { node, root } = mount(<ProjectPlan project={project} ownerId="owner" />);
   await act(async () => button(node, 'Recuperar plan guardado').click());
-  expect(recoverProjectPlan).toHaveBeenCalledWith('p', ''); expect(submitPlanOperation).not.toHaveBeenCalled();
+  expect(recoverProjectPlan).toHaveBeenCalledWith('p'); expect(submitPlanOperation).not.toHaveBeenCalled();
   expect(node.textContent).toContain('Estado del plan: DRAFT'); act(() => root.unmount());
 });
 

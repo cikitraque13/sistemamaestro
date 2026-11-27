@@ -63,14 +63,19 @@ test('reconciliation keeps identity; confirmed terminal rejection permits new op
 
 test('actual Builder fetch client retains identity until response JSON is available', async () => {
   const url = new URL('../features/builder/api/builderAiClient.js', import.meta.url);
-  const source = (await readFile(url, 'utf8')).replace(
-    "'../../../lib/economicRequest'", JSON.stringify(new URL('./economicRequest.js', import.meta.url).href),
+  const apiClientModule = 'data:text/javascript,' + encodeURIComponent(
+    'export const BACKEND_URL = "https://builder.test";\n',
   );
+  const source = (await readFile(url, 'utf8'))
+    .replace("'../../../lib/economicRequest'", JSON.stringify(new URL('./economicRequest.js', import.meta.url).href))
+    .replace("'../../../lib/apiClient'", JSON.stringify(apiClientModule));
+  assert.equal(source.includes('apiBaseUrl'), false);
+  assert.equal(source.includes('localhost'), false);
   const { buildWithBuilderAI } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
   const requests = [];
   const original = globalThis.fetch;
-  globalThis.fetch = async (url, options) => {
-    requests.push(options);
+  globalThis.fetch = async (requestUrl, options) => {
+    requests.push({ requestUrl, options });
     return { ok: true, json: async () => {
       if (requests.length === 1) throw new Error('connection lost before JSON');
       return { assistantMessage: 'synthetic' };
@@ -79,7 +84,9 @@ test('actual Builder fetch client retains identity until response JSON is availa
   try {
     await assert.rejects(buildWithBuilderAI({ userInput: 'synthetic' }));
     await buildWithBuilderAI({ userInput: 'synthetic' });
-    assert.equal(requests[0].headers['Idempotency-Key'], requests[1].headers['Idempotency-Key']);
-    assert.equal(requests[0].credentials, 'include');
+    assert.equal(requests[0].options.headers['Idempotency-Key'], requests[1].options.headers['Idempotency-Key']);
+    assert.equal(requests[0].options.credentials, 'include');
+    assert.equal(requests[0].requestUrl, 'https://builder.test/api/builder/build');
+    assert.equal(requests[1].requestUrl, requests[0].requestUrl);
   } finally { globalThis.fetch = original; }
 });

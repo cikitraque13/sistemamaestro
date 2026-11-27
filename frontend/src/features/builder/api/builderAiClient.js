@@ -1,9 +1,25 @@
-﻿const BUILDER_AI_ENDPOINT = "/api/builder/build";
-
+﻿import { BACKEND_URL } from '../../../lib/apiClient';
 import { runEconomicRequest } from '../../../lib/economicRequest';
 
-function normalizeBaseUrl(baseUrl = "") {
-  return String(baseUrl || "").replace(/\/$/, "");
+const BUILDER_AI_ENDPOINT = "/api/builder/build";
+
+function apiUrl(path) {
+  const base = String(BACKEND_URL || "").replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${normalizedPath}`;
+}
+
+function failedResponse(status, detail) {
+  let parsed = null;
+  try { parsed = JSON.parse(detail); } catch (_) { /* keep the raw body */ }
+  const message = parsed?.detail?.message;
+  const error = new Error(typeof message === "string" && message
+    ? message
+    : `Builder AI falló: ${status} ${detail}`);
+  if (parsed) error.response = { status, data: parsed };
+  const code = parsed?.detail?.code || parsed?.code;
+  if (typeof code === "string") error.code = code;
+  return error;
 }
 
 export async function buildWithBuilderAI({
@@ -12,7 +28,6 @@ export async function buildWithBuilderAI({
   projectId = null,
   userId = null,
   mode = "build",
-  apiBaseUrl = "",
   serverRevision,
   contextUse = "formatting_only",
 } = {}) {
@@ -20,12 +35,12 @@ export async function buildWithBuilderAI({
     throw new Error("Falta userInput para Builder AI.");
   }
 
-  const baseUrl = normalizeBaseUrl(apiBaseUrl);
+  const url = apiUrl(BUILDER_AI_ENDPOINT);
   const body = {
     userInput: String(userInput).trim(), currentBuildState, projectId, userId, mode, contextUse,
   };
-  return runEconomicRequest(`${baseUrl}${BUILDER_AI_ENDPOINT}`, {body, serverRevision}, async (key) => {
-  const response = await fetch(`${baseUrl}${BUILDER_AI_ENDPOINT}`, {
+  return runEconomicRequest(url, {body, serverRevision}, async (key) => {
+  const response = await fetch(url, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -37,10 +52,7 @@ export async function buildWithBuilderAI({
   });
 
   if (!response.ok) {
-    const detail = await response.text();
-    const error = new Error(`Builder AI falló: ${response.status} ${detail}`);
-    try { error.response = { status: response.status, data: JSON.parse(detail) }; } catch (_) { /* retain key */ }
-    throw error;
+    throw failedResponse(response.status, await response.text());
   }
 
   return response.json();
@@ -50,44 +62,32 @@ export async function buildWithBuilderAI({
 export { BUILDER_AI_ENDPOINT };
 
 // Intent requests deliberately bypass economicRequest and BuilderAIOutput.
-export async function submitIntentOperation(body, revision, apiBaseUrl = '') {
-  const response = await fetch(`${normalizeBaseUrl(apiBaseUrl)}${BUILDER_AI_ENDPOINT}`, {
+export async function submitIntentOperation(body, revision) {
+  const response = await fetch(apiUrl(BUILDER_AI_ENDPOINT), {
     method: 'POST', credentials: 'include',
     headers: { 'Content-Type': 'application/json', 'If-Match': revision },
     body: JSON.stringify({ ...body, kind: 'intent' }),
   });
   const result = await response.json();
-  if (!response.ok) {
-    const error = new Error(result?.detail?.code || 'PERSISTENCE_UNAVAILABLE');
-    error.code = result?.detail?.code || 'PERSISTENCE_UNAVAILABLE';
-    throw error;
-  }
+  if (!response.ok) throw failedResponse(response.status, JSON.stringify(result));
   return result;
 }
 
 // Plan lifecycle requests bypass construction and commercial-credit handling.
-export async function submitPlanOperation(body, revision, apiBaseUrl = '') {
-  const response = await fetch(`${normalizeBaseUrl(apiBaseUrl)}${BUILDER_AI_ENDPOINT}`, {
+export async function submitPlanOperation(body, revision) {
+  const response = await fetch(apiUrl(BUILDER_AI_ENDPOINT), {
     method: 'POST', credentials: 'include',
     headers: { 'Content-Type': 'application/json', 'If-Match': revision },
     body: JSON.stringify({ ...body, kind: 'plan' }),
   });
   const result = await response.json();
-  if (!response.ok) {
-    const error = new Error(result?.code || result?.detail?.code || 'PERSISTENCE_UNAVAILABLE');
-    error.code = result?.code || result?.detail?.code || 'PERSISTENCE_UNAVAILABLE';
-    throw error;
-  }
+  if (!response.ok) throw failedResponse(response.status, JSON.stringify(result));
   return result;
 }
 
-export async function recoverProjectPlan(projectId, apiBaseUrl = '') {
-  const response = await fetch(`${normalizeBaseUrl(apiBaseUrl)}/api/projects/${encodeURIComponent(projectId)}`, { credentials: 'include' });
+export async function recoverProjectPlan(projectId) {
+  const response = await fetch(apiUrl(`/api/projects/${encodeURIComponent(projectId)}`), { credentials: 'include' });
   const project = await response.json();
-  if (!response.ok) {
-    const error = new Error(project?.code || project?.detail?.code || 'PERSISTENCE_UNAVAILABLE');
-    error.code = project?.code || project?.detail?.code || 'PERSISTENCE_UNAVAILABLE';
-    throw error;
-  }
+  if (!response.ok) throw failedResponse(response.status, JSON.stringify(project));
   return { project_id: project.project_id, user_id: project.user_id, updated_at: project.updated_at || '0', plan: project.j06_2_plan || null };
 }

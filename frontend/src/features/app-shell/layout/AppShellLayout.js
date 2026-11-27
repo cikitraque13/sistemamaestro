@@ -16,8 +16,6 @@ const DEFAULT_WORKSPACE_TABS = [
   { id: 'code', label: 'Código' },
   { id: 'extract', label: 'Extracción' },
   { id: 'structure', label: 'Estructura' },
-  { id: 'deploy', label: 'Deploy' },
-  { id: 'github', label: 'GitHub' },
 ];
 
 function GemaMaestra({ credits, bonus, usageLabel }) {

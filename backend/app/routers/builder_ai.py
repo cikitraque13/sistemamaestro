@@ -139,6 +139,29 @@ def build_builder_consumption_request(
     )
 
 
+# Same gate the cost guard used to answer with HTTP 402: raw text, or the
+# serialized build state divided by 4, at 10_000 units (about 40k characters
+# of state). Oversized input is rejected before any credit reservation.
+INPUT_TOO_LARGE_UNITS = 10000
+CLASSIFIER_UNAVAILABLE_MESSAGE = (
+    "El clasificador no está disponible ahora. No se ha generado ningún resultado."
+)
+
+
+def builder_estimated_units(payload: BuilderAIInput) -> int:
+    return max(
+        len(payload.userInput or ""),
+        len(str(payload.currentBuildState or {})) // 4,
+    )
+
+
+def _input_too_large_detail() -> Dict[str, str]:
+    return {
+        "code": "input_too_large",
+        "message": "El texto es demasiado largo. No se ha cobrado nada.",
+    }
+
+
 def build_builder_ai_guard_context(
     *,
     payload: BuilderAIInput,
@@ -154,10 +177,7 @@ def build_builder_ai_guard_context(
     elif "precio" in user_input or "pricing" in user_input:
         target_domain = "pricing_strategy"
 
-    estimated_units = max(
-        len(payload.userInput or ""),
-        len(str(payload.currentBuildState or {})) // 4,
-    )
+    estimated_units = builder_estimated_units(payload)
 
     return {
         "agent_key": "builder_agent",
@@ -203,10 +223,7 @@ def enforce_builder_ai_guards(guards: Dict[str, Dict[str, Any]]) -> None:
         )
 
     if cost.get("action") == "require_explicit_approval":
-        raise HTTPException(
-            status_code=402,
-            detail={"message": "Builder AI bloqueado por cost_guard.", "guards": guards},
-        )
+        raise HTTPException(status_code=413, detail=_input_too_large_detail())
 
 
 def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
@@ -242,7 +259,10 @@ async def build_with_ai(payload: BuilderEndpointInput, request: Request):
             return await apply_intent(db.projects, user["user_id"], payload, expected, revision_factory=next_project_revision)
         except IntentError as exc:
             status = 403 if exc.code == "ACCESS_DENIED" else 400 if exc.code == "INVALID_REQUEST" else 503 if exc.code in {"CLASSIFIER_UNAVAILABLE", "PERSISTENCE_UNAVAILABLE"} else 409
-            raise HTTPException(status, detail={"code": exc.code}) from None
+            detail = {"code": exc.code}
+            if exc.code == "CLASSIFIER_UNAVAILABLE":
+                detail["message"] = CLASSIFIER_UNAVAILABLE_MESSAGE
+            raise HTTPException(status, detail=detail) from None
 
     # This endpoint currently supports the two operations emitted by the Builder
     # workspace. Keep schema-admitted modes such as `repair` fail-closed before
@@ -254,6 +274,8 @@ async def build_with_ai(payload: BuilderEndpointInput, request: Request):
         )
 
     user = await get_current_user(request)
+    if builder_estimated_units(payload) >= INPUT_TOO_LARGE_UNITS:
+        raise HTTPException(status_code=413, detail=_input_too_large_detail())
     operation_id = request_operation_id(request, "builder_build")
 
     project = None

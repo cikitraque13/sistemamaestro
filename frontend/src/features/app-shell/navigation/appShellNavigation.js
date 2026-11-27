@@ -20,14 +20,6 @@ export const APP_SHELL_NAVIGATION = [
     label: 'Facturación',
   },
   {
-    id: 'deploy',
-    label: 'Deploy',
-  },
-  {
-    id: 'github',
-    label: 'GitHub',
-  },
-  {
     id: 'settings',
     label: 'Ajustes',
   },
