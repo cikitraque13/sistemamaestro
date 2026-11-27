@@ -49,12 +49,12 @@ const PROJECT_CONTEXTS = [
   {
     id: 'restaurant',
     label: 'Restaurante',
-    context: 'restaurante u hostelería: reservas, carta, fotos, reseñas, ubicación y WhatsApp',
+    context: 'restaurante u hostelería: carta, fotos, reseñas y ubicación',
   },
   {
     id: 'clinic',
     label: 'Clínica',
-    context: 'clínica o salud: citas, tratamientos, confianza, reseñas y contacto',
+    context: 'clínica o salud: servicios, confianza, reseñas y contacto',
   },
   {
     id: 'agency',
@@ -84,7 +84,7 @@ const PROJECT_CONTEXTS = [
   {
     id: 'local',
     label: 'Servicio local',
-    context: 'servicio local: zona, confianza, llamada, WhatsApp, reseñas y disponibilidad',
+    context: 'servicio local: zona, confianza, reseñas y contacto',
   },
   {
     id: 'education',
@@ -125,14 +125,9 @@ const PROJECT_GOALS = [
     context: 'aumentar ventas y reducir fricción de compra',
   },
   {
-    id: 'appointments',
-    label: 'Citas',
-    context: 'conseguir citas o diagnósticos',
-  },
-  {
     id: 'automation',
-    label: 'Automatización',
-    context: 'automatizar procesos y reducir trabajo manual',
+    label: 'Menos trabajo manual',
+    context: 'reducir trabajo manual en el borrador',
   },
   {
     id: 'redesign',
@@ -148,34 +143,6 @@ const PROJECT_GOALS = [
     id: 'calls',
     label: 'Llamadas',
     context: 'conseguir llamadas comerciales o diagnósticos cualificados',
-  },
-];
-
-const ASSISTANTS = [
-  {
-    id: 'master',
-    label: 'Maestro',
-    context: 'orquestador maestro: priorizar claridad, estructura, conversión y siguiente paso',
-  },
-  {
-    id: 'cro',
-    label: 'CRO',
-    context: 'agente CRO: optimizar conversión, CTA, fricción y recorrido del usuario',
-  },
-  {
-    id: 'copy',
-    label: 'Copy',
-    context: 'agente de copy: mejorar promesa, claridad, persuasión y tono comercial',
-  },
-  {
-    id: 'visual',
-    label: 'Visual',
-    context: 'agente visual: elevar diseño, jerarquía, sensación premium y coherencia',
-  },
-  {
-    id: 'automation',
-    label: 'Auto',
-    context: 'agente de automatización: estructurar flujos, procesos, entradas y salidas',
   },
 ];
 
@@ -245,7 +212,6 @@ const buildLaunchPrompt = ({
   selectedMode,
   selectedContext,
   selectedGoal,
-  selectedAssistant,
 }) => {
   const cleanPrompt = prompt.trim();
 
@@ -253,7 +219,6 @@ const buildLaunchPrompt = ({
     selectedMode?.label ? `Tipo de proyecto: ${selectedMode.label}.` : '',
     selectedContext?.context ? `Contexto de negocio: ${selectedContext.context}.` : '',
     selectedGoal?.context ? `Objetivo principal: ${selectedGoal.context}.` : '',
-    selectedAssistant?.context ? `Asistente preferente: ${selectedAssistant.context}.` : '',
   ].filter(Boolean);
 
   if (!contextLines.length) return cleanPrompt;
@@ -366,7 +331,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
   const [activeMode, setActiveMode] = useState('landing');
   const [selectedContextId, setSelectedContextId] = useState('');
   const [selectedGoalId, setSelectedGoalId] = useState('');
-  const [selectedAssistantId, setSelectedAssistantId] = useState('master');
   const [openMenu, setOpenMenu] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [error, setError] = useState('');
@@ -416,11 +380,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
     [selectedGoalId]
   );
 
-  const selectedAssistant = useMemo(
-    () => ASSISTANTS.find((item) => item.id === selectedAssistantId) || ASSISTANTS[0],
-    [selectedAssistantId]
-  );
-
   const firstName = getUserFirstName(user);
 
   const projectLabel = user?.name
@@ -442,7 +401,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
       selectedMode,
       selectedContext,
       selectedGoal,
-      selectedAssistant,
     });
 
     setError('');
@@ -471,7 +429,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
             mode: selectedMode?.label || '',
             context: selectedContext?.label || '',
             goal: selectedGoal?.label || '',
-            assistant: selectedAssistant?.label || '',
           },
           source: 'dashboard-launch-console',
         },
@@ -519,7 +476,7 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
 
         <div className="mt-3 max-w-[760px]">
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-100/70">
-            Launch Console
+            Builder
           </p>
 
           <p className="mt-2 text-sm font-medium text-zinc-400 md:text-base">
@@ -576,15 +533,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
             <div className="mt-3 flex flex-col gap-3 border-t border-black/10 pt-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setOpenMenu(null)}
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white/35 text-sm font-semibold text-black/70 transition hover:bg-white/50 hover:text-black"
-                    title="Adjuntar contexto"
-                  >
-                    +
-                  </button>
-
                   <CompactDropUp
                     id="service"
                     value={selectedContextId}
@@ -610,19 +558,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
                     openMenu={openMenu}
                     setOpenMenu={setOpenMenu}
                   />
-
-                  <CompactDropUp
-                    id="assistant"
-                    value={selectedAssistantId}
-                    options={ASSISTANTS}
-                    onChange={(value) => {
-                      setSelectedAssistantId(value);
-                      setError('');
-                    }}
-                    ariaLabel="Seleccionar asistente"
-                    openMenu={openMenu}
-                    setOpenMenu={setOpenMenu}
-                  />
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2">
@@ -633,15 +568,6 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
                     className="inline-flex h-8 items-center justify-center rounded-full border border-black/10 bg-black/10 px-3 text-xs font-semibold text-black transition hover:bg-black/15 disabled:opacity-50"
                   >
                     Inspirarme
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setOpenMenu(null)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-black/10 text-xs text-black transition hover:bg-black/15"
-                    title="Voz"
-                  >
-                    ○
                   </button>
 
                   <button

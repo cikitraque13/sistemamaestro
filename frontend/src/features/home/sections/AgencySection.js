@@ -7,32 +7,32 @@ import '../homeFlow.css';
 const steps = [
   {
     step: '01',
-    title: 'Eliges tu nicho',
-    text: 'Clínica, inmobiliaria, restaurante o el tuyo.',
+    title: 'Cuentas el negocio',
+    text: 'Idea o URL, con tus palabras.',
     accent: 'text-[#FDBA74]',
     badge: 'border-[#F97316]/40',
     classes: 'bg-[linear-gradient(180deg,rgba(249,115,22,0.30),rgba(249,115,22,0.12))]',
   },
   {
     step: '02',
-    title: 'Describes tu negocio',
-    text: 'Con tus palabras, en un par de minutos.',
+    title: 'Ves el diagnóstico',
+    text: 'Prioridades y el siguiente paso.',
     accent: 'text-[#C6F432]',
     badge: 'border-[#C6F432]/40',
     classes: 'bg-[linear-gradient(180deg,rgba(198,244,50,0.22),rgba(198,244,50,0.08))]',
   },
   {
     step: '03',
-    title: 'El agente nace',
-    text: 'Tu web y tu agente, listos para trabajar.',
+    title: 'Abres la preview',
+    text: 'Preview y borrador en el Builder.',
     accent: 'text-[#E9D5FF]',
     badge: 'border-[#E9D5FF]/40',
     classes: 'bg-[linear-gradient(180deg,rgba(216,180,254,0.26),rgba(167,139,250,0.12))]',
   },
 ];
 
-const beforeItems = ['Mensajes sin contestar', 'Clientes que se van', 'Tú pegado al móvil'];
-const afterItems = ['Web que capta', 'Agente que responde al instante', 'Tú a tu negocio'];
+const beforeItems = ['Idea sin orden', 'Web sin lectura', 'Siguiente paso poco claro'];
+const afterItems = ['Diagnóstico', 'Preview de la web', 'Borrador de prompt'];
 
 const useReveal = () => {
   const ref = useRef(null);
@@ -82,18 +82,18 @@ const AgencySection = () => {
             </p>
 
             <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3rem] md:leading-[1.02]">
-              ¿Y si tu negocio
+              Diagnóstico, preview
               <br />
               <span className="inline-block bg-[linear-gradient(90deg,#F97316,#A78BFA_55%,#22D3EE)] bg-clip-text pb-1 text-transparent">
-                contestara solo?
+                y borrador.
               </span>
             </h2>
 
             <div className="mt-7 grid gap-5 sm:grid-cols-2 sm:gap-4">
               <div className="flex flex-col">
               <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.18em] text-zinc-400/50">Antes</p>
-              <div className="sm-float flex-1 rounded-[20px] border border-white/[0.08] bg-[#111216] p-5" style={{ '--sm-glow': 'rgba(161,161,170,0.18)' }} aria-label="Sin agente">
-                <p className="text-base font-semibold text-zinc-500">Sin agente</p>
+              <div className="sm-float flex-1 rounded-[20px] border border-white/[0.08] bg-[#111216] p-5" style={{ '--sm-glow': 'rgba(161,161,170,0.18)' }} aria-label="Sin este paso">
+                <p className="text-base font-semibold text-zinc-500">Sin este paso</p>
                 <ul className="mt-3 space-y-2.5 text-[15px] leading-6 text-zinc-500 md:text-base">
                   {beforeItems.map((item) => (
                     <li key={item} className="flex items-start gap-2.5">
@@ -116,7 +116,7 @@ const AgencySection = () => {
               >
                 <div className="h-full rounded-[18.5px] bg-[#12122a] bg-[linear-gradient(180deg,rgba(139,92,246,0.14),rgba(18,18,42,0)_70%)] p-5">
                   <p className="bg-[linear-gradient(90deg,#A78BFA,#22D3EE)] bg-clip-text text-base font-semibold text-transparent">
-                    Con Sistema Maestro
+                    Con la Agencia de IA
                   </p>
                   <ul className="mt-3 space-y-2.5 text-[15px] font-medium leading-6 text-white md:text-base">
                     {afterItems.map((item) => (
@@ -176,7 +176,7 @@ const AgencySection = () => {
             href="#pricing"
             className="inline-flex whitespace-nowrap rounded-2xl border border-lime-200/70 bg-[#C6F432] px-6 py-3 text-sm font-semibold text-zinc-950 shadow-[0_0_0_1px_rgba(198,244,50,0.25),0_10px_28px_rgba(198,244,50,0.30)] transition hover:-translate-y-0.5 hover:bg-[#D4FF4F] focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-200/80 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
-            Quiero mi agencia
+            Planes
           </a>
           <Link
             to="/register"

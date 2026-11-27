@@ -30,10 +30,10 @@ const capabilityItems = [
       'Prepara el proyecto para pasar del análisis a la ejecución con más criterio.',
   },
   {
-    id: 'deploy',
-    title: 'Deploy y continuidad',
+    id: 'draft',
+    title: 'Borrador',
     description:
-      'Piensa en salida, estabilidad y siguiente paso, no solo en la idea inicial.',
+      'Deja el diagnóstico, la preview y el borrador. No publica la web.',
   },
   {
     id: 'security',

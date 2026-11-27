@@ -232,10 +232,10 @@ export const buildLifecyclePatchForAction = ({
 export const getLifecycleStageProgressLabel = (lifecycleState = {}) => {
   const stage = lifecycleState.currentStage;
 
-  if (!stage) return 'Proyecto en preparacion';
+  if (!stage) return 'Proyecto en preparación';
 
   if (stage.id === BUILDER_LIFECYCLE_STAGE_IDS.TECHNICAL_EXIT) {
-    return `Salida tecnica · ${lifecycleState.readinessScore || 0}/100`;
+    return `Revisión del borrador · ${lifecycleState.readinessScore || 0}/100`;
   }
 
   return `${stage.label} · ${lifecycleState.readinessScore || 0}/100`;
@@ -247,7 +247,7 @@ export const getLifecycleNextStepLabel = (lifecycleState = {}) => {
   }
 
   if (lifecycleState.isReadyForTechnicalExit) {
-    return 'Preparar salida tecnica';
+    return 'Revisar el borrador';
   }
 
   return lifecycleState.nextStage?.label || 'Siguiente mejora';

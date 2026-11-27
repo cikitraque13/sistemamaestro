@@ -35,7 +35,9 @@ export default function AppShellTopbar({
                 Estado
               </p>
               <p className="text-xs font-medium text-zinc-200">
-                {projectCount} proyectos · {creditLabel}
+                {projectCount > 0 ? 'Proyecto abierto' : 'Sin proyecto abierto'}
+                {' · '}
+                {creditLabel}
               </p>
             </div>
 

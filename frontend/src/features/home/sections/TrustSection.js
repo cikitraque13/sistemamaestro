@@ -17,7 +17,7 @@ const trustItems = [
     id: 'professional-logic',
     title: 'Lógica profesional',
     description:
-      'Estructura, análisis, construcción, validación y despliegue se presentan como partes conectadas de un sistema serio.',
+      'Estructura, análisis y borrador se presentan como partes del mismo sistema. La publicación no está disponible.',
   },
 ];
 

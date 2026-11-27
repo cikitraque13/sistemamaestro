@@ -143,9 +143,9 @@ export const BUILDER_LIFECYCLE_ACTIONS = {
 
   [BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_BOOKING_FLOW]: defineAction({
     id: BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_BOOKING_FLOW,
-    label: 'Configurar reserva',
+    label: 'Borrador de reserva. Calendario previsto',
     prompt:
-      'Convierte la landing en una experiencia de reserva clara con fecha, servicio, datos y confirmacion.',
+      'Deja en la preview un borrador de reserva. No guarda citas ni conecta un calendario.',
     stageId: BUILDER_LIFECYCLE_STAGE_IDS.CONVERSION,
     category: BUILDER_LIFECYCLE_ACTION_CATEGORIES.CONVERSION,
     projectTypes: [
@@ -249,9 +249,9 @@ export const BUILDER_LIFECYCLE_ACTIONS = {
 
   [BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_WHATSAPP]: defineAction({
     id: BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_WHATSAPP,
-    label: 'Configurar WhatsApp',
+    label: 'WhatsApp previsto',
     prompt:
-      'Prepara WhatsApp como canal de contacto con mensaje inicial, CTA visible y continuidad despues del clic.',
+      'Anota en el borrador que WhatsApp está previsto. No lo conecta.',
     stageId: BUILDER_LIFECYCLE_STAGE_IDS.CONVERSION,
     category: BUILDER_LIFECYCLE_ACTION_CATEGORIES.CONVERSION,
     projectTypes: SIMPLE_WEB_PROJECTS,
@@ -621,9 +621,9 @@ export const BUILDER_LIFECYCLE_ACTIONS = {
 
   [BUILDER_LIFECYCLE_ACTION_IDS.PREPARE_DEPLOY_PLAN]: defineAction({
     id: BUILDER_LIFECYCLE_ACTION_IDS.PREPARE_DEPLOY_PLAN,
-    label: 'Preparar deploy',
+    label: 'Revisar borrador',
     prompt:
-      'Prepara plan de deploy, dominio y entorno solo cuando el proyecto este listo para salir.',
+      'Revisa el diagnóstico y la preview. El sistema no publica ni despliega.',
     stageId: BUILDER_LIFECYCLE_STAGE_IDS.TECHNICAL_EXIT,
     category: BUILDER_LIFECYCLE_ACTION_CATEGORIES.TECHNICAL_EXIT,
     projectTypes: ALL_PROJECTS,

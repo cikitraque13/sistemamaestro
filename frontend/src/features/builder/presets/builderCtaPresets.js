@@ -54,9 +54,9 @@ export const CTA_PRESETS = {
   },
 
   deploy: {
-    primary: 'Preparar deploy',
-    secondary: 'Revisar archivos',
-    final: 'Publicar versión',
+    primary: 'Revisar el borrador',
+    secondary: 'Ver la preview',
+    final: 'Seguir en el Builder',
   },
 };
 

@@ -161,7 +161,7 @@ const AGENT_ACTIONS = [
   {
     id: 'cro',
     label: 'CRO',
-    title: 'Atajo experto: optimizar conversion',
+    title: 'Atajo de conversión',
     agentSpecId: 'cro_agent',
     mutationType: 'improve_premium_conversion',
     mutationAction: 'improve_premium_conversion',
@@ -176,7 +176,7 @@ const AGENT_ACTIONS = [
   {
     id: 'copy',
     label: 'COPY',
-    title: 'Atajo experto: mejorar copy',
+    title: 'Mejorar el texto',
     agentSpecId: 'copy_agent',
     mutationType: 'improve_copy',
     mutationAction: 'improve_copy',
@@ -191,7 +191,7 @@ const AGENT_ACTIONS = [
   {
     id: 'visual',
     label: 'VISUAL',
-    title: 'Atajo experto: elevar diseno',
+    title: 'Mejorar el diseño',
     agentSpecId: 'visual_agent',
     mutationType: 'apply_visual_hierarchy',
     mutationAction: 'apply_visual_hierarchy',
@@ -206,14 +206,14 @@ const AGENT_ACTIONS = [
   {
     id: 'trust',
     label: 'CHECK',
-    title: 'Atajo experto: validar salida',
+    title: 'Revisar el borrador',
     agentSpecId: 'trust_agent',
     mutationType: 'validate_ready_for_export',
     mutationAction: 'validate_ready_for_export',
     creditTier: 'low',
     source: 'agentrail_shortcut_v1',
     prompt:
-      'Valida si el proyecto esta listo para salida tecnica sin exportar, desplegar ni tocar backend.',
+      'Revisa el borrador. No exporta, no publica y no toca el backend.',
     dotClassName: 'bg-orange-300 shadow-[0_0_14px_rgba(253,186,116,0.65)]',
     ringClassName:
       'border-orange-300/25 hover:border-orange-300/50 hover:bg-orange-300/[0.08]',
@@ -221,14 +221,14 @@ const AGENT_ACTIONS = [
   {
     id: 'seo',
     label: 'SEO',
-    title: 'Atajo experto: mejorar estructura SEO',
+    title: 'Mejorar la estructura',
     agentSpecId: 'builder_agent',
     mutationType: 'generate_folder_structure',
     mutationAction: 'generate_folder_structure',
     creditTier: 'medium',
     source: 'agentrail_shortcut_v1',
     prompt:
-      'Mejora estructura, titulos, semantica y texto para busqueda organica sin salir del recorrido actual.',
+      'Mejora estructura, títulos y texto. No publica la web.',
     dotClassName: 'bg-sky-300 shadow-[0_0_14px_rgba(125,211,252,0.65)]',
     ringClassName:
       'border-sky-300/25 hover:border-sky-300/50 hover:bg-sky-300/[0.08]',
@@ -236,7 +236,7 @@ const AGENT_ACTIONS = [
 ];
 
 const AgentRail = ({ onSelectShortcut }) => (
-  <div className="pointer-events-none absolute left-1.5 top-12 z-[6] flex flex-col items-center gap-1.5" aria-label="Atajos expertos del Builder">
+  <div className="pointer-events-none absolute left-1.5 top-12 z-[6] flex flex-col items-center gap-1.5" aria-label="Atajos del Builder">
     {AGENT_ACTIONS.map((agent) => (
       <button
         key={agent.id}
@@ -256,7 +256,7 @@ const AgentCapsule = ({
   status,
   progress,
 }) => {
-  const safeStatus = progress >= 100 ? 'Agente listo' : (status || 'Agente preparado');
+  const safeStatus = progress >= 100 ? 'Builder listo' : (status || 'Builder preparado');
   const tone = getStatusTone(safeStatus);
   const progressLabel =
     typeof progress === 'number'
@@ -572,7 +572,7 @@ export default function BuilderAgentPane({
   activeCodeTab,
   onCodeTabChange,
   messages = [],
-  agentStatus = 'Agente preparado',
+  agentStatus = 'Builder preparado',
   onSubmitMessage,
   onStartBuild,
   builderIntelligence = null,
@@ -688,7 +688,7 @@ export default function BuilderAgentPane({
         />
       </section>
 
-      <section className="flex min-h-0 flex-col overflow-hidden border-t border-white/[0.08]" aria-label="Chat del agente">
+      <section className="flex min-h-0 flex-col overflow-hidden border-t border-white/[0.08]" aria-label="Chat del Builder">
         <AgentCapsule
           status={agentStatus}
           progress={progress}

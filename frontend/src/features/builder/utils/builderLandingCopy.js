@@ -168,7 +168,7 @@ const buildTransformCopy = ({ project, initialPrompt, direction }) => {
       },
       {
         title: 'Salida',
-        text: 'Iterar diseño, cambiar fotos, preparar deploy o exportar.',
+        text: 'Seguir en la preview o en el borrador.',
       },
     ],
   };
@@ -188,14 +188,14 @@ const buildSistemaMaestroCopy = ({ direction }) => {
     templateType: 'generic_landing',
     eyebrow: 'Sistema Maestro',
     originalLabel: 'Proyecto nuevo',
-    headline: 'Convierte una idea o una URL en un sistema digital listo para avanzar.',
+    headline: 'De una idea o una URL a diagnóstico, preview y borrador.',
     subheadline:
-      'Analiza, estructura y prepara proyectos digitales con IA para reducir improvisación, acelerar decisiones y mejorar conversión.',
+      'El Builder ordena el diagnóstico y deja la preview. No publica la web.',
     primaryCta: ctaMap[direction] || ctaMap.balanced,
     secondaryCta: 'Analizar una URL',
     sectionTitle: 'Un sistema para pasar de intención a ejecución',
     sectionText:
-      'Estrategia, arquitectura, conversión, diseño, automatización y salida técnica conectadas en una experiencia continua.',
+      'Diagnóstico, preview y borrador. La publicación no está disponible.',
     cards: [
       {
         title: 'Analiza',
@@ -207,7 +207,7 @@ const buildSistemaMaestroCopy = ({ direction }) => {
       },
       {
         title: 'Escala',
-        text: 'Itera con créditos, salida técnica y deploy.',
+        text: 'Puedes volver al diagnóstico y a la preview.',
       },
     ],
   };
@@ -282,7 +282,7 @@ const buildGenericCopy = ({ project, initialPrompt, direction }) => {
     sectionText:
       core?.main_leverage ||
       diagnosis?.opportunity ||
-      'Builder organiza promesa, bloques, CTA y continuidad antes de pasar a salida técnica.',
+      'El Builder ordena la promesa, los bloques y el CTA. No publica la web.',
     cards: [
       {
         title: 'Promesa',
@@ -294,7 +294,7 @@ const buildGenericCopy = ({ project, initialPrompt, direction }) => {
       },
       {
         title: 'Salida',
-        text: 'Base lista para iterar, generar archivos y preparar deploy.',
+        text: 'Borrador para seguir en la preview. No hay publicación.',
       },
     ],
   };

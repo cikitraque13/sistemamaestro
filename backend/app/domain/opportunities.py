@@ -1,18 +1,18 @@
 OPPORTUNITIES = [
     {
         "opportunity_id": "opp_001",
-        "title": "Asistente web para atención y captación",
-        "description": "Plantilla para crear un asistente conversacional que recibe al usuario, entiende su necesidad y lo guía hacia cita, contacto, formulario o enlace externo.",
-        "business_model": "Producto recurrente para clínicas, gestorías, inmobiliarias, estudios y negocios de servicios que necesitan automatizar atención inicial y captar solicitudes cualificadas.",
+        "title": "Borrador de atención en la web",
+        "description": "Plantilla de borrador: diagnóstico, preguntas y un CTA en la web. No conecta WhatsApp ni calendario.",
+        "business_model": "Producto para clínicas, gestorías, inmobiliarias, estudios y negocios de servicios que necesitan un borrador de atención en la web.",
         "monetization": "Setup inicial + suscripción mensual por personalización del flujo, mantenimiento del asistente y mejoras por sector.",
         "difficulty": "media",
         "route": "automate",
         "steps": [
             "Definir sector, cliente objetivo y tres problemas frecuentes.",
             "Crear saludo inicial y preguntas de diagnóstico.",
-            "Diseñar respuestas base para dudas, citas, presupuestos o contacto.",
-            "Añadir CTA hacia WhatsApp, formulario, calendario o enlace externo.",
-            "Construir en Builder una primera interfaz visible del asistente."
+            "Diseñar respuestas base para dudas, presupuestos o contacto.",
+            "Dejar el CTA en la web. WhatsApp y calendario están previstos.",
+            "Construir en el Builder una preview. No conecta canales.",
         ]
     },
     {
@@ -83,7 +83,7 @@ OPPORTUNITIES = [
         "opportunity_id": "opp_006",
         "title": "Generador de propuestas comerciales",
         "description": "Plantilla para convertir una solicitud o briefing en una propuesta clara con alcance, beneficios, fases y siguiente acción.",
-        "business_model": "Herramienta para profesionales y equipos comerciales que necesitan responder mejor, más rápido y con una presentación consistente.",
+        "business_model": "Herramienta para profesionales y equipos comerciales que necesitan una presentación consistente.",
         "monetization": "Suscripción por uso interno + plantillas premium por sector + personalización para equipos.",
         "difficulty": "media",
         "route": "sell",
@@ -97,8 +97,8 @@ OPPORTUNITIES = [
     },
     {
         "opportunity_id": "opp_007",
-        "title": "Sistema de reservas y solicitudes",
-        "description": "Plantilla para crear una página o miniapp donde un usuario pueda solicitar cita, enviar datos iniciales o pedir disponibilidad.",
+        "title": "Borrador de reservas y solicitudes",
+        "description": "Plantilla para una página que pide una reserva. El calendario no se guarda.",
         "business_model": "Solución útil para clínicas, centros de estética, consultorías, inmobiliarias, academias y servicios con agenda o solicitudes frecuentes.",
         "monetization": "Pago por configuración inicial + cuota mensual por ajustes, formularios, contenidos y mejoras del flujo.",
         "difficulty": "facil",
@@ -108,7 +108,7 @@ OPPORTUNITIES = [
             "Crear formulario con datos mínimos y prioridad de contacto.",
             "Añadir mensajes de confirmación y siguiente paso.",
             "Diseñar una vista de servicios o disponibilidad orientativa.",
-            "Construir en Builder una primera versión funcional del flujo."
+            "Construir en el Builder una preview del formulario. Las citas no se guardan."
         ]
     },
     {

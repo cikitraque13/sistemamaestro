@@ -45,7 +45,7 @@ const HomeFooter = () => {
           </div>
 
           <p className="mt-4 max-w-md text-sm leading-6 text-zinc-300">
-            Construimos tu web, la lanzamos y ponemos un agente de IA a atender a tus clientes por chat, web o WhatsApp.
+            Diagnóstico, preview y borrador de prompt. El canal disponible es la web. Nova está disponible en esta página.
           </p>
         </div>
 
