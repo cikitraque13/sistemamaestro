@@ -6,18 +6,47 @@ from backend.app.core.config import GROK_API_KEY, GROK_BASE_URL, GROK_MODEL
 
 logger = logging.getLogger(__name__)
 
+ALLOWED_GROK_MODELS = {"grok-4.3", "grok-4.7"}
+PROVIDER_UNAVAILABLE = "blueprint_provider_unavailable"
+INVALID_OUTPUT = "blueprint_invalid_output"
+
+
+class BlueprintGenerationError(Exception):
+    """The provider did not return a usable blueprint. Callers must not persist or charge."""
+
+    def __init__(self, code: str):
+        super().__init__(code)
+        self.code = code
+
+
+def _has_minimum_blueprint(value) -> bool:
+    if not isinstance(value, dict):
+        return False
+    title = value.get("title")
+    summary = value.get("summary")
+    priorities = value.get("priorities")
+    if not isinstance(title, str) or not title.strip():
+        return False
+    if not isinstance(summary, str) or not summary.strip():
+        return False
+    if not isinstance(priorities, list) or not priorities:
+        return False
+    return all(isinstance(item, str) and item.strip() for item in priorities)
+
+
+def _strip_fences(response_text: str) -> str:
+    if response_text.startswith("```json"):
+        response_text = response_text[7:]
+    if response_text.startswith("```"):
+        response_text = response_text[3:]
+    if response_text.endswith("```"):
+        response_text = response_text[:-3]
+    return response_text.strip()
+
 
 async def generate_blueprint(project: Dict) -> Dict:
-    if not GROK_API_KEY or GROK_MODEL not in {"grok-4.3", "grok-4.7"}:
-        return {
-            "title": "Blueprint no disponible",
-            "summary": "Configura GROK_API_KEY para generar blueprints",
-            "priorities": ["Configurar API key de Grok"],
-            "architecture": {"components": ["Por definir"]},
-            "monetization": "Por definir",
-            "deployment_steps": ["Configurar entorno"],
-            "timeline_estimate": "Por definir"
-        }
+    if not (GROK_API_KEY or "").strip() or GROK_MODEL not in ALLOWED_GROK_MODELS:
+        raise BlueprintGenerationError(PROVIDER_UNAVAILABLE)
 
     from backend.app.ai.providers.grok_client import GrokChatClient
 
@@ -56,39 +85,35 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
 """
 
     try:
-        response = await client_ai.chat.completions.create(
-            model=GROK_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": context}
-            ],
-            temperature=0.7,
-            max_tokens=2000,
-            response_format={"type": "json_object"},
-            reasoning_effort="low",
-        )
+        try:
+            response = await client_ai.chat.completions.create(
+                model=GROK_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": context}
+                ],
+                temperature=0.7,
+                max_tokens=2000,
+                response_format={"type": "json_object"},
+                reasoning_effort="low",
+            )
+        except Exception as exc:
+            logger.error("Blueprint provider unavailable: %s", type(exc).__name__)
+            raise BlueprintGenerationError(PROVIDER_UNAVAILABLE) from exc
 
-        response_text = (response.choices[0].message.content or "").strip()
+        try:
+            response_text = _strip_fences((response.choices[0].message.content or "").strip())
+            parsed = json.loads(response_text)
+        except (AttributeError, IndexError, TypeError, KeyError, json.JSONDecodeError) as exc:
+            logger.error("Blueprint invalid output: %s", type(exc).__name__)
+            raise BlueprintGenerationError(INVALID_OUTPUT) from exc
 
-        if response_text.startswith("```json"):
-            response_text = response_text[7:]
-        if response_text.startswith("```"):
-            response_text = response_text[3:]
-        if response_text.endswith("```"):
-            response_text = response_text[:-3]
-
-        return json.loads(response_text.strip())
-
-    except Exception as e:
-        logger.error(f"Blueprint generation error: {e}")
-        return {
-            "title": f"Blueprint: {route_names.get(project.get('route', ''), 'Proyecto')}",
-            "summary": "Blueprint generado para tu proyecto",
-            "priorities": ["Definir alcance", "Crear MVP", "Iterar con feedback"],
-            "architecture": {"components": ["Frontend", "Backend", "Database"]},
-            "monetization": "Por definir según validación",
-            "deployment_steps": ["Configurar entorno", "Desarrollar MVP", "Testing", "Lanzamiento"],
-            "timeline_estimate": "4-8 semanas"
-        }
+        if not _has_minimum_blueprint(parsed):
+            logger.error("Blueprint invalid output: missing minimum keys")
+            raise BlueprintGenerationError(INVALID_OUTPUT)
+        return parsed
     finally:
-        await client_ai.close()
+        try:
+            await client_ai.close()
+        except Exception:
+            logger.exception("blueprint_client_close_failed")

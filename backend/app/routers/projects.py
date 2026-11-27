@@ -17,7 +17,7 @@ from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
 from backend.app.schemas.projects import ProjectCreate, RefineInput
 from backend.app.services.ai_analysis import analyze_with_ai
-from backend.app.services.blueprint import generate_blueprint
+from backend.app.services.blueprint import BlueprintGenerationError, generate_blueprint
 from backend.app.services.economic_operation import (
     EconomicPersistenceUncertain, request_fingerprint, request_operation_id, run_economic_operation,
 )
@@ -44,6 +44,20 @@ from backend.app.services.url_analysis import fetch_and_analyze_url
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 logger = logging.getLogger(__name__)
+
+BLUEPRINT_FAILURE_MESSAGE = (
+    "No hemos podido generar el blueprint ahora. No se te ha cobrado. "
+    "Prueba de nuevo en unos minutos."
+)
+
+
+def _blueprint_failure(exc: BlueprintGenerationError) -> HTTPException:
+    status_code = 502 if exc.code == "blueprint_invalid_output" else 503
+    return HTTPException(status_code, detail={
+        "code": exc.code,
+        "message": BLUEPRINT_FAILURE_MESSAGE,
+        "retry_with_new_key": True,
+    })
 
 MAX_REFINE_ANSWER_KEY_CHARS = 128
 MAX_REFINE_ANSWER_VALUE_CHARS = 4000
@@ -670,7 +684,10 @@ async def create_blueprint(project_id: str, request: Request):
         # Use the projection only as the source of the already-existing value.
         # Its identity and provenance metadata never enter the provider payload.
         blueprint_context["refine_answers"] = project_memory["answers"]
-        blueprint = await generate_blueprint(blueprint_context)
+        try:
+            blueprint = await generate_blueprint(blueprint_context)
+        except BlueprintGenerationError as exc:
+            raise _blueprint_failure(exc) from exc
         after_provider = await db.projects.find_one(
             {"project_id": project_id, "user_id": user["user_id"]},
             {"_id": 0},

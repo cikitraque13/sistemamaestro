@@ -40,7 +40,13 @@ stub("fastapi", APIRouter=APIRouter, HTTPException=HTTPException, Request=object
 stub("fastapi.encoders", jsonable_encoder=lambda value: json.loads(json.dumps(value)))
 stub("backend.app.core.security", get_current_user=AsyncMock(return_value={"user_id": "user_test", "plan": "premium"}))
 stub("backend.app.services.ai_analysis", analyze_with_ai=AsyncMock())
-stub("backend.app.services.blueprint", generate_blueprint=AsyncMock())
+class BlueprintGenerationError(Exception):
+    def __init__(self, code="blueprint_provider_unavailable"):
+        super().__init__(code)
+        self.code = code
+
+
+stub("backend.app.services.blueprint", generate_blueprint=AsyncMock(), BlueprintGenerationError=BlueprintGenerationError)
 stub("backend.app.services.plan_recommendation", build_plan_recommendation=lambda **kwargs: {})
 stub("backend.app.services.semantic_admission", run_semantic_admission=lambda *args, **kwargs: {})
 stub("backend.app.services.semantic_admission_trace", build_semantic_admission_trace_payload=lambda **kwargs: {},
