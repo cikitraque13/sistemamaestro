@@ -319,7 +319,10 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       setActiveWorkspaceTab('structure');
       toast.success('Blueprint generado.');
     } catch (error) {
-      const message = getErrorMessage(error);
+      const detail = error?.response?.data?.detail;
+      const message = typeof detail?.message === 'string' && detail.message
+        ? detail.message
+        : getErrorMessage(error);
       toast.error(message);
     } finally {
       setGeneratingBlueprint(false);
