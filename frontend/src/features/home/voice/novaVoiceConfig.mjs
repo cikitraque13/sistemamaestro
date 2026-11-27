@@ -22,9 +22,16 @@ export const resolveNovaVoiceProvider = (config) => {
   return 'browser';
 };
 
-export const buildGrokSessionUpdate = ({ instructions, voice, inputRate, outputRate = 24000 }) => ({
-  type: 'session.update',
-  session: {
+export const WEBSITE_ANALYSIS_TOOL_NAME = 'register_website_analysis';
+
+const websiteAnalysisFailure = () => ({
+  ok: false,
+  registered: false,
+  message: 'No se ha podido registrar la solicitud. No digas que quedó registrada.',
+});
+
+export const buildGrokSessionUpdate = ({ instructions, voice, inputRate, outputRate = 24000, tools }) => {
+  const session = {
     voice,
     instructions,
     turn_detection: { type: 'server_vad' },
@@ -37,8 +44,55 @@ export const buildGrokSessionUpdate = ({ instructions, voice, inputRate, outputR
         format: { type: 'audio/pcm', rate: outputRate },
       },
     },
+  };
+  if (Array.isArray(tools) && tools.length) session.tools = tools;
+  return { type: 'session.update', session };
+};
+
+export const functionCallOutputItem = (callId, output) => ({
+  type: 'conversation.item.create',
+  item: {
+    type: 'function_call_output',
+    call_id: String(callId || ''),
+    output: JSON.stringify(output && typeof output === 'object' ? output : websiteAnalysisFailure()),
   },
 });
+
+export async function postWebsiteAnalysis(fetchImpl, apiBase, args) {
+  const consent = Boolean(args && args.consent === true);
+  const payload = {
+    business_name: String((args && args.business_name) || '').trim(),
+    website_url: String((args && args.website_url) || '').trim(),
+    contact: consent ? String((args && args.contact) || '').trim() : '',
+    consent,
+  };
+  try {
+    const response = await fetchImpl(`${apiBase}/public/nova-voice/website-analysis`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return websiteAnalysisFailure();
+    return data;
+  } catch {
+    return websiteAnalysisFailure();
+  }
+}
+
+export async function executeWebsiteAnalysisTool(event, { fetchImpl, apiBase }) {
+  if (!event || event.name !== WEBSITE_ANALYSIS_TOOL_NAME) return websiteAnalysisFailure();
+  let args = event.arguments;
+  if (typeof args === 'string') {
+    try {
+      args = JSON.parse(args || '{}');
+    } catch {
+      args = {};
+    }
+  }
+  if (!args || typeof args !== 'object') args = {};
+  return postWebsiteAnalysis(fetchImpl, apiBase, args);
+}
 
 export const greetingItem = () => ({
   type: 'conversation.item.create',

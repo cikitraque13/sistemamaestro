@@ -15,11 +15,32 @@ from backend.app.services.nova_voice import (
     resolve_nova_voice_provider,
     sanitize_nova_diag,
 )
+from backend.app.services.website_analysis_request import (
+    NOT_REGISTERED_MESSAGE,
+    WebsiteAnalysisError,
+    prepare_analysis_request,
+    queued_result,
+    refused_result,
+)
 
 router = APIRouter(prefix="/api", tags=["nova-voice"])
 logger = logging.getLogger(__name__)
 _limiter = RateLimiter()
 _diag_limiter = RateLimiter(limit=30, window_seconds=600)
+_analysis_limiter = RateLimiter(limit=5, window_seconds=600)
+
+
+class WebsiteAnalysisIn(BaseModel):
+    business_name: str = Field(default="", max_length=200)
+    website_url: str = Field(default="", max_length=500)
+    contact: str = Field(default="", max_length=200)
+    consent: bool = False
+
+
+def analysis_requests_collection():
+    from backend.app.db.mongodb import db
+
+    return db.analysis_requests
 
 
 class NovaVoiceDiag(BaseModel):
@@ -77,6 +98,32 @@ async def nova_voice_session(request: Request):
 
     logger.info("nova_voice_session_minted")
     return public_session(minted["token"], minted["expires_at"], nova_voice_id())
+
+
+@router.post("/public/nova-voice/website-analysis")
+async def nova_website_analysis(body: WebsiteAnalysisIn, request: Request):
+    if not _analysis_limiter.allow(_client_key(request)):
+        return JSONResponse(
+            status_code=429,
+            content=refused_result("rate_limited", NOT_REGISTERED_MESSAGE),
+        )
+    try:
+        record = prepare_analysis_request(body.model_dump())
+    except WebsiteAnalysisError as exc:
+        return JSONResponse(
+            status_code=400,
+            content=refused_result(exc.detail, exc.nova_message),
+        )
+    try:
+        await analysis_requests_collection().insert_one(dict(record))
+    except Exception:
+        logger.error("website_analysis_store_failed")
+        return JSONResponse(
+            status_code=503,
+            content=refused_result("store_failed", NOT_REGISTERED_MESSAGE),
+        )
+    logger.info("website_analysis_queued")
+    return queued_result(record)
 
 
 @router.post("/public/nova-voice/diag")

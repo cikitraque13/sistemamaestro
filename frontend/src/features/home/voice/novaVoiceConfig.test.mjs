@@ -7,8 +7,11 @@ import {
   buildGrokSessionUpdate,
   choosePcmRate,
   encodePcm16Base64,
+  executeWebsiteAnalysisTool,
   floatToPcm16,
+  functionCallOutputItem,
   levelsFromPcm16,
+  postWebsiteAnalysis,
   novaPhase,
   novaStatusLabel,
   resolveNovaVoiceProvider,
@@ -97,4 +100,72 @@ test('el pcm16 se puede codificar y la onda no revienta con silencio', () => {
   assert.deepEqual(levelsFromPcm16(null, 4), [0, 0, 0, 0]);
   const loud = levelsFromPcm16(new Int16Array(16).fill(32767), 4);
   assert.ok(loud.every((value) => value > 0));
+});
+
+test('session.update incluye la herramienta de análisis cuando el servidor la manda', () => {
+  const tool = { type: 'function', name: 'register_website_analysis' };
+  const message = buildGrokSessionUpdate({
+    instructions: 'Habla en es-ES.',
+    voice: 'ara',
+    inputRate: 24000,
+    tools: [tool],
+  });
+  assert.deepEqual(message.session.tools, [tool]);
+  const without = buildGrokSessionUpdate({
+    instructions: 'Habla en es-ES.',
+    voice: 'ara',
+    inputRate: 24000,
+  });
+  assert.equal(Object.hasOwn(without.session, 'tools'), false);
+});
+
+test('la herramienta pide el alta de la solicitud y no manda el contacto sin consentimiento', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, options });
+    return {
+      json: async () => ({
+        ok: true,
+        registered: true,
+        status: 'queued',
+        message: 'queda registrado para el análisis',
+      }),
+    };
+  };
+  const result = await executeWebsiteAnalysisTool(
+    {
+      name: 'register_website_analysis',
+      arguments: JSON.stringify({
+        business_name: 'Creative Flow',
+        website_url: 'https://creativeflow.example',
+        contact: 'lucas@example.com',
+        consent: false,
+      }),
+    },
+    { fetchImpl, apiBase: 'https://sistemamaestro.com/api' },
+  );
+  assert.equal(result.registered, true);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, 'https://sistemamaestro.com/api/public/nova-voice/website-analysis');
+  const sent = JSON.parse(calls[0].options.body);
+  assert.equal(sent.contact, '');
+  assert.equal(sent.consent, false);
+  assert.equal(sent.business_name, 'Creative Flow');
+  const output = functionCallOutputItem('call-1', result);
+  assert.equal(output.type, 'conversation.item.create');
+  assert.equal(output.item.type, 'function_call_output');
+  assert.equal(output.item.call_id, 'call-1');
+  assert.equal(JSON.parse(output.item.output).status, 'queued');
+});
+
+test('si el alta falla, el resultado dice que no quedó registrada', async () => {
+  const result = await postWebsiteAnalysis(async () => {
+    throw new Error('offline');
+  }, 'https://sistemamaestro.com/api', {
+    business_name: 'Creative Flow',
+    website_url: 'https://creativeflow.example',
+    consent: true,
+  });
+  assert.equal(result.registered, false);
+  assert.match(result.message, /No digas que quedó registrada/);
 });
