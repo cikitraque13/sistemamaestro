@@ -43,13 +43,14 @@ class ResolveTests(unittest.TestCase):
         self.assertEqual(body["language"], "es-ES")
         self.assertEqual(body["voice"], "ara")
         self.assertIn(nova_voice.NOVA_GREETING, body["instructions"])
-        self.assertIn("es-ES", body["instructions"])
-        self.assertIn("acento neutro de España", body["instructions"])
-        self.assertIn(
-            "No uses acento andaluz, malagueño ni de ninguna otra región.",
-            body["instructions"],
-        )
-        self.assertNotIn("acento malagueño", body["instructions"])
+        self.assertEqual(body["language"], "es-ES")
+        self.assertIn("Habla en español de España con acento malagueño.", body["instructions"])
+        self.assertNotIn("acento neutro", body["instructions"])
+        self.assertNotIn("No uses acento andaluz", body["instructions"])
+        self.assertIn("llamada de teléfono natural", body["instructions"])
+        self.assertIn("No repitas la misma fórmula.", body["instructions"])
+        self.assertIn("No tienes ninguna herramienta para registrar", body["instructions"])
+        self.assertIn("Nunca digas que ya lo has registrado", body["instructions"])
         self.assertIn("29 € al mes", body["instructions"])
         self.assertIn("Reglamento de IA", body["instructions"])
         self.assertNotIn("[", body["instructions"])
