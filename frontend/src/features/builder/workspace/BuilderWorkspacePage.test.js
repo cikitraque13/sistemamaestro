@@ -57,13 +57,16 @@ test('S15 A to B to A hides stale shell and rejects stale project actions during
 
   mocks.mockLocation = { search: '?project_id=A', state: null };
   await act(async () => root.render(<BuilderWorkspacePage />));
-  expect(mocks.mockShellProps.contextTitle).toBe('Proyecto A');
-  expect(mocks.mockShellProps.contextBody).toContain('Proyecto real A');
+  expect(mocks.mockShellProps.contextTitle).toBe('A content');
+  expect(mocks.mockShellProps.contextBody).toBe('Preview del proyecto.');
+  expect(mocks.mockShellProps.contextBody).not.toContain('Estado:');
+  expect(mocks.mockShellProps.contextTitle).not.toMatch(/proj_|analyzed|ready/);
+  expect(mocks.mockShellProps.workspaceTabs).toEqual([]);
 
   mocks.mockShellProps.onProjectChange('B');
   mocks.mockLocation = { search: '?project_id=B', state: { projectId: 'B' } };
   await act(async () => root.render(<BuilderWorkspacePage />));
-  expect(mocks.mockShellProps.contextTitle).toBe('Proyecto B');
+  expect(mocks.mockShellProps.contextTitle).toBe('B content');
   expect(mocks.mockShellProps.activeProjectId).toBe('B');
   const generateFromB = mocks.mockProps.onGenerateBlueprint;
 
@@ -72,7 +75,8 @@ test('S15 A to B to A hides stale shell and rejects stale project actions during
 
   expect(mocks.mockShellProps.productLabel).toBe('Sistema Maestro');
   expect(mocks.mockShellProps.contextTitle).toBe('Builder activo');
-  expect(mocks.mockShellProps.contextBody).not.toContain('Proyecto real B');
+  expect(mocks.mockShellProps.contextBody).not.toContain('B content');
+  expect(mocks.mockShellProps.contextBody).not.toContain('Estado:');
   expect(mocks.mockShellProps.activeProjectId).toBe('A');
   expect(mocks.mockProps.project).toBeNull();
   expect(mocks.mockProps.loadingProject).toBe(true);
@@ -98,9 +102,11 @@ test('S15 A to B to A hides stale shell and rejects stale project actions during
     },
   }));
   expect(mocks.mockProps.project.project_id).toBe('A');
-  expect(mocks.mockShellProps.contextTitle).toBe('Proyecto A');
-  expect(mocks.mockShellProps.contextBody).toContain('Proyecto real A');
-  expect(mocks.mockShellProps.contextBody).not.toContain('Proyecto real B');
+  expect(mocks.mockShellProps.contextTitle).toBe('A2 content');
+  expect(mocks.mockShellProps.contextBody).toBe('Preview del proyecto.');
+  expect(`${mocks.mockShellProps.contextTitle} ${mocks.mockShellProps.contextBody}`).not.toContain('B content');
+  expect(node.textContent).not.toContain('Revisar intención');
+  expect(node.textContent).not.toContain('Preparar plan');
   act(() => root.unmount());
 });
 

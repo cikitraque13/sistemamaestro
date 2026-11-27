@@ -12,13 +12,11 @@ const DEFAULT_PROJECTS = [
 ];
 
 const DEFAULT_WORKSPACE_TABS = [
-  { id: 'code', label: 'Código' },
   { id: 'preview', label: 'Preview' },
   { id: 'extract', label: 'Extracción' },
-  { id: 'structure', label: 'Estructura' },
 ];
 
-function GemaMaestra({ credits, bonus, usageLabel }) {
+export function GemaMaestra({ credits, bonus, usageLabel }) {
   return (
     <div className="flex shrink-0 items-center gap-3 rounded-full border border-emerald-300/25 bg-[radial-gradient(circle_at_20%_20%,rgba(253,230,138,0.35),rgba(16,185,129,0.14)_38%,rgba(6,8,10,0.9)_75%)] px-4 py-2 shadow-[0_0_34px_rgba(16,185,129,0.13)]">
       <div className="relative grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-emerald-200/35 bg-[linear-gradient(135deg,#bbf7d0,#67e8f9,#fde68a)] text-[11px] font-black text-black shadow-[0_0_26px_rgba(52,211,153,0.2)]">
@@ -52,7 +50,10 @@ function BuilderCompactHeader({
   credits,
   bonus,
   usageLabel,
+  showGema = true,
 }) {
+  const hasTabs = Array.isArray(workspaceTabs) && workspaceTabs.length > 0;
+
   return (
     <section className="shrink-0 rounded-[24px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.012))] shadow-[0_0_70px_rgba(0,0,0,0.22)]">
       <div className="flex flex-col gap-3 px-4 py-3 xl:flex-row xl:items-center xl:justify-between">
@@ -60,24 +61,32 @@ function BuilderCompactHeader({
           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
             {contextTitle}
           </p>
-          <p className="mt-1 line-clamp-1 max-w-4xl text-sm leading-6 text-zinc-300">
-            {contextBody}
-          </p>
+          {contextBody ? (
+            <p className="mt-1 line-clamp-1 max-w-4xl text-sm leading-6 text-zinc-300">
+              {contextBody}
+            </p>
+          ) : null}
         </div>
 
-        <div className="flex shrink-0 flex-col gap-3 xl:flex-row xl:items-center">
-          <BuilderWorkspaceTabs
-            items={workspaceTabs}
-            activeId={activeWorkspaceTab}
-            onChange={onWorkspaceTabChange}
-          />
+        {(hasTabs || showGema) && (
+          <div className="flex shrink-0 flex-col gap-3 xl:flex-row xl:items-center">
+            {hasTabs && (
+              <BuilderWorkspaceTabs
+                items={workspaceTabs}
+                activeId={activeWorkspaceTab}
+                onChange={onWorkspaceTabChange}
+              />
+            )}
 
-          <GemaMaestra
-            credits={credits}
-            bonus={bonus}
-            usageLabel={usageLabel}
-          />
-        </div>
+            {showGema && (
+              <GemaMaestra
+                credits={credits}
+                bonus={bonus}
+                usageLabel={usageLabel}
+              />
+            )}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -93,7 +102,7 @@ export default function AppShellLayout({
   activeProjectId = 'project-alpha',
   onProjectChange = () => {},
   workspaceTabs = DEFAULT_WORKSPACE_TABS,
-  activeWorkspaceTab = 'code',
+  activeWorkspaceTab = 'preview',
   onWorkspaceTabChange = () => {},
   credits = 120,
   bonus = 25,
@@ -102,6 +111,7 @@ export default function AppShellLayout({
   onNewProject = () => {},
   contextTitle = 'Builder activo',
   contextBody = 'Diagnóstico, preview y borrador en el Builder.',
+  showHeaderGema = true,
 }) {
   const isBuilderMode = activeNavId === 'builder';
 
@@ -129,6 +139,7 @@ export default function AppShellLayout({
             credits={credits}
             bonus={bonus}
             usageLabel={usageLabel}
+            showGema={showHeaderGema}
           />
 
           <section className="min-h-0 flex-1 overflow-hidden">

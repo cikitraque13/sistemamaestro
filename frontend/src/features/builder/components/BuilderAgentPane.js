@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+const SHOW_SIMULATED_CODE = false;
+
 import {
   BUILDER_CODE_TABS,
   getBuilderCodeLines,
@@ -671,6 +673,23 @@ export default function BuilderAgentPane({
       submit();
     }
   };
+
+  const recommendations = (
+    <div aria-label="Siguiente paso recomendado">
+      <DecisionPanel
+        actions={suggestedActions}
+        onSelectAction={submitSuggestedAction}
+        feedback={decisionFeedback}
+        draft={draft}
+        setDraft={setDraft}
+        onSubmit={submit}
+        onKeyDown={handleKeyDown}
+        canSubmit={canSubmit}
+      />
+    </div>
+  );
+
+  if (!SHOW_SIMULATED_CODE) return recommendations;
 
   return (
     <div className="relative grid h-full min-h-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] overflow-hidden bg-[#050709]">
