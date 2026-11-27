@@ -19,6 +19,7 @@ from backend.app.ai.guards.policy_guard import evaluate_policy
 from backend.app.ai.guards.security_guard import assess_security_context
 from backend.app.ai.schemas.builder_ai_output import BuilderAIInput
 from backend.app.ai.telemetry.agent_trace import build_trace
+from backend.app.core.builder_access import ensure_builder_available
 from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
@@ -239,6 +240,7 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 
 @router.post("/build")
 async def build_with_ai(payload: BuilderEndpointInput, request: Request):
+    await ensure_builder_available(request)
     from backend.app.routers.projects import expected_project_revision, assert_project_revision, next_project_revision
 
     if isinstance(payload, PlanOperation):

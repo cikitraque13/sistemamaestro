@@ -12,6 +12,7 @@ from backend.app.ai.memory.project_memory import (
     ProjectMemoryError,
     build_project_memory,
 )
+from backend.app.core.builder_access import ensure_builder_available
 from backend.app.core.security import get_current_user
 from backend.app.db.mongodb import db
 from backend.app.schemas.consumption import ConsumptionRequest
@@ -605,6 +606,7 @@ async def refine_project(
 
 @router.post("/{project_id}/blueprint")
 async def create_blueprint(project_id: str, request: Request):
+    await ensure_builder_available(request)
     user = await get_current_user(request)
     expected = expected_project_revision(request)
     operation_id = request_operation_id(request, "create_blueprint")

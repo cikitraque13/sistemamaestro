@@ -9,7 +9,7 @@ import Login from './features/auth/LoginPage';
 import Register from './features/auth/RegisterPage';
 import AuthCallback from './features/auth/AuthCallbackPage';
 import Dashboard from './features/dashboard/DashboardPage';
-import BuilderWorkspacePage from './features/builder/workspace/BuilderWorkspacePage';
+import BuilderRoute from './features/builder/BuilderRoute';
 import Projects from './features/projects/ProjectsPage';
 import ProjectDetail from './features/projects/detail/ProjectDetailPage';
 import Opportunities from './features/opportunities/OpportunitiesPage';
@@ -76,7 +76,7 @@ const AppRouter = () => {
       <Route path="/terms" element={<Terms />} />
 
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/builder" element={<ProtectedRoute><BuilderWorkspacePage /></ProtectedRoute>} />
+      <Route path="/dashboard/builder" element={<ProtectedRoute><BuilderRoute /></ProtectedRoute>} />
       <Route path="/dashboard/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
       <Route path="/dashboard/opportunities" element={<ProtectedRoute><Opportunities /></ProtectedRoute>} />
