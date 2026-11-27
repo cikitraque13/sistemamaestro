@@ -22,18 +22,23 @@ test('exact text, headings and ordered values; markup never executes',()=>{
 test('confirm transmits exact digest/revisions and does not build',async()=>{
  submitIntentOperation.mockResolvedValue({user_id:'owner',project_id:'p',updated_at:'r2',intent:{...project.active_j06_1_intent,status:'CONFIRMED'}});
  const {node,root}=mount(<IntentClarification project={project} ownerId="owner"/>);
- await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Confirmo esta intención exacta').click());
+ await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Confirmar').click());
  expect(submitIntentOperation).toHaveBeenCalledTimes(1);const [body,revision]=submitIntentOperation.mock.calls[0];
  expect(body.operation_type).toBe('CONFIRM');expect(body.digest).toBe('a'.repeat(64));expect(body.intent_id).toBe('i');expect(revision).toBe('r');
- expect(node.textContent).toContain('No se ha iniciado ninguna construcción');act(()=>root.unmount());
+ expect(node.querySelector('[data-intent-status]').getAttribute('data-intent-status')).toBe('CONFIRMED');
+ expect(node.textContent).not.toContain('Revisar intención');
+ expect(node.textContent).not.toContain('registra tu decisión');
+ expect(node.textContent).not.toContain('Preparar propuesta');
+ expect(node.textContent).not.toContain('la confirmamos');
+ act(()=>root.unmount());
 });
 test('uncertain persistence allows only exact retry',async()=>{
  submitIntentOperation.mockRejectedValue(Object.assign(new Error(),{code:'PERSISTENCE_UNAVAILABLE'}));
  const {node,root}=mount(<IntentClarification project={project} ownerId="owner"/>);
- await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Confirmo esta intención exacta').click());
+ await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Confirmar').click());
  const first=submitIntentOperation.mock.calls[0];
  expect([...node.querySelectorAll('button')].find(n=>n.textContent==='Cancelar').disabled).toBe(true);
- await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Reintentar la misma solicitud').click());
+ await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Reintentar').click());
  expect(submitIntentOperation.mock.calls[1]).toEqual(first);act(()=>root.unmount());
 });
 test('project identity keyed remount clears previous proposal',()=>{
@@ -45,11 +50,11 @@ test('project identity keyed remount clears previous proposal',()=>{
 test.each([new TypeError('network failure'), new SyntaxError('JSON parse failure')])('raw transport failure retains same operation and revision',async(failure)=>{
  submitIntentOperation.mockRejectedValue(failure);
  const {node,root}=mount(<IntentClarification project={project} ownerId="owner"/>);
- await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Confirmo esta intención exacta').click());
+ await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Confirmar').click());
  const first=submitIntentOperation.mock.calls[0];
  expect(node.querySelector('[role="alert"]').textContent).toBe('PERSISTENCE_UNAVAILABLE');
  expect([...node.querySelectorAll('button')].find(n=>n.textContent==='Cancelar').disabled).toBe(true);
- await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Reintentar la misma solicitud').click());
+ await act(async()=>[...node.querySelectorAll('button')].find(n=>n.textContent==='Reintentar').click());
  expect(submitIntentOperation.mock.calls[1]).toEqual(first);
  expect(submitIntentOperation.mock.calls[1][0].operation_id).toBe(first[0].operation_id);
  act(()=>root.unmount());

@@ -47,16 +47,14 @@ export default function IntentClarification({ project, ownerId, onSaved }) {
     } finally { if (binding.current === requestBinding) setBusy(false); }
   }
   const terminal = ['CONFIRMED','CANCELLED','SUPERSEDED'].includes(intent?.status);
-  return <section aria-label="Intención del proyecto">
-    <h2>Revisar intención</h2><p>La confirmación registra tu decisión. No construye ni consume créditos comerciales.</p>
+  return <section aria-label="Intención del proyecto" data-intent-status={intent?.status || ''}>
     <textarea aria-label="Petición" value={text} maxLength={8000} disabled={busy || Boolean(pending.current) || terminal} onChange={e=>setText(e.target.value)} />
-    <button disabled={busy || terminal || !text || Boolean(pending.current)} onClick={()=>send(intent ? 'EDIT' : 'CREATE_INTENT')}>Preparar propuesta</button>
+    <button disabled={busy || terminal || !text || Boolean(pending.current)} onClick={()=>send(intent ? 'EDIT' : 'CREATE_INTENT')}>Guardar</button>
     {intent?.questions.map(q=><label key={q.question_id}>{q.question}<textarea aria-label={q.question} disabled={busy || terminal || Boolean(pending.current)} value={answers[q.question_id] ?? intent.answers[q.question_id]?.text ?? ''} onChange={e=>setAnswers({...answers,[q.question_id]:e.target.value})} maxLength={2000} /></label>)}
-    {intent && !terminal && <><button disabled={busy || Boolean(pending.current) || !Object.keys(answers).length} onClick={()=>send('ANSWER')}>Guardar aclaraciones</button><button disabled={busy || Boolean(pending.current)} onClick={()=>send('SAVE_DRAFT')}>Guardar borrador</button><button disabled={busy || Boolean(pending.current)} onClick={()=>send('REFRESH')}>Actualizar contexto</button><button disabled={busy || Boolean(pending.current)} onClick={()=>send('CANCEL')}>Cancelar</button><button disabled={busy || Boolean(pending.current) || !text} onClick={()=>send('SUPERSEDE_AND_CREATE')}>Sustituir propuesta</button></>}
+    {intent && !terminal && <><button disabled={busy || Boolean(pending.current) || !Object.keys(answers).length} onClick={()=>send('ANSWER')}>Aclaraciones</button><button disabled={busy || Boolean(pending.current)} onClick={()=>send('SAVE_DRAFT')}>Borrador</button><button disabled={busy || Boolean(pending.current)} onClick={()=>send('REFRESH')}>Actualizar</button><button disabled={busy || Boolean(pending.current)} onClick={()=>send('CANCEL')}>Cancelar</button><button disabled={busy || Boolean(pending.current) || !text} onClick={()=>send('SUPERSEDE_AND_CREATE')}>Sustituir</button></>}
     <IntentProjection projection={intent?.confirmation_challenge?.display_projection} />
-    {intent?.status === 'READY_FOR_CONFIRMATION' && <button disabled={busy || Boolean(pending.current)} onClick={()=>send('CONFIRM')}>Confirmo esta intención exacta</button>}
-    {pending.current && !busy && <button onClick={()=>send(pending.current.body.operation_type, true)}>Reintentar la misma solicitud</button>}
-    {intent?.status === 'CONFIRMED' && <p role="status">Intención confirmada. No se ha iniciado ninguna construcción.</p>}
+    {intent?.status === 'READY_FOR_CONFIRMATION' && <button disabled={busy || Boolean(pending.current)} onClick={()=>send('CONFIRM')}>Confirmar</button>}
+    {pending.current && !busy && <button onClick={()=>send(pending.current.body.operation_type, true)}>Reintentar</button>}
     {error && <p role="alert">{error === 'CLASSIFIER_UNAVAILABLE' ? CLASSIFIER_UNAVAILABLE_MESSAGE : error}</p>}
   </section>;
 }

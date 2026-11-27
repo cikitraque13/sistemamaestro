@@ -815,7 +815,7 @@ const BuilderStructureCompact = ({ project, builderIntelligence }) => {
 };
 
 export default function BuilderCanvasPane({
-  activeWorkspaceTab = 'preview',
+  activeWorkspaceTab = 'code',
   copy,
   project,
   progress,

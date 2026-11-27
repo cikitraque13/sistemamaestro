@@ -62,45 +62,38 @@ export default function ProjectPlan({ project, ownerId }) {
     [steps[index], steps[destination]] = [steps[destination], steps[index]];
     change('steps', steps);
   };
-  return <section aria-label="Plan del proyecto"><h2>Preparar plan</h2>
-    <p>Escribe el plan y confirma su contenido por separado de la intención. Esta decisión no construye ni consume créditos comerciales.</p>
-    {!plan && <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('CREATE')}>Crear borrador de plan</button>}
-    {plan && <><p role="status">Estado del plan: {plan.stored_status === 'CANCELLED' ? 'CANCELLED' : plan.status}{plan.stored_status === 'CANCELLED' && plan.status === 'STALE' ? ' · Fuente obsoleta' : ''}</p>
-      <label>Título del plan<input aria-label="Título del plan" value={content.title} maxLength={120} disabled={locked} onChange={e => change('title', e.target.value)} /></label>
-      <label>Objetivo del plan<textarea aria-label="Objetivo del plan" value={content.objective} maxLength={1000} disabled={locked} onChange={e => change('objective', e.target.value)} /></label>
+  return <section aria-label="Plan del proyecto" data-plan-status={plan?.status || ''}>
+    {!plan && <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('CREATE')}>Crear</button>}
+    {plan && <>
+      <label>Título<input aria-label="Título del plan" value={content.title} maxLength={120} disabled={locked} onChange={e => change('title', e.target.value)} /></label>
+      <label>Objetivo<textarea aria-label="Objetivo del plan" value={content.objective} maxLength={1000} disabled={locked} onChange={e => change('objective', e.target.value)} /></label>
       <ol>{content.steps.map((step, index) => <li key={step.step_id}>
-        {['title', 'description', 'acceptance_criterion'].map(field => <label key={field}>{`${field === 'title' ? 'Título' : field === 'description' ? 'Descripción' : 'Criterio de aceptación'} del paso ${index + 1}`}<textarea aria-label={`${field} paso ${index + 1}`} disabled={locked} value={step[field]} maxLength={field === 'title' ? 120 : field === 'description' ? 600 : 400} onChange={e => stepChange(index, field, e.target.value)} /></label>)}
-        <button disabled={locked} onClick={() => change('steps', content.steps.filter((_, i) => i !== index))}>Eliminar paso {index + 1}</button>
-        <button disabled={locked || index === 0} onClick={() => moveStep(index, -1)}>Subir paso {index + 1}</button>
-        <button disabled={locked || index === content.steps.length - 1} onClick={() => moveStep(index, 1)}>Bajar paso {index + 1}</button>
+        {['title', 'description', 'acceptance_criterion'].map(field => <label key={field}>{`${field === 'title' ? 'Título' : field === 'description' ? 'Descripción' : 'Criterio'} ${index + 1}`}<textarea aria-label={`${field} paso ${index + 1}`} disabled={locked} value={step[field]} maxLength={field === 'title' ? 120 : field === 'description' ? 600 : 400} onChange={e => stepChange(index, field, e.target.value)} /></label>)}
+        <button disabled={locked} onClick={() => change('steps', content.steps.filter((_, i) => i !== index))}>Quitar {index + 1}</button>
+        <button disabled={locked || index === 0} onClick={() => moveStep(index, -1)}>Subir {index + 1}</button>
+        <button disabled={locked || index === content.steps.length - 1} onClick={() => moveStep(index, 1)}>Bajar {index + 1}</button>
       </li>)}</ol>
-      <button disabled={locked || content.steps.length >= 12} onClick={() => change('steps', [...content.steps, { step_id: crypto.randomUUID(), title: '', description: '', acceptance_criterion: '' }])}>Añadir paso</button>
-      <button disabled={locked || !dirty} onClick={() => send('EDIT')}>Guardar plan</button>
-      <button disabled={busy || Boolean(pending.current) || dirty || plan.status !== 'DRAFT'} onClick={() => send('REVIEW')}>Revisar plan guardado</button>
-      {dirty && <p>Guarda tus cambios y revisa la nueva propuesta antes de confirmar.</p>}
-      {plan.status === 'READY_FOR_CONFIRMATION' && !dirty && <><PlanProjection projection={plan.confirmation_challenge?.display_projection} /><button disabled={busy || Boolean(pending.current)} onClick={() => send('CONFIRM')}>Confirmo este plan exacto</button></>}
-      {['CONFIRMED', 'STALE'].includes(plan.status) && <section aria-label="Progreso declarado">
-        <h3>Progreso declarado</h3><p>Este estado lo declaras tú; no verifica que el trabajo se haya ejecutado.</p>
+      <button disabled={locked || content.steps.length >= 12} onClick={() => change('steps', [...content.steps, { step_id: crypto.randomUUID(), title: '', description: '', acceptance_criterion: '' }])}>Añadir</button>
+      <button disabled={locked || !dirty} onClick={() => send('EDIT')}>Guardar</button>
+      <button disabled={busy || Boolean(pending.current) || dirty || plan.status !== 'DRAFT'} onClick={() => send('REVIEW')}>Revisar</button>
+      {plan.status === 'READY_FOR_CONFIRMATION' && !dirty && <><PlanProjection projection={plan.confirmation_challenge?.display_projection} /><button disabled={busy || Boolean(pending.current)} onClick={() => send('CONFIRM')}>Confirmar</button></>}
+      {['CONFIRMED', 'STALE'].includes(plan.status) && <section aria-label="Progreso">
         {content.steps.map(step => <label key={step.step_id}>{step.title}
           <select aria-label={`Progreso de ${step.title}`} value={progressDraft[step.step_id] || plan.step_statuses?.[step.step_id] || 'NOT_STARTED'} disabled={plan.status !== 'CONFIRMED' || busy || Boolean(pending.current)}
             onChange={e => setProgressDraft({ ...progressDraft, [step.step_id]: e.target.value })}>
             {progressStatuses.map(status => <option key={status} value={status}>{status}</option>)}
           </select>
           {plan.status === 'CONFIRMED' && <button disabled={busy || Boolean(pending.current) || (progressDraft[step.step_id] || plan.step_statuses?.[step.step_id] || 'NOT_STARTED') === (plan.step_statuses?.[step.step_id] || 'NOT_STARTED')}
-            onClick={() => send('PROGRESS_UPDATE', false, { step_id: step.step_id, status: progressDraft[step.step_id] })}>Guardar progreso del paso</button>
+            onClick={() => send('PROGRESS_UPDATE', false, { step_id: step.step_id, status: progressDraft[step.step_id] })}>Guardar progreso</button>
           }
         </label>)}
       </section>}
-      {['CONFIRMED', 'STALE'].includes(plan.status) && <>
-        <p>Replan crea un borrador nuevo desde el contenido confirmado; el progreso anterior permanece en el predecesor y no se transfiere.</p>
-        <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('REPLAN')}>Crear replanteamiento</button>
-      </>}
-      {plan.stored_status !== 'CANCELLED' && ['DRAFT', 'READY_FOR_CONFIRMATION', 'STALE'].includes(plan.status) && <button disabled={busy || Boolean(pending.current)} onClick={() => send('CANCEL')}>Cancelar plan</button>}
-      {['CANCELLED', 'STALE'].includes(plan.status) && <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('RESTART')}>Iniciar nuevo borrador</button>}
-      {plan.status === 'STALE' && <p>La intención fuente cambió. El plan se conserva. Solo podrás iniciar otro borrador cuando exista una intención vigente confirmada en este proyecto.</p>}
-      <button disabled={busy || Boolean(pending.current)} onClick={() => send('READ')}>{dirty ? 'Descartar cambios y recuperar plan' : 'Recuperar plan guardado'}</button>
+      {['CONFIRMED', 'STALE'].includes(plan.status) && <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('REPLAN')}>Replan</button>}
+      {plan.stored_status !== 'CANCELLED' && ['DRAFT', 'READY_FOR_CONFIRMATION', 'STALE'].includes(plan.status) && <button disabled={busy || Boolean(pending.current)} onClick={() => send('CANCEL')}>Cancelar</button>}
+      {['CANCELLED', 'STALE'].includes(plan.status) && <button disabled={!confirmedIntent || busy || Boolean(pending.current)} onClick={() => send('RESTART')}>Nuevo</button>}
+      <button disabled={busy || Boolean(pending.current)} onClick={() => send('READ')}>Recuperar</button>
     </>}
-    {pending.current && !busy && <button onClick={() => send(pending.current.body.operation_type, true)}>Reintentar la misma solicitud de plan</button>}
+    {pending.current && !busy && <button onClick={() => send(pending.current.body.operation_type, true)}>Reintentar</button>}
     {error && <p role="alert">{error}</p>}
   </section>;
 }

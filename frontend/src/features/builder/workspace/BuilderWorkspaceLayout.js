@@ -56,7 +56,7 @@ const EmptyState = () => (
 
 export default function BuilderWorkspaceLayout({
   ownerId = null,
-  activeWorkspaceTab = 'preview',
+  activeWorkspaceTab = 'code',
   initialPrompt = '',
   project = null,
   loadingProject = false,
@@ -81,24 +81,47 @@ export default function BuilderWorkspaceLayout({
 
   return (
     <section className="h-full min-h-0 overflow-hidden rounded-[24px] border border-white/10 bg-[#06080B] shadow-[0_0_90px_rgba(0,0,0,0.38)]">
-      <div className="grid h-full min-h-0 grid-cols-1 overflow-hidden xl:grid-cols-[minmax(390px,0.48fr)_1px_minmax(560px,0.52fr)]">
-        <BuilderAgentPane
-          project={project}
-          copy={runtime.copy}
-          progress={runtime.progress}
-          activeCodeTab={runtime.activeCodeTab}
-          onCodeTabChange={runtime.setActiveCodeTab}
-          messages={runtime.messages}
-          agentStatus={runtime.agentStatus}
-          onSubmitMessage={runtime.submitMessage}
-          onStartBuild={runtime.startBuild}
-          builderIntelligence={runtime.builderIntelligence}
-        />
-
-        <div className="hidden bg-white/[0.08] xl:block" />
-
-        <div className="min-h-0 overflow-auto bg-[#08070D]">
-          {isLandingWorkspace && <>
+      <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[minmax(0,1.15fr)_minmax(0,0.85fr)] overflow-hidden xl:grid-cols-[minmax(560px,0.52fr)_1px_minmax(390px,0.48fr)] xl:grid-rows-1">
+        <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#08070D] xl:order-1">
+          <div className="min-h-0 flex-1 overflow-hidden">
+          {activeWorkspaceTab === 'code' ? (
+            <div className="flex h-full min-h-0 flex-col">
+              <div className="min-h-0 flex-1 overflow-hidden border-b border-white/10">
+                <BuilderCanvasPane
+                  activeWorkspaceTab="code"
+                  copy={runtime.copy}
+                  project={project}
+                  progress={runtime.progress}
+                  activeCodeTab={runtime.activeCodeTab}
+                  onCodeTabChange={runtime.setActiveCodeTab}
+                  builderIntelligence={previewIntelligence}
+                />
+              </div>
+              <div className="min-h-0 flex-1 overflow-hidden" aria-label="Preview del proyecto">
+                <BuilderCanvasPane
+                  activeWorkspaceTab="preview"
+                  copy={runtime.copy}
+                  project={project}
+                  progress={runtime.progress}
+                  activeCodeTab={runtime.activeCodeTab}
+                  onCodeTabChange={runtime.setActiveCodeTab}
+                  builderIntelligence={previewIntelligence}
+                />
+              </div>
+            </div>
+          ) : isLandingWorkspace && activeWorkspaceTab === 'preview' && (transaction.pending || transaction.revision > 0) ? (
+            <LandingArtifactPreview state={transaction.pending?.candidate || runtime.builderBuildState} artifact={transaction.pending?.artifact} isCandidate={Boolean(transaction.pending)} />
+          ) : <BuilderCanvasPane
+            activeWorkspaceTab={activeWorkspaceTab}
+            copy={runtime.copy}
+            project={project}
+            progress={runtime.progress}
+            activeCodeTab={runtime.activeCodeTab}
+            onCodeTabChange={runtime.setActiveCodeTab}
+            builderIntelligence={previewIntelligence}
+          />}
+          </div>
+          {isLandingWorkspace && <div className="max-h-[42%] shrink-0 overflow-auto border-t border-white/10">
           <div className="border-b border-white/10 p-3 text-sm text-white" aria-label="Cambio de landing">
             <p>{transaction.pending ? 'Vista previa del cambio · aún no aplicado' : `Landing activa · revisión local ${transaction.revision}`}</p>
             {transaction.pending && <p>Propuesta: {transaction.pending.operations.map((op) => ({ insert_static_section: 'Añadir sección', update_static_section: 'Editar sección', move_static_section: 'Mover sección', remove_static_section: 'Eliminar sección', set_primary_cta: 'Cambiar CTA', set_accent: 'Cambiar acento' }[op.type])).join(', ')} · CTA: {transaction.pending.candidate.primaryCTA} · Acento: {transaction.pending.candidate.visualAccent}</p>}
@@ -119,18 +142,24 @@ export default function BuilderWorkspaceLayout({
             <p className="text-xs text-zinc-400">Cambios locales de CTA, acento y secciones estáticas. No publica ni modifica créditos.</p>
           </div>
           <StaticSectionEditor state={runtime.builderBuildState} transaction={transaction} />
-          </>}
-          {isLandingWorkspace && activeWorkspaceTab === 'preview' && (transaction.pending || transaction.revision > 0) ? (
-            <LandingArtifactPreview state={transaction.pending?.candidate || runtime.builderBuildState} artifact={transaction.pending?.artifact} isCandidate={Boolean(transaction.pending)} />
-          ) : <BuilderCanvasPane
-            activeWorkspaceTab={activeWorkspaceTab}
-            copy={runtime.copy}
-            project={project}
-            progress={runtime.progress}
-            activeCodeTab={runtime.activeCodeTab}
-            onCodeTabChange={runtime.setActiveCodeTab}
-            builderIntelligence={previewIntelligence}
-          />}
+          </div>}
+        </div>
+
+        <div className="hidden bg-white/[0.08] xl:order-2 xl:block" />
+
+        <div className="h-full min-h-0 xl:order-3">
+        <BuilderAgentPane
+          project={project}
+          copy={runtime.copy}
+          progress={runtime.progress}
+          activeCodeTab={runtime.activeCodeTab}
+          onCodeTabChange={runtime.setActiveCodeTab}
+          messages={runtime.messages}
+          agentStatus={runtime.agentStatus}
+          onSubmitMessage={runtime.submitMessage}
+          onStartBuild={runtime.startBuild}
+          builderIntelligence={runtime.builderIntelligence}
+        />
         </div>
       </div>
     </section>

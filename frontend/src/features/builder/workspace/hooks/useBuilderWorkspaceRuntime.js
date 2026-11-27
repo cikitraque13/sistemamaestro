@@ -747,7 +747,7 @@ export default function useBuilderWorkspaceRuntime({
       // Existing-project requests are reviewed in the intent panel; confirmation
       // does not chain into construction in this first J06.1 slice.
       if (project?.project_id) {
-        landingTransaction.reject('Revisa la intención en el panel del proyecto. La construcción posterior no está habilitada en J06.1.');
+        landingTransaction.reject('No disponible.');
         return;
       }
       const requestIdentity = liveIdentity.current;
