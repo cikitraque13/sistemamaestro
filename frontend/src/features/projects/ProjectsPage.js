@@ -7,7 +7,6 @@ import {
   CaretDown,
   Check,
   FolderOpen,
-  Plus,
   Trash,
   MagnifyingGlass
 } from '@phosphor-icons/react';
@@ -15,11 +14,6 @@ import { toast } from 'sonner';
 
 import DashboardLayout from '../../components/DashboardLayout';
 import { api } from '../../lib/apiClient';
-
-const BUILDER_LAUNCHER_STATE = {
-  focus: 'builder-launcher',
-  source: 'projects-page-new-project'
-};
 
 const ROUTE_FILTERS = [
   {
@@ -263,20 +257,9 @@ const ProjectsPage = () => {
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-6 text-zinc-400 md:text-base">
-                Proyectos centraliza tus construcciones activas. La acción principal es
-                continuar en Builder.
+                Aquí están los proyectos guardados. Para uno nuevo, usa Nuevo proyecto.
               </p>
             </div>
-
-            <Link
-              to="/dashboard"
-              state={BUILDER_LAUNCHER_STATE}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
-              data-testid="new-project-btn"
-            >
-              <Plus size={18} weight="bold" />
-              Nuevo proyecto
-            </Link>
           </div>
         </div>
 
@@ -479,18 +462,8 @@ const ProjectsPage = () => {
             </h3>
 
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
-              Crea tu primer proyecto desde el launcher del Dashboard. Sistema Maestro
-              abrirá Builder para construir la primera versión y guiar las siguientes mejoras.
+              Usa Nuevo proyecto. El Builder guarda el diagnóstico, la preview y el borrador.
             </p>
-
-            <Link
-              to="/dashboard"
-              state={BUILDER_LAUNCHER_STATE}
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
-            >
-              <Plus size={18} weight="bold" />
-              Crear proyecto
-            </Link>
           </div>
         )}
       </div>

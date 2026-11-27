@@ -3,42 +3,28 @@ import { Link } from 'react-router-dom';
 import {
   CreditCard,
   FolderOpen,
-  Lightning,
-  Plus
+  Lightning
 } from '@phosphor-icons/react';
-
-const BUILDER_LAUNCHER_STATE = {
-  focus: 'builder-launcher',
-  source: 'dashboard-quick-actions'
-};
 
 const actions = [
   {
-    to: '/dashboard',
-    state: BUILDER_LAUNCHER_STATE,
-    label: 'Nuevo proyecto',
-    helper: 'Crear o inspirar desde el launcher',
-    icon: Plus,
-    tone: 'amber'
-  },
-  {
     to: '/dashboard/projects',
     label: 'Ver proyectos',
-    helper: 'Continuar construcciones activas',
+    helper: 'Abrir los proyectos guardados.',
     icon: FolderOpen,
     tone: 'cyan'
   },
   {
     to: '/dashboard/opportunities',
     label: 'Oportunidades',
-    helper: 'Plantillas y rutas desbloqueables',
+    helper: 'Plantillas para el Builder.',
     icon: Lightning,
     tone: 'emerald'
   },
   {
     to: '/dashboard/billing',
-    label: 'Facturación y gemas',
-    helper: 'Pagos, planes y capacidad operativa',
+    label: 'Facturación',
+    helper: 'Planes y gemas de la cuenta.',
     icon: CreditCard,
     tone: 'fuchsia'
   }
@@ -60,7 +46,7 @@ export default function DashboardQuickActions() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {actions.map((action) => {
           const Icon = action.icon;
 

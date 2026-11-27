@@ -17,14 +17,14 @@ export const BUILDER_QUESTION_PRESETS = {
     id: 'cta_priority',
     label: 'Prioridad del CTA',
     question: '¿Qué debe empujar el CTA principal?',
-    options: ['Crear cuenta', 'Analizar una URL', 'Hablar por WhatsApp'],
+    options: ['Crear cuenta', 'Analizar una URL', 'Formulario web'],
   },
 
   local_business_goal: {
     id: 'local_business_goal',
     label: 'Negocio local',
     question: '¿Qué prioridad tiene el negocio?',
-    options: ['Reservas', 'WhatsApp', 'Llamadas'],
+    options: ['Contacto', 'Formulario web', 'Llamada'],
   },
 
   design_intensity: {
@@ -38,7 +38,7 @@ export const BUILDER_QUESTION_PRESETS = {
     id: 'output_next_step',
     label: 'Siguiente salida',
     question: '¿Qué quieres preparar ahora?',
-    options: ['Iterar diseño', 'Ver código', 'Preparar deploy'],
+    options: ['Iterar diseño', 'Ver código', 'Revisar el borrador'],
   },
 };
 

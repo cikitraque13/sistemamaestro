@@ -76,7 +76,7 @@ export default function BuilderWorkspaceLayout({
 
   const transaction = runtime.landingTransaction;
   const isLandingWorkspace = runtime.builderBuildState?.projectKind === 'landing';
-  if (transaction.status !== 'ready' && runtime.builderBuildState?.projectKind === 'landing') return <div role="status" className="p-6 text-white">{transaction.error || 'Recuperando tu workspace…'}</div>;
+  if (transaction.status !== 'ready' && runtime.builderBuildState?.projectKind === 'landing') return <div role="status" className="p-6 text-white">{transaction.error || 'Recuperando el Builder…'}</div>;
   const previewIntelligence = transaction.pending ? { ...runtime.builderIntelligence, builderBuildState: transaction.pending.candidate, builderKernelOutput: createBuilderOutputMap(transaction.pending.candidate) } : runtime.builderIntelligence;
 
   return (

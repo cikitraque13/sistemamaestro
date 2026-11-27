@@ -70,6 +70,7 @@ const DashboardLayout = ({ children, title = 'Workspace' }) => {
           <button
             type="button"
             onClick={handleNewProject}
+            data-testid="new-project-btn"
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_10px_24px_rgba(245,158,11,0.14)] transition hover:scale-[1.01]"
           >
             <Plus size={16} weight="bold" />

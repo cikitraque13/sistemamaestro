@@ -677,7 +677,7 @@ const BlueprintCompact = ({ project }) => {
 
       <p className="mt-4 max-w-4xl text-sm leading-7 text-zinc-400">
         {blueprint?.summary ||
-          'El blueprint queda como base interna para informe, PDF y preparación estructural. Builder mantiene foco en construcción.'}
+          'El blueprint es el diagnóstico guardado. No es un PDF ni una publicación.'}
       </p>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
@@ -771,7 +771,7 @@ const BuilderStructureCompact = ({ project, builderIntelligence }) => {
           </h2>
 
           <p className="mt-4 max-w-4xl text-sm leading-7 text-zinc-400">
-            Esta estructura sale del estado de construcción y permite preparar una salida técnica coherente.
+            Este borrador lista carpetas y rutas. No publica el proyecto.
           </p>
         </div>
 

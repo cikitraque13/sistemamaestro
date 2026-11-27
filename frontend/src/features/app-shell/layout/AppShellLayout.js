@@ -97,11 +97,11 @@ export default function AppShellLayout({
   onWorkspaceTabChange = () => {},
   credits = 120,
   bonus = 25,
-  usageLabel = 'Construcción · iteración · salida',
+  usageLabel = 'Análisis · Builder · blueprint',
   userLabel = 'Cuenta principal',
   onNewProject = () => {},
   contextTitle = 'Builder activo',
-  contextBody = 'Construye, itera y prepara salida técnica con agente, código, extracción y preview.',
+  contextBody = 'Diagnóstico, preview y borrador en el Builder.',
 }) {
   const isBuilderMode = activeNavId === 'builder';
 
@@ -142,7 +142,7 @@ export default function AppShellLayout({
                     Área operativa del Builder.
                   </h2>
                   <p className="mt-4 text-sm leading-7 text-zinc-300">
-                    El agente, el código, la extracción y el preview viven dentro de esta zona fija.
+                    El diagnóstico, la preview y el borrador viven en esta zona.
                   </p>
                 </div>
               </div>

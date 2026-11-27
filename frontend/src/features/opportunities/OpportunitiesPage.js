@@ -90,8 +90,8 @@ const COPY_REPLACEMENTS = [
   [/Membresía recurrente \+ eventos premium/gi, 'Membresía recurrente + contenidos premium'],
   [/Freemium:/gi, 'Entrada gratuita:'],
   [/Reporte completo/gi, 'Informe completo'],
-  [/reportes de mejora automáticos/gi, 'informes de mejora generados desde el sistema'],
-  [/reportes PDF profesionales/gi, 'informes PDF profesionales'],
+  [/reportes de mejora automáticos/gi, 'notas de mejora en el diagnóstico'],
+  [/reportes PDF profesionales/gi, 'diagnóstico escrito'],
   [/recomendaciones detalladas/gi, 'recomendaciones accionables']
 ];
 

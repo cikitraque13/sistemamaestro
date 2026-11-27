@@ -107,7 +107,7 @@ const getFallbackText = ({
 
   if (mode === 'initial') {
     return [
-      'He preparado la primera version visible del proyecto.',
+      'He preparado la primera versión visible del proyecto.',
       `Estado: ${stageLabel} (${score}/100).`,
       primaryAction
         ? `Siguiente mejora recomendada: ${primaryAction}.`
@@ -118,7 +118,7 @@ const getFallbackText = ({
   }
 
   return [
-    'He interpretado tu mensaje y mantengo el proyecto dentro de su recorrido de maduracion.',
+    'He leído tu mensaje. El proyecto sigue en el Builder.',
     `Estado: ${stageLabel} (${score}/100).`,
     primaryAction
       ? `Siguiente mejora recomendada: ${primaryAction}.`
@@ -522,23 +522,23 @@ export const composeBuilderPhaseMessage = ({
   }
 
   if (safeProgress < 40) {
-    return 'Preparando primera version visible con estructura, CTA y secciones principales.';
+    return 'Preparando la primera versión visible, con estructura y CTA.';
   }
 
   if (safeProgress < 60) {
-    return 'Sincronizando preview, codigo y estructura inicial del proyecto.';
+    return 'Sincronizando la preview y la estructura inicial.';
   }
 
   if (safeProgress < 80) {
-    return 'Refinando conversion, confianza y continuidad hacia la siguiente accion.';
+    return 'Afinando la conversión y el siguiente paso.';
   }
 
   if (safeProgress < 100) {
-    return 'Preparando el siguiente paso del recorrido de maduracion.';
+    return 'Preparando el siguiente paso.';
   }
 
   if (phase === 'complete') {
-    return `Primera version lista para iterar${project?.title ? `: ${project.title}` : ''}.`;
+    return `Primera versión lista para iterar${project?.title ? `: ${project.title}` : ''}.`;
   }
 
   return 'Builder listo para la siguiente mejora.';
@@ -549,11 +549,11 @@ export const composeAgentStatusLabel = ({
   pendingQuestion = null,
   error = null,
 } = {}) => {
-  if (error) return 'Agente revisando error';
-  if (isBuilding) return 'Agente construyendo';
-  if (pendingQuestion) return 'Agente esperando decision';
+  if (error) return 'Builder con un error';
+  if (isBuilding) return 'Builder trabajando';
+  if (pendingQuestion) return 'Builder espera una decisión';
 
-  return 'Agente listo';
+  return 'Builder listo';
 };
 
 export default composeBuilderAgentResponse;

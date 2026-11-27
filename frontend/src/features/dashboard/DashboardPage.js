@@ -3,8 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowRight,
-  FolderOpen,
-  Plus
+  FolderOpen
 } from '@phosphor-icons/react';
 
 import DashboardLayout from '../../components/DashboardLayout';
@@ -16,11 +15,6 @@ import DashboardWelcomePanel from './components/DashboardWelcomePanel';
 import DashboardStatusPanel from './components/DashboardStatusPanel';
 import DashboardCreditsPanel from './components/DashboardCreditsPanel';
 import DashboardQuickActions from './widgets/DashboardQuickActions';
-
-const BUILDER_LAUNCHER_STATE = {
-  focus: 'builder-launcher',
-  source: 'dashboard-page'
-};
 
 const ROUTE_NAMES = {
   improve_existing: 'Mejorar existente',
@@ -121,7 +115,7 @@ const DashboardPage = () => {
   }, []);
 
   return (
-    <DashboardLayout title="Resumen premium">
+    <DashboardLayout title="Resumen">
       <div className="mx-auto max-w-7xl space-y-6">
         <motion.div
           id="builder-launcher"
@@ -200,18 +194,9 @@ const DashboardPage = () => {
               </h3>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
-                Vuelve al Builder como acción principal para seguir construyendo tu proyecto.
+                Los proyectos guardados se abren en el Builder.
               </p>
             </div>
-
-            <Link
-              to="/dashboard"
-              state={BUILDER_LAUNCHER_STATE}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
-            >
-              <Plus size={16} weight="bold" />
-              Nuevo proyecto
-            </Link>
           </div>
 
           {loading ? (
@@ -283,17 +268,8 @@ const DashboardPage = () => {
               </h3>
 
               <p className="mt-3 text-zinc-400">
-                Empieza con una idea o una URL y activa el sistema desde una base clara.
+                Escribe la idea en el Builder, arriba en esta página.
               </p>
-
-              <Link
-                to="/dashboard"
-                state={BUILDER_LAUNCHER_STATE}
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-5 py-3 text-sm font-semibold text-black shadow-[0_12px_26px_rgba(245,158,11,0.16)] transition hover:scale-[1.01]"
-              >
-                <Plus size={16} weight="bold" />
-                Abrir launcher
-              </Link>
             </div>
           )}
         </motion.section>

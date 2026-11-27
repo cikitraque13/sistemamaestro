@@ -1,14 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Plus, X } from '@phosphor-icons/react';
+import { X } from '@phosphor-icons/react';
 
 const STORAGE_KEY = 'sm_dashboard_open_tabs_v1';
 const MAX_TABS = 6;
-
-const BUILDER_LAUNCHER_STATE = {
-  focus: 'builder-launcher',
-  source: 'dashboard-project-tabs-new-project'
-};
 
 const TAB_META = [
   {
@@ -32,7 +27,7 @@ const TAB_META = [
   {
     match: (pathname) => pathname === '/dashboard/billing',
     key: 'billing',
-    label: 'Facturacion',
+    label: 'Facturación',
     to: '/dashboard/billing'
   },
   {
@@ -160,14 +155,6 @@ const DashboardProjectTabs = () => {
         );
       })}
 
-      <Link
-        to="/dashboard"
-        state={BUILDER_LAUNCHER_STATE}
-        className="inline-flex items-center gap-2 rounded-2xl border border-amber-200/20 bg-[linear-gradient(135deg,#f8e0a5_0%,#f3b96c_52%,#ef85c0_100%)] px-4 py-2 text-sm font-semibold text-black shadow-[0_10px_24px_rgba(245,158,11,0.14)] transition hover:scale-[1.01]"
-      >
-        <Plus size={14} />
-        Nuevo proyecto
-      </Link>
     </div>
   );
 };

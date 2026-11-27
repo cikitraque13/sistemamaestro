@@ -710,9 +710,9 @@ const buildTechnicalDelta = ({
     return {
       shouldExposeCode: true,
       shouldPrepareExport: true,
-      shouldMentionDeploy: true,
+      shouldMentionDeploy: false,
       strategy:
-        'Preparar salida técnica progresiva: estructura, código visible, GitHub/exportación y posible deploy posterior.',
+        'Mostrar la estructura y el código visible. No hay exportación ni publicación.',
     };
   }
 

@@ -26,11 +26,11 @@ const builderVisualStates = {
       badge: 'Producto en montaje',
       title: 'Aplicación con rutas, panel y lógica de continuidad',
       description:
-        'La vista representa una app que ya piensa en acceso, dashboard, proyecto y despliegue.',
+        'La vista representa una app con acceso, panel y proyecto. No está publicada.',
       cards: [
         { id: 'auth', label: 'Acceso', value: 'Entrada preparada' },
         { id: 'dashboard', label: 'Dashboard', value: 'Base operativa' },
-        { id: 'release', label: 'Deploy', value: 'Listo para siguiente paso' },
+        { id: 'release', label: 'Borrador', value: 'Sin publicación' },
       ],
     },
   },

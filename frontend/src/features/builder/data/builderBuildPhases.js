@@ -33,7 +33,7 @@ export const BUILDER_BUILD_PHASES = {
     {
       id: 'decision',
       threshold: 72,
-      label: 'Agente esperando dirección',
+      label: 'Builder espera dirección',
       agent: 'Antes de cerrar la versión, dime si quieres orientar el diseño a más premium, más claridad o más conversión.',
       options: ['Más premium', 'Más claridad', 'Más conversión'],
     },
@@ -47,7 +47,7 @@ export const BUILDER_BUILD_PHASES = {
       id: 'ready',
       threshold: 96,
       label: 'Versión lista',
-      agent: 'Primera versión lista. Puedes pedir una mejora visual, más conversión o preparar salida técnica.',
+      agent: 'Primera versión lista. Puedes pedir una mejora visual o seguir con la preview.',
     },
   ],
 
@@ -85,9 +85,9 @@ export const BUILDER_BUILD_PHASES = {
     {
       id: 'decision',
       threshold: 72,
-      label: 'Agente esperando dirección',
+      label: 'Builder espera dirección',
       agent: 'Antes de cerrar esta reconstrucción, dime la prioridad comercial principal.',
-      options: ['Reservas', 'WhatsApp', 'Llamadas'],
+      options: ['Contacto', 'Formulario web', 'Llamada'],
     },
     {
       id: 'preview',
@@ -99,7 +99,7 @@ export const BUILDER_BUILD_PHASES = {
       id: 'ready',
       threshold: 96,
       label: 'Rediseño listo',
-      agent: 'Primera reconstrucción lista. Puedes pedir cambios, mejorar fotos, reforzar CTA o preparar deploy.',
+      agent: 'Primera reconstrucción lista. Puedes pedir cambios, mejorar fotos o reforzar el CTA. No publica la web.',
     },
   ],
 
@@ -137,7 +137,7 @@ export const BUILDER_BUILD_PHASES = {
     {
       id: 'decision',
       threshold: 74,
-      label: 'Agente esperando dirección',
+      label: 'Builder espera dirección',
       agent: 'Antes de cerrar el hub, dime si quieres destacar un GPT principal, agrupar por categorías o reforzar captación.',
       options: ['Destacar GPT principal', 'Agrupar por categorías', 'Reforzar captación'],
     },
@@ -151,7 +151,7 @@ export const BUILDER_BUILD_PHASES = {
       id: 'ready',
       threshold: 96,
       label: 'Hub listo',
-      agent: 'Primera versión del hub lista para iterar tarjetas, enlaces, categorías o salida técnica.',
+      agent: 'Primera versión del hub lista para iterar tarjetas, enlaces o categorías.',
     },
   ],
 };
@@ -183,8 +183,8 @@ export const getAgentStatusFromBuildPhase = ({
   isRunning = false,
   templateType = null,
 } = {}) => {
-  if (!isRunning && progress >= 100) return 'Agente esperando respuesta';
-  if (!isRunning) return 'Agente preparado';
+  if (!isRunning && progress >= 100) return 'Builder espera respuesta';
+  if (!isRunning) return 'Builder preparado';
 
   const phase = getActiveBuildPhase({
     mode,
@@ -192,13 +192,13 @@ export const getAgentStatusFromBuildPhase = ({
     templateType,
   });
 
-  if (phase.id === 'decision') return 'Agente esperando dirección';
-  if (phase.id === 'preview') return 'Agente sincronizando preview';
-  if (phase.id === 'code') return 'Agente construyendo código';
-  if (phase.id === 'ready') return 'Agente listo para iterar';
-  if (phase.id === 'conversion') return 'Agente afinando conversión';
+  if (phase.id === 'decision') return 'Builder espera dirección';
+  if (phase.id === 'preview') return 'Builder sincroniza la preview';
+  if (phase.id === 'code') return 'Builder prepara el código';
+  if (phase.id === 'ready') return 'Builder listo para iterar';
+  if (phase.id === 'conversion') return 'Builder afina la conversión';
 
-  return 'Agente pensando';
+  return 'Builder pensando';
 };
 
 export const buildPhaseMessages = ({

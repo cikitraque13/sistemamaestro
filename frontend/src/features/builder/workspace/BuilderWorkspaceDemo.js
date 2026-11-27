@@ -31,7 +31,7 @@ export default function BuilderWorkspaceDemo() {
       onWorkspaceTabChange={setActiveWorkspaceTab}
       credits={120}
       bonus={25}
-      usageLabel="Créditos listos para construir, iterar y desplegar."
+      usageLabel="Créditos visibles para análisis, Builder y blueprint."
       contextTitle="Builder activo"
       contextBody="El App Shell ya contiene navegación, proyectos, créditos y tabs de trabajo. Esta demo levanta la primera base del Builder dentro de esa carcasa."
     >

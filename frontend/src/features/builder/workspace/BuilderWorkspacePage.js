@@ -1,5 +1,5 @@
 import { requestedProject, validatedProjectIdentity, serverRevision } from '../state/projectIdentity.mjs';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -11,7 +11,6 @@ import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
 import IntentClarification from '../panels/IntentClarification';
 import ProjectPlan from '../panels/ProjectPlan';
 
-import builderProjects from '../data/builderProjects';
 import builderWorkspaceTabs from '../data/builderWorkspaceTabs';
 
 const ACTIVE_BUILDER_PROJECT_STORAGE_KEY =
@@ -239,17 +238,9 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     loadingProject ||
     (Boolean(runtimeProjectId) && !selectionError && !resolved && !projectError);
 
-  const activeProjectData = useMemo(
-    () =>
-      builderProjects.find((item) => item.id === runtimeProjectId) ||
-      builderProjects[0] ||
-      { label: 'Proyecto activo' },
-    [runtimeProjectId]
-  );
-
   const activeIntent = resolveBuilderIntent(initialMode || resolved?.route);
   const activeType = resolveBuilderType(initialMode || resolved?.input_type);
-  const projectLabel = buildProjectLabel(resolved, activeProjectData.label);
+  const projectLabel = buildProjectLabel(resolved, 'Proyecto activo');
 
   const currentBuilderProjectId =
     resolved?.project_id ||
@@ -325,16 +316,20 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   };
 
   const contextBody = resolved
-    ? `Proyecto real ${resolved.project_id}. Estado: ${resolved.status || 'sin estado'}. El Builder ya está conectado al diagnóstico del backend.`
+    ? `Proyecto real ${resolved.project_id}. Estado: ${resolved.status || 'sin estado'}. Aquí están el diagnóstico, la preview y el borrador.`
     : initialPrompt
-      ? `Entrada recibida: "${initialPrompt}". El Builder está esperando proyecto real.`
-      : 'Builder operativo para construir, revisar diagnóstico, generar blueprint y preparar continuidad.';
+      ? `Entrada recibida: "${initialPrompt}". El Builder espera un proyecto guardado.`
+      : 'Builder para el diagnóstico, la preview y el borrador.';
   return (
     <AppShellLayout
       productLabel="Sistema Maestro"
       activeNavId="builder"
       onNavChange={handleNavChange}
-      projectItems={builderProjects}
+      projectItems={
+        currentBuilderProjectId
+          ? [{ id: currentBuilderProjectId, label: projectLabel, status: resolved?.status || 'Abierto', accent: 'cyan' }]
+          : []
+      }
       activeProjectId={selectionError ? '' : (runtimeProjectId || resolved?.project_id || '')}
       onProjectChange={(id) => navigate(buildBuilderProjectRoute(id), { state: { projectId: id } })}
       workspaceTabs={builderWorkspaceTabs}
@@ -342,7 +337,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       onWorkspaceTabChange={setActiveWorkspaceTab}
       credits={user?.credit_balance ?? 0}
       bonus={user?.credit_lifetime_granted ?? 0}
-      usageLabel="Créditos visibles para análisis, builder, blueprint, exportación y deploy."
+      usageLabel="Créditos visibles para análisis, Builder y blueprint."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
       contextTitle={resolved ? `Proyecto ${resolved.project_id}` : 'Builder activo'}

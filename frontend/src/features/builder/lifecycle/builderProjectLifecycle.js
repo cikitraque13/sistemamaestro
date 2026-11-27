@@ -70,17 +70,17 @@ export const BUILDER_LIFECYCLE_STAGES = [
   },
   {
     id: BUILDER_LIFECYCLE_STAGE_IDS.CONVERSION,
-    label: 'Conversion configurada',
+    label: 'Conversión en borrador',
     range: [41, 55],
     objective:
-      'Configurar CTA principal, formulario, WhatsApp, reserva, presupuesto, pedido, demo o recomendacion.',
+      'Dejar en el borrador un CTA, un formulario o una nota de contacto. WhatsApp y calendario están previstos.',
     userPromise:
-      'Hago que la web tenga una accion clara para convertir visitas en oportunidades.',
+      'La preview muestra una acción clara. No conecta WhatsApp ni un calendario.',
     visibleOutcome: [
-      'CTA configurado',
-      'formulario sectorial',
-      'WhatsApp o canal principal',
-      'mensaje de confirmacion',
+      'CTA en el borrador',
+      'formulario en la web',
+      'WhatsApp previsto',
+      'mensaje de confirmación en el borrador',
     ],
   },
   {
@@ -133,19 +133,16 @@ export const BUILDER_LIFECYCLE_STAGES = [
   },
   {
     id: BUILDER_LIFECYCLE_STAGE_IDS.TECHNICAL_EXIT,
-    label: 'Salida tecnica',
+    label: 'Revisión del borrador',
     range: [93, 100],
     objective:
-      'Preparar estructura final, codigo coherente, exportacion, GitHub, deploy, dominio o backend si procede.',
+      'Revisar la estructura del borrador. El sistema no publica, no despliega y no configura un dominio.',
     userPromise:
-      'Preparo la salida tecnica cuando el proyecto ya esta maduro.',
+      'Puedes revisar el borrador. La publicación no está disponible.',
     visibleOutcome: [
-      'estructura final',
-      'codigo coherente',
-      'exportacion',
-      'GitHub',
-      'deploy',
-      'dominio',
+      'estructura del borrador',
+      'código visible',
+      'sin publicación',
     ],
   },
 ];

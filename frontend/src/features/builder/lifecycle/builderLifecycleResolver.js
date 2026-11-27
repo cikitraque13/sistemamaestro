@@ -299,21 +299,21 @@ const contextualizeLabel = ({
     action.id === BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_BOOKING_FLOW &&
     sectorId === 'fitness_membership'
   ) {
-    return 'Configurar clase de prueba';
+    return 'Borrador de clase. Calendario previsto';
   }
 
   if (
     action.id === BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_BOOKING_FLOW &&
     sectorId === 'health_clinic'
   ) {
-    return 'Configurar cita o valoracion';
+    return 'Borrador de cita. Calendario previsto';
   }
 
   if (
     action.id === BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_BOOKING_FLOW &&
     sectorId === 'hospitality_booking'
   ) {
-    return 'Configurar reserva';
+    return 'Borrador de reserva. Calendario previsto';
   }
 
   if (action.id === BUILDER_LIFECYCLE_ACTION_IDS.CONFIGURE_ORDER_FLOW) {
@@ -516,7 +516,7 @@ export const buildLifecycleDecisionMessage = ({
 } = {}) => {
   if (!lifecycle?.nextActions?.length) return null;
 
-  const stageLabel = lifecycle.currentStage?.label || 'Proyecto en preparacion';
+  const stageLabel = lifecycle.currentStage?.label || 'Proyecto en preparación';
   const score = lifecycle.readinessScore || 0;
 
   return {
