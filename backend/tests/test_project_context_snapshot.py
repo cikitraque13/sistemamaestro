@@ -4,8 +4,10 @@ from copy import deepcopy
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
+import sys
 import test_credit_consumption_safety as credits_fixture
-credits_fixture.config_stub.OPENAI_API_KEY = None
+# Another suite stubs this module at import. Load the real prompt builder.
+sys.modules.pop("backend.app.ai.agents.builder_agent", None)
 from backend.app.ai.agents.builder_agent import _build_prompt
 import test_consumption_callers as f
 from pydantic import ValidationError

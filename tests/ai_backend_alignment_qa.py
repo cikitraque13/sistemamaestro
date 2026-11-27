@@ -56,7 +56,7 @@ KNOWN_SPEC_TOOLS_NOT_IN_TOOL_REGISTRY = {
     "decision_registry",
     "layout_mapper",
     "objection_mapper",
-    "openai_json",
+    "structured_json",
     "output_shape_validator",
     "structure_mapper",
 }

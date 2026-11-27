@@ -3,9 +3,6 @@
 import json
 from typing import Any, Dict
 
-from openai import AsyncOpenAI
-
-from backend.app.core.llm_client import async_client_kwargs, chat_model
 from backend.app.ai.schemas.builder_ai_output import (
     BuilderAIInput,
     BuilderAIOutput,
@@ -20,7 +17,7 @@ Tu función:
 Convertir el input del usuario en una salida estructurada que el Builder pueda aplicar como mutación.
 
 Arquitectura obligatoria:
-- OpenAI decide la construcción.
+- El modelo decide la construcción.
 - builder_agent.py adapta la decisión.
 - builderBuildKernel.js aplica o normaliza la mutación.
 - builderBuildState.js sigue siendo la fuente de verdad.
@@ -128,27 +125,33 @@ async def run_builder_agent(
     *,
     project_context: Dict[str, Any] | None = None,
 ) -> BuilderAIOutput:
-    client_kwargs = async_client_kwargs()
-    if not client_kwargs:
-        raise RuntimeError("GROK_API_KEY no está configurada (ni OPENAI_API_KEY de respaldo)")
+    from backend.app.ai.providers.anthropic_json import complete_builder_json
+    from backend.app.ai.providers.model_pricing import ANTHROPIC_RATES
+    from backend.app.core.config import ANTHROPIC_API_KEY, ANTHROPIC_EFFORT, ANTHROPIC_MAX_TOKENS, ANTHROPIC_MODEL
 
-    client = AsyncOpenAI(**client_kwargs)
+    if not ANTHROPIC_API_KEY or ANTHROPIC_MODEL not in ANTHROPIC_RATES:
+        raise RuntimeError("ANTHROPIC_API_KEY no está configurada o el modelo no tiene tarifa fijada")
 
-    response = await client.chat.completions.create(
-        model=chat_model(),
-        temperature=0.35,
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": _build_prompt(payload, project_context)},
-        ],
+    raw_content = await complete_builder_json(
+        api_key=ANTHROPIC_API_KEY,
+        model=ANTHROPIC_MODEL,
+        system=SYSTEM_PROMPT,
+        user=_build_prompt(payload, project_context),
+        max_tokens=ANTHROPIC_MAX_TOKENS,
+        effort=ANTHROPIC_EFFORT,
     )
 
-    raw_content = response.choices[0].message.content or "{}"
+    cleaned = (raw_content or "").strip()
+    if cleaned.startswith("```json"):
+        cleaned = cleaned[7:]
+    if cleaned.startswith("```"):
+        cleaned = cleaned[3:]
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
 
     try:
-        data: Dict[str, Any] = json.loads(raw_content)
+        data: Dict[str, Any] = json.loads(cleaned.strip() or "{}")
     except json.JSONDecodeError as exc:
-        raise RuntimeError("OpenAI no devolvió JSON válido para BuilderAIOutput.") from exc
+        raise RuntimeError("El modelo no devolvió JSON válido para BuilderAIOutput.") from exc
 
     return BuilderAIOutput.model_validate(data)

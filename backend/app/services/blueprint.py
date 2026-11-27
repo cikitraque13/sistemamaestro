@@ -2,27 +2,26 @@ import json
 import logging
 from typing import Dict
 
-import openai
-
-from backend.app.core.llm_client import async_client_kwargs, chat_model
+from backend.app.core.config import GROK_API_KEY, GROK_BASE_URL, GROK_MODEL
 
 logger = logging.getLogger(__name__)
 
 
 async def generate_blueprint(project: Dict) -> Dict:
-    client_kwargs = async_client_kwargs()
-    if not client_kwargs:
+    if not GROK_API_KEY or GROK_MODEL not in {"grok-4.3", "grok-4.7"}:
         return {
             "title": "Blueprint no disponible",
             "summary": "Configura GROK_API_KEY para generar blueprints",
-            "priorities": ["Configurar GROK_API_KEY"],
+            "priorities": ["Configurar API key de Grok"],
             "architecture": {"components": ["Por definir"]},
             "monetization": "Por definir",
             "deployment_steps": ["Configurar entorno"],
             "timeline_estimate": "Por definir"
         }
 
-    client_ai = openai.AsyncOpenAI(**client_kwargs)
+    from backend.app.ai.providers.grok_client import GrokChatClient
+
+    client_ai = GrokChatClient(api_key=GROK_API_KEY, timeout=60, max_retries=0, base_url=GROK_BASE_URL)
 
     route_names = {
         "improve": "Mejorar algo existente",
@@ -58,16 +57,18 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
 
     try:
         response = await client_ai.chat.completions.create(
-            model=chat_model(),
+            model=GROK_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": context}
             ],
             temperature=0.7,
-            max_tokens=2000
+            max_tokens=2000,
+            response_format={"type": "json_object"},
+            reasoning_effort="low",
         )
 
-        response_text = response.choices[0].message.content.strip()
+        response_text = (response.choices[0].message.content or "").strip()
 
         if response_text.startswith("```json"):
             response_text = response_text[7:]
@@ -89,3 +90,5 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
             "deployment_steps": ["Configurar entorno", "Desarrollar MVP", "Testing", "Lanzamiento"],
             "timeline_estimate": "4-8 semanas"
         }
+    finally:
+        await client_ai.close()

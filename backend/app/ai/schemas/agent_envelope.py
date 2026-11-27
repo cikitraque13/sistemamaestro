@@ -106,7 +106,7 @@ AGENT_SPEC_V1_REGISTRY: Dict[str, AgentSpecV1] = {
             "generate_folder_structure",
             "prepare_export_plan",
         ],
-        allowedTools=["openai_json", "builder_kernel", "output_shape_validator"],
+        allowedTools=["structured_json", "builder_kernel", "output_shape_validator"],
         forbiddenDomains=["autonomous_deploy", "pricing_strategy", "payments", "secrets"],
         userFeedback="He aplicado una mejora estructurada al Builder.",
         gemCostTier="medium",
