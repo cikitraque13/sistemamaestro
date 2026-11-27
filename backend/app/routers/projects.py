@@ -1,12 +1,13 @@
 import asyncio
+import base64
 import logging
 import os
 from datetime import datetime, timezone, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from backend.app.services.project_plan import project_plan_view, PlanError, HISTORY_ERROR, HISTORY_RESPONSE
 
 from backend.app.ai.memory.project_memory import (
@@ -506,23 +507,96 @@ async def create_project(project_data: ProjectCreate, request: Request):
     return project_doc
 
 
-@router.get("")
-async def get_projects(request: Request):
-    user = await get_current_user(request)
+# One list response stays a JSON array. 200 covers the supported project count
+# (100) with room; callers page with limit and cursor when they need the rest.
+DEFAULT_PROJECT_LIST_LIMIT = 200
+MAX_PROJECT_LIST_LIMIT = 200
+# Dashboard and ProjectsPage read these. updated_at is the delete If-Match revision.
+# Flow loads a single project, not this list.
+PROJECT_LIST_SUMMARY_FIELDS = (
+    "project_id",
+    "input_content",
+    "input_url",
+    "status",
+    "route",
+    "created_at",
+    "updated_at",
+)
+_PROJECT_LIST_PROJECTION = {field: 1 for field in PROJECT_LIST_SUMMARY_FIELDS}
+_PROJECT_LIST_PROJECTION["_id"] = 0
+_PROJECT_LIST_SORT = [("created_at", -1), ("project_id", -1)]
 
-    projects = await db.projects.find(
-        {"user_id": user["user_id"]},
-        {"_id": 0},
-    ).sort("created_at", -1).to_list(100)
 
+def _project_list_limit(limit: Optional[int]) -> int:
+    if limit is None:
+        return DEFAULT_PROJECT_LIST_LIMIT
+    if type(limit) is not int or not 1 <= limit <= MAX_PROJECT_LIST_LIMIT:
+        raise HTTPException(422, detail={"code": "invalid_project_list_limit"})
+    return limit
+
+
+def _project_cursor_parts(project: Dict[str, Any]) -> Optional[Tuple[str, str]]:
+    created_at = project.get("created_at")
+    project_id = project.get("project_id")
+    if not isinstance(created_at, str) or not created_at or "\n" in created_at:
+        return None
+    if not isinstance(project_id, str) or not project_id or "\n" in project_id:
+        return None
+    return created_at, project_id
+
+
+def encode_project_cursor(project: Dict[str, Any]) -> str:
+    parts = _project_cursor_parts(project)
+    if parts is None:
+        raise HTTPException(422, detail={"code": "invalid_project_cursor"})
+    created_at, project_id = parts
+    raw = f"{created_at}\n{project_id}".encode("utf-8")
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+
+
+def decode_project_cursor(cursor: str) -> Tuple[str, str]:
+    if not isinstance(cursor, str) or not cursor or len(cursor) > 512:
+        raise HTTPException(422, detail={"code": "invalid_project_cursor"})
     try:
-        for project in projects:
-            if "j06_2_plan" in project:
-                project["j06_2_plan"] = project_plan_view(project, user["user_id"])
-    except PlanError as exc:
-        if exc.code == HISTORY_ERROR:
-            return JSONResponse(status_code=409, content=HISTORY_RESPONSE)
-        raise HTTPException(409, detail={"code": exc.code}) from None
+        decoded = base64.urlsafe_b64decode(cursor + "=" * (-len(cursor) % 4)).decode("utf-8")
+    except Exception:
+        raise HTTPException(422, detail={"code": "invalid_project_cursor"}) from None
+    created_at, separator, project_id = decoded.partition("\n")
+    if not separator or _project_cursor_parts({"created_at": created_at, "project_id": project_id}) is None:
+        raise HTTPException(422, detail={"code": "invalid_project_cursor"})
+    return created_at, project_id
+
+
+def _project_list_query(user_id: str, cursor: Optional[str]) -> Dict[str, Any]:
+    query: Dict[str, Any] = {"user_id": user_id}
+    if not cursor:
+        return query
+    created_at, project_id = decode_project_cursor(cursor)
+    query["$or"] = [
+        {"created_at": {"$lt": created_at}},
+        {"created_at": created_at, "project_id": {"$lt": project_id}},
+    ]
+    return query
+
+
+@router.get("")
+async def get_projects(
+    request: Request,
+    response: Response,
+    limit: Optional[int] = None,
+    cursor: Optional[str] = None,
+):
+    user = await get_current_user(request)
+    page_size = _project_list_limit(limit)
+    found = await db.projects.find(
+        _project_list_query(user["user_id"], cursor),
+        _PROJECT_LIST_PROJECTION,
+    ).sort(_PROJECT_LIST_SORT).limit(page_size + 1).to_list(page_size + 1)
+    projects = found[:page_size]
+    if len(found) > page_size:
+        token = _project_cursor_parts(projects[-1])
+        if token is not None:
+            response.headers["X-Next-Cursor"] = encode_project_cursor(projects[-1])
     return projects
 
 
