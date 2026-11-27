@@ -52,10 +52,29 @@ class ResolveTests(unittest.TestCase):
         self.assertNotIn("acento malagueño", body["instructions"])
         self.assertIn("29 € al mes", body["instructions"])
         self.assertIn("Reglamento de IA", body["instructions"])
-        self.assertNotIn("[FECHA_CIERRE_REAL]", body["instructions"])
-        self.assertNotIn("[CASO_CERCANO_1]", body["instructions"])
-        self.assertNotIn("[TITULAR_DEL_TRATAMIENTO]", body["instructions"])
-        self.assertNotIn("[ENLACE_PRIVACIDAD]", body["instructions"])
+        self.assertNotIn("[", body["instructions"])
+        self.assertIn("xAI Grok Voice", body["instructions"])
+        self.assertIn("La voz es ara.", body["instructions"])
+        self.assertIn("https://sistemamaestro.com", body["instructions"])
+        self.assertIn("https://sistemamaestro.com/privacy", body["instructions"])
+        self.assertIn("privacidad@sistemamaestro.com", body["instructions"])
+        self.assertIn(
+            "Los datos los trata Sistema Maestro; tienes todos los detalles y el contacto de privacidad en sistemamaestro.com/privacy.",
+            body["instructions"],
+        )
+        self.assertIn(
+            "No hay fecha de cierre, cupo ni oferta que termine. Nunca uses urgencia.",
+            body["instructions"],
+        )
+        self.assertIn(
+            "No te voy a presionar con una fecha que no tengo.",
+            body["instructions"],
+        )
+        self.assertNotIn("solo quedan", body["instructions"].lower())
+        self.assertNotIn("acaba hoy", body["instructions"].lower())
+        self.assertIn("no es un cliente real", body["instructions"])
+        self.assertIn("una clínica pequeña podría entrar Gratis", body["instructions"])
+        self.assertIn("un comercio o restaurante de barrio podría entrar Gratis", body["instructions"])
         self.assertNotIn("session", body["websocket_url"])
 
     def test_rate_limit(self):
