@@ -46,6 +46,10 @@ class ResolveTests(unittest.TestCase):
         self.assertEqual(body["language"], "es-ES")
         self.assertIn("Habla en español de España con acento malagueño.", body["instructions"])
         self.assertIn("# Diagnóstico guiado", body["instructions"])
+        self.assertIn("# Manual de venta", body["instructions"])
+        self.assertIn("No inventes precios.", body["instructions"])
+        self.assertIn("queda registrado para el análisis", body["instructions"])
+        self.assertIn("agencia de inteligencia artificial que lo hace por ellos", body["instructions"])
         self.assertIn(
             "Nunca digas que la has mirado, escaneado o analizado.",
             body["instructions"],
