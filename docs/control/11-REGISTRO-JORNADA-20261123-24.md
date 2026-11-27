@@ -168,6 +168,8 @@ Diferencia con lo declarado: no existe una carpeta `Sistema Maestro` de soporte.
 
 ## 11. Nova, agente de voz de la demo
 
+Actualización 2026-11-27: el proveedor de voz de esta jornada se retiró del producto. El estado vigente está en `docs/agents/nova/README.md` (Grok Voice en el servidor, voz del navegador o texto). Los apuntes de abajo describen el 24/11.
+
 Comprobado el 2026-11-24 entre la 01:40 y la 01:45, en solo lectura.
 
 - Agente en ElevenLabs: `agent_4201m85fg3z3eb281fjjx0vhhg0h` (id público, no es una clave). Existe, se llama "Nova · Sistema Maestro (demo portada)", idioma español. Creado a la 01:32 y actualizado a la 01:43.

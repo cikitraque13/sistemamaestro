@@ -23,7 +23,7 @@
 | GitHub main | `918a017` (merge de PR #139, 01:44 Europe/Madrid) |
 | PRs publicados desde la observación anterior | #128 y #130 a #140 (#129 cerrado sin fusionar); detalle en el [registro de jornada 2026-11-23/24](../control/11-REGISTRO-JORNADA-20261123-24.md) |
 | Railway deployment | `c26e56a1`; SUCCESS; creado 2026-11-24T00:44Z vía GitHub, rama `main`, commit `918a017` |
-| Variable de build | `VITE_ELEVENLABS_AGENT_ID` presente en el servicio (solo el nombre comprobado); el bundle publicado contiene el id público del agente |
+| Variable de build | En esa fecha el servicio tenía una variable de build del proveedor de voz de entonces (solo se comprobó el nombre) y el bundle publicado contenía el id público. El 2026-11-27 esa variable dejó de formar parte del producto: el `Dockerfile` ya no la declara. |
 | Health | `GET /` y `GET /health` respondieron HTTP 200 a la 01:45 Europe/Madrid |
 | Build provenance | UNVERIFIED |
 | Alcance | Portada y demo de voz de Nova; no modifica estados de madurez |

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-// Check for browser support
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const speechSynthesis = window.speechSynthesis;
+// Check for browser support. Guard `window` so importing this hook cannot crash
+// a non-browser bundle or a page that has no speech APIs.
+const speechWindow = typeof window !== 'undefined' ? window : {};
+const SpeechRecognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+const speechSynthesis = speechWindow.speechSynthesis;
 
 export const useVoice = () => {
   const [isListening, setIsListening] = useState(false);
@@ -19,6 +21,7 @@ export const useVoice = () => {
     setIsSupported(supported);
     
     if (supported && SpeechRecognition) {
+      try {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = true;
@@ -47,6 +50,10 @@ export const useVoice = () => {
       recognitionRef.current.onend = () => {
         setIsListening(false);
       };
+      } catch {
+        recognitionRef.current = null;
+        setIsSupported(false);
+      }
     }
 
     return () => {

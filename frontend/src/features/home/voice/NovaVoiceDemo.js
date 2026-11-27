@@ -1,34 +1,34 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import { API_BASE } from '../../../lib/apiClient';
+import { useVoice } from '../../../hooks/useVoice';
 import {
-  isEarlyDrop,
-  levelsFromFrequency,
+  BROWSER_FOLLOWUP,
+  NOVA_GREETING,
+  NOVA_GREETING_DISPLAY,
+  buildGrokSessionUpdate,
+  choosePcmRate,
+  downsampleFloat32,
+  encodePcm16Base64,
+  floatToPcm16,
+  greetingItem,
+  isMicDenied,
+  levelsFromPcm16,
   novaPhase,
   novaStatusLabel,
-  resolveNovaVoiceConfig,
+  resolveNovaVoiceProvider,
 } from './novaVoiceConfig.mjs';
 import NovaAvatar from './NovaAvatar';
 import './novaDemo.css';
 
-// Demo de voz en vivo de Nova: avatar animado, onda con el volumen real de la
-// llamada, estado pulsante y botón grande. Se resuelve una sola vez en el
-// build: sin VITE_ELEVENLABS_AGENT_ID ni VITE_VOICE_AGENT_URL se muestra el
-// avatar y el saludo, pero no el botón. El SDK de voz solo se carga al pulsar.
-const NOVA_VOICE = resolveNovaVoiceConfig(import.meta.env || {});
-
 const BAR_COUNT = 28;
 const BAR_COLORS = ['#F97316', '#C6F432', '#A78BFA', '#38BDF8'];
-// Perfil en reposo: una onda suave, más alta en el centro.
 const BAR_BASE = Array.from({ length: BAR_COUNT }, (_, i) => {
   const x = i / (BAR_COUNT - 1);
   const envelope = Math.sin(Math.PI * x);
   const ripple = 0.5 + 0.5 * Math.sin(i * 1.7);
   return Number((0.16 + envelope * (0.22 + ripple * 0.26)).toFixed(3));
 });
-
-// Mismo texto que el primer mensaje del agente en ElevenLabs.
-const GREETING =
-  '«Hola, soy Nova, asistente de inteligencia artificial de Sistema Maestro. Estoy aquí para explicarte el producto con claridad y resolver tus dudas. ¿Me cuentas en una frase qué negocio tienes y qué te trae por aquí?»';
 
 const PHASE_UI = {
   idle: { pill: 'Disponible ahora', color: 'text-[#C6F432]', ripple: 'text-[#A78BFA]' },
@@ -52,9 +52,6 @@ const prefersReducedMotion = () =>
   window.matchMedia &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const isMicDenied = (error) =>
-  error && (error.name === 'NotAllowedError' || error.name === 'SecurityError');
-
 const MicIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="9" y="2.5" width="6" height="12" rx="3" />
@@ -69,162 +66,459 @@ const HangUpIcon = () => (
   </svg>
 );
 
+const decodeBase64 = (value) => {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+};
+
+async function readProvider() {
+  try {
+    const response = await fetch(`${API_BASE}/public/nova-voice`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) return 'browser';
+    return resolveNovaVoiceProvider(await response.json());
+  } catch {
+    return 'browser';
+  }
+}
+
 const NovaVoiceDemo = () => {
+  const voice = useVoice();
+  const [provider, setProvider] = useState('pending');
   const [status, setStatus] = useState('idle');
   const [agentMode, setAgentMode] = useState('listening');
+  const [engine, setEngine] = useState(null);
+  const [heard, setHeard] = useState('');
   const rootRef = useRef(null);
   const barsRef = useRef([]);
-  const sessionRef = useRef(null);
-  const connectedAtRef = useRef(0);
-  const endedByUserRef = useRef(false);
-  const modeRef = useRef('listening');
   const mountedRef = useRef(true);
+  const providerRef = useRef('pending');
+  const callRef = useRef(null);
+  const browserStep = useRef('idle');
+  const sawSpeaking = useRef(false);
 
-  const voiceMode = NOVA_VOICE.mode;
   const phase = novaPhase(status, agentMode);
-  const ui = PHASE_UI[phase];
-  const inCall = status === 'connected';
+  const ui = PHASE_UI[phase] || PHASE_UI.idle;
+  const inCall = engine === 'grok' || engine === 'browser';
   const label = novaStatusLabel(status, agentMode);
+
+  const safe = (fn) => {
+    if (mountedRef.current) fn();
+  };
+
+  const paintLevels = (levels) => {
+    if (prefersReducedMotion()) return;
+    barsRef.current.forEach((bar, index) => {
+      if (!bar) return;
+      const level = Math.max(BAR_BASE[index] * 0.35, 0.08 + (levels[index] || 0) * 0.92);
+      bar.style.transform = `scaleY(${level.toFixed(3)})`;
+    });
+  };
+
+  const stopCall = useCallback(() => {
+    const call = callRef.current;
+    callRef.current = null;
+    browserStep.current = 'idle';
+    sawSpeaking.current = false;
+    if (call) {
+      try { call.stop(); } catch { /* already closed */ }
+    }
+    try { voice.stopSpeaking(); } catch { /* speech API unavailable */ }
+    try { voice.stopListening(); } catch { /* speech API unavailable */ }
+  }, [voice]);
 
   useEffect(() => {
     mountedRef.current = true;
+    let cancelled = false;
+    readProvider().then((next) => {
+      if (cancelled) return;
+      providerRef.current = next;
+      setProvider(next);
+    });
     return () => {
+      cancelled = true;
       mountedRef.current = false;
-      const session = sessionRef.current;
-      sessionRef.current = null;
-      if (session) session.endSession().catch(() => {});
+      const call = callRef.current;
+      callRef.current = null;
+      if (call) {
+        try { call.stop(); } catch { /* already closed */ }
+      }
     };
   }, []);
 
-  const safeSet = (setter, value) => {
-    if (mountedRef.current) setter(value);
+  useEffect(() => {
+    if (engine !== 'browser') return;
+    if (voice.isSpeaking) sawSpeaking.current = true;
+    if (browserStep.current === 'greeting' && sawSpeaking.current && !voice.isSpeaking) {
+      browserStep.current = 'listening';
+      let started = false;
+      try {
+        started = voice.startListening();
+      } catch {
+        started = false;
+      }
+      if (!started) {
+        safe(() => {
+          setEngine(null);
+          setStatus('text');
+        });
+      } else {
+        safe(() => setAgentMode('listening'));
+      }
+    }
+  }, [engine, voice.isSpeaking, voice]);
+
+  useEffect(() => {
+    if (engine !== 'browser') return;
+    if (browserStep.current !== 'listening' || voice.isListening) return;
+    const transcript = (voice.transcript || '').trim();
+    if (!transcript) return;
+    browserStep.current = 'done';
+    safe(() => {
+      setHeard(transcript);
+      setAgentMode('speaking');
+    });
+    try {
+      voice.speak(BROWSER_FOLLOWUP);
+    } catch {
+      safe(() => setStatus('text'));
+    }
+  }, [engine, voice.isListening, voice.transcript, voice]);
+
+  const startBrowser = () => {
+    if (!voice.isSupported) return false;
+    browserStep.current = 'greeting';
+    sawSpeaking.current = false;
+    setEngine('browser');
+    setStatus('browser');
+    setAgentMode('speaking');
+    try {
+      return voice.speak(NOVA_GREETING) !== false;
+    } catch {
+      return false;
+    }
   };
 
-  const resetVisuals = () => {
+  const startGrok = async () => {
+    let payload;
+    try {
+      const response = await fetch(`${API_BASE}/public/nova-voice/session`, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+      });
+      payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.provider !== 'grok' || !payload.token || !payload.websocket_url) {
+        return 'fail';
+      }
+    } catch {
+      return 'fail';
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof WebSocket === 'undefined') {
+      return 'fail';
+    }
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+      });
+    } catch (error) {
+      return isMicDenied(error) ? 'mic-denied' : 'fail';
+    }
+
+    let inputContext;
+    try {
+      inputContext = new AudioContext();
+      if (inputContext.resume) await inputContext.resume();
+    } catch {
+      stream.getTracks().forEach((track) => track.stop());
+      return 'fail';
+    }
+
+    const inputRate = choosePcmRate(inputContext.sampleRate);
+    const outputRate = Number(payload.output_sample_rate) || 24000;
+    let playback;
+    const sources = [];
+    let nextTime = 0;
+    let ws;
+    let processor;
+    let settled = false;
+    let ready = false;
+    let configured = false;
+    let greeted = false;
+
+    const stopMic = () => {
+      if (processor) {
+        try { processor.disconnect(); } catch { /* already stopped */ }
+        processor.onaudioprocess = null;
+        processor = null;
+      }
+      stream.getTracks().forEach((track) => track.stop());
+      if (inputContext && inputContext.close) inputContext.close().catch(() => {});
+      sources.forEach((source) => {
+        try { source.stop(); } catch { /* already ended */ }
+      });
+      if (playback && playback.close) playback.close().catch(() => {});
+    };
+
+    const playDelta = (b64) => {
+      if (!b64 || !playback) return;
+      try {
+        const bytes = decodeBase64(b64);
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const sampleCount = Math.floor(bytes.byteLength / 2);
+        if (!sampleCount) return;
+        const audioBuffer = playback.createBuffer(1, sampleCount, outputRate);
+        const channel = audioBuffer.getChannelData(0);
+        const pcm = new Int16Array(sampleCount);
+        for (let i = 0; i < sampleCount; i += 1) {
+          pcm[i] = view.getInt16(i * 2, true);
+          channel[i] = pcm[i] / 32768;
+        }
+        const source = playback.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(playback.destination);
+        const startAt = Math.max(playback.currentTime, nextTime);
+        source.start(startAt);
+        nextTime = startAt + audioBuffer.duration;
+        sources.push(source);
+        paintLevels(levelsFromPcm16(pcm, BAR_COUNT));
+        if (rootRef.current) {
+          const rms = levelsFromPcm16(pcm, 1)[0] || 0;
+          rootRef.current.style.setProperty('--nova-level', Math.min(1, rms).toFixed(3));
+        }
+        safe(() => setAgentMode('speaking'));
+      } catch {
+        /* a bad audio chunk must not take down the page */
+      }
+    };
+
+    const beginMic = () => {
+      try {
+        const source = inputContext.createMediaStreamSource(stream);
+        processor = inputContext.createScriptProcessor(4096, 1, 1);
+        const mute = inputContext.createGain();
+        mute.gain.value = 0;
+        processor.onaudioprocess = (event) => {
+          if (!ws || ws.readyState !== WebSocket.OPEN) return;
+          try {
+            let channel = event.inputBuffer.getChannelData(0);
+            if (inputContext.sampleRate !== inputRate) {
+              channel = downsampleFloat32(channel, inputContext.sampleRate, inputRate);
+            }
+            const pcm = floatToPcm16(channel);
+            ws.send(JSON.stringify({
+              type: 'input_audio_buffer.append',
+              audio: encodePcm16Base64(pcm),
+            }));
+          } catch {
+            /* ignore one bad frame */
+          }
+        };
+        source.connect(processor);
+        processor.connect(mute);
+        mute.connect(inputContext.destination);
+      } catch {
+        /* the call can still play the greeting if the mic graph fails */
+      }
+    };
+
+    const readyPromise = new Promise((resolve) => {
+      const finish = (result) => {
+        if (settled) return;
+        settled = true;
+        resolve(result);
+      };
+      const timer = window.setTimeout(() => {
+        if (!ready) {
+          try { ws && ws.close(); } catch { /* ignore */ }
+          stopMic();
+          finish('fail');
+        }
+      }, 8000);
+
+      try {
+        ws = new WebSocket(payload.websocket_url, [`xai-client-secret.${payload.token}`]);
+      } catch {
+        window.clearTimeout(timer);
+        stopMic();
+        finish('fail');
+        return;
+      }
+
+      ws.onmessage = (message) => {
+        let event;
+        try {
+          event = JSON.parse(message.data);
+        } catch {
+          return;
+        }
+        const type = event && event.type;
+        if ((type === 'session.created' || type === 'conversation.created') && !configured) {
+          configured = true;
+          try {
+            ws.send(JSON.stringify(buildGrokSessionUpdate({
+              instructions: payload.instructions,
+              voice: payload.voice || 'ara',
+              inputRate,
+              outputRate,
+            })));
+          } catch {
+            finish('fail');
+          }
+        }
+        if (type === 'session.updated' && !greeted) {
+          greeted = true;
+          ready = true;
+          window.clearTimeout(timer);
+          try {
+            playback = new AudioContext({ sampleRate: outputRate });
+            if (playback.resume) playback.resume();
+          } catch {
+            try { playback = new AudioContext(); } catch { playback = null; }
+          }
+          try {
+            ws.send(JSON.stringify(greetingItem()));
+            ws.send(JSON.stringify({ type: 'response.create' }));
+          } catch {
+            /* the visitor can still speak */
+          }
+          beginMic();
+          safe(() => {
+            setEngine('grok');
+            setStatus('connected');
+            setAgentMode('listening');
+          });
+          finish('ok');
+        }
+        if (type === 'response.output_audio.delta' || type === 'response.audio.delta') {
+          playDelta(event.delta);
+        }
+        if (type === 'response.done') {
+          safe(() => setAgentMode('listening'));
+        }
+        if (type === 'input_audio_buffer.speech_started') {
+          sources.splice(0).forEach((source) => {
+            try { source.stop(); } catch { /* already ended */ }
+          });
+          if (playback) nextTime = playback.currentTime;
+          safe(() => setAgentMode('listening'));
+        }
+        if (type === 'error' && !ready) {
+          window.clearTimeout(timer);
+          try { ws.close(); } catch { /* ignore */ }
+          stopMic();
+          finish('fail');
+        }
+      };
+
+      ws.onerror = () => {
+        if (!ready) {
+          window.clearTimeout(timer);
+          stopMic();
+          finish('fail');
+        }
+      };
+
+      ws.onclose = () => {
+        if (!ready) {
+          window.clearTimeout(timer);
+          stopMic();
+          finish('fail');
+        } else if (callRef.current && callRef.current.ws === ws) {
+          stopMic();
+          callRef.current = null;
+          safe(() => {
+            setEngine(null);
+            setStatus('dropped');
+          });
+        }
+      };
+    });
+
+    callRef.current = {
+      ws,
+      stop: () => {
+        ready = false;
+        try { ws && ws.close(); } catch { /* ignore */ }
+        stopMic();
+      },
+    };
+
+    const result = await readyPromise;
+    if (result !== 'ok') {
+      callRef.current = null;
+    }
+    return result;
+  };
+
+  const start = async () => {
+    setHeard('');
+    setStatus('connecting');
+    setAgentMode('listening');
+    let nextProvider = providerRef.current;
+    if (nextProvider === 'pending') {
+      nextProvider = await readProvider();
+      providerRef.current = nextProvider;
+      safe(() => setProvider(nextProvider));
+    }
+    if (!mountedRef.current) return;
+    if (nextProvider === 'text') {
+      setStatus('text');
+      return;
+    }
+    if (nextProvider === 'grok') {
+      let result = 'fail';
+      try {
+        result = await startGrok();
+      } catch {
+        result = 'fail';
+      }
+      if (!mountedRef.current) {
+        stopCall();
+        return;
+      }
+      if (result === 'ok') return;
+      if (result === 'mic-denied') {
+        setStatus('mic-denied');
+        return;
+      }
+    }
+    let browserOk = false;
+    try {
+      browserOk = startBrowser();
+    } catch {
+      browserOk = false;
+    }
+    if (!browserOk) {
+      setEngine(null);
+      setStatus('text');
+    }
+  };
+
+  const stop = () => {
+    stopCall();
+    setEngine(null);
+    setStatus(providerRef.current === 'text' ? 'text' : 'idle');
+    setAgentMode('listening');
     if (rootRef.current) rootRef.current.style.setProperty('--nova-level', '0');
     barsRef.current.forEach((bar) => {
       if (bar) bar.style.transform = '';
     });
   };
 
-  // Onda y avatar con el volumen REAL de la llamada: espectro de salida cuando
-  // habla Nova, de entrada (micrófono) cuando escucha.
-  useEffect(() => {
-    if (!inCall || prefersReducedMotion()) return undefined;
-    let frame = 0;
-    const tick = () => {
-      const session = sessionRef.current;
-      if (session) {
-        try {
-          const speaking = modeRef.current === 'speaking';
-          const data = speaking
-            ? session.getOutputByteFrequencyData()
-            : session.getInputByteFrequencyData();
-          const volume = speaking ? session.getOutputVolume() : session.getInputVolume();
-          const levels = levelsFromFrequency(data, BAR_COUNT);
-          barsRef.current.forEach((bar, index) => {
-            if (bar) {
-              const level = Math.max(BAR_BASE[index] * 0.35, 0.08 + levels[index] * 0.92);
-              bar.style.transform = `scaleY(${level.toFixed(3)})`;
-            }
-          });
-          if (rootRef.current) {
-            rootRef.current.style.setProperty('--nova-level', Math.min(1, volume || 0).toFixed(3));
-          }
-        } catch {
-          // El análisis de audio aún no está listo; se intenta en el siguiente frame.
-        }
-      }
-      frame = window.requestAnimationFrame(tick);
-    };
-    frame = window.requestAnimationFrame(tick);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      resetVisuals();
-    };
-  }, [inCall]);
-
-  const start = useCallback(async () => {
-    endedByUserRef.current = false;
-    connectedAtRef.current = 0;
-    modeRef.current = 'listening';
-    setStatus('connecting');
-    setAgentMode('listening');
-
-    // 1) Permiso de micrófono, pedido tras el clic del visitante.
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-    } catch (error) {
-      safeSet(setStatus, isMicDenied(error) ? 'mic-denied' : 'error');
-      return;
-    }
-
-    // 2) El SDK de ElevenLabs solo se descarga ahora (chunk aparte, carga diferida).
-    try {
-      const { Conversation } = await import('@elevenlabs/client');
-      const session = await Conversation.startSession({
-        agentId: NOVA_VOICE.agentId,
-        connectionType: 'webrtc',
-        onConnect: () => {
-          if (!connectedAtRef.current) connectedAtRef.current = Date.now();
-          safeSet(setStatus, 'connected');
-        },
-        onDisconnect: (details) => {
-          sessionRef.current = null;
-          if (endedByUserRef.current) {
-            safeSet(setStatus, 'idle');
-            return;
-          }
-          const early = isEarlyDrop(connectedAtRef.current, Date.now());
-          if (early && typeof console !== 'undefined') {
-            console.warn('[Nova] la llamada se cortó al empezar', details);
-          }
-          safeSet(setStatus, early ? 'dropped' : 'idle');
-        },
-        onError: (message) => {
-          if (typeof console !== 'undefined') console.warn('[Nova] error de voz', message);
-          safeSet(setStatus, 'error');
-        },
-        onModeChange: ({ mode }) => {
-          modeRef.current = mode;
-          safeSet(setAgentMode, mode);
-        },
-      });
-
-      if (!mountedRef.current) {
-        session.endSession().catch(() => {});
-        return;
-      }
-      sessionRef.current = session;
-      if (!connectedAtRef.current) connectedAtRef.current = Date.now();
-      setStatus((current) => (current === 'connecting' ? 'connected' : current));
-    } catch (error) {
-      safeSet(setStatus, isMicDenied(error) ? 'mic-denied' : 'error');
-    }
-  }, []);
-
-  const stop = useCallback(async () => {
-    endedByUserRef.current = true;
-    const session = sessionRef.current;
-    sessionRef.current = null;
-    setStatus('idle');
-    if (session) {
-      try {
-        await session.endSession();
-      } catch {
-        // La sesión ya estaba cerrada.
-      }
-    }
-  }, []);
-
+  const showButton = provider !== 'text' || inCall;
   const ctaBase =
     'nova-cta group mt-4 inline-flex min-h-[3.125rem] w-full items-center justify-center gap-3 rounded-2xl px-6 text-base font-semibold transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] disabled:cursor-wait disabled:opacity-80 motion-reduce:transition-none md:min-h-[3.25rem] md:text-[17px]';
   const ctaIdle = `${ctaBase} border border-white/20 bg-[linear-gradient(110deg,#F97316_0%,#A78BFA_55%,#38BDF8_100%)] text-white shadow-[0_0_0_1px_rgba(167,139,250,0.25),0_14px_40px_rgba(167,139,250,0.38)] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(198,244,50,0.35),0_18px_48px_rgba(167,139,250,0.5)] focus-visible:ring-[#DDD6FE] motion-reduce:hover:translate-y-0`;
   const ctaHang = `${ctaBase} border border-[#FDBA74]/50 bg-[#1a0f08] text-[#FED7AA] shadow-[0_10px_30px_rgba(249,115,22,0.22)] hover:bg-[#24140a] focus-visible:ring-[#FDBA74]`;
 
   return (
-    <div ref={rootRef} className="nova-demo" data-phase={phase} data-status={status}>
+    <div ref={rootRef} className="nova-demo" data-phase={phase} data-status={status} data-engine={engine || 'text'}>
       <span className="nova-demo__glow" aria-hidden="true" />
       {MOTES.map((mote) => (
         <span
@@ -255,7 +549,7 @@ const NovaVoiceDemo = () => {
             <span className="h-1 w-1 rounded-full bg-[#C4B5FD]/60" aria-hidden="true" />
             <span className="font-medium normal-case tracking-normal text-zinc-400">agente de Sistema Maestro</span>
           </figcaption>
-          <blockquote className="text-[14px] leading-6 text-zinc-100 md:text-[15px]">{GREETING}</blockquote>
+          <blockquote className="text-[14px] leading-6 text-zinc-100 md:text-[15px]">{NOVA_GREETING_DISPLAY}</blockquote>
         </figure>
       </div>
 
@@ -277,10 +571,10 @@ const NovaVoiceDemo = () => {
         ))}
       </div>
 
-      {voiceMode === 'elevenlabs' && (
+      {showButton && (
         <button
           type="button"
-          onClick={inCall ? stop : start}
+          onClick={inCall ? stop : () => { start().catch(() => safe(() => setStatus('text'))); }}
           disabled={status === 'connecting'}
           aria-pressed={inCall}
           className={inCall ? ctaHang : ctaIdle}
@@ -291,22 +585,16 @@ const NovaVoiceDemo = () => {
         </button>
       )}
 
-      {voiceMode === 'link' && (
-        <a href={NOVA_VOICE.url} target="_blank" rel="noopener noreferrer" className={ctaIdle} data-testid="nova-talk-button">
-          <MicIcon />
-          Habla con Nova
-        </a>
-      )}
-
-      {voiceMode !== 'off' && (
-        <p
-          aria-live="polite"
-          data-testid="nova-status-text"
-          className={`mt-2 min-h-[1.25rem] text-center text-[13px] leading-5 ${phase === 'error' ? 'text-[#FDBA74]' : 'text-zinc-400'}`}
-        >
-          {label}
-        </p>
-      )}
+      <p
+        aria-live="polite"
+        data-testid="nova-status-text"
+        className={`mt-2 min-h-[1.25rem] text-center text-[13px] leading-5 ${phase === 'error' ? 'text-[#FDBA74]' : 'text-zinc-400'}`}
+      >
+        {label}
+      </p>
+      {heard ? (
+        <p className="mt-1 text-center text-[13px] leading-5 text-zinc-500">Has dicho: {heard}</p>
+      ) : null}
     </div>
   );
 };
