@@ -45,6 +45,12 @@ class ResolveTests(unittest.TestCase):
         self.assertIn(nova_voice.NOVA_GREETING, body["instructions"])
         self.assertEqual(body["language"], "es-ES")
         self.assertIn("Habla en español de España con acento malagueño.", body["instructions"])
+        self.assertIn("# Diagnóstico guiado", body["instructions"])
+        self.assertIn(
+            "Nunca digas que la has mirado, escaneado o analizado.",
+            body["instructions"],
+        )
+        self.assertIn("por lo que me cuentas", body["instructions"])
         self.assertNotIn("acento neutro", body["instructions"])
         self.assertNotIn("No uses acento andaluz", body["instructions"])
         self.assertIn("llamada de teléfono natural", body["instructions"])
