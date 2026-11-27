@@ -12,6 +12,7 @@ import {
   novaPhase,
   novaStatusLabel,
   resolveNovaVoiceProvider,
+  sanitizeNovaDiag,
 } from './novaVoiceConfig.mjs';
 
 test('sin respuesta del servidor Nova usa la voz del navegador', () => {
@@ -69,6 +70,21 @@ test('fases visuales', () => {
   assert.equal(novaPhase('browser', 'listening'), 'listening');
   assert.equal(novaPhase('text'), 'idle');
   assert.equal(novaPhase('mic-denied'), 'error');
+});
+
+test('el diagnóstico no se lleva tokens ni datos largos', () => {
+  const clean = sanitizeNovaDiag({
+    stage: 'ws',
+    httpStatus: 503,
+    wsCode: 1006,
+    wsReason: 'bye',
+    message: 'Bearer super-secret-key xai-realtime-client-secret-abc',
+  });
+  assert.equal(clean.stage, 'ws');
+  assert.equal(clean.http_status, 503);
+  assert.equal(clean.message.includes('super-secret-key'), false);
+  assert.equal(clean.message.includes('xai-realtime'), false);
+  assert.equal(Object.hasOwn(clean, 'token'), false);
 });
 
 test('el pcm16 se puede codificar y la onda no revienta con silencio', () => {

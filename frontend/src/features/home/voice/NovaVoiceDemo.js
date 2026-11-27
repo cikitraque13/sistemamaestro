@@ -17,6 +17,7 @@ import {
   novaPhase,
   novaStatusLabel,
   resolveNovaVoiceProvider,
+  sanitizeNovaDiag,
 } from './novaVoiceConfig.mjs';
 import NovaAvatar from './NovaAvatar';
 import './novaDemo.css';
@@ -72,6 +73,51 @@ const decodeBase64 = (value) => {
   for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
   return bytes;
 };
+
+function reportNovaFailure(detail) {
+  const safe = sanitizeNovaDiag(detail);
+  try {
+    console.warn('[Nova]', safe);
+  } catch {
+    /* consola no disponible */
+  }
+  try {
+    fetch(`${API_BASE}/public/nova-voice/diag`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(safe),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    /* el diagnóstico no puede romper la página */
+  }
+}
+
+function openPlaybackContext() {
+  const Ctor = window.AudioContext || window.webkitAudioContext;
+  if (!Ctor) {
+    const error = new Error('AudioContext missing');
+    error.name = 'NotSupportedError';
+    throw error;
+  }
+  const context = new Ctor();
+  try {
+    const pending = context.resume();
+    if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+  } catch {
+    /* resume puede fallar si el contexto ya se cerró */
+  }
+  return context;
+}
+
+function xaiErrorMessage(event) {
+  const error = event && event.error;
+  if (error && typeof error === 'object') {
+    return String(error.message || error.code || error.type || 'xai error');
+  }
+  if (event && typeof event.message === 'string') return event.message;
+  return 'xai error';
+}
 
 async function readProvider() {
   try {
@@ -202,7 +248,18 @@ const NovaVoiceDemo = () => {
     }
   };
 
-  const startGrok = async () => {
+  const startGrok = async (playback) => {
+    const diag = { stage: 'unknown', httpStatus: null, wsCode: null, wsReason: '', message: '' };
+    const note = (partial) => {
+      Object.assign(diag, partial);
+    };
+    const releasePlayback = () => {
+      try {
+        if (playback && playback.close) playback.close().catch(() => {});
+      } catch {
+        /* el contexto ya estaba cerrado */
+      }
+    };
     let payload;
     try {
       const response = await fetch(`${API_BASE}/public/nova-voice/session`, {
@@ -211,13 +268,26 @@ const NovaVoiceDemo = () => {
       });
       payload = await response.json().catch(() => ({}));
       if (!response.ok || payload.provider !== 'grok' || !payload.token || !payload.websocket_url) {
+        note({
+          stage: 'session',
+          httpStatus: response.status,
+          message: payload.detail || payload.provider || 'session rejected',
+        });
+        reportNovaFailure(diag);
+        releasePlayback();
         return 'fail';
       }
-    } catch {
+    } catch (error) {
+      note({ stage: 'session', message: (error && error.name) || 'network' });
+      reportNovaFailure(diag);
+      releasePlayback();
       return 'fail';
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof WebSocket === 'undefined') {
+      note({ stage: 'mic', message: 'mediaDevices or WebSocket missing' });
+      reportNovaFailure(diag);
+      releasePlayback();
       return 'fail';
     }
 
@@ -227,6 +297,9 @@ const NovaVoiceDemo = () => {
         audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
       });
     } catch (error) {
+      note({ stage: 'mic', message: (error && (error.name || error.message)) || 'getUserMedia' });
+      reportNovaFailure(diag);
+      releasePlayback();
       return isMicDenied(error) ? 'mic-denied' : 'fail';
     }
 
@@ -234,14 +307,16 @@ const NovaVoiceDemo = () => {
     try {
       inputContext = new AudioContext();
       if (inputContext.resume) await inputContext.resume();
-    } catch {
+    } catch (error) {
+      note({ stage: 'audiocontext', message: (error && (error.name || error.message)) || 'input AudioContext' });
+      reportNovaFailure(diag);
       stream.getTracks().forEach((track) => track.stop());
+      releasePlayback();
       return 'fail';
     }
 
     const inputRate = choosePcmRate(inputContext.sampleRate);
     const outputRate = Number(payload.output_sample_rate) || 24000;
-    let playback;
     const sources = [];
     let nextTime = 0;
     let ws;
@@ -250,6 +325,7 @@ const NovaVoiceDemo = () => {
     let ready = false;
     let configured = false;
     let greeted = false;
+    let userEnded = false;
 
     const stopMic = () => {
       if (processor) {
@@ -335,6 +411,7 @@ const NovaVoiceDemo = () => {
       };
       const timer = window.setTimeout(() => {
         if (!ready) {
+          note({ stage: 'timeout', message: 'session.updated timeout' });
           try { ws && ws.close(); } catch { /* ignore */ }
           stopMic();
           finish('fail');
@@ -343,7 +420,8 @@ const NovaVoiceDemo = () => {
 
       try {
         ws = new WebSocket(payload.websocket_url, [`xai-client-secret.${payload.token}`]);
-      } catch {
+      } catch (error) {
+        note({ stage: 'ws', message: (error && (error.name || error.message)) || 'WebSocket' });
         window.clearTimeout(timer);
         stopMic();
         finish('fail');
@@ -367,7 +445,8 @@ const NovaVoiceDemo = () => {
               inputRate,
               outputRate,
             })));
-          } catch {
+          } catch (error) {
+            note({ stage: 'ws', message: (error && error.message) || 'session.update send' });
             finish('fail');
           }
         }
@@ -376,10 +455,9 @@ const NovaVoiceDemo = () => {
           ready = true;
           window.clearTimeout(timer);
           try {
-            playback = new AudioContext({ sampleRate: outputRate });
-            if (playback.resume) playback.resume();
-          } catch {
-            try { playback = new AudioContext(); } catch { playback = null; }
+            if (playback && playback.resume) playback.resume();
+          } catch (error) {
+            note({ stage: 'audiocontext', message: (error && error.name) || 'playback resume' });
           }
           try {
             ws.send(JSON.stringify(greetingItem()));
@@ -409,6 +487,7 @@ const NovaVoiceDemo = () => {
           safe(() => setAgentMode('listening'));
         }
         if (type === 'error' && !ready) {
+          note({ stage: 'xai', message: xaiErrorMessage(event) });
           window.clearTimeout(timer);
           try { ws.close(); } catch { /* ignore */ }
           stopMic();
@@ -418,23 +497,44 @@ const NovaVoiceDemo = () => {
 
       ws.onerror = () => {
         if (!ready) {
+          if (!diag.message) note({ stage: 'ws', message: 'websocket error' });
           window.clearTimeout(timer);
           stopMic();
           finish('fail');
         }
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
+        const code = event && typeof event.code === 'number' ? event.code : null;
+        const reason = event && event.reason ? String(event.reason) : '';
+        if (userEnded) {
+          stopMic();
+          return;
+        }
         if (!ready) {
+          if (diag.stage === 'unknown') note({ stage: 'ws', message: 'websocket closed before ready' });
+          if (diag.wsCode == null) note({ wsCode: code, wsReason: reason });
           window.clearTimeout(timer);
           stopMic();
           finish('fail');
-        } else if (callRef.current && callRef.current.ws === ws) {
+          return;
+        }
+        if (callRef.current && callRef.current.ws === ws) {
           stopMic();
           callRef.current = null;
+          reportNovaFailure({
+            stage: 'dropped',
+            wsCode: code,
+            wsReason: reason,
+            message: 'closed after ready',
+          });
           safe(() => {
-            setEngine(null);
-            setStatus('dropped');
+            let browserOk = false;
+            try { browserOk = startBrowser(); } catch { browserOk = false; }
+            if (!browserOk) {
+              setEngine(null);
+              setStatus('text');
+            }
           });
         }
       };
@@ -443,6 +543,7 @@ const NovaVoiceDemo = () => {
     callRef.current = {
       ws,
       stop: () => {
+        userEnded = true;
         ready = false;
         try { ws && ws.close(); } catch { /* ignore */ }
         stopMic();
@@ -452,11 +553,12 @@ const NovaVoiceDemo = () => {
     const result = await readyPromise;
     if (result !== 'ok') {
       callRef.current = null;
+      reportNovaFailure(diag);
     }
     return result;
   };
 
-  const start = async () => {
+  const start = async (playback) => {
     setHeard('');
     setStatus('connecting');
     setAgentMode('listening');
@@ -468,14 +570,16 @@ const NovaVoiceDemo = () => {
     }
     if (!mountedRef.current) return;
     if (nextProvider === 'text') {
+      if (playback && playback.close) playback.close().catch(() => {});
       setStatus('text');
       return;
     }
     if (nextProvider === 'grok') {
       let result = 'fail';
       try {
-        result = await startGrok();
-      } catch {
+        result = await startGrok(playback);
+      } catch (error) {
+        reportNovaFailure({ stage: 'unknown', message: (error && error.message) || 'startGrok' });
         result = 'fail';
       }
       if (!mountedRef.current) {
@@ -483,10 +587,8 @@ const NovaVoiceDemo = () => {
         return;
       }
       if (result === 'ok') return;
-      if (result === 'mic-denied') {
-        setStatus('mic-denied');
-        return;
-      }
+    } else if (playback && playback.close) {
+      playback.close().catch(() => {});
     }
     let browserOk = false;
     try {
@@ -574,7 +676,21 @@ const NovaVoiceDemo = () => {
       {showButton && (
         <button
           type="button"
-          onClick={inCall ? stop : () => { start().catch(() => safe(() => setStatus('text'))); }}
+          onClick={inCall ? stop : () => {
+            let playback = null;
+            try {
+              playback = openPlaybackContext();
+            } catch (error) {
+              reportNovaFailure({
+                stage: 'audiocontext',
+                message: (error && (error.name || error.message)) || 'AudioContext',
+              });
+            }
+            start(playback).catch((error) => {
+              reportNovaFailure({ stage: 'unknown', message: (error && error.message) || 'start' });
+              safe(() => setStatus('text'));
+            });
+          }}
           disabled={status === 'connecting'}
           aria-pressed={inCall}
           className={inCall ? ctaHang : ctaIdle}

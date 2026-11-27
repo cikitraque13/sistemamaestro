@@ -1,6 +1,6 @@
 # Nova: demo de la portada
 
-Nova es la asistente de la sección Agencia de IA (`frontend/src/features/home/sections/AgencySection.js`). Saluda, presenta Sistema Maestro y responde dudas. Se presenta siempre como Nova. Habla español de España (es-ES), con acento neutro. No hay voz clonada ni acento regional.
+Nova es la asistente de la sección Agencia de IA (`frontend/src/features/home/sections/AgencySection.js`). Saluda, presenta Sistema Maestro y responde dudas. Se presenta siempre como Nova. Habla español de España (es-ES), con acento neutro: no usa acento andaluz ni malagueño. La voz integrada sigue siendo `ara` (`NOVA_GROK_VOICE`). El texto de comportamiento está en `NOVA_CONFIGURACION_20261124.md` y en las instrucciones del servidor.
 
 ## Voz (27/11/2026)
 

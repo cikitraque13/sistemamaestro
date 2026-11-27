@@ -14,6 +14,7 @@ from backend.app.core.config import (
     FRONTEND_BUILD_DIR,
     FRONTEND_STATIC_DIR,
 )
+from backend.app.services.frontend_cache import cache_control_for
 from backend.app.db.mongodb import client, db
 from backend.app.routers.auth import router as auth_router
 from backend.app.routers.billing import router as billing_router
@@ -77,11 +78,15 @@ if FRONTEND_STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_STATIC_DIR)), name="static")
 
 
+def _frontend_response(path, relative: str):
+    return FileResponse(str(path), headers={"Cache-Control": cache_control_for(relative)})
+
+
 @app.get("/", include_in_schema=False)
 async def serve_root():
     index_file = FRONTEND_BUILD_DIR / "index.html"
     if index_file.exists():
-        return FileResponse(str(index_file))
+        return _frontend_response(index_file, "index.html")
     return {"detail": "Frontend build not found"}
 
 
@@ -93,11 +98,12 @@ async def serve_react(full_path: str):
     build_root = FRONTEND_BUILD_DIR.resolve()
     requested_file = (build_root / full_path).resolve()
     if requested_file.is_relative_to(build_root) and requested_file.exists() and requested_file.is_file():
-        return FileResponse(str(requested_file))
+        relative = requested_file.relative_to(build_root).as_posix()
+        return _frontend_response(requested_file, relative)
 
     index_file = FRONTEND_BUILD_DIR / "index.html"
     if index_file.exists():
-        return FileResponse(str(index_file))
+        return _frontend_response(index_file, "index.html")
 
     return {"detail": "Frontend build not found"}
 
