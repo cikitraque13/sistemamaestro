@@ -257,11 +257,6 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     '';
 
   const handleNavChange = (navId) => {
-    if (navId === 'deploy' || navId === 'github') {
-      setActiveWorkspaceTab(navId);
-      return;
-    }
-
     if (navId === 'builder') {
       navigate(buildBuilderProjectRoute(currentBuilderProjectId), {
         state: buildNavigationState({

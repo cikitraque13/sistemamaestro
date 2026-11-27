@@ -11,7 +11,9 @@ export function IntentProjection({ projection }) {
   </div>;
 }
 
-export default function IntentClarification({ project, ownerId, apiBaseUrl = '', onSaved }) {
+const CLASSIFIER_UNAVAILABLE_MESSAGE = 'El clasificador no está disponible ahora. No se ha generado ningún resultado.';
+
+export default function IntentClarification({ project, ownerId, onSaved }) {
   const [intent, setIntent] = useState(project.active_j06_1_intent || null);
   const [revision, setRevision] = useState(project.updated_at || '0');
   const [text, setText] = useState(intent?.text || '');
@@ -32,7 +34,7 @@ export default function IntentClarification({ project, ownerId, apiBaseUrl = '',
     if (!pending.current) pending.current = { body, revision };
     setBusy(true); setError('');
     try {
-      const result = await submitIntentOperation(pending.current.body, pending.current.revision, apiBaseUrl);
+      const result = await submitIntentOperation(pending.current.body, pending.current.revision);
       if (binding.current !== requestBinding) return;
       if (result.user_id !== ownerId || result.project_id !== project.project_id) throw new Error('ACCESS_DENIED');
       setIntent(result.intent); setRevision(result.updated_at); setAnswers({}); pending.current = null;
@@ -55,6 +57,6 @@ export default function IntentClarification({ project, ownerId, apiBaseUrl = '',
     {intent?.status === 'READY_FOR_CONFIRMATION' && <button disabled={busy || Boolean(pending.current)} onClick={()=>send('CONFIRM')}>Confirmo esta intención exacta</button>}
     {pending.current && !busy && <button onClick={()=>send(pending.current.body.operation_type, true)}>Reintentar la misma solicitud</button>}
     {intent?.status === 'CONFIRMED' && <p role="status">Intención confirmada. No se ha iniciado ninguna construcción.</p>}
-    {error && <p role="alert">{error}</p>}
+    {error && <p role="alert">{error === 'CLASSIFIER_UNAVAILABLE' ? CLASSIFIER_UNAVAILABLE_MESSAGE : error}</p>}
   </section>;
 }

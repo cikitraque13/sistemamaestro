@@ -14,7 +14,7 @@ export function PlanProjection({ projection }) {
   </div>;
 }
 
-export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
+export default function ProjectPlan({ project, ownerId }) {
   const [plan, setPlan] = useState(project.j06_2_plan || null);
   const [content, setContent] = useState(project.j06_2_plan?.content || empty());
   const [progressDraft, setProgressDraft] = useState(project.j06_2_plan?.step_statuses || {});
@@ -44,8 +44,8 @@ export default function ProjectPlan({ project, ownerId, apiBaseUrl = '' }) {
     setBusy(true); setError('');
     try {
       const result = pending.current.body.operation_type === 'READ'
-        ? await recoverProjectPlan(project.project_id, apiBaseUrl)
-        : await submitPlanOperation(pending.current.body, pending.current.revision, apiBaseUrl);
+        ? await recoverProjectPlan(project.project_id)
+        : await submitPlanOperation(pending.current.body, pending.current.revision);
       if (binding.current !== requestIdentity) return;
       if (result.user_id !== ownerId || result.project_id !== project.project_id) throw Object.assign(new Error(), { code: 'PROJECT_NOT_FOUND_OR_NOT_OWNED' });
       setPlan(result.plan); setContent(result.plan?.content || empty()); setProgressDraft(result.plan?.step_statuses || {}); setRevision(result.updated_at); pending.current = null;
