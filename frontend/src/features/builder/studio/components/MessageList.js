@@ -12,15 +12,15 @@ const SUGGESTIONS = [
 
 function MessageActions({ id, text, reaction, onReact, onCopy }) {
   return (
-    <div className="mt-1 flex justify-end gap-1 text-[#9a9a9a]">
-      <button type="button" aria-label="Me gusta" aria-pressed={reaction === 'up'} onClick={() => onReact(id, 'up')} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-[#1e1e20]">
-        <ThumbsUp size={14} aria-hidden="true" />
+    <div className="fb">
+      <button type="button" aria-label="Me gusta" aria-pressed={reaction === 'up'} onClick={() => onReact(id, 'up')}>
+        <ThumbsUp size={15} aria-hidden="true" />
       </button>
-      <button type="button" aria-label="No me gusta" aria-pressed={reaction === 'down'} onClick={() => onReact(id, 'down')} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-[#1e1e20]">
-        <ThumbsDown size={14} aria-hidden="true" />
+      <button type="button" aria-label="No me gusta" aria-pressed={reaction === 'down'} onClick={() => onReact(id, 'down')}>
+        <ThumbsDown size={15} aria-hidden="true" />
       </button>
-      <button type="button" aria-label="Copiar mensaje" onClick={() => onCopy(text)} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-[#1e1e20]">
-        <Copy size={14} aria-hidden="true" />
+      <button type="button" aria-label="Copiar mensaje" onClick={() => onCopy(text)}>
+        <Copy size={15} aria-hidden="true" />
       </button>
     </div>
   );
@@ -52,10 +52,10 @@ export default function MessageList({
       ref={threadRef}
       data-testid="builder-executor-thread"
       onScroll={onScroll}
-      className="min-h-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-4 py-4"
+      className="studio-thread"
     >
       {showSuggestions ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="studio-suggest">
           {SUGGESTIONS.map((suggestion) => (
             <button
               key={suggestion}
@@ -71,12 +71,12 @@ export default function MessageList({
       ) : null}
       {log.map((item, index) => (
         item.role === 'user' ? (
-          <p key={`user-${index}`} data-testid="builder-user-bubble" className="ml-auto max-w-[90%] rounded-2xl bg-[#1e1e20] px-3 py-2 text-right text-sm text-[#f2f2f2]">
+          <p key={`user-${index}`} data-testid="builder-user-bubble" className="u">
             {item.text}
           </p>
         ) : (
           <div key={`agent-${index}`} data-testid="builder-agent-message">
-            <MarkdownMessage text={item.text} />
+            <div className="md"><MarkdownMessage text={item.text} /></div>
             <MessageActions id={`log-${index}`} text={item.text} reaction={reactions[`log-${index}`]} onReact={onReact} onCopy={onCopy} />
           </div>
         )
@@ -98,11 +98,10 @@ export default function MessageList({
         <p role="alert" className="text-sm text-[#f2f2f2]">{message}</p>
       ) : null}
       {phase === 'completado' ? (
-        <div data-testid="builder-agent-finished" className="flex items-center gap-3 py-2 text-xs text-[#22c55e]">
-          <span className="h-px flex-1 bg-[#22c55e]" />
-          <span>Agente terminado{stamp ? ` · ${stamp}` : ''}</span>
-          <span className="h-px flex-1 bg-[#22c55e]" />
-        </div>
+        <>
+          <div data-testid="builder-agent-finished" className="done"><i /><b>Agente terminado</b><i /></div>
+          {stamp ? <div className="date">{stamp}</div> : null}
+        </>
       ) : null}
     </div>
   );

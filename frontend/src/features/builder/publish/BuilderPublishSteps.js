@@ -101,7 +101,7 @@ export default function BuilderPublishSteps({
           <button type="button" className={buttonClass} disabled={locked || !check.ok || !scoreAllowed} onClick={() => onPublish(check.slug)}>
             Publicar
           </button>
-          {!scoreAllowed ? <p className="mt-2 text-sm text-amber-100">La versión no ha superado la evaluación. No se ha publicado.</p> : null}
+          {!scoreAllowed ? <p className="mt-2 text-sm text-amber-100">La versión no ha superado la evaluación (12/20). No se ha publicado.</p> : null}
           {publication?.status && publication.status !== 'none' ? (
             <button type="button" className={buttonClass} disabled={locked || !publication?.slug} onClick={onRepublish}>
               Volver a publicar

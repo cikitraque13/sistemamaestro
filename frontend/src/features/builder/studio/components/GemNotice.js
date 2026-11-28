@@ -1,18 +1,23 @@
 import React from 'react';
-import { X } from '@phosphor-icons/react';
+
+function Gem() {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+      <path d="M8 1.8 3 6.3 8 14.4l5-8.1L8 1.8zM8 3.4 11.1 6.2H4.9L8 3.4z" />
+    </svg>
+  );
+}
 
 export default function GemNotice({ tone = 'normal', text = '', onDismiss }) {
   return (
-    <div data-testid="builder-gem-notice" data-tone={tone} className="flex h-10 items-center gap-2 border-y border-[#2a2a2d] px-4 text-xs text-[#f2f2f2]">
-      <p className="min-w-0 flex-1 truncate">{text}</p>
-      <a
-        href="/dashboard/billing"
-        className="shrink-0 rounded-full bg-[#f5d90a] px-2 py-1 text-[11px] font-semibold text-black"
-      >
-        Mejorar plan
-      </a>
-      <button type="button" aria-label="Cerrar aviso de gemas" onClick={onDismiss} className="grid h-8 w-8 place-items-center text-[#9a9a9a]">
-        <X size={14} aria-hidden="true" />
+    <div data-testid="builder-gem-notice" data-tone={tone} className="notice">
+      <span className="g"><Gem /></span>
+      <span>{text}</span>
+      <span className="sp" />
+      <button type="button" aria-label="Cerrar aviso de gemas" onClick={onDismiss} className="xb">
+        <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+          <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" />
+        </svg>
       </button>
     </div>
   );

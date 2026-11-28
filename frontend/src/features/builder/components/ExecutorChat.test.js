@@ -54,11 +54,11 @@ test('working states show Pensando and the empty state offers suggestions', () =
     );
   });
   expect(node.querySelector('[data-testid="builder-thinking"]').textContent).toContain('Pensando');
-  expect(node.querySelector('[data-testid="builder-user-bubble"]').className).toContain('text-right');
+  expect(node.querySelector('[data-testid="builder-user-bubble"]').className).toContain('u');
   expect(node.querySelector('[data-testid="builder-agent-message"]').textContent).toContain('Estoy en la primera sección.');
   expect(node.textContent).not.toContain('Completado');
   const thread = node.querySelector('[data-testid="builder-executor-thread"]');
-  expect(thread.className).toContain('overflow-y-auto');
+  expect(thread.className).toContain('studio-thread');
   act(() => {
     root.render(<MessageList phase="error" message="No se ha podido preparar la preview." />);
   });

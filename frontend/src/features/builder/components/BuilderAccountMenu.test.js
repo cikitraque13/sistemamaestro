@@ -148,13 +148,14 @@ test('account menu renders on builder screens and shows only the real balance', 
   expect(header.textContent).not.toContain('Estado');
   expect(header.textContent).not.toContain('Proyecto abierto');
   expect(header.textContent).not.toContain('Nuevo proyecto');
-  expect(header.querySelector('[data-testid="builder-header-upgrade"]').getAttribute('href')).toBe('/dashboard/billing');
-  expect(header.querySelector('[data-testid="builder-header-upgrade"]').textContent).toContain('Mejorar plan');
+  expect(header.querySelector('[data-testid="builder-header-upgrade"]')).toBeNull();
+  expect(header.textContent).not.toContain('Mejorar plan');
   const badge = header.querySelector('[data-testid="builder-free-test-badge"]');
   expect(badge.textContent).toContain('Modo prueba · sin gemas');
   expect(actions.contains(badge)).toBe(true);
   expect(badge.nextElementSibling).toBe(trigger);
   expect(badge.compareDocumentPosition(trigger.querySelector('[data-testid="builder-account-avatar"]')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(actions.contains(trigger)).toBe(true);
   expect(header.querySelector('[data-testid="builder-inicio"]').getAttribute('href')).toBe('/dashboard');
   expect(header.querySelector('[aria-label="Secciones"]')).toBeNull();
   expect(header.querySelector('[data-testid="builder-project-select"]')).not.toBeNull();

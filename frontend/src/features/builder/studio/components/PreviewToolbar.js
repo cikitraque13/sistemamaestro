@@ -14,7 +14,7 @@ import {
 import PublishButton from './PublishButton';
 import VersionHistory from './VersionHistory';
 
-const toolButton = 'grid h-8 w-8 place-items-center rounded-lg border border-[#2a2a2d] bg-[#161618] text-[#f2f2f2] disabled:opacity-40';
+const toolButton = 'sq';
 
 const SCORE_LABELS = {
   visual_hierarchy: 'Jerarquía visual',
@@ -50,17 +50,18 @@ export default function PreviewToolbar({
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   return (
-    <div data-testid="builder-preview-toolbar" className="flex h-12 flex-wrap items-center gap-2 py-2">
+    <div data-testid="builder-preview-toolbar" className="rbar">
+      <div className="rl">
       <button type="button" aria-label={chatOpen ? 'Ocultar chat' : 'Mostrar chat'} onClick={onToggleChat} className={toolButton}>
         <SidebarSimple size={16} aria-hidden="true" />
       </button>
-      <div className="inline-flex h-8 items-center rounded-full border border-[#2a2a2d] bg-[#161618] p-0.5 text-xs text-[#9a9a9a]">
-        <button type="button" aria-pressed={surface === 'preview'} onClick={() => onSurface?.('preview')} className={`inline-flex h-7 items-center gap-1 rounded-full px-2 ${surface === 'preview' ? 'bg-[#2a2a2d] text-white' : ''}`}>
-          <Eye size={13} aria-hidden="true" />
+      <div className="seg">
+        <button type="button" aria-pressed={surface === 'preview'} onClick={() => onSurface?.('preview')} className={surface === 'preview' ? 'on' : ''}>
+          <Eye size={14} aria-hidden="true" />
           Vista previa
         </button>
-        <button type="button" aria-pressed={surface === 'live'} onClick={() => onSurface?.('live')} className={`inline-flex h-7 items-center gap-1 rounded-full px-2 ${surface === 'live' ? 'bg-[#2a2a2d] text-white' : ''}`}>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" aria-hidden="true" />
+        <button type="button" aria-pressed={surface === 'live'} onClick={() => onSurface?.('live')} className={surface === 'live' ? 'on' : ''}>
+          <i className="dot" />
           En vivo
         </button>
       </div>
@@ -86,11 +87,11 @@ export default function PreviewToolbar({
       <button type="button" aria-label="Código" aria-pressed={codeOpen} onClick={onToggleCode} className={toolButton}>
         <Code size={16} aria-hidden="true" />
       </button>
-      <button type="button" aria-label="Editar" onClick={onEdit} className={`${toolButton} w-auto gap-1 px-2`}>
-        <PencilSimple size={14} aria-hidden="true" />
-        <span className="text-xs">Editar</span>
+      <button type="button" aria-label="Editar" onClick={onEdit} className={toolButton}>
+        <PencilSimple size={15} aria-hidden="true" />
       </button>
-      <div className="ml-auto flex flex-wrap items-center gap-2">
+      </div>
+      <div className="rr">
         <button type="button" aria-label="Abrir vista" onClick={onOpen} disabled={!onOpen} className={toolButton}>
           <ArrowSquareOut size={16} aria-hidden="true" />
         </button>

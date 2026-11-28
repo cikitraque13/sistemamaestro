@@ -3,7 +3,7 @@ import { ClockCounterClockwise } from '@phosphor-icons/react';
 
 import { finishedStamp, versionRows } from '../model';
 
-const toolButton = 'grid h-8 w-8 place-items-center rounded-lg border border-[#2a2a2d] bg-[#161618] text-[#f2f2f2] disabled:opacity-40';
+const toolButton = 'sq';
 
 export default function VersionHistory({
   versions = [],

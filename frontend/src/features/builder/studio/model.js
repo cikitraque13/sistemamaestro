@@ -10,7 +10,9 @@ export const PACE_OPTIONS = [
   { id: 'profundo', label: 'Modo profundo', cost: PACE_COST.profundo },
 ];
 
-export const EVALUATION_MISS = 'La versión no ha superado la evaluación. No se ha publicado.';
+export const EVAL_THRESHOLD = 12;
+export const EVAL_MAX = 20;
+export const EVALUATION_MISS = 'La versión no ha superado la evaluación (12/20). No se ha publicado.';
 
 export function paceOption(pace) {
   return PACE_OPTIONS.find((item) => item.id === pace) || PACE_OPTIONS[0];
@@ -25,13 +27,11 @@ export function paceLabel(pace) {
 export function readEvaluation(preview) {
   const raw = preview?.evaluation;
   if (!raw || !Number.isInteger(raw.total)) return null;
-  const max = Number.isInteger(raw.max) ? raw.max : 20;
-  const threshold = Number.isInteger(raw.threshold) ? raw.threshold : 12;
   return {
     total: raw.total,
-    max,
-    threshold,
-    passed: raw.passed === true && raw.total >= threshold,
+    max: EVAL_MAX,
+    threshold: EVAL_THRESHOLD,
+    passed: raw.passed === true && raw.total >= EVAL_THRESHOLD,
     scores: raw.scores && typeof raw.scores === 'object' ? raw.scores : null,
   };
 }
@@ -62,23 +62,22 @@ export function mapBuilderSteps({
   preview = null,
   evaluation = null,
   publication = null,
-  live = false,
 } = {}) {
   const idea = Boolean(project?.project_id && (project.input_content || project.title || project.project_id));
   const analysis = analysisDone(project);
   const built = Boolean(preview?.html);
-  const scored = Boolean(evaluation);
-  const evalLabel = scored ? `Evaluación ${evaluation.total}/${evaluation.max}` : 'Evaluación';
+  const scored = Boolean(evaluation && Number.isInteger(evaluation.total));
+  const evalLabel = scored ? `Evaluación ${evaluation.total}/${EVAL_MAX}` : 'Evaluación';
   const published = publication?.status === 'published';
   const domain = Boolean(publication?.customDomain?.status === 'verified' || publication?.customDomain?.host);
   const steps = [
     { id: 'idea', label: 'Idea', done: idea },
     { id: 'analisis', label: 'Análisis', done: analysis },
     { id: 'construccion', label: 'Construcción', done: built },
-    { id: 'evaluacion', label: evalLabel, done: Boolean(evaluation?.passed) },
+    { id: 'evaluacion', label: evalLabel, done: Boolean(evaluation?.passed) && evaluation.total >= EVAL_THRESHOLD },
     { id: 'publicar', label: 'Publicar', done: published },
     { id: 'dominio', label: 'Dominio', done: domain },
-    { id: 'envivo', label: 'En vivo', done: Boolean(live && built) },
+    { id: 'envivo', label: 'En vivo', done: published },
   ];
   const current = steps.find((step) => !step.done)?.id || '';
   return steps.map((step) => ({
@@ -99,6 +98,24 @@ export function derivePreviewPhase({
   if (busy) return 'live';
   if (html) return 'static';
   return 'idle';
+}
+
+const STEP_ICON = 16;
+
+export function estimateStepRow(labels, fontSize) {
+  return labels.reduce(
+    (sum, label) => sum + STEP_ICON + String(label).length * fontSize * 0.48,
+    24,
+  );
+}
+
+export function fitStepLabels(steps, width) {
+  const labels = steps.map((step) => step.label);
+  if (!width) return { font: 11 };
+  for (const font of [11, 10, 9, 8, 7]) {
+    if (estimateStepRow(labels, font) <= width) return { font };
+  }
+  return { font: 7 };
 }
 
 export function narrateSteps(steps) {
