@@ -16,11 +16,21 @@ class PolicyDecision:
     blocked_domains: List[str]
 
 
+# The eight keys below are contracts only: NOT_DEMONSTRATED, not executable.
+# Their modules stay absent. J07 is not opened.
 DEFAULT_POLICY = {
+    "discovery_agent": [],
+    "audit_agent": [],
     "report_agent": [],
     "system_architect_agent": ["payments"],
     "builder_agent": ["pricing_strategy", "autonomous_deploy"],
+    "rescue_sre_agent": ["ux_redesign", "pricing_strategy"],
     "security_architect_agent": ["general_ui_build"],
+    "growth_agent": ["runtime_patch"],
+    "cro_agent": ["backend_runtime", "auth_security"],
+    "seo_architect_agent": ["payments", "runtime_patch"],
+    "deploy_agent": ["pricing_strategy", "ui_copy"],
+    "algorithmic_auditor_agent": ["code_write", "deploy", "payments"],
 }
 
 

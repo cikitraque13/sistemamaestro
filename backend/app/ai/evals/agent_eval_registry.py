@@ -33,12 +33,26 @@ EVAL_REGISTRY: Dict[str, EvalContract] = {
         phase="not_connected",
         metrics=("structure_consistency", "clarity", "usefulness"),
     ),
+    "audit_eval": EvalContract(
+        key="audit_eval",
+        target_agent="audit_agent",
+        objective="Evaluar calidad de hallazgos y detección de fricciones visibles.",
+        phase="NOT_DEMONSTRATED",
+        metrics=("signal_quality", "friction_detection"),
+    ),
     "builder_eval": EvalContract(
         key="builder_eval",
         target_agent="builder_agent",
         objective="Evaluar seguridad, ajuste al alcance y consistencia del cambio técnico.",
         phase="next",
         metrics=("scope_compliance", "code_consistency", "change_safety"),
+    ),
+    "rescue_eval": EvalContract(
+        key="rescue_eval",
+        target_agent="rescue_sre_agent",
+        objective="Evaluar calidad del diagnóstico y precisión de causa raíz.",
+        phase="NOT_DEMONSTRATED",
+        metrics=("root_cause_precision", "repair_safety"),
     ),
     "security_eval": EvalContract(
         key="security_eval",

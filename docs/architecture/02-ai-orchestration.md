@@ -57,7 +57,22 @@ No debe:
 
 ## 3. Agentes especialistas núcleo
 
-Los ocho módulos vacíos `discovery_agent`, `audit_agent`, `growth_agent`, `cro_agent`, `seo_architect_agent`, `deploy_agent`, `rescue_sre_agent` y `algorithmic_auditor_agent` se borraron en #166. No son runtime. J07 y J08 siguen NOT_DEMONSTRATED: no hay runtime multiagente.
+### `discovery_agent`
+
+Función:
+
+- entender idea, URL, oportunidad o problema;
+- detectar intención;
+- clasificar madurez;
+- preparar diagnóstico inicial.
+
+### `audit_agent`
+
+Función:
+
+- auditar fricciones;
+- revisar claridad, conversión, estructura y monetización;
+- identificar debilidades y quick wins.
 
 ### `report_agent`
 
@@ -82,6 +97,14 @@ Función:
 - generar mutaciones;
 - actualizar modelos de preview, código y estructura.
 
+### `rescue_sre_agent`
+
+Función:
+
+- diagnosticar errores de runtime;
+- interpretar logs;
+- proponer corrección mínima segura.
+
 ---
 
 ## 4. Agentes de crecimiento y control
@@ -102,6 +125,40 @@ Función:
 - proponer mitigaciones.
 
 No debe ejecutar ataques reales.
+
+### `growth_agent`
+
+Función:
+
+- detectar palancas de crecimiento;
+- proponer activaciones y oportunidades comerciales.
+
+### `cro_agent`
+
+Función:
+
+- mejorar conversión;
+- revisar CTA, oferta, objeciones y estructura persuasiva.
+
+### `seo_architect_agent`
+
+Función:
+
+- analizar oportunidad orgánica;
+- estructurar SEO, clusters, intención y arquitectura de contenido.
+
+### `deploy_agent`
+
+Función:
+
+- razonar sobre despliegue;
+- validar rutas, entornos, healthchecks y runtime.
+
+### `algorithmic_auditor_agent`
+
+Función:
+
+- revisar consistencia de scoring, reglas, decisiones y trazas.
 
 ---
 
@@ -144,16 +201,28 @@ Evita consumo excesivo, uso sin crédito o acciones caras sin control.
 
 ## 7. Orden de activación recomendado
 
-### Ola 1 — Núcleo que sigue en el árbol
+### Ola 1 — Núcleo operativo
 
-- `master_orchestrator` (puente; no enruta en vivo)
+- `master_orchestrator`
+- `discovery_agent`
+- `audit_agent`
 - `report_agent`
+- `rescue_sre_agent`
+
+### Ola 2 — Construcción y seguridad
+
 - `system_architect_agent`
 - `builder_agent`
+- `deploy_agent`
 - `security_architect_agent`
 - `red_team_agent`
 
-Los ocho agentes vacíos no forman parte de ninguna ola activa.
+### Ola 3 — Crecimiento y auditoría
+
+- `growth_agent`
+- `cro_agent`
+- `seo_architect_agent`
+- `algorithmic_auditor_agent`
 
 ---
 
