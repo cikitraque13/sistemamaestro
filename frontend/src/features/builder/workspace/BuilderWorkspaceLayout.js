@@ -96,7 +96,7 @@ function WorkspaceSidePanel({
   const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
 
   return (
-    <aside className="flex min-h-0 flex-col gap-3 overflow-auto border-t border-white/10 bg-[#08070D] p-3 lg:border-l lg:border-t-0">
+    <aside className="order-2 flex min-h-0 flex-col gap-3 overflow-auto border-t border-white/10 bg-[#08070D] p-3 lg:order-1 lg:h-full lg:border-r lg:border-t-0">
       <div className="grid grid-cols-2 gap-2" aria-label="Vista del Builder">
         <button type="button" className={viewButtonClass(visibleTab === 'preview')} onClick={() => onWorkspaceTabChange?.('preview')}>
           Preview
@@ -180,8 +180,8 @@ export default function BuilderWorkspaceLayout({
 
   return (
     <section className="h-full min-h-0 overflow-auto rounded-[24px] border border-white/10 bg-[#06080B] shadow-[0_0_90px_rgba(0,0,0,0.38)] lg:overflow-hidden">
-      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_20.5rem] lg:overflow-hidden">
-        <div className="min-h-[70vh] overflow-hidden lg:min-h-0 lg:h-full">
+      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[20.5rem_minmax(0,1fr)] lg:overflow-hidden">
+        <div className="order-1 min-h-[70vh] overflow-hidden lg:order-2 lg:min-h-0 lg:h-full">
           {main}
         </div>
         <WorkspaceSidePanel

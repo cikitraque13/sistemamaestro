@@ -23,10 +23,10 @@ from backend.app.services.builder_pipeline import PipelineError, public_preview,
 INTENT = {"title": "Consulta clara", "goal": "Conseguir una primera visita"}
 BLUEPRINT = {"title": "Landing de consulta", "summary": "Una página", "priorities": ["Hero", "Prueba", "CTA"]}
 DRAFT = {
-    "title": "Convierte dudas en decisiones claras",
-    "subtitle": "Asesoramiento para empresas.",
-    "cta": "Agendar consulta",
-    "sections": [{"title": "Cómo empieza", "text": "Cuentas el caso y agendamos."}],
+    "title": "Clara atiende la consulta esta semana",
+    "subtitle": "Una landing escrita para este encargo, no la plantilla de sector.",
+    "cta": "Pedir cita con Clara",
+    "sections": [{"title": "La consulta", "text": "Clara revisa el caso y propone el siguiente paso."}],
 }
 PROJECT = {"project_id": "proj_pipeline", "user_id": "alice", "input_content": "Asesoría", "route": "idea"}
 
@@ -159,7 +159,9 @@ def test_instruction_is_saved_and_becomes_the_preview_payload():
 
     saved, loaded, result = asyncio.run(run())
     html = result["public"]["html"]
-    assert "Convierte dudas en decisiones claras" in html
+    assert "Clara atiende la consulta esta semana" in html
+    assert "Pedir cita con Clara" in html
+    assert "Convierte dudas en decisiones claras" not in html
     assert "<script" not in html
     assert loaded["preview"]["versions"][0]["instruction"] == "Quiero una landing de consulta"
     assert public_preview(loaded["preview"])["html"] == html
