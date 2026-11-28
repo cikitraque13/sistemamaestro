@@ -14,6 +14,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock('react-router-dom', () => ({ useLocation: () => mocks.mockLocation, useNavigate: () => mocks.mockNavigate }));
 vi.mock('../../../context/AuthContext', () => ({ useAuth: () => ({ user: mocks.mockUser }) }));
 vi.mock('../../../lib/apiClient', () => ({ api: { get: vi.fn() } }));
+vi.mock('../api/builderPreviewClient', () => ({
+  loadBuilderSession: vi.fn(async () => ({ freeTestMode: false, publishLanding: false, customDomain: false })),
+}));
 vi.mock('../../../lib/economicRequest', () => ({ economicPost: vi.fn() }));
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 vi.mock('../../app-shell/layout/AppShellLayout', () => ({ __esModule: true, default: (props) => { mocks.mockShellProps=props; return props.children; } }));
