@@ -41,7 +41,7 @@ export const PLAN_VISUAL_META = {
     badgeClass: 'bg-[#1A1521] text-[#E4D8F7]',
     ctaClass: 'bg-[#2A1F3A] text-white hover:bg-[#34274A]',
     surfaceClass: 'bg-[linear-gradient(180deg,#171717_0%,#181320_100%)]',
-    eyebrow: 'Capa superior',
+    eyebrow: 'Nivel maestro',
     accentLineClass: 'from-[#4A3B61]/0 via-[#4A3B61]/35 to-[#4A3B61]/0'
   }
 };

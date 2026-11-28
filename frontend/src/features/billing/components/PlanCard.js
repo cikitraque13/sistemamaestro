@@ -16,7 +16,7 @@ const PLAN_ROLE_META = {
     suggestedBadge: 'Recomendado',
     headline: 'Activa una base real de trabajo.',
     description:
-      'Idea o diagnostico convertidos en base operativa lista para Builder.',
+      'Idea o diagnóstico convertidos en base operativa lista para Builder.',
     surface:
       'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
     glow: 'bg-[#0F5257]/26',
@@ -28,10 +28,10 @@ const PLAN_ROLE_META = {
   },
   sistema: {
     stage: 'CONTINUAR',
-    badge: 'Nucleo operativo',
+    badge: 'Núcleo operativo',
     headline: 'Convierte el sistema en continuidad operativa.',
     description:
-      'Iteracion, seguimiento y construccion continua para mantener proyectos vivos.',
+      'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
     surface:
       'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
     glow: 'bg-sky-400/18',
@@ -43,10 +43,10 @@ const PLAN_ROLE_META = {
   },
   premium: {
     stage: 'ESCALAR',
-    badge: 'Capa superior',
+    badge: 'Nivel maestro',
     headline: 'Activa la capa maestra para casos complejos.',
     description:
-      'Mas criterio, inteligencia y capacidad para preparar una salida seria.',
+      'Más criterio, inteligencia y capacidad para preparar una salida seria.',
     surface:
       'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
     glow: 'bg-fuchsia-400/18',
@@ -77,7 +77,7 @@ const cleanVisibleText = (value) =>
 const getVisibleOperationalLabel = (label) => {
   const normalized = normalizeText(label);
 
-  if (normalized === 'activacion') return 'Activacion';
+  if (normalized === 'activacion') return 'Activación';
   if (normalized === 'exportacion') return 'Salida';
   if (normalized === TECH_TOKEN) return 'Gemas';
 
@@ -292,7 +292,7 @@ const PlanCard = ({
 
         <div className="mt-3 flex items-center justify-center gap-2 text-xs text-white/45">
           <Sparkle size={13} />
-          <span>Activacion mediante checkout seguro</span>
+          <span>Activación mediante checkout seguro</span>
         </div>
       </div>
     </article>

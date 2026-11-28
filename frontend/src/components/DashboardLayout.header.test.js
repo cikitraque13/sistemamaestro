@@ -103,7 +103,7 @@ test('resumen sidebar keeps billing above the account card and hides oportunidad
   act(() => root.unmount());
 });
 
-test('project pages still render the workspace tab bar', () => {
+test('project pages use the same shell without the chip bar', () => {
   window.sessionStorage.clear();
   const node = document.createElement('div');
   const root = createRoot(node);
@@ -118,9 +118,9 @@ test('project pages still render the workspace tab bar', () => {
     );
   });
 
-  const header = node.querySelector('header');
-  expect(header.textContent).toContain('Proyectos');
-  expect(header.querySelector('a')).not.toBeNull();
+  expect(node.querySelector('header')).toBeNull();
+  expect(node.textContent).not.toContain('Workspace');
+  expect(node.textContent).not.toContain('Oportunidades');
   expect(node.querySelector('[data-testid="dashboard-sidebar"]').className).toContain('overflow-hidden');
 
   act(() => root.unmount());

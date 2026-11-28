@@ -70,13 +70,12 @@ const BillingHero = ({ fromProjectId, onReturnToProject }) => (
           Sistema Maestro Gold
         </div>
 
-        <h1 className="mb-3 text-3xl font-light leading-tight text-white sm:text-4xl">
-          Centro de capacidad Gold
+        <h1 className="mb-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+          Facturación
         </h1>
 
-        <p className="max-w-2xl text-sm leading-6 text-[#D4D4D4] sm:text-base">
-          Gestiona tu plan, tus Gemas Maestras y la continuidad
-          de trabajo dentro de Sistema Maestro Builder sin perder el hilo del proyecto.
+        <p className="max-w-2xl text-sm leading-6 text-[#b4bec8] sm:text-base">
+          Tu saldo, tu plan y los pagos de la cuenta.
         </p>
       </div>
 
