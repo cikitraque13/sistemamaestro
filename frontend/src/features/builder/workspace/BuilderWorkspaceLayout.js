@@ -12,6 +12,7 @@ import { gemNoticeState, mapBuilderSteps, publishGate, readEvaluation } from '..
 import { previewPhaseOf } from '../studio/store';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 import EmbedInstallStep from '../embed/EmbedInstallStep';
+import '../studio/studio.css';
 
 const LoadingState = () => (
   <div className="flex h-full items-center justify-center p-6">
@@ -146,7 +147,6 @@ export default function BuilderWorkspaceLayout({
     preview,
     evaluation,
     publication: state.publication,
-    live: state.ui.surface === 'live' && busy,
   });
   const thinking = executorPhase === 'construyendo' || executorPhase === 'iterando';
   const exhausted = notice?.tone === 'exhausted';
@@ -205,8 +205,8 @@ export default function BuilderWorkspaceLayout({
   const showStrip = !state.ui.codeOpen && (phase === 'static' || phase === 'resuming') && Boolean(shownHtml);
 
   return (
-    <section className="h-full min-h-0 overflow-hidden bg-[#0b0b0c] text-[#f2f2f2]">
-      <div className={`grid h-full min-h-0 ${state.ui.chatOpen ? 'lg:grid-cols-[minmax(0,39fr)_minmax(0,61fr)]' : 'grid-cols-1'}`}>
+    <section className="studio">
+      <div className={`studio-body ${state.ui.chatOpen ? '' : 'is-preview-only'}`}>
         {state.ui.chatOpen ? (
           <AgentPanel
             log={runtime.executor?.log || []}
@@ -242,7 +242,7 @@ export default function BuilderWorkspaceLayout({
             onMic={() => dispatch({ type: 'note', key: 'micNote', text: 'El micrófono no está conectado a este ejecutor.' })}
           />
         ) : null}
-        <div className="flex h-full min-h-0 flex-col px-4 pb-4">
+        <div className="studio-right">
           {state.ui.copyNote ? <p role="status" className="text-xs text-[#9a9a9a]">{state.ui.copyNote}</p> : null}
           <PreviewToolbar
             chatOpen={state.ui.chatOpen}

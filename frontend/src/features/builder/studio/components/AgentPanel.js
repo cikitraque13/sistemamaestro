@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 
+import '../studio.css';
 import Composer from './Composer';
 import GemNotice from './GemNotice';
 import MessageList from './MessageList';
@@ -33,7 +34,7 @@ export default function AgentPanel({
 }) {
   const threadRef = useRef(null);
   return (
-    <aside data-testid="builder-side-panel" aria-label="Ejecutor" className="flex h-full min-h-0 flex-col overflow-hidden bg-black text-[#f2f2f2]">
+    <aside data-testid="builder-side-panel" aria-label="Ejecutor" className="studio-left">
       <MessageList
         threadRef={threadRef}
         log={log}

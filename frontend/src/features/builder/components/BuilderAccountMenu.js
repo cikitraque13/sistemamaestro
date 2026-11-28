@@ -77,7 +77,7 @@ function AccountAvatar({ name, picture, compact = false }) {
   return (
     <span
       data-testid="builder-account-avatar"
-      className={`grid shrink-0 place-items-center overflow-hidden rounded-full text-sm font-semibold text-white ${compact ? 'h-8 w-8 bg-[#6d28d9]' : 'h-9 w-9 bg-[#6d28d9]'}`}
+      className={`grid shrink-0 place-items-center overflow-hidden rounded-full font-semibold text-white ${compact ? 'h-full w-full bg-transparent text-[14px]' : 'h-9 w-9 bg-[#7c5cff] text-sm'}`}
     >
       {showPhoto ? (
         <img
@@ -124,7 +124,7 @@ export default function BuilderAccountMenu({ onNewProject = () => {}, advisorCon
         data-testid="builder-account-menu"
         aria-label={`Cuenta de ${name}`}
         className={compact
-          ? 'grid h-8 w-8 place-items-center rounded-full bg-[#6d28d9] text-sm font-semibold text-white outline-none'
+          ? 'av-l outline-none'
           : 'inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-black/30 py-1 pl-1 pr-2 text-left text-sm font-medium text-white outline-none transition hover:border-white/20 hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-cyan-300/70 sm:pr-3'}
       >
         <AccountAvatar name={name} picture={picture} compact={compact} />

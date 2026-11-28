@@ -55,8 +55,9 @@ function Harness() {
 test('workspace shows the sector preview and hides code, landing controls and engineering tabs', () => {
   const { node, root } = mount(<Harness />);
 
-  expect(node.querySelector('section > div').className).toContain('lg:grid-cols-[minmax(0,39fr)_minmax(0,61fr)]');
-  expect(node.querySelector('aside').className).toContain('bg-black');
+  expect(node.querySelector('section').className).toContain('studio');
+  expect(node.querySelector('section > div').className).toContain('studio-body');
+  expect(node.querySelector('aside').className).toContain('studio-left');
   expect(node.querySelector('iframe')).toBeNull();
   expect(node.textContent).toContain('Convierte dudas en decisiones claras');
   expect(node.textContent).toContain('Asesoramiento experto');
@@ -71,10 +72,10 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.querySelector('[aria-label="Mensaje para el ejecutor"]').getAttribute('placeholder')).toBe('Esperando tu próximo mensaje');
   expect(node.querySelector('[aria-label="Enviar"]')).not.toBeNull();
   const aside = node.querySelector('[data-testid="builder-side-panel"]');
-  expect(aside.className).toContain('overflow-hidden');
-  expect(aside.className).not.toMatch(/overflow-(auto|scroll|y-auto|y-scroll)/);
+  expect(aside.className).toContain('studio-left');
   expect(aside.getAttribute('aria-label')).toBe('Ejecutor');
-  expect(aside.querySelector('[data-testid="builder-executor-thread"]').className).toContain('flex-1');
+  expect(aside.querySelector('[data-testid="builder-executor-thread"]').className).toContain('studio-thread');
+  expect(aside.lastElementChild.classList.contains('composer')).toBe(true);
   const sideButtons = [...aside.querySelectorAll('button')].map((button) => button.textContent.trim());
   expect(sideButtons).not.toContain('Preview');
   expect(sideButtons).not.toContain('Extracción');
