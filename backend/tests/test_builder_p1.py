@@ -12,10 +12,13 @@ from uuid import uuid4
 
 import pytest
 
+# Import the real config before the consumption harness. That harness installs
+# an empty config stub with setdefault, which hides GROK_API_KEY when this
+# file is the first thing in the process.
+from backend.app.core import config
 import test_consumption_callers as f
 from backend.app.ai.agents.intent_clarification import ClassifierUnavailable, classify_intent
 from backend.app.ai.schemas.intent_clarification import IntentOperation
-from backend.app.core import config
 from backend.app.services.intent_clarification import IntentError
 
 INFERENCE = {

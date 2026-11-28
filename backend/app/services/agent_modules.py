@@ -44,18 +44,31 @@ MESSAGES = {
     "invalid_contact": "Hace falta un teléfono o un correo.",
     "invalid_settings": "La configuración del módulo no es válida.",
     "store": "No se ha podido guardar.",
+    "store_timeout": "El almacenamiento no ha respondido a tiempo.",
     "schema": "No he podido responder ahora mismo.",
+    "empty_message": "El mensaje está vacío.",
+    "invalid_input": "El mensaje contiene caracteres o contenido no permitido.",
+    "invalid_phone": "El teléfono tiene que estar en formato internacional, por ejemplo +34600111222.",
+    "invalid_timezone": "La zona horaria no es válida.",
+    "too_long": "El texto supera el límite permitido.",
+    "unexpected_field": "La solicitud contiene campos que no están permitidos.",
+    "payload_too_large": "La solicitud es demasiado grande.",
+    "provider_timeout": "El proveedor no ha respondido a tiempo.",
+    "bad_gateway": "El proveedor no ha respondido.",
+    "idempotency_conflict": "La petición repetida no coincide con la original.",
+    "internal": "No se ha podido completar la operación.",
 }
 
 _indexes_ready = False
 
 
 class AgentModuleError(Exception):
-    def __init__(self, code: str, status: int = 400, message: str = ""):
+    def __init__(self, code: str, status: int = 400, message: str = "", *, retry_after: int | None = None):
         super().__init__(code)
         self.code = code
         self.status = status
         self.message = message or MESSAGES.get(code, "No se ha podido completar la operación.")
+        self.retry_after = retry_after
 
 
 def log_failure(category: str, module: str) -> None:
@@ -129,7 +142,11 @@ def fresh_widget_key() -> str:
     return secrets.token_urlsafe(24)
 
 
-def normalize_chat_settings(previous: dict, rotate: bool) -> dict:
+def normalize_chat_settings(previous: dict, rotate: bool, incoming: dict | None = None) -> dict:
+    if isinstance(incoming, dict) and incoming:
+        from backend.app.services.agent_guard import reject_unknown
+
+        reject_unknown(incoming, {"widget_key"}, "chat")
     key = previous.get("widget_key") if isinstance(previous, dict) else None
     if rotate or not isinstance(key, str) or len(key) < 16:
         key = fresh_widget_key()
@@ -194,6 +211,12 @@ async def ensure_agent_indexes(database) -> None:
         unique=True,
         partialFilterExpression={"status": "confirmed"},
         name="confirmed_slot",
+    )
+    await database.agent_bookings.create_index(
+        [("project_id", 1), ("idempotency_key", 1)],
+        unique=True,
+        partialFilterExpression={"idempotency_key": {"$exists": True}},
+        name="booking_idempotency",
     )
     await database.agent_inbound_events.create_index(
         [("provider", 1), ("event_id", 1)],

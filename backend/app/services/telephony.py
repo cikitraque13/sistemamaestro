@@ -26,6 +26,14 @@ from dataclasses import dataclass
 from urllib.parse import parse_qs
 from xml.sax.saxutils import escape
 
+from backend.app.services.agent_guard import (
+    GREETING_MAX,
+    SPEECH_MAX,
+    normalize_e164,
+    optional_plain_text,
+    reject_unknown,
+    require_plain_text,
+)
 from backend.app.services.agent_modules import AgentModuleError, log_failure
 
 PROPOSAL_PROVIDER = "twilio"
@@ -65,7 +73,16 @@ def _form(body: bytes) -> dict:
 def _call_from_form(form: dict) -> InboundCall | None:
     call_id = form.get("CallSid") or ""
     number = (form.get("To") or "").strip()
-    speech = (form.get("SpeechResult") or "").strip()[:2000]
+    speech_raw = form.get("SpeechResult") or ""
+    if not isinstance(speech_raw, str):
+        log_failure("schema", "voz")
+        raise AgentModuleError("schema", 400, "La solicitud no es válida.")
+    if len(speech_raw) > SPEECH_MAX:
+        log_failure("too_long", "voz")
+        raise AgentModuleError("too_long", 422)
+    speech = speech_raw.strip()
+    if speech:
+        speech = require_plain_text(speech, max_len=SPEECH_MAX, module="voz")
     if not _CALL_ID.fullmatch(call_id) or not _E164.fullmatch(number):
         return None
     return InboundCall(call_id=call_id, to_number=number, speech=speech)
@@ -147,17 +164,29 @@ def build_adapter():
 
 
 def normalize_voz_settings(raw) -> dict:
-    incoming = raw if isinstance(raw, dict) else {}
-    number = incoming.get("inbound_number")
-    if not isinstance(number, str) or not _E164.fullmatch(number.strip()):
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
         raise AgentModuleError("invalid_settings", 422)
-    greeting = incoming.get("greeting") or ""
-    if not isinstance(greeting, str) or len(greeting) > 240:
+    reject_unknown(raw, {"inbound_number", "greeting"}, "voz")
+    try:
+        number = normalize_e164(raw.get("inbound_number"), module="voz")
+    except AgentModuleError as exc:
+        if exc.code in {"invalid_phone", "invalid_input"}:
+            raise AgentModuleError("invalid_settings", 422) from None
+        raise
+    greeting = raw.get("greeting") or ""
+    if not isinstance(greeting, str) or len(greeting) > GREETING_MAX:
         raise AgentModuleError("invalid_settings", 422)
-    settings = {"inbound_number": number.strip()}
-    clean = " ".join(greeting.split())
+    try:
+        clean = optional_plain_text(greeting, max_len=GREETING_MAX, module="voz")
+    except AgentModuleError as exc:
+        if exc.code == "invalid_input":
+            raise AgentModuleError("invalid_settings", 422) from None
+        raise
+    settings = {"inbound_number": number}
     if clean:
-        settings["greeting"] = clean[:240]
+        settings["greeting"] = clean
     return settings
 
 

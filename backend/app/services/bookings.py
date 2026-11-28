@@ -16,6 +16,17 @@ import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from backend.app.services.agent_guard import (
+    BOOKING_HORIZON_DAYS,
+    NAME_MAX,
+    NOTE_MAX,
+    clean_email_or_phone,
+    optional_plain_text,
+    parse_slot_text,
+    reject_unknown,
+    require_plain_text,
+    require_timezone,
+)
 from backend.app.services.agent_modules import (
     AgentModuleError,
     global_module_enabled,
@@ -27,9 +38,8 @@ from backend.app.services.agent_modules import (
 
 DAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
 SLOT_MINUTES = {15, 20, 30, 60}
+_CITAS_KEYS = {"timezone", "slot_minutes", "weekly_hours", "reminder_hours_before"}
 _TIME = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
-_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-_PHONE = re.compile(r"^\+?\d{8,15}$")
 
 
 def default_citas_settings() -> dict:
@@ -43,19 +53,23 @@ def default_citas_settings() -> dict:
 
 def _zone(name: str) -> ZoneInfo:
     try:
-        return ZoneInfo(name)
+        return ZoneInfo(require_timezone(name))
+    except AgentModuleError:
+        raise
     except ZoneInfoNotFoundError:
-        raise AgentModuleError("invalid_settings", 422) from None
+        raise AgentModuleError("invalid_timezone", 422) from None
 
 
 def normalize_citas_settings(raw) -> dict:
-    incoming = raw if isinstance(raw, dict) else {}
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise AgentModuleError("invalid_settings", 422)
+    reject_unknown(raw, _CITAS_KEYS, "citas")
+    incoming = raw
     settings = default_citas_settings()
     timezone_name = incoming.get("timezone") or settings["timezone"]
-    if not isinstance(timezone_name, str):
-        raise AgentModuleError("invalid_settings", 422)
-    _zone(timezone_name.strip())
-    settings["timezone"] = timezone_name.strip()
+    settings["timezone"] = require_timezone(timezone_name)
 
     minutes = incoming.get("slot_minutes", settings["slot_minutes"])
     if minutes not in SLOT_MINUTES:
@@ -135,24 +149,20 @@ def slot_is_open(start_utc: datetime, settings: dict) -> bool:
 
 
 def clean_name(value: str) -> str:
-    if not isinstance(value, str):
-        raise AgentModuleError("invalid_contact", 422)
-    name = " ".join(value.split())
-    if not name or len(name) > 80:
-        raise AgentModuleError("invalid_contact", 422)
-    return name
+    try:
+        return require_plain_text(value, max_len=NAME_MAX, module="citas")
+    except AgentModuleError as exc:
+        if exc.code == "empty_message":
+            raise AgentModuleError("invalid_contact", 422) from None
+        raise
 
 
 def clean_contact(value: str) -> str:
-    if not isinstance(value, str):
-        raise AgentModuleError("invalid_contact", 422)
-    text = value.strip()
-    if _EMAIL.fullmatch(text):
-        return text.lower()
-    digits = re.sub(r"[^\d+]", "", text)
-    if _PHONE.fullmatch(digits):
-        return digits
-    raise AgentModuleError("invalid_contact", 422)
+    return clean_email_or_phone(value, module="citas")
+
+
+def clean_note(value: str) -> str:
+    return optional_plain_text(value, max_len=NOTE_MAX, module="citas")
 
 
 def whatsapp_destination(contact: str) -> str | None:
@@ -207,18 +217,26 @@ async def create_booking(
     note: str = "",
     channel: str,
     now: datetime | None = None,
+    idempotency_key: str | None = None,
 ) -> dict:
     moment = now or datetime.now(timezone.utc)
     settings = settings or default_citas_settings()
-    start = parse_slot(slot_start)
-    if start <= moment:
-        raise AgentModuleError("invalid_slot", 422)
-    if not slot_is_open(start, settings):
-        raise AgentModuleError("outside_hours", 422)
+    # Every check above the first collection call is pure. A bad payload
+    # never reaches Mongo.
+    start = parse_slot_text(slot_start, now=moment, horizon_days=BOOKING_HORIZON_DAYS)
     name = clean_name(customer_name)
     contact_clean = clean_contact(contact)
-    note_clean = " ".join((note or "").split())[:240]
+    note_clean = clean_note(note)
+    if not slot_is_open(start, settings):
+        raise AgentModuleError("outside_hours", 422)
     end = start + timedelta(minutes=int(settings["slot_minutes"]))
+    if idempotency_key:
+        existing = await database.agent_bookings.find_one({
+            "project_id": project["project_id"],
+            "idempotency_key": idempotency_key,
+        })
+        if existing:
+            return _replay_or_conflict(existing, start=start, name=name, contact=contact_clean, note=note_clean)
     overlap = await _confirmed_overlap(database.agent_bookings, project["project_id"], start, end)
     if overlap:
         log_failure("slot_taken", "citas")
@@ -236,6 +254,7 @@ async def create_booking(
         "contact": contact_clean,
         "note": note_clean,
         "channel": channel if channel in {"chat", "whatsapp", "voice", "api"} else "api",
+        **({"idempotency_key": idempotency_key} if idempotency_key else {}),
         "reminder_due_at": start - timedelta(hours=int(settings["reminder_hours_before"])),
         "reminder_sent_at": None,
         "reminder_claimed_at": None,
@@ -245,9 +264,36 @@ async def create_booking(
     try:
         await database.agent_bookings.insert_one(document)
     except DuplicateKeyError:
+        if idempotency_key:
+            existing = await database.agent_bookings.find_one({
+                "project_id": project["project_id"],
+                "idempotency_key": idempotency_key,
+            })
+            if existing:
+                return _replay_or_conflict(
+                    existing, start=start, name=name, contact=contact_clean, note=note_clean,
+                )
         log_failure("slot_taken", "citas")
         raise AgentModuleError("slot_taken", 409) from None
     return serialize_booking(document)
+
+
+def _same_instant(stored, start: datetime) -> bool:
+    if not isinstance(stored, datetime):
+        return False
+    return stored.astimezone(timezone.utc).replace(microsecond=0) == start
+
+
+def _replay_or_conflict(existing: dict, *, start: datetime, name: str, contact: str, note: str) -> dict:
+    if (
+        _same_instant(existing.get("slot_start"), start)
+        and existing.get("customer_name") == name
+        and existing.get("contact") == contact
+        and (existing.get("note") or "") == note
+    ):
+        return serialize_booking(existing)
+    log_failure("idempotency_conflict", "citas")
+    raise AgentModuleError("idempotency_conflict", 409)
 
 
 async def list_bookings(database, project_id: str) -> list:
@@ -295,6 +341,10 @@ def _day_bounds(day: date, zone: ZoneInfo) -> tuple[datetime, datetime]:
 
 async def open_slots(database, project_id: str, settings: dict, day: date) -> list:
     zone = _zone(settings["timezone"])
+    today = datetime.now(zone).date()
+    if day > today + timedelta(days=BOOKING_HORIZON_DAYS):
+        log_failure("invalid_slot", "citas")
+        raise AgentModuleError("invalid_slot", 422)
     window_start, window_end = _day_bounds(day, zone)
     cursor = database.agent_bookings.find({
         "project_id": project_id,
@@ -344,6 +394,7 @@ async def run_due_reminders(database, *, now: datetime | None = None, send=None)
 
     moment = now or datetime.now(timezone.utc)
     sender = send or whatsapp_service.send_text
+    await _release_stale_claims(database, moment)
     cursor = database.agent_bookings.find({
         "status": "confirmed",
         "reminder_sent_at": None,
@@ -388,20 +439,41 @@ async def run_due_reminders(database, *, now: datetime | None = None, send=None)
         body = reminder_text(project, row)
         try:
             await sender(phone_number_id=phone_number_id, to=destination, body=body)
-        except Exception:
+        except Exception as exc:
             await database.agent_bookings.update_one(
                 {"booking_id": row["booking_id"]},
                 {"$set": {"reminder_claimed_at": None}},
             )
-            log_failure("provider", "citas")
-            failed += 1
-            continue
+            if isinstance(exc, AgentModuleError):
+                raise
+            from backend.app.services.agent_guard import classify_provider
+
+            raise classify_provider(exc, "citas") from None
         await database.agent_bookings.update_one(
             {"booking_id": row["booking_id"]},
             {"$set": {"reminder_sent_at": moment}},
         )
         sent += 1
     return {"checked": len(rows), "sent": sent, "skipped": skipped, "failed": failed}
+
+
+async def _release_stale_claims(database, moment: datetime) -> None:
+    """A claim older than two minutes is released so a crash cannot hold a reminder forever."""
+    stale_before = moment - timedelta(minutes=2)
+    cursor = database.agent_bookings.find({
+        "status": "confirmed",
+        "reminder_sent_at": None,
+        "reminder_skip": None,
+    })
+    rows = await cursor.to_list(100)
+    for row in rows:
+        claimed = row.get("reminder_claimed_at")
+        if not isinstance(claimed, datetime) or claimed > stale_before:
+            continue
+        await database.agent_bookings.update_one(
+            {"booking_id": row["booking_id"], "reminder_sent_at": None},
+            {"$set": {"reminder_claimed_at": None}},
+        )
 
 
 async def delete_project_bookings(database, project_id: str) -> int:
