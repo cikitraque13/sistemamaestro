@@ -1,6 +1,9 @@
-"""Generate a saved landing preview. Publication stays off."""
+"""Generate a saved landing preview.
+
+Publication lives in builder_publish. The flags stay off unless the
+environment or an admin opens them. This module only reports that state.
+"""
 import asyncio
-import os
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -24,6 +27,11 @@ from backend.app.services.builder_landing_state import (
 from backend.app.services.builder_executor import encode_sse, iter_executor, with_heartbeats
 from backend.app.services.builder_executor_providers import draft_page, draft_piece, judge_draft
 from backend.app.services.builder_pipeline import GENERIC_MESSAGE, PipelineError, public_preview, run_pipeline
+from backend.app.services.builder_publish import (
+    publish_landing_enabled,
+    user_may_custom_domain,
+    user_may_publish,
+)
 from backend.app.services.builder_test_mode import builder_charge_waived, run_builder_operation
 from backend.app.services.economic_operation import request_operation_id, run_economic_operation
 
@@ -33,13 +41,6 @@ router = APIRouter(prefix="/api/builder", tags=["builder-preview"])
 class PreviewRequest(BaseModel):
     projectId: str = Field(min_length=1)
     instruction: str = Field(min_length=1, max_length=4000)
-
-
-def publish_landing_enabled() -> bool:
-    raw = os.environ.get("BUILDER_PUBLISH_ENABLED")
-    if raw is None:
-        return False
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _http_error(error: PipelineError) -> HTTPException:
@@ -81,7 +82,11 @@ async def draft_section_with_writer(data):
 async def builder_session(request: Request):
     await ensure_builder_available(request)
     user = await get_current_user(request)
-    return {"freeTestMode": builder_charge_waived(user)}
+    return {
+        "freeTestMode": builder_charge_waived(user),
+        "publishLanding": user_may_publish(user),
+        "customDomain": user_may_custom_domain(user),
+    }
 
 
 @router.get("/preview/{project_id}")
@@ -278,12 +283,3 @@ async def stream_preview(body: PreviewRequest, request: Request):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
-
-
-@router.post("/publish/{project_id}")
-async def publish_preview(project_id: str, request: Request):
-    await ensure_builder_available(request)
-    await get_current_user(request)
-    if not publish_landing_enabled():
-        raise HTTPException(503, detail={"message": "La publicación no está disponible."})
-    raise HTTPException(503, detail={"message": "La publicación no está disponible."})

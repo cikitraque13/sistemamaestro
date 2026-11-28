@@ -1,7 +1,9 @@
 import { api, API_BASE } from '../../../lib/apiClient';
 import { economicPost, runEconomicRequest } from '../../../lib/economicRequest';
 
+// Dark defaults. The live switch is the builder session (flag or admin), not these constants.
 export const PUBLISH_LANDING_ENABLED = false;
+export const CUSTOM_DOMAIN_ENABLED = false;
 
 export function previewErrorMessage(error) {
   const message = error?.response?.data?.detail?.message;
@@ -14,9 +16,13 @@ export function previewErrorMessage(error) {
 export async function loadBuilderSession() {
   try {
     const response = await api.get('/builder/session');
-    return { freeTestMode: Boolean(response?.data?.freeTestMode) };
+    return {
+      freeTestMode: Boolean(response?.data?.freeTestMode),
+      publishLanding: Boolean(response?.data?.publishLanding),
+      customDomain: Boolean(response?.data?.customDomain),
+    };
   } catch {
-    return { freeTestMode: false };
+    return { freeTestMode: false, publishLanding: false, customDomain: false };
   }
 }
 

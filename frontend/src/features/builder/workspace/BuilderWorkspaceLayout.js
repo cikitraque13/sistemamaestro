@@ -4,7 +4,7 @@ import { GemaMaestra } from '../../app-shell/layout/AppShellLayout';
 import BuilderAgentPane from '../components/BuilderAgentPane';
 import ExecutorChat from '../components/ExecutorChat';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
-import { PUBLISH_LANDING_ENABLED } from '../api/builderPreviewClient';
+import BuilderPublishDock from '../publish/BuilderPublishDock';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 
 const HISTORY_LABELS = {
@@ -174,7 +174,6 @@ function WorkspaceSidePanel({
       </div>
 
       {runtime.previewNotice ? <p role="alert" className="text-sm text-amber-100">{runtime.previewNotice}</p> : null}
-      {PUBLISH_LANDING_ENABLED ? <button type="button">Publicar</button> : null}
 
       <ProjectHistory audit={runtime.landingTransaction?.audit} versions={runtime.generatedPreview?.versions} />
     </aside>
@@ -194,6 +193,8 @@ export default function BuilderWorkspaceLayout({
   usageLabel = '',
   autoStart = false,
   freeTestMode = false,
+  publishLanding = false,
+  customDomain = false,
 }) {
   const runtime = useBuilderWorkspaceRuntime({
     project,
@@ -227,6 +228,13 @@ export default function BuilderWorkspaceLayout({
           sandbox=""
           srcDoc={liveHtml}
           className="min-h-0 w-full flex-1 border-0 bg-[#090b12]"
+        />
+        <BuilderPublishDock
+          projectId={project.project_id}
+          publishLanding={publishLanding}
+          customDomain={customDomain}
+          hasPreview={Boolean(runtime.generatedPreview?.html)}
+          busy={busy}
         />
       </div>
     );

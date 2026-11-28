@@ -1,8 +1,10 @@
 ﻿from backend.app.routers import builder_ai, builder_preview
+from backend.app.routers.builder_publish import router as builder_publish_router
 import logging
 import asyncio
 from contextlib import suppress
 from backend.app.services.intent_clarification import run_receipt_compaction_worker
+from backend.app.services.builder_publish import PublishedLandingMiddleware
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -51,6 +53,9 @@ app.include_router(public_router)
 app.include_router(nova_voice_router)
 app.include_router(opportunities_router)
 app.include_router(consumption_router)
+app.include_router(builder_ai.router)
+app.include_router(builder_preview.router)
+app.include_router(builder_publish_router)
 
 
 @app.on_event("startup")
@@ -72,6 +77,16 @@ async def startup_event():
     await db.builder_landing_states.create_index(
         [("user_id", 1), ("project_id", 1)],
         unique=True,
+    )
+    await db.builder_publications.create_index(
+        [("user_id", 1), ("project_id", 1)],
+        unique=True,
+    )
+    await db.builder_publications.create_index("slug", unique=True)
+    await db.builder_publications.create_index(
+        "custom_domain.host",
+        unique=True,
+        partialFilterExpression={"custom_domain.host": {"$type": "string"}},
     )
     app.state.j06_receipt_compaction_task = asyncio.create_task(run_receipt_compaction_worker(db.projects))
 
@@ -124,6 +139,6 @@ async def shutdown_db_client():
             await task
     client.close()
 
-app.include_router(builder_ai.router)
-app.include_router(builder_preview.router)
+# Outermost: a published Host never falls through to the app or its API.
+app.add_middleware(PublishedLandingMiddleware, publications=db.builder_publications)
 

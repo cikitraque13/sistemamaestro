@@ -197,12 +197,17 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('preview');
   const [freeTestMode, setFreeTestMode] = useState(false);
+  const [publishLanding, setPublishLanding] = useState(false);
+  const [customDomain, setCustomDomain] = useState(false);
   const autoStart = location.state?.source === 'dashboard-launch-console';
 
   useEffect(() => {
     let live = true;
     loadBuilderSession().then((session) => {
-      if (live) setFreeTestMode(Boolean(session.freeTestMode));
+      if (!live) return;
+      setFreeTestMode(Boolean(session.freeTestMode));
+      setPublishLanding(Boolean(session.publishLanding));
+      setCustomDomain(Boolean(session.customDomain));
     });
     return () => { live = false; };
   }, []);
@@ -389,6 +394,8 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         usageLabel="Créditos visibles para análisis, Builder y blueprint."
         autoStart={autoStart}
         freeTestMode={freeTestMode}
+        publishLanding={publishLanding}
+        customDomain={customDomain}
       />
     </AppShellLayout>
   );

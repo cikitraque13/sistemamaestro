@@ -355,7 +355,7 @@ def test_worker_cadence_and_shutdown_cancellation_before_close():
         finally:events.append("cancelled")
     def close():events.append("close")
     index=AsyncMock();collection=SimpleNamespace(create_index=index)
-    db=SimpleNamespace(**{name:collection for name in ("users","projects","user_sessions","payment_transactions","login_attempts","newsletter_subscribers","analysis_requests","builder_landing_states")})
+    db=SimpleNamespace(**{name:collection for name in ("users","projects","user_sessions","payment_transactions","login_attempts","newsletter_subscribers","analysis_requests","builder_landing_states","builder_publications")})
     namespace={"asyncio":asyncio,"suppress":contextlib.suppress,"app":SimpleNamespace(state=SimpleNamespace()),"db":db,"client":SimpleNamespace(close=close),"run_receipt_compaction_worker":fake_worker}
     exec(compile(ast.Module(body=functions,type_ignores=[]),str(main),"exec"),namespace)
     async def execute():
