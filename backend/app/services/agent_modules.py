@@ -1,10 +1,11 @@
 """Per-project agent modules and the global kill switches.
 
-Modules: chat, voz, whatsapp, citas. Each one is off on the project until the
-owner enables it, and off globally until its env flag is set. Admins use the
-role check that already exists for the builder; this module does not define a
-new admin rule. Public webhooks have no user, so they stay hidden until the
-flag is on.
+Modules: chat, voz, whatsapp, citas. A new project keeps them off. Publishing a
+landing turns chat and citas on unless the owner has opted out. voz and
+whatsapp stay off until the project already has credentials. Every module
+stays off globally until its env flag is set. Admins use the role check that
+already exists for the builder; this module does not define a new admin rule.
+Public webhooks have no user, so they stay hidden until the flag is on.
 
 The client dashboard that should toggle these modules is not in this change.
 """
@@ -153,19 +154,133 @@ def normalize_chat_settings(previous: dict, rotate: bool, incoming: dict | None 
     return {"widget_key": key}
 
 
+def _stored_modules(doc, view: dict, name: str, enabled: bool) -> dict:
+    """Keep an owner opt-out on the document. The public view does not show it."""
+    raw = doc.get("modules") if isinstance(doc, dict) and isinstance(doc.get("modules"), dict) else {}
+    modules = {}
+    for module_name in MODULES:
+        item = view["modules"][module_name]
+        settings = item.get("settings") if isinstance(item.get("settings"), dict) else {}
+        entry = {"enabled": bool(item.get("enabled")), "settings": settings}
+        if module_name == name:
+            entry["opted_out"] = not bool(enabled)
+        else:
+            previous = raw.get(module_name) if isinstance(raw.get(module_name), dict) else None
+            if isinstance(previous, dict) and "opted_out" in previous:
+                entry["opted_out"] = bool(previous.get("opted_out"))
+        modules[module_name] = entry
+    return modules
+
+
 async def save_module(collection, project: dict, name: str, enabled: bool, settings: dict) -> dict:
     if name not in MODULES:
         raise AgentModuleError("not_found", 404)
-    current = await load_modules(collection, project["project_id"])
+    doc = await collection.find_one({"project_id": project["project_id"]})
+    current = public_modules(doc, project["project_id"])
     current["modules"][name] = {"enabled": bool(enabled), "settings": settings}
     stored = {
         "project_id": project["project_id"],
         "user_id": project["user_id"],
-        "modules": current["modules"],
+        "modules": _stored_modules(doc, current, name, enabled),
         "updated_at": datetime.now(timezone.utc),
     }
     await collection.update_one({"project_id": project["project_id"]}, {"$set": stored}, upsert=True)
     return public_modules(stored, project["project_id"])
+
+
+def _copy_entry(item) -> dict:
+    if not isinstance(item, dict):
+        item = {}
+    settings = item.get("settings") if isinstance(item.get("settings"), dict) else {}
+    entry = {"enabled": bool(item.get("enabled")), "settings": dict(settings)}
+    if "opted_out" in item:
+        entry["opted_out"] = bool(item.get("opted_out"))
+    return entry
+
+
+def channel_credentials(name: str, settings: dict) -> dict | None:
+    """Normalized voz or WhatsApp settings, or None when credentials are missing.
+
+    A missing number is not a connected channel. Callers leave the module off
+    so the webhook cannot report a successful send.
+    """
+    if not isinstance(settings, dict) or not settings:
+        return None
+    if name == "voz":
+        from backend.app.services.telephony import normalize_voz_settings
+
+        normalizer = normalize_voz_settings
+    elif name == "whatsapp":
+        from backend.app.services.whatsapp import normalize_whatsapp_settings
+
+        normalizer = normalize_whatsapp_settings
+    else:
+        return None
+    try:
+        return normalizer(settings)
+    except AgentModuleError:
+        return None
+
+
+def _auto_settings(name: str, previous: dict) -> dict | None:
+    if name == "chat":
+        return normalize_chat_settings(previous, False)
+    if name == "citas":
+        from backend.app.services.bookings import normalize_citas_settings
+
+        try:
+            return normalize_citas_settings(previous or {})
+        except AgentModuleError:
+            return None
+    if name in {"voz", "whatsapp"}:
+        return channel_credentials(name, previous)
+    return None
+
+
+async def activate_published_attendant(collection, project: dict) -> None:
+    """Turn the attendant on after a publish. Failures are logged and swallowed.
+
+    chat and citas turn on unless the stored module has opted_out. An already
+    enabled module keeps its settings, so a second publish does not rotate the
+    widget key or the weekly hours. voz and whatsapp turn on only when the
+    stored settings already contain credentials the normalizers accept.
+    """
+    if collection is None or not isinstance(project, dict):
+        return
+    project_id = project.get("project_id")
+    user_id = project.get("user_id")
+    if not isinstance(project_id, str) or not project_id or not isinstance(user_id, str):
+        return
+    try:
+        doc = await collection.find_one({"project_id": project_id})
+        raw = {}
+        if isinstance(doc, dict) and isinstance(doc.get("modules"), dict):
+            raw = doc["modules"]
+        modules = {}
+        changed = False
+        for name in MODULES:
+            item = raw.get(name) if isinstance(raw.get(name), dict) else {}
+            entry = _copy_entry(item)
+            if entry.get("opted_out") is True or entry["enabled"]:
+                modules[name] = entry
+                continue
+            prepared = _auto_settings(name, entry["settings"])
+            if prepared is None:
+                modules[name] = entry
+                continue
+            modules[name] = {"enabled": True, "settings": prepared, "opted_out": False}
+            changed = True
+        if not changed:
+            return
+        stored = {
+            "project_id": project_id,
+            "user_id": user_id,
+            "modules": modules,
+            "updated_at": datetime.now(timezone.utc),
+        }
+        await collection.update_one({"project_id": project_id}, {"$set": stored}, upsert=True)
+    except Exception as exc:
+        logger.warning("publish_attendant_activation_failed category=%s", type(exc).__name__)
 
 
 async def owned_project(projects, user, project_id: str) -> dict:

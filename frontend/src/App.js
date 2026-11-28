@@ -18,6 +18,7 @@ import Opportunities from './features/opportunities/OpportunitiesPage';
 import Billing from './features/billing/BillingPage';
 import Settings from './features/settings/SettingsPage';
 import Flow from './features/flow/FlowPage';
+import AttentionPage from './features/attention/AttentionPage';
 
 // Public/legal pages kept in pages for now
 import Privacy from './pages/Privacy';
@@ -76,6 +77,7 @@ const AppRouter = () => {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/cookies" element={<Cookies />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/atencion/:projectId" element={<AttentionPage />} />
 
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/dashboard/agente-voz" element={<ProtectedRoute><AgentModulePage title="Agente de voz" /></ProtectedRoute>} />

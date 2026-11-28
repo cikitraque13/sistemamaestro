@@ -1,4 +1,5 @@
 """Slug, snapshot, host, unpublish, DNS and the dark publish flags."""
+import logging
 import os
 
 os.environ.setdefault("MONGO_URL", "mongodb://127.0.0.1:27017")
@@ -28,6 +29,7 @@ from backend.app.services.builder_publish import (
     publish_project,
     published_landing_response,
     republish_project,
+    with_attendant_link,
     resolve_host,
     set_custom_domain,
     unpublish_project,
@@ -213,9 +215,9 @@ def test_publish_copies_the_latest_version_and_republish_keeps_the_old_snapshot(
 
     run(go())
     stored = publications.documents[0]
-    assert stored["history"][0]["html"] == first_html
+    assert stored["history"][0]["html"] == with_attendant_link(first_html, "proj_clara", SETTINGS)
     assert stored["history"][0]["publishedAt"] == "t1"
-    assert stored["snapshot"]["html"] == second
+    assert stored["snapshot"]["html"] == with_attendant_link(second, "proj_clara", SETTINGS)
     assert stored["snapshot"]["version"] == 2
     assert stored["snapshot"] is not stored["history"][0]
     assert "mutated-source" not in stored["history"][0]["html"]
@@ -242,7 +244,8 @@ def test_unpublish_stops_serving_and_a_published_host_sends_the_preview_csp():
 
     live, hidden, unknown, nested, apex, api = run(go())
     assert live.status_code == 200
-    assert html in live.body.decode()
+    assert "Clara atiende la consulta esta semana" in live.body.decode()
+    assert "Habla con nosotros · Reserva cita" in live.body.decode()
     policy = live.headers["content-security-policy"]
     assert PREVIEW_CSP in policy
     assert "script-src 'none'" in policy
@@ -308,7 +311,8 @@ def test_verified_custom_domain_serves_and_a_pending_one_does_not():
     assert pending.status_code == 404
     assert "Clara atiende" not in pending.body.decode()
     assert verified.status_code == 200
-    assert html in verified.body.decode()
+    assert "Clara atiende la consulta esta semana" in verified.body.decode()
+    assert "Habla con nosotros · Reserva cita" in verified.body.decode()
     assert "script-src 'none'" in verified.headers["content-security-policy"]
     assert stranger is None
 
@@ -604,3 +608,124 @@ def test_publish_code_does_not_call_railway_or_charge_gems():
     result = run(DomainActivationAdapter().request_attachment("cliente.com"))
     assert result["status"] == "pending_sistema_maestro"
     assert result["ok"] is False
+
+
+def test_publish_enables_attendant_modules_and_is_idempotent():
+    from backend.app.services.agent_modules import save_module
+
+    projects, landings, publications, _html = world()
+    modules = Store()
+    modules.documents.append({
+        "project_id": "proj_clara",
+        "user_id": "alice",
+        "modules": {
+            "whatsapp": {"enabled": False, "settings": {"phone_number_id": "123456789"}},
+            "voz": {"enabled": False, "settings": {"greeting": "Hola"}},
+        },
+    })
+
+    async def go():
+        await publish_project(
+            projects, landings, publications,
+            owner_id="alice", project_id="proj_clara", slug="clara", now="t1", settings=SETTINGS,
+            modules=modules,
+        )
+        first = copy.deepcopy(modules.documents[0])
+        modules.documents[0]["modules"]["citas"]["settings"]["weekly_hours"] = {
+            "mon": [["10:00", "14:00"]],
+        }
+        await publish_project(
+            projects, landings, publications,
+            owner_id="alice", project_id="proj_clara", slug="clara", now="t2", settings=SETTINGS,
+            modules=modules,
+        )
+        second = copy.deepcopy(modules.documents[0])
+        await save_module(
+            modules,
+            {"project_id": "proj_clara", "user_id": "alice"},
+            "chat",
+            False,
+            second["modules"]["chat"]["settings"],
+        )
+        await publish_project(
+            projects, landings, publications,
+            owner_id="alice", project_id="proj_clara", slug="clara", now="t3", settings=SETTINGS,
+            modules=modules,
+        )
+        return first, second
+
+    first, second = run(go())
+    assert len(modules.documents) == 1
+    chat = first["modules"]["chat"]
+    assert chat["enabled"] is True
+    assert chat["opted_out"] is False
+    assert len(chat["settings"]["widget_key"]) >= 16
+    citas = first["modules"]["citas"]
+    assert citas["enabled"] is True
+    assert citas["settings"]["timezone"] == "Europe/Madrid"
+    assert citas["settings"]["weekly_hours"] == {}
+    assert first["modules"]["voz"]["enabled"] is False
+    assert "inbound_number" not in first["modules"]["voz"]["settings"]
+    assert first["modules"]["whatsapp"]["enabled"] is True
+    assert first["modules"]["whatsapp"]["settings"] == {"phone_number_id": "123456789"}
+    assert second["modules"]["chat"]["settings"]["widget_key"] == chat["settings"]["widget_key"]
+    assert second["modules"]["citas"]["settings"]["weekly_hours"] == {"mon": [["10:00", "14:00"]]}
+    stored = modules.documents[0]["modules"]
+    assert stored["chat"]["enabled"] is False
+    assert stored["chat"]["opted_out"] is True
+    assert stored["chat"]["settings"]["widget_key"] == chat["settings"]["widget_key"]
+    assert stored["citas"]["enabled"] is True
+    assert stored["citas"]["settings"]["weekly_hours"] == {"mon": [["10:00", "14:00"]]}
+    assert stored["voz"]["enabled"] is False
+    assert stored["whatsapp"]["enabled"] is True
+    page = publications.documents[0]["snapshot"]["html"]
+    assert page.count('data-sm-attention="1"') == 1
+    assert 'href="https://sistemamaestro.com/atencion/proj_clara"' in page
+    assert "<script" not in page.lower()
+
+
+def test_attendant_activation_failure_does_not_roll_back_publish(caplog):
+    projects, landings, publications, html = world()
+
+    class Boom:
+        async def find_one(self, *_args, **_kwargs):
+            raise RuntimeError("storage down")
+
+    async def go():
+        return await publish_project(
+            projects, landings, publications,
+            owner_id="alice", project_id="proj_clara", slug="clara", now="t1", settings=SETTINGS,
+            modules=Boom(),
+        )
+
+    caplog.set_level(logging.WARNING)
+    result = run(go())
+    assert result["status"] == "published"
+    assert result["slug"] == "clara"
+    stored = publications.documents[0]
+    assert stored["status"] == "published"
+    body = stored["snapshot"]["html"]
+    assert html.split("</body>", 1)[0] in body
+    assert "Habla con nosotros · Reserva cita" in body
+    assert "publish_attendant_activation_failed" in caplog.text
+    served = run(published_landing_response(publications, "clara.sistemamaestro.com", SETTINGS))
+    assert served.status_code == 200
+
+
+def test_published_landing_links_to_attention_and_keeps_script_src_none():
+    projects, landings, publications, _html = world()
+    run(publish_project(
+        projects, landings, publications,
+        owner_id="alice", project_id="proj_clara", slug="clara", now="t1", settings=SETTINGS,
+    ))
+    response = run(published_landing_response(publications, "clara.sistemamaestro.com", SETTINGS))
+    body = response.body.decode()
+    assert response.status_code == 200
+    assert 'href="https://sistemamaestro.com/atencion/proj_clara"' in body
+    assert "Habla con nosotros · Reserva cita" in body
+    assert body.lower().count("<script") == 0
+    assert "javascript:" not in body.lower()
+    policy = response.headers["content-security-policy"]
+    assert PREVIEW_CSP in policy
+    assert "script-src 'none'" in policy
+    assert "frame-ancestors 'none'" in policy
