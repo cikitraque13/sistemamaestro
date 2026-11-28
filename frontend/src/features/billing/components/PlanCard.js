@@ -18,13 +18,13 @@ const PLAN_ROLE_META = {
     description:
       'Idea o diagnóstico convertidos en base operativa lista para Builder.',
     surface:
-      'border-[#8DE1D0]/45 bg-[linear-gradient(180deg,#073B39_0%,#05211F_46%,#050505_100%)]',
-    glow: 'bg-[#0F5257]/26',
+      'border-orange-300/70 bg-[radial-gradient(circle_at_12%_0%,rgba(249,115,22,0.55),transparent_42%),linear-gradient(165deg,#7c2d12_0%,#431407_48%,#1c0a04_100%)]',
+    glow: 'bg-orange-400/40',
     badgeClass:
-      'border-[#8DE1D0]/25 bg-[#0F5257]/34 text-[#8DE1D0]',
+      'border-orange-200/40 bg-orange-400/20 text-orange-50',
     ctaClass:
-      'bg-[#0F5257] text-white hover:bg-[#136970]',
-    iconClass: 'text-[#8DE1D0]'
+      'bg-[linear-gradient(95deg,#fdba74,#fb923c,#f97316)] text-[#2a1204] shadow-[0_0_24px_rgba(249,115,22,0.45)]',
+    iconClass: 'text-orange-200'
   },
   sistema: {
     stage: 'CONTINUAR',
@@ -33,13 +33,13 @@ const PLAN_ROLE_META = {
     description:
       'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
     surface:
-      'border-sky-200/42 bg-[linear-gradient(180deg,#0C314C_0%,#071D2B_46%,#050505_100%)]',
-    glow: 'bg-sky-400/18',
+      'border-lime-300/70 bg-[radial-gradient(circle_at_12%_0%,rgba(190,242,100,0.5),transparent_42%),linear-gradient(165deg,#3f6212_0%,#1a2e05_48%,#0a1403_100%)]',
+    glow: 'bg-lime-300/35',
     badgeClass:
-      'border-sky-200/22 bg-sky-400/18 text-sky-100',
+      'border-lime-200/40 bg-lime-300/20 text-lime-50',
     ctaClass:
-      'bg-[#2A3F55] text-white hover:bg-[#355169]',
-    iconClass: 'text-sky-200'
+      'bg-[linear-gradient(95deg,#ecfccb,#bef264,#84cc16)] text-[#142004] shadow-[0_0_24px_rgba(190,242,100,0.4)]',
+    iconClass: 'text-lime-200'
   },
   premium: {
     stage: 'ESCALAR',
@@ -48,13 +48,13 @@ const PLAN_ROLE_META = {
     description:
       'Más criterio, inteligencia y capacidad para preparar una salida seria.',
     surface:
-      'border-fuchsia-200/42 bg-[linear-gradient(180deg,#3A0F3A_0%,#1E0820_46%,#050505_100%)]',
-    glow: 'bg-fuchsia-400/18',
+      'border-violet-300/70 bg-[radial-gradient(circle_at_80%_0%,rgba(167,139,250,0.55),transparent_40%),radial-gradient(circle_at_10%_90%,rgba(56,189,248,0.4),transparent_42%),linear-gradient(165deg,#4c1d95_0%,#1e1b4b_55%,#082f49_100%)]',
+    glow: 'bg-sky-400/30',
     badgeClass:
-      'border-fuchsia-200/22 bg-fuchsia-400/16 text-fuchsia-100',
+      'border-violet-200/40 bg-violet-400/20 text-violet-50',
     ctaClass:
-      'bg-[#3B123E] text-white hover:bg-[#4A1850]',
-    iconClass: 'text-fuchsia-200'
+      'bg-[linear-gradient(95deg,#ddd6fe,#a78bfa,#38bdf8)] text-[#140828] shadow-[0_0_24px_rgba(167,139,250,0.45)]',
+    iconClass: 'text-sky-200'
   }
 };
 
@@ -259,7 +259,7 @@ const PlanCard = ({
               <CheckCircle
                 size={16}
                 weight="fill"
-                className="mt-1 flex-shrink-0 text-[#0F5257]"
+                className={`mt-1 flex-shrink-0 ${role.iconClass}`}
               />
 
               <span>{feature}</span>

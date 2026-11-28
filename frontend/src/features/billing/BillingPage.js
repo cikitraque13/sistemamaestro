@@ -1,12 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  ArrowLeft,
-  CheckCircle,
-  DiamondsFour,
-  WarningCircle
-} from '@phosphor-icons/react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -17,12 +10,7 @@ import { pricingPlans } from '../../content/pricingContent';
 import { API_BASE } from './billing.constants';
 import { isPaymentProvisionComplete } from './paymentCompletion.mjs';
 import { getErrorMessage, isValidCheckoutUrl } from './billing.utils';
-
-import SuggestedPlanBanner from './components/SuggestedPlanBanner';
-import CreditSummaryCard from './components/CreditSummaryCard';
-import CurrentPlanCard from './components/CurrentPlanCard';
-import PlansGrid from './components/PlansGrid';
-import PaymentHistoryTable from './components/PaymentHistoryTable';
+import PlanCard from './components/PlanCard';
 
 const CHECKOUT_CONTEXT_KEY = 'sm_billing_checkout_context';
 
@@ -57,108 +45,9 @@ const clearCheckoutContext = () => {
   }
 };
 
-const BillingHero = ({ fromProjectId, onReturnToProject }) => (
-  <motion.section
-    initial={{ opacity: 0, y: 18 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="mb-8 overflow-hidden rounded-[28px] border border-cyan-300/10 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_28%),radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(180deg,#141414_0%,#090909_100%)] p-6 sm:p-8"
-  >
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-      <div className="max-w-3xl">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-200/15 bg-amber-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-amber-100">
-          <DiamondsFour size={14} weight="fill" />
-          Sistema Maestro Gold
-        </div>
-
-        <h1 className="mb-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-          Facturación
-        </h1>
-
-        <p className="max-w-2xl text-sm leading-6 text-[#b4bec8] sm:text-base">
-          Tu saldo, tu plan y los pagos de la cuenta.
-        </p>
-      </div>
-
-      {fromProjectId && (
-        <button
-          type="button"
-          onClick={onReturnToProject}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition-all hover:bg-white/10"
-        >
-          <ArrowLeft size={16} />
-          Volver al proyecto
-        </button>
-      )}
-    </div>
-
-    <div className="mt-6 grid gap-3 md:grid-cols-2">
-      <div className="rounded-2xl border border-cyan-300/12 bg-cyan-400/[0.06] p-4">
-        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-cyan-100">
-          Gema Maestra
-        </p>
-        <p className="text-sm leading-6 text-[#D4D4D4]">
-          Capacidad operativa visible para construir, iterar y avanzar dentro
-          del sistema sin perder continuidad.
-        </p>
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-        <p className="mb-1 text-xs uppercase tracking-[0.14em] text-sky-200">
-          Continuidad
-        </p>
-        <p className="text-sm leading-6 text-[#D4D4D4]">
-          Los planes amplían acceso, recorrido y capacidad cuando el proyecto necesita
-          más construcción.
-        </p>
-      </div>
-    </div>
-  </motion.section>
-);
-
-const ProjectContextCard = ({ fromProjectId, onReturnToProject }) => {
-  if (!fromProjectId) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mb-6 rounded-2xl border border-[#0F5257]/20 bg-[#0F5257]/10 px-5 py-4"
-    >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-start gap-3">
-          <CheckCircle
-            size={20}
-            weight="fill"
-            className="mt-0.5 flex-shrink-0 text-[#8DE1D0]"
-          />
-
-          <div>
-            <p className="mb-1 font-medium text-white">
-              Vienes desde un proyecto activo
-            </p>
-            <p className="text-sm leading-6 text-[#D4D4D4]">
-              Si activas un plan desde aquí, el sistema conserva el contexto para
-              devolverte al proyecto correspondiente.
-            </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onReturnToProject}
-          className="inline-flex items-center justify-center rounded-xl border border-[#0F5257]/30 bg-black/20 px-4 py-2 text-sm text-[#8DE1D0] transition-all hover:bg-black/30"
-        >
-          Volver al proyecto
-        </button>
-      </div>
-    </motion.div>
-  );
-};
-
 const BillingPage = () => {
   const { user, checkAuth } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const restoredContext = useMemo(() => readCheckoutContext(), []);
@@ -179,34 +68,12 @@ const BillingPage = () => {
     restoredContext?.fromProjectId ||
     null;
 
-  const suggestedPlan = useMemo(
-    () => pricingPlans.find((plan) => plan.id === suggestedPlanId) || null,
-    [suggestedPlanId]
-  );
-
   const currentPlanId = billingData?.current_plan?.id || user?.plan || 'free';
 
-  const currentPlanDefinition = useMemo(
-    () => pricingPlans.find((plan) => plan.id === currentPlanId) || null,
-    [currentPlanId]
+  const paidPlans = useMemo(
+    () => pricingPlans.filter((plan) => plan.id !== 'free'),
+    []
   );
-
-  const creditSummary = billingData?.credit_summary || null;
-  const currentPlanIncludedCredits = billingData?.current_plan?.included_credits;
-
-  const currentPlanName =
-    currentPlanDefinition?.visibleName ||
-    billingData?.current_plan?.name ||
-    'Gratis';
-
-  const transactions = Array.isArray(billingData?.transactions)
-    ? billingData.transactions
-    : [];
-
-  const handleReturnToProject = () => {
-    if (!fromProjectId) return;
-    navigate(`/dashboard/project/${fromProjectId}`);
-  };
 
   const fetchBillingData = async () => {
     try {
@@ -336,69 +203,28 @@ const BillingPage = () => {
 
   return (
     <DashboardLayout title="Facturación">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-6xl" data-testid="billing-plans">
         {checkingPayment && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-            <div className="rounded-2xl border border-[#262626] bg-[#171717] p-8 text-center">
+            <div className="rounded-2xl border border-white/10 bg-[#0e131a] p-8 text-center">
               <div className="spinner mx-auto mb-4"></div>
               <p className="text-white">Verificando pago...</p>
             </div>
           </div>
         )}
 
-        <BillingHero
-          fromProjectId={fromProjectId}
-          onReturnToProject={handleReturnToProject}
-        />
-
-        <ProjectContextCard
-          fromProjectId={fromProjectId}
-          onReturnToProject={handleReturnToProject}
-        />
-
-        {checkoutError && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4"
-          >
-            <div className="flex items-start gap-3">
-              <WarningCircle size={20} className="mt-0.5 flex-shrink-0 text-red-400" />
-              <div>
-                <p className="mb-1 font-medium text-red-300">
-                  No se pudo abrir el checkout
-                </p>
-                <p className="text-sm text-red-200/90">{checkoutError}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        <SuggestedPlanBanner
-          suggestedPlan={suggestedPlan}
-          fromProjectId={fromProjectId}
-          userPlan={user?.plan}
-          processingKey={processingKey}
-          onPlanCheckout={handlePlanCheckout}
-        />
-
-        <CreditSummaryCard creditSummary={creditSummary} />
-
-        <CurrentPlanCard
-          currentPlanDefinition={currentPlanDefinition}
-          currentPlanIncludedCredits={currentPlanIncludedCredits}
-          currentPlanName={currentPlanName}
-          currentPlanFeatures={billingData?.current_plan?.features}
-        />
-
-        <PlansGrid
-          userPlan={user?.plan}
-          suggestedPlanId={suggestedPlanId}
-          processingKey={processingKey}
-          onPlanCheckout={handlePlanCheckout}
-        />
-
-        <PaymentHistoryTable transactions={transactions} />
+        <div className="grid gap-6 lg:grid-cols-3">
+          {paidPlans.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              userPlan={currentPlanId}
+              suggestedPlanId={suggestedPlanId}
+              processingKey={processingKey}
+              onPlanCheckout={handlePlanCheckout}
+            />
+          ))}
+        </div>
       </div>
     </DashboardLayout>
   );
