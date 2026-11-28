@@ -13,6 +13,8 @@ import {
 } from '@phosphor-icons/react';
 
 import { useAuth } from '../../../context/AuthContext';
+import AdvisorFlowPanel from '../advisor/AdvisorFlowPanel';
+import { useAdvisorFlowConfig } from '../advisor/useAdvisorFlowConfig';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,10 +94,13 @@ function AccountAvatar({ name, picture }) {
   );
 }
 
-export default function BuilderAccountMenu({ onNewProject = () => {} }) {
+export default function BuilderAccountMenu({ onNewProject = () => {}, advisorConfig = null }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const logoutPending = useRef(false);
+  const fetchedAdvisor = useAdvisorFlowConfig();
+  const advisor = advisorConfig ?? fetchedAdvisor;
+  const [advisorOpen, setAdvisorOpen] = useState(false);
   const name = accountName(user);
   const email = String(user?.email || '').trim();
   const balance = realCreditBalance(user);
@@ -113,6 +118,7 @@ export default function BuilderAccountMenu({ onNewProject = () => {} }) {
   };
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger
         data-testid="builder-account-menu"
@@ -216,7 +222,18 @@ export default function BuilderAccountMenu({ onNewProject = () => {} }) {
           <span>Nuevo proyecto</span>
         </DropdownMenuItem>
 
-        <SoonItem testId="builder-account-advisor" icon={Waveform} label="Conoce a tu asesor" />
+        {advisor.enabled ? (
+          <DropdownMenuItem
+            className={itemClass}
+            data-testid="builder-account-advisor"
+            onSelect={() => setAdvisorOpen(true)}
+          >
+            <Waveform size={18} aria-hidden="true" className="text-zinc-300" />
+            <span className="min-w-0 flex-1">Conoce a tu asesor</span>
+          </DropdownMenuItem>
+        ) : (
+          <SoonItem testId="builder-account-advisor" icon={Waveform} label="Conoce a tu asesor" />
+        )}
         <SoonItem testId="builder-account-help" icon={Question} label="Ayuda" />
 
         <DropdownMenuSeparator className="my-2 bg-white/10" />
@@ -233,5 +250,11 @@ export default function BuilderAccountMenu({ onNewProject = () => {} }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    <AdvisorFlowPanel
+      open={Boolean(advisor.enabled) && advisorOpen}
+      onOpenChange={setAdvisorOpen}
+      config={advisor}
+    />
+    </>
   );
 }

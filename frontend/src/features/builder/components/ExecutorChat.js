@@ -71,6 +71,7 @@ export default function ExecutorChat({
       >
         <input
           aria-label="Mensaje para el ejecutor"
+          data-testid="builder-executor-input"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder="Pide un cambio de la página"
