@@ -56,7 +56,11 @@ class FakeGrok:
 
 
 def _pin_grok(api_key):
-    previous = (config.GROK_API_KEY, config.GROK_MODEL, config.GROK_BASE_URL)
+    previous = (
+        getattr(config, "GROK_API_KEY", None),
+        getattr(config, "GROK_MODEL", None),
+        getattr(config, "GROK_BASE_URL", None),
+    )
     config.GROK_API_KEY = api_key
     config.GROK_MODEL = "grok-4.3"
     config.GROK_BASE_URL = "https://api.x.ai/v1"

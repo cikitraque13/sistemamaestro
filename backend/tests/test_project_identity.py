@@ -18,7 +18,10 @@ class ProjectIdentityTests(f.ChargedCallerFixture):
         self.db.projects.documents['project_test'].update({
             'input_type': 'text', 'input_content': 'synthetic project', 'route': 'idea',
         })
-        result = await f.builder_ai.build_with_ai(f.BuilderAIInput(userInput='synthetic', projectId='project_test'), f.request())
+        result = await f.builder_ai.build_with_ai(
+            f.BuilderAIInput(userInput='synthetic', projectId='project_test', contextUse='project_overview'),
+            f.request(),
+        )
         identity = result['trace']['meta']['identity']
         self.assertEqual(identity['projectId'], 'project_test')
         self.assertEqual(identity['ownerId'], 'user_test')

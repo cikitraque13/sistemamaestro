@@ -241,7 +241,7 @@ class ChargedCallerTests(ChargedCallerFixture):
 
     async def test_concurrent_http_callers_do_work_once(self):
         started, release = asyncio.Event(), asyncio.Event()
-        async def slow(payload):
+        async def slow(payload, **_kwargs):
             started.set()
             await release.wait()
             return SimpleNamespace(model_dump=lambda: {"warnings": []})
@@ -279,7 +279,7 @@ class ChargedCallerTests(ChargedCallerFixture):
             return result
 
         original_result = self.builder.return_value
-        async def held_work(*args):
+        async def held_work(*args, **_kwargs):
             started.set()
             await release.wait()
             return original_result

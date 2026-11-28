@@ -13,6 +13,9 @@ config_stub.CREDIT_LEDGER_COLLECTION = "credit_ledger"
 config_stub.PLAN_INCLUDED_CREDITS = {"free": 0}
 config_stub.JWT_ALGORITHM = "HS256"
 config_stub.JWT_SECRET = "unit-test-secret"
+config_stub.GROK_API_KEY = ""
+config_stub.GROK_MODEL = "grok-4.3"
+config_stub.GROK_BASE_URL = "https://api.x.ai/v1"
 config_stub.get_google_client_id = lambda: None
 sys.modules.setdefault("backend.app.core.config", config_stub)
 sys.modules.setdefault("backend.app.db.mongodb", mongodb_stub)

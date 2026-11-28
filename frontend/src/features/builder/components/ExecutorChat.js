@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { streamTerminalState } from '../api/builderPreviewClient';
+
+export { streamTerminalState };
 
 const PHASE_LABEL = {
   idle: 'Listo',
@@ -14,6 +17,12 @@ const STEP_MARK = {
   done: '✓',
   error: '!',
 };
+
+export function executorStatusText(phase, message) {
+  const label = PHASE_LABEL[phase] || phase || 'Listo';
+  const detail = message || 'El ejecutor está listo.';
+  return `${label}. ${detail}`;
+}
 
 export default function ExecutorChat({
   phase = 'idle',
@@ -37,7 +46,7 @@ export default function ExecutorChat({
     <section aria-label="Ejecutor" className="flex min-h-[280px] flex-col rounded-2xl border border-white/10 bg-black/30">
       <header className="border-b border-white/10 px-3 py-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">Ejecutor</p>
-        <p className="mt-1 text-sm text-zinc-200" role="status">{PHASE_LABEL[phase] || phase}. {message}</p>
+        <p className="mt-1 text-sm text-zinc-200" role="status">{executorStatusText(phase, message)}</p>
       </header>
       <div className="min-h-0 flex-1 space-y-2 overflow-auto px-3 py-2">
         {log.map((item, index) => (
