@@ -18,6 +18,10 @@ vi.mock('../api/builderPreviewClient', () => ({
   loadBuilderSession: vi.fn(async () => ({ freeTestMode: false, publishLanding: false, customDomain: false })),
 }));
 vi.mock('../../../lib/economicRequest', () => ({ economicPost: vi.fn() }));
+vi.mock('../api/builderPreviewClient', async () => {
+  const actual = await vi.importActual('../api/builderPreviewClient');
+  return { ...actual, loadBuilderSession: async () => ({ freeTestMode: false }) };
+});
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 vi.mock('../../app-shell/layout/AppShellLayout', () => ({ __esModule: true, default: (props) => { mocks.mockShellProps=props; return props.children; } }));
 vi.mock('./BuilderWorkspaceLayout', () => ({ __esModule: true, default: (props) => { mocks.mockProps = props; return <div>{props.ownerId}:{props.project?.input_content}</div>; } }));
