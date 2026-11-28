@@ -1,3 +1,5 @@
+import { planDisplayCopyById } from '../../content/planDisplayCopy';
+
 export const API_BASE = '/api';
 
 export const FEATURE_LABELS = {
@@ -48,22 +50,22 @@ export const PLAN_VISUAL_META = {
 
 export const PLAN_SIGNAL_META = {
   free: {
-    chips: ['Entrada', 'Builder limitado', '10 gemas'],
+    chips: [planDisplayCopyById.free.gemsLine],
     chipClass:
       'bg-[rgba(255,255,255,0.035)] text-[#DCE7E4] border border-[#0F5257]/14'
   },
   blueprint: {
-    chips: ['Activación', 'Builder base', 'Prioridades'],
+    chips: [planDisplayCopyById.blueprint.gemsLine],
     chipClass:
       'bg-[#0F5257]/10 text-[#8DE1D0] border border-[#0F5257]/20'
   },
   sistema: {
-    chips: ['Growth', 'Optimización', 'Builder', 'Continuidad'],
+    chips: [planDisplayCopyById.sistema.gemsLine],
     chipClass:
       'bg-[#2F455A]/12 text-[#D6E6F5] border border-[#2F455A]/22'
   },
   premium: {
-    chips: ['CRO', 'AI Auditor', 'Architecture', 'Criterio'],
+    chips: [planDisplayCopyById.premium.gemsLine],
     chipClass:
       'bg-[#4A3B61]/12 text-[#E4D8F7] border border-[#4A3B61]/22'
   }

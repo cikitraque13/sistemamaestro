@@ -222,7 +222,7 @@ const pricingContent = {
       type: 'plan',
       backendId: 'premium',
       internalName: 'Premium',
-      visibleName: 'AI Master 199',
+      visibleName: 'AI Master',
       backendName: 'Premium',
       badge: 'Capa superior',
       category: 'advanced_activation',
@@ -240,7 +240,7 @@ const pricingContent = {
       bestFor:
         'Usuario que necesita criterio superior, operador serio o preparación real de transferencia.',
       bestForShort:
-        'Casos complejos, operador serio y salida preparada.',
+        'Casos complejos y operador serio.',
       valuePromise:
         'No vende lujo. Vende criterio, activación avanzada y mayor capacidad operativa.',
       features: [
@@ -278,7 +278,7 @@ const pricingContent = {
       perceptionGoal:
         'Hacer sentir al usuario que entra en una capa de criterio fuerte y capacidad superior.',
       cta: {
-        label: 'Acceder a AI Master 199',
+        label: 'Entrar en AI Master',
         variant: 'strategic'
       },
       highlight: false,
