@@ -1,4 +1,4 @@
-import { PACE_COST } from '../builder/studio/model';
+import { PACE_COST, gemNoticeState } from '../builder/studio/model';
 
 // Same key the builder writes when a project is open.
 export const ACTIVE_PROJECT_STORAGE_KEY = 'sistema_maestro.active_builder_project_id';
@@ -38,22 +38,25 @@ export const LAUNCHER_MODES = [
   },
 ];
 
-// Visible tabs. Automatización stays in LAUNCHER_MODES and is not a tab.
+// Visible tabs. Web/App and Automatización stay in LAUNCHER_MODES and are not tabs.
 export const DASHBOARD_TABS = [
   {
+    id: 'landing',
     modeId: 'landing',
-    label: 'Sitio web',
+    label: 'Crear mi web',
     placeholder: 'Describe tu negocio, a quién vendes y qué quieres que hagan tus clientes…',
   },
   {
-    modeId: 'webapp',
-    label: 'App web',
-    placeholder: 'Describe la herramienta o panel que necesitas…',
-  },
-  {
+    id: 'url',
     modeId: 'url',
     label: 'Mejorar mi web',
     placeholder: 'Pega la URL de tu web y dime qué quieres mejorar…',
+  },
+  {
+    id: 'install',
+    modeId: null,
+    label: 'Instalar agente',
+    placeholder: 'tunegocio.com',
   },
 ];
 
@@ -112,8 +115,24 @@ export function launcherModeById(id) {
   return LAUNCHER_MODES.find((mode) => mode.id === id) || LAUNCHER_MODES[0];
 }
 
+export function dashboardTabById(id) {
+  return DASHBOARD_TABS.find((tab) => tab.id === id) || DASHBOARD_TABS[0];
+}
+
 export function dashboardTabForMode(modeId) {
-  return DASHBOARD_TABS.find((tab) => tab.modeId === modeId) || null;
+  if (modeId === 'url') return dashboardTabById('url');
+  if (modeId === 'install') return dashboardTabById('install');
+  return dashboardTabById('landing');
+}
+
+export function embedOriginFromHost(raw) {
+  const host = String(raw || '')
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .split('/')[0]
+    .trim();
+  if (!host) return '';
+  return `https://${host}`;
 }
 
 export function resolveLauncherMode(launcherState = null) {
@@ -153,10 +172,11 @@ export function buildLaunchPrompt({
   ].join('\n');
 }
 
-export function dashboardSendLabel() {
-  const cost = PACE_COST.rapido;
-  const unit = cost === 1 ? 'gema' : 'gemas';
-  return `Crear · ◆ ${cost} ${unit} →`;
+export function dashboardSendLabel(tabId = 'landing', freeTestMode = false) {
+  if (tabId === 'install') return 'Instalar agente';
+  if (freeTestMode) return gemNoticeState({ freeTestMode: true }).text;
+  const label = tabId === 'url' ? 'Mejorar mi web' : 'Crear mi web';
+  return `${label} ◆ ${PACE_COST.rapido}`;
 }
 
 export function readStoredActiveProjectId() {

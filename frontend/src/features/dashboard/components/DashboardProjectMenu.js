@@ -53,8 +53,9 @@ export default function DashboardProjectMenu({ onNewProject }) {
       <DropdownMenuTrigger
         data-testid="dashboard-project-menu"
         aria-label="Proyecto activo"
-        className="inline-flex h-9 max-w-[16rem] items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-zinc-100 outline-none transition hover:border-white/20 hover:bg-white/[0.07] focus-visible:ring-2 focus-visible:ring-white/30"
+        className="inline-flex h-9 max-w-[16rem] items-center gap-2 rounded-full border border-white/10 bg-black/30 px-4 text-sm font-medium text-zinc-100 outline-none transition hover:border-cyan-200/30 focus-visible:ring-2 focus-visible:ring-cyan-300/50"
       >
+        <span className="h-2 w-2 shrink-0 rounded-full bg-[#67e8f9] shadow-[0_0_12px_#67e8f9]" aria-hidden="true" />
         <span className="min-w-0 truncate">{label}</span>
         <CaretDown aria-hidden="true" size={14} className="shrink-0 text-zinc-400" />
       </DropdownMenuTrigger>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import DashboardLayout from '../../components/DashboardLayout';
 import { api } from '../../lib/apiClient';
@@ -88,6 +89,8 @@ function BookingsPanel({ project }) {
 }
 
 const AgentModulePage = ({ title }) => {
+  const location = useLocation();
+  const embedOrigin = typeof location.state?.embedOrigin === 'string' ? location.state.embedOrigin : '';
   const [tab, setTab] = useState('modulo');
   const [project, setProject] = useState(null);
 
@@ -135,7 +138,14 @@ const AgentModulePage = ({ title }) => {
         {tab === 'reservas' ? (
           <BookingsPanel project={project} />
         ) : (
-          <p className="text-sm text-zinc-400">Próximamente</p>
+          <div>
+            <p className="text-sm text-zinc-400">Próximamente</p>
+            {embedOrigin ? (
+              <p className="mt-3 text-sm text-zinc-300" data-testid="agent-embed-origin">
+                Dominio: {embedOrigin}
+              </p>
+            ) : null}
+          </div>
         )}
       </section>
     </DashboardLayout>

@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
 import DashboardProjectTabs from '../features/dashboard/components/DashboardProjectTabs';
 import DashboardSidebarProjects from '../features/dashboard/components/DashboardSidebarProjects';
+import '../features/dashboard/dashboardAurora.css';
 import {
   DASHBOARD_BILLING_NAV,
   DASHBOARD_SIDEBAR_LINKS
@@ -48,14 +49,14 @@ const NavLinks = ({ items, pathname, onNavigate, linkTestId = true }) => (
     {items.map((link) => {
       const active = link.path ? navIsActive(link, pathname) : false;
       const Icon = NAV_ICONS[link.id] || FolderOpen;
-      const className = `flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
+      const className = `flex items-center gap-2.5 rounded-xl border-l-2 px-3 py-2 text-sm transition ${
         active
-          ? 'bg-white/[0.06] text-white'
-          : 'text-zinc-400 hover:bg-white/[0.04] hover:text-white'
+          ? 'border-[#67e8f9] bg-[linear-gradient(90deg,rgba(103,232,249,0.22),rgba(103,232,249,0.04))] text-white'
+          : 'border-transparent text-zinc-300 hover:bg-white/[0.04] hover:text-white'
       }`;
       const body = (
         <>
-          <Icon size={18} weight={active ? 'fill' : 'regular'} />
+          <Icon size={18} weight={active ? 'fill' : 'regular'} className="text-[#67e8f9]" />
           <span className="truncate">{link.label}</span>
         </>
       );
@@ -220,7 +221,8 @@ const DashboardLayout = ({ children, title = 'Workspace', headerExtra = null }) 
         </div>
       </aside>
 
-      <main className={`flex min-w-0 flex-1 flex-col ${isResumen ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+      <main className={`relative flex min-w-0 flex-1 flex-col ${isResumen ? 'dashboard-stage h-screen overflow-hidden' : 'min-h-screen'}`}>
+        {isResumen ? null : (
         <header className="sticky top-0 z-30 shrink-0 border-b border-white/6 bg-[#050505]">
           <div className={`flex items-center justify-between gap-4 px-5 md:px-6 ${isResumen ? 'py-2.5' : 'py-4'}`}>
             <div className="flex items-center gap-4">
@@ -249,14 +251,23 @@ const DashboardLayout = ({ children, title = 'Workspace', headerExtra = null }) 
             </div>
           </div>
 
-          {!isResumen && (
-            <div className="border-t border-white/6 px-5 py-3 md:px-6">
-              <DashboardProjectTabs />
-            </div>
-          )}
+          <div className="border-t border-white/6 px-5 py-3 md:px-6">
+            <DashboardProjectTabs />
+          </div>
         </header>
+        )}
 
-        <div className={isResumen ? 'flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3 md:px-6' : 'flex-1 px-5 py-6 md:px-6'}>
+        {isResumen ? (
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="absolute left-4 top-4 z-20 text-zinc-300 lg:hidden"
+            aria-label="Abrir menú"
+          >
+            <List size={24} />
+          </button>
+        ) : null}
+        <div className={isResumen ? 'relative flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3 md:px-6' : 'flex-1 px-5 py-6 md:px-6'}>
           {children}
         </div>
       </main>

@@ -24,7 +24,7 @@ import DashboardLayout from './DashboardLayout';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-test('dashboard header stays the workspace header', () => {
+test('resumen does not show the workspace header', () => {
   window.sessionStorage.clear();
   const node = document.createElement('div');
   const root = createRoot(node);
@@ -39,34 +39,17 @@ test('dashboard header stays the workspace header', () => {
     );
   });
 
-  const header = node.querySelector('header');
-  expect(header).not.toBeNull();
-  expect(header.className).toContain('sticky');
-  expect(header.className).toContain('top-0');
-  expect(header.className).toContain('z-30');
-  expect(header.className).toContain('bg-[#050505]');
-  expect(header.className).not.toContain('backdrop-blur');
-  expect(header.className).not.toContain('/88');
-  expect(header.querySelector('[aria-label^="Cerrar "]')).toBeNull();
-  expect(header.querySelector('p').textContent.trim()).toBe('Workspace');
-  expect(header.querySelector('h1').textContent.trim()).toBe('Resumen');
-  expect(header.textContent).not.toContain('Gratis');
-  expect(header.textContent).not.toContain('Premium');
-  expect(header.textContent).toContain('Resumen');
-  expect(header.querySelector('[data-testid="builder-account-menu"]')).toBeNull();
-  expect(header.textContent).not.toContain('Mejorar plan');
-  expect(header.textContent).not.toContain('Conoce a tu asesor');
-  expect(header.textContent).not.toContain('Próximamente');
-  expect(header.textContent).not.toContain('574');
-  expect({
-    className: header.className,
-    text: header.textContent.replace(/\s+/g, ' ').trim(),
-  }).toMatchSnapshot();
+  expect(node.querySelector('header')).toBeNull();
+  expect(node.textContent).not.toContain('Workspace');
+  expect(node.textContent).not.toContain('Mejorar plan');
+  expect(node.textContent).not.toContain('Conoce a tu asesor');
+  expect(node.textContent).not.toContain('574');
+  expect(node.querySelector('[data-testid="builder-account-menu"]')).toBeNull();
 
   act(() => root.unmount());
 });
 
-test('resumen sidebar keeps billing above the account card and hides oportunidades', () => {
+test('resumen sidebar keeps billing above the account card and hides oportunidades', async () => {
   const node = document.createElement('div');
   const root = createRoot(node);
 
@@ -103,8 +86,9 @@ test('resumen sidebar keeps billing above the account card and hides oportunidad
   expect(primary.textContent).not.toContain('Facturación');
   expect(sidebar.querySelector('[data-testid="new-project-btn"]')).toBeNull();
 
-  act(() => {
+  await act(async () => {
     projectsToggle.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve, 0));
   });
   expect(sidebar.textContent).toContain('Nuevo proyecto');
   expect(billing.getAttribute('href')).toBe('/dashboard/billing');
@@ -114,7 +98,7 @@ test('resumen sidebar keeps billing above the account card and hides oportunidad
   expect(account.querySelector('[data-testid="dashboard-account-avatar"]').textContent).toBe('L');
   expect(account.textContent).not.toContain('Cerrar sesión');
   expect(sidebar.textContent).toContain('Cerrar sesión');
-  expect(node.querySelector('header').textContent).not.toContain('Oportunidades');
+  expect(node.querySelector('header')).toBeNull();
 
   act(() => root.unmount());
 });

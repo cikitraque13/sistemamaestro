@@ -91,7 +91,7 @@ export default function DashboardSidebarProjects({ onNavigate, testId = true }) 
           <button
             type="button"
             onClick={startNew}
-            className="mt-0.5 flex w-full items-center gap-1 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-teal-300 hover:bg-white/[0.04]"
+            className="mt-0.5 flex w-full items-center gap-1 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[#fbbf24] hover:bg-white/[0.04]"
           >
             <Plus size={12} aria-hidden="true" />
             Nuevo proyecto

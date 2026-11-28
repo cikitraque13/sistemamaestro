@@ -16,14 +16,12 @@ test('headline and subtitle stay in one place', () => {
   );
 });
 
-test('the box only offers the three existing launcher modes', () => {
-  expect(DASHBOARD_TABS.map((tab) => tab.modeId)).toEqual(['landing', 'webapp', 'url']);
-  expect(DASHBOARD_TABS.map((tab) => tab.label)).toEqual(['Sitio web', 'App web', 'Mejorar mi web']);
-  expect(LAUNCHER_MODES.map((mode) => mode.id)).toContain('automation');
-  expect(DASHBOARD_TABS.map((tab) => tab.modeId)).not.toContain('automation');
-  expect(DASHBOARD_TABS.find((tab) => tab.modeId === 'landing').placeholder).toBe(
-    'Describe tu negocio, a quién vendes y qué quieres que hagan tus clientes…'
-  );
+test('the box offers crear, mejorar and instalar', () => {
+  expect(DASHBOARD_TABS.map((tab) => tab.id)).toEqual(['landing', 'url', 'install']);
+  expect(DASHBOARD_TABS.map((tab) => tab.label)).toEqual(['Crear mi web', 'Mejorar mi web', 'Instalar agente']);
+  expect(LAUNCHER_MODES.map((mode) => mode.id)).toEqual(expect.arrayContaining(['landing', 'webapp', 'automation', 'url']));
+  expect(DASHBOARD_TABS.map((tab) => tab.id)).not.toContain('webapp');
+  expect(DASHBOARD_TABS.map((tab) => tab.id)).not.toContain('automation');
 });
 
 test('sector quick starts are the existing sector records', () => {
@@ -58,8 +56,11 @@ test('a prefilled sector is not repeated in the launch prompt', () => {
   expect(prompt.match(/hostelería/g)).toHaveLength(1);
 });
 
-test('send label uses the rapid pace cost', () => {
-  expect(dashboardSendLabel()).toBe('Crear · ◆ 1 gema →');
+test('send label uses the rapid pace cost and the test-mode notice', () => {
+  expect(dashboardSendLabel('landing', false)).toBe('Crear mi web ◆ 1');
+  expect(dashboardSendLabel('url', false)).toBe('Mejorar mi web ◆ 1');
+  expect(dashboardSendLabel('install', false)).toBe('Instalar agente');
+  expect(dashboardSendLabel('landing', true)).toBe('Modo prueba · sin gemas');
 });
 
 test('gem balance reads billing balance and ignores the old field names', () => {

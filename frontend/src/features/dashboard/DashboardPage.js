@@ -44,30 +44,27 @@ const DashboardPage = () => {
   const gemLabel = !billingLoaded || gemBalance == null ? '—' : String(gemBalance);
 
   return (
-    <DashboardLayout
-      title="Resumen"
-      headerExtra={(
-        <>
-          {freeTestMode ? (
-            <p
-              data-testid="dashboard-test-mode"
-              className="inline-flex h-7 items-center rounded-full border border-white/10 px-2.5 text-[11px] text-zinc-200"
-            >
-              {gemNoticeState({ freeTestMode: true }).text}
-            </p>
-          ) : null}
+    <DashboardLayout title="Resumen">
+      <div className="pointer-events-none absolute right-4 top-4 z-20 flex items-center gap-2 md:right-6">
+        {freeTestMode ? (
           <p
-            data-testid="dashboard-gem-pill"
-            className="inline-flex h-7 items-center rounded-full border border-white/10 bg-[#101114] px-2.5 text-[11px] font-medium text-zinc-200"
+            data-testid="dashboard-test-mode"
+            className="pointer-events-auto inline-flex h-7 items-center rounded-full border border-white/10 bg-black/40 px-2.5 text-[11px] text-zinc-200"
           >
-            Gema Maestra · {gemLabel}
+            {gemNoticeState({ freeTestMode: true }).text}
           </p>
-        </>
-      )}
-    >
+        ) : null}
+        <p
+          data-testid="dashboard-gem-pill"
+          className="pointer-events-auto inline-flex h-7 items-center rounded-full border border-white/10 bg-black/40 px-2.5 text-[11px] font-medium text-zinc-100"
+        >
+          ◆ {gemLabel} gemas
+        </p>
+      </div>
       <div id="builder-launcher" className="h-full min-h-0">
         <DashboardBuilderLauncher
           user={user}
+          freeTestMode={freeTestMode}
           launcherState={location.state || null}
         />
       </div>

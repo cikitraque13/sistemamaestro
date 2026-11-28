@@ -1,58 +1,48 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppWindow, Globe, LinkSimple, Microphone, Plus } from '@phosphor-icons/react';
+import { Microphone, Plus } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 
 import { api } from '../../../lib/apiClient';
 import { economicPost } from '../../../lib/economicRequest';
 import { useVoice } from '../../../hooks/useVoice';
 import { builderEntryIsOpen } from '../../builder/builderAccess';
+import { loadOwnerProjects } from '../../builder/components/BuilderProjectSelect';
 import { DASHBOARD_HEADLINE, DASHBOARD_SUBTITLE } from '../dashboardCopy';
 import {
   DASHBOARD_TABS,
   PROJECT_CONTEXTS,
-  SECTOR_QUICK_STARTS,
   buildLaunchPrompt,
   dashboardSendLabel,
+  dashboardTabById,
   dashboardTabForMode,
+  embedOriginFromHost,
   launcherModeById,
+  resolveActiveProject,
   resolveLauncherMode,
 } from '../dashboardModel';
 import DashboardProjectMenu from './DashboardProjectMenu';
 
-const TAB_ICONS = {
-  landing: Globe,
-  webapp: AppWindow,
-  url: LinkSimple,
-};
-
-const getErrorMessage = (error) => {
+const detailMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
-
-  if (typeof detail === 'string') return detail;
-
-  if (Array.isArray(detail)) {
-    return detail
-      .map((item) => item?.msg || JSON.stringify(item))
-      .filter(Boolean)
-      .join(' ');
-  }
-
-  if (detail && typeof detail === 'object') {
-    return detail.msg || JSON.stringify(detail);
-  }
-
-  return error?.message || 'No se pudo crear el proyecto.';
+  if (typeof detail === 'string' && detail.trim()) return detail;
+  if (detail && typeof detail.message === 'string' && detail.message.trim()) return detail.message;
+  return fallback;
 };
 
-const DashboardBuilderLauncher = ({ launcherState = null, user = null }) => {
+const getErrorMessage = (error) => detailMessage(error, 'No se pudo crear el proyecto.');
+
+const DashboardBuilderLauncher = ({ launcherState = null, user = null, freeTestMode = false }) => {
   const navigate = useNavigate();
   const promptRef = useRef(null);
   const voice = useVoice();
 
-  const [activeModeId, setActiveModeId] = useState(() => resolveLauncherMode(launcherState));
+  const [activeTabId, setActiveTabId] = useState(() => dashboardTabForMode(resolveLauncherMode(launcherState)).id);
   const [selectedContextId, setSelectedContextId] = useState('');
   const [prompt, setPrompt] = useState('');
+  const [host, setHost] = useState('');
+  const [agentChannel, setAgentChannel] = useState('voz');
+  const [snippet, setSnippet] = useState('');
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -75,8 +65,11 @@ const DashboardBuilderLauncher = ({ launcherState = null, user = null }) => {
 
     if (launcherState.resetPrompt) {
       setPrompt('');
+      setHost('');
+      setSnippet('');
       setSelectedContextId('');
       setError('');
+      setActiveTabId('landing');
     }
 
     const incomingPrompt =
@@ -89,15 +82,11 @@ const DashboardBuilderLauncher = ({ launcherState = null, user = null }) => {
       setError('');
     }
 
-    setActiveModeId(resolveLauncherMode(launcherState));
+    if (!launcherState.resetPrompt) {
+      setActiveTabId(dashboardTabForMode(resolveLauncherMode(launcherState)).id);
+    }
     promptRef.current?.focus({ preventScroll: true });
   }, [launcherState, launcherHydrationKey]);
-
-  const activeMode = launcherModeById(activeModeId);
-  const visibleTab = dashboardTabForMode(activeMode.id);
-  const selectedContext = PROJECT_CONTEXTS.find((item) => item.id === selectedContextId) || null;
-  const placeholder = visibleTab?.placeholder || activeMode.placeholder;
-  const sendLabel = dashboardSendLabel();
 
   useEffect(() => {
     if (!voice.transcript) return;
@@ -105,18 +94,19 @@ const DashboardBuilderLauncher = ({ launcherState = null, user = null }) => {
     setError('');
   }, [voice.transcript]);
 
+  const activeTab = dashboardTabById(activeTabId);
+  const activeMode = launcherModeById(activeTab.modeId || 'landing');
+  const selectedContext = PROJECT_CONTEXTS.find((item) => item.id === selectedContextId) || null;
+  const sendLabel = dashboardSendLabel(activeTab.id, freeTestMode);
+  const installing = activeTab.id === 'install';
+
   const startNewProject = () => {
     setPrompt('');
+    setHost('');
+    setSnippet('');
     setSelectedContextId('');
     setError('');
-    setActiveModeId('landing');
-    promptRef.current?.focus({ preventScroll: true });
-  };
-
-  const applySector = (sector) => {
-    setSelectedContextId(sector.id);
-    setPrompt(sector.context);
-    setError('');
+    setActiveTabId('landing');
     promptRef.current?.focus({ preventScroll: true });
   };
 
@@ -178,148 +168,207 @@ const DashboardBuilderLauncher = ({ launcherState = null, user = null }) => {
         },
       });
     } catch (requestError) {
-      const message = getErrorMessage(requestError);
-      setError(message);
+      setError(getErrorMessage(requestError));
       toast.error('Error al abrir Builder');
     } finally {
       setCreating(false);
     }
   };
 
+  const installVoiceAgent = async () => {
+    const origin = embedOriginFromHost(host);
+    if (!origin) {
+      setError('Escribe el dominio completo, por ejemplo https://tuempresa.com.');
+      return;
+    }
+
+    setCreating(true);
+    setError('');
+    try {
+      const projects = await loadOwnerProjects().catch(() => []);
+      const project = resolveActiveProject(projects);
+      if (!project?.project_id) {
+        navigate('/dashboard/agente-voz', { state: { embedOrigin: origin } });
+        return;
+      }
+      const response = await api.post('/embed/agents', {
+        project_id: project.project_id,
+        allowed_origins: [origin],
+      });
+      setSnippet(typeof response?.data?.snippet === 'string' ? response.data.snippet : '');
+      if (!response?.data?.snippet) {
+        setError('El agente no devolvió el fragmento de instalación.');
+      }
+    } catch (requestError) {
+      setSnippet('');
+      setError(detailMessage(requestError, 'No se ha podido crear el agente.'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const onPrimary = () => {
+    if (installing) {
+      installVoiceAgent();
+      return;
+    }
+    submitToBuilder();
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && !event.shiftKey && !creating) {
       event.preventDefault();
-      submitToBuilder();
+      onPrimary();
     }
   };
 
   return (
-    <section className="flex h-full min-h-0 w-full flex-col items-center justify-center">
+    <section className="relative flex h-full min-h-0 w-full flex-col items-center justify-center">
       <DashboardProjectMenu onNewProject={startNewProject} />
 
-      <div className="mt-4 max-w-[760px] px-2 text-center">
-        <h2 className="text-[1.75rem] font-semibold leading-tight tracking-[-0.04em] text-white md:text-[2rem]">
-          {DASHBOARD_HEADLINE}
-        </h2>
-        <p className="mx-auto mt-1.5 max-w-[40rem] text-sm leading-5 text-zinc-400">
+      <div className="mt-5 flex max-w-[760px] flex-col items-center px-2 text-center">
+        <p className="dash-kicker text-[11px] font-semibold">SISTEMA MAESTRO</p>
+        <h2 className="dash-headline mt-3">{DASHBOARD_HEADLINE}</h2>
+        <p className="mx-auto mt-3 max-w-[40rem] text-[18px] leading-7 text-[#b4bec8]">
           {DASHBOARD_SUBTITLE}
         </p>
       </div>
 
-      <div className="mt-3 flex flex-nowrap items-center justify-center gap-1">
+      <div className="dash-tabs mt-5 inline-flex items-center gap-1 p-1">
         {DASHBOARD_TABS.map((tab) => {
-          const Icon = TAB_ICONS[tab.modeId] || Globe;
-          const isActive = tab.modeId === activeMode.id;
-
+          const isActive = tab.id === activeTab.id;
           return (
             <button
-              key={tab.modeId}
+              key={tab.id}
               type="button"
-              data-testid={`dashboard-tab-${tab.modeId}`}
+              data-testid={`dashboard-tab-${tab.id}`}
               aria-pressed={isActive}
               onClick={() => {
-                setActiveModeId(tab.modeId);
+                setActiveTabId(tab.id);
                 setError('');
+                setSnippet('');
               }}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
-                isActive
-                  ? 'bg-white text-black'
-                  : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                isActive ? 'dash-tab-active' : 'text-zinc-300 hover:text-white'
               }`}
             >
-              <Icon size={16} aria-hidden="true" />
               {tab.label}
             </button>
           );
         })}
       </div>
 
-      <div className="mt-3 w-full max-w-[760px]">
-        <div className="relative rounded-[28px] border border-white/10 bg-[#0e0f12]">
-          <textarea
-            ref={promptRef}
-            data-testid="dashboard-prompt"
-            value={prompt}
-            onChange={(event) => {
-              setPrompt(event.target.value);
-              if (error) setError('');
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            rows={3}
-            disabled={creating}
-            className="h-[120px] w-full resize-none rounded-[28px] bg-transparent px-5 pb-12 pt-4 text-[15px] leading-6 text-white outline-none placeholder:text-zinc-500 disabled:opacity-60"
-          />
+      <div className="dash-composer mt-5 w-full max-w-[760px]">
+        <div className="dash-composer-inner relative">
+          {installing ? (
+            <div className="px-5 pb-16 pt-4">
+              <label className="block text-sm text-zinc-300" htmlFor="dashboard-embed-host">
+                <span className="sr-only">Dominio</span>
+                <span className="flex h-11 items-center overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                  <span className="border-r border-white/10 px-3 text-sm text-zinc-400">https://</span>
+                  <input
+                    id="dashboard-embed-host"
+                    data-testid="dashboard-embed-host"
+                    value={host}
+                    placeholder="tunegocio.com"
+                    autoComplete="off"
+                    spellCheck="false"
+                    onChange={(event) => {
+                      setHost(event.target.value.replace(/^https?:\/\//i, ''));
+                      if (error) setError('');
+                    }}
+                    onKeyDown={handleKeyDown}
+                    className="h-full w-full bg-transparent px-3 text-[15px] text-white outline-none placeholder:text-zinc-500"
+                  />
+                </span>
+              </label>
+              <div className="mt-3 inline-flex rounded-full border border-white/10 p-1" role="group" aria-label="Canal del agente">
+                <button
+                  type="button"
+                  data-testid="dashboard-agent-voz"
+                  aria-pressed={agentChannel === 'voz'}
+                  onClick={() => setAgentChannel('voz')}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    agentChannel === 'voz'
+                      ? 'bg-amber-200/15 text-[#fde68a] shadow-[0_0_16px_rgba(251,191,36,0.45)]'
+                      : 'text-zinc-400'
+                  }`}
+                >
+                  Voz
+                </button>
+                <button
+                  type="button"
+                  data-testid="dashboard-agent-chat"
+                  disabled
+                  className="cursor-not-allowed rounded-full px-3 py-1 text-xs text-zinc-500"
+                >
+                  Chat · Próximamente
+                </button>
+              </div>
+              {snippet ? (
+                <pre className="mt-3 max-h-24 overflow-auto rounded-xl border border-white/10 bg-black/40 p-3 text-left text-[11px] leading-5 text-cyan-50">
+                  <code data-testid="dashboard-embed-snippet">{snippet}</code>
+                </pre>
+              ) : null}
+            </div>
+          ) : (
+            <textarea
+              ref={promptRef}
+              data-testid="dashboard-prompt"
+              value={prompt}
+              onChange={(event) => {
+                setPrompt(event.target.value);
+                if (error) setError('');
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder={activeTab.placeholder}
+              rows={3}
+              disabled={creating}
+              className="h-[148px] w-full resize-none rounded-[20px] bg-transparent px-5 pb-16 pt-4 text-[15px] leading-6 text-white outline-none placeholder:text-zinc-500 disabled:opacity-60"
+            />
+          )}
 
           <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
             <button
               type="button"
               data-testid="dashboard-attach"
               aria-label="Adjuntar"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 hover:bg-white/[0.06] hover:text-white"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-zinc-300"
             >
               <Plus size={18} aria-hidden="true" />
             </button>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 data-testid="dashboard-mic"
                 aria-label={voice.isListening ? 'Detener dictado' : 'Dictar'}
                 aria-pressed={voice.isListening}
-                disabled={!voice.isSupported || creating}
+                disabled={!voice.isSupported || creating || installing}
                 onClick={() => (voice.isListening ? voice.stopListening() : voice.startListening())}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition hover:bg-white/[0.06] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/15 text-[#67e8f9] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Microphone size={18} weight={voice.isListening ? 'fill' : 'regular'} aria-hidden="true" />
               </button>
               <button
                 type="button"
                 data-testid="dashboard-send"
-                aria-label="Enviar"
-                onClick={submitToBuilder}
-                disabled={creating}
-                className="inline-flex h-9 items-center rounded-full bg-white px-3 text-xs font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label={installing ? 'Instalar agente' : 'Enviar'}
+                onClick={onPrimary}
+                disabled={creating || (installing && agentChannel !== 'voz')}
+                className="inline-flex h-10 items-center rounded-full bg-[linear-gradient(95deg,#fde68a,#fbbf24,#f9a8d4,#67e8f9)] px-4 text-sm font-extrabold text-[#04141a] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {sendLabel}
               </button>
             </div>
           </div>
         </div>
-
-        {error ? (
-          <p role="alert" className="mt-2 text-center text-sm text-red-300">
-            {error}
-          </p>
-        ) : null}
       </div>
 
-      <p className="mt-3 text-[10px] font-semibold tracking-[0.16em] text-zinc-500">
-        EMPIEZA CON UNA PLANTILLA
-      </p>
-      <div
-        data-testid="dashboard-sectors"
-        className="mt-2 flex w-full max-w-[760px] flex-nowrap items-center justify-center gap-1.5"
-      >
-        {SECTOR_QUICK_STARTS.map((sector) => {
-          const selected = sector.id === selectedContextId;
-          return (
-            <button
-              key={sector.id}
-              type="button"
-              data-testid={`dashboard-sector-${sector.id}`}
-              aria-pressed={selected}
-              onClick={() => applySector(sector)}
-              className={`inline-flex h-8 shrink-0 items-center rounded-full border px-2.5 text-xs font-medium transition ${
-                selected
-                  ? 'border-white bg-white text-black'
-                  : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20 hover:text-white'
-              }`}
-            >
-              {sector.label}
-            </button>
-          );
-        })}
-      </div>
+      {error ? (
+        <p role="alert" className="mt-2 text-center text-sm text-red-300">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 };

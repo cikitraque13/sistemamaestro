@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 const apiMocks = vi.hoisted(() => ({
   get: vi.fn(),
+  post: vi.fn(),
 }));
 
 const navigateMock = vi.hoisted(() => vi.fn());
@@ -20,7 +21,10 @@ vi.mock('../../context/AuthContext', () => ({
 }));
 
 vi.mock('../../lib/apiClient', () => ({
-  api: { get: (...args) => apiMocks.get(...args) },
+  api: {
+    get: (...args) => apiMocks.get(...args),
+    post: (...args) => apiMocks.post(...args),
+  },
 }));
 
 vi.mock('../../lib/economicRequest', () => ({
@@ -78,6 +82,7 @@ const projects = [
 beforeEach(() => {
   navigateMock.mockReset();
   economicPost.mockReset();
+  apiMocks.post.mockReset();
   builderEntryIsOpen.mockReset();
   builderEntryIsOpen.mockResolvedValue(true);
   window.localStorage.clear();
@@ -128,37 +133,28 @@ test('resumen keeps the composer, sectors and gems, and drops recent projects', 
   const { node, unmount } = await renderDashboard();
   const text = node.textContent;
 
+  expect(text).toContain('SISTEMA MAESTRO');
   expect(text).toContain('¿Qué negocio vamos a lanzar hoy?');
   expect(text).toContain('Describe tu negocio: creamos tu web, la publicamos y tu agente de IA atiende.');
-  expect(text).toContain('Sitio web');
-  expect(text).toContain('App web');
+  expect(text).toContain('Crear mi web');
   expect(text).toContain('Mejorar mi web');
-  expect(text).not.toContain('App móvil');
-  expect(text).not.toContain('Vídeo');
-  expect(text).not.toContain('NUEVO');
-  expect(text).not.toContain('Automatización');
+  expect(text).toContain('Instalar agente');
+  expect(text).not.toContain('App web');
+  expect(text).not.toContain('Workspace');
+  expect(text).not.toContain('EMPIEZA CON UNA PLANTILLA');
+  expect(text).not.toContain('Restaurante');
   expect(node.querySelector('[data-testid="dashboard-prompt"]').getAttribute('placeholder')).toBe(
     'Describe tu negocio, a quién vendes y qué quieres que hagan tus clientes…'
   );
   expect(node.querySelector('[data-testid="dashboard-attach"]')).not.toBeNull();
   expect(node.querySelector('[data-testid="dashboard-mic"]')).not.toBeNull();
-  expect(node.querySelector('[data-testid="dashboard-send"]').textContent).toBe('Crear · ◆ 1 gema →');
-  expect(text).toContain('EMPIEZA CON UNA PLANTILLA');
-  expect(node.querySelector('[data-testid="dashboard-primary-nav"]').textContent).toContain('PRODUCTOS');
-  expect(node.querySelector('[data-testid="dashboard-gem-pill"]').textContent).toContain('Gema Maestra · 128');
+  expect(node.querySelector('[data-testid="dashboard-send"]').textContent).toBe('Crear mi web ◆ 1');
+  expect(node.querySelector('[data-testid="dashboard-gem-pill"]').textContent).toBe('◆ 128 gemas');
   expect(node.querySelector('[data-testid="dashboard-test-mode"]')).toBeNull();
-  expect(node.querySelector('header').textContent).not.toContain('Premium');
+  expect(node.querySelector('header')).toBeNull();
   expect(node.querySelector('[data-testid="dashboard-account-card"]').textContent).toContain('Premium');
 
-  const sectors = [...node.querySelectorAll('[data-testid^="dashboard-sector-"]')].map((item) => item.textContent);
-  expect(sectors).toEqual([
-    'Restaurante',
-    'Clínica',
-    'Inmobiliaria',
-    'Ecommerce',
-    'Servicio local',
-    'Educación',
-  ]);
+  expect(node.querySelector('[data-testid="dashboard-sectors"]')).toBeNull();
   expect(node.querySelector('[data-testid^="dashboard-recent-"]')).toBeNull();
   expect(text).not.toContain('Continúa construyendo');
   expect(text).not.toContain('Ver todos');
@@ -169,22 +165,30 @@ test('resumen keeps the composer, sectors and gems, and drops recent projects', 
   unmount();
 });
 
-test('a sector template prefills the box and the launch keeps that sector once', async () => {
+test('crear mi web sends the landing text flow', async () => {
   economicPost.mockResolvedValue({ data: { project_id: 'proj_new' } });
   const { node, unmount } = await renderDashboard();
+  const prompt = node.querySelector('[data-testid="dashboard-prompt"]');
 
-  act(() => activate(node.querySelector('[data-testid="dashboard-sector-restaurant"]')));
-  expect(node.querySelector('[data-testid="dashboard-prompt"]').value).toContain('hostelería');
+  await act(async () => {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+    setter.call(prompt, 'Una clínica en Málaga');
+    prompt.dispatchEvent(new Event('input', { bubbles: true }));
+  });
 
   await act(async () => {
     activate(node.querySelector('[data-testid="dashboard-send"]'));
   });
   await flush();
 
-  const body = economicPost.mock.calls[0][2];
-  expect(body.input_type).toBe('text');
-  expect(body.input_content.match(/hostelería/g)).toHaveLength(1);
-  expect(body.kind).toBeUndefined();
+  expect(economicPost).toHaveBeenCalledWith(
+    expect.anything(),
+    '/projects',
+    expect.objectContaining({
+      input_type: 'text',
+      input_content: expect.stringContaining('Una clínica en Málaga'),
+    })
+  );
   expect(navigateMock).toHaveBeenCalledWith(
     '/dashboard/builder?project_id=proj_new',
     expect.objectContaining({
@@ -194,6 +198,37 @@ test('a sector template prefills the box and the launch keeps that sector once',
       }),
     })
   );
+
+  unmount();
+});
+
+test('instalar agente posts the voice embed for the active project', async () => {
+  apiMocks.post.mockResolvedValue({ data: { snippet: '<script src="/embed/agent.js"></script>' } });
+  const { node, unmount } = await renderDashboard();
+
+  act(() => activate(node.querySelector('[data-testid="dashboard-tab-install"]')));
+  expect(node.querySelector('[data-testid="dashboard-send"]').textContent).toBe('Instalar agente');
+  expect(node.querySelector('[data-testid="dashboard-agent-chat"]').disabled).toBe(true);
+  expect(node.querySelector('[data-testid="dashboard-agent-chat"]').textContent).toContain('Próximamente');
+
+  const host = node.querySelector('[data-testid="dashboard-embed-host"]');
+  await act(async () => {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    setter.call(host, 'tunegocio.com');
+    host.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+  await act(async () => {
+    activate(node.querySelector('[data-testid="dashboard-send"]'));
+  });
+  await flush();
+
+  expect(apiMocks.post).toHaveBeenCalledWith('/embed/agents', {
+    project_id: 'p1',
+    allowed_origins: ['https://tunegocio.com'],
+  });
+  expect(node.querySelector('[data-testid="dashboard-embed-snippet"]').textContent).toContain('agent.js');
+  expect(economicPost).not.toHaveBeenCalled();
 
   unmount();
 });
@@ -263,10 +298,9 @@ test('free test mode replaces the send cost and stays in the header', async () =
   });
 
   const { node, unmount } = await renderDashboard();
-  expect(node.querySelector('[data-testid="dashboard-send"]').textContent).toBe('Crear · ◆ 1 gema →');
+  expect(node.querySelector('[data-testid="dashboard-send"]').textContent).toBe('Modo prueba · sin gemas');
   expect(node.querySelector('[data-testid="dashboard-test-mode"]').textContent).toContain('Modo prueba · sin gemas');
-  expect(node.querySelector('[data-testid="dashboard-gem-pill"]').textContent).toContain('Gema Maestra · 4');
-  expect(node.querySelector('[data-testid="dashboard-sectors"]').textContent).toContain('Restaurante');
+  expect(node.querySelector('[data-testid="dashboard-gem-pill"]').textContent).toBe('◆ 4 gemas');
   expect(node.querySelector('[data-testid="dashboard-project-menu"]').textContent).toContain('Proyecto');
 
   unmount();

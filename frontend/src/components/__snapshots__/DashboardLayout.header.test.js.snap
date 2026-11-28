@@ -1,8 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`dashboard header stays the workspace header 1`] = `
-{
-  "className": "sticky top-0 z-30 shrink-0 border-b border-white/6 bg-[#050505]",
-  "text": "WorkspaceResumen",
-}
-`;
