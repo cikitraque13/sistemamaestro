@@ -6,7 +6,6 @@ visible result is a static document, not the model source.
 """
 from html import escape
 
-from backend.app.services.blueprint import BlueprintGenerationError
 from backend.app.services.builder_landing_state import MAX_PREVIEW_VERSIONS, PREVIEW_SCHEMA
 
 USER_MESSAGES = {
@@ -14,6 +13,8 @@ USER_MESSAGES = {
     "blueprint_provider_unavailable": "No se ha podido preparar el plano. No se ha generado la preview.",
     "blueprint_invalid_output": "El plano no ha salido bien. No se ha guardado la preview.",
     "landing_unavailable": "No se ha podido escribir la página. No se ha guardado nada.",
+    "landing_rejected": "La revisión no ha aceptado la página. No se ha sustituido la versión guardada.",
+    "judge_unavailable": "La revisión no está disponible ahora. No se ha sustituido la versión guardada.",
     "empty_instruction": "Escribe qué quieres en la página.",
     "publish_disabled": "La publicación no está disponible.",
 }
@@ -54,6 +55,61 @@ def normalize_draft(raw):
     if not title or not subtitle or not cta or not sections:
         raise PipelineError("landing_unavailable")
     return {"title": title, "subtitle": subtitle, "cta": cta, "sections": sections}
+
+
+def landing_brief(data) -> dict:
+    """Facts the writer must see. Values are data, not extra instructions."""
+    blueprint = data.get("blueprint") if isinstance(data.get("blueprint"), dict) else {}
+    diagnosis = data.get("diagnosis") if isinstance(data.get("diagnosis"), dict) else {}
+    intent = data.get("intent") if isinstance(data.get("intent"), dict) else {}
+    priorities = []
+    for item in blueprint.get("priorities") or []:
+        text = _clip(item, 120)
+        if text and text not in priorities:
+            priorities.append(text)
+        if len(priorities) == 6:
+            break
+    return {
+        "instruction": _clip(data.get("instruction"), 2000),
+        "intentTitle": _clip(intent.get("title"), 160),
+        "intentGoal": _clip(intent.get("goal"), 400),
+        "blueprintTitle": _clip(blueprint.get("title"), 160),
+        "blueprintSummary": _clip(blueprint.get("summary"), 500),
+        "priorities": priorities,
+        "diagnosis": _clip(diagnosis.get("summary"), 500),
+        "slot": _clip(data.get("slot"), 80),
+    }
+
+
+def section_slots(plan) -> list:
+    slots = []
+    if isinstance(plan, dict):
+        for item in plan.get("priorities") or []:
+            text = _clip(item, 80)
+            if text and text not in slots:
+                slots.append(text)
+            if len(slots) == 4:
+                break
+    return slots or ["Presentación", "Servicio", "Siguiente paso"]
+
+
+def render_partial_html(*, title, subtitle, cta, sections) -> str:
+    ready = [item for item in sections or [] if isinstance(item, dict) and item.get("title") and item.get("text")]
+    if not ready:
+        ready = [{"title": "En curso", "text": "El texto de esta sección aparece en cuanto está listo."}]
+    return render_preview_html({
+        "title": _clip(title, 160) or "Tu página",
+        "subtitle": _clip(subtitle, 400) or "Estamos escribiendo esta versión.",
+        "cta": _clip(cta, 80) or "Continuar",
+        "sections": ready,
+    })
+
+
+def structural_judge(draft, _instruction) -> dict:
+    title = _clip((draft or {}).get("title"), 160)
+    if "convierte dudas en decisiones claras" in title.lower():
+        return {"ok": False, "summary": "El texto sigue siendo la plantilla genérica."}
+    return {"ok": True, "summary": title or "Página revisada."}
 
 
 def render_preview_html(draft) -> str:
@@ -116,43 +172,19 @@ def _next_preview(previous, owner_id, project_id, instruction, intent, blueprint
     }
 
 
-async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at=""):
-    text = " ".join(str(instruction or "").split())
-    if not text:
-        raise PipelineError("empty_instruction")
-    project_id = project["project_id"]
-    try:
-        intent = await classify({
-            "instruction": text,
-            "input_content": project.get("input_content") or "",
-            "route": project.get("route") or "",
-        })
-    except PipelineError:
-        raise
-    except Exception as exc:
-        raise PipelineError("CLASSIFIER_UNAVAILABLE") from exc
-    if not isinstance(intent, dict) or not str(intent.get("title") or "").strip():
-        raise PipelineError("CLASSIFIER_UNAVAILABLE")
-    brief = dict(project)
-    brief["input_content"] = text
-    try:
-        plan = await blueprint(brief)
-    except BlueprintGenerationError as exc:
-        raise PipelineError(exc.code) from exc
-    except PipelineError:
-        raise
-    except Exception as exc:
-        raise PipelineError("blueprint_provider_unavailable") from exc
-    try:
-        draft = normalize_draft(await draft_landing({
-            "instruction": text,
-            "intent": intent,
-            "blueprint": plan,
-        }))
-    except PipelineError:
-        raise
-    except Exception as exc:
-        raise PipelineError("landing_unavailable") from exc
-    html = render_preview_html(draft)
-    preview = _next_preview(previous, owner_id, project_id, text, intent, plan, html, created_at)
-    return {"preview": preview, "public": public_preview(preview)}
+async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None):
+    from backend.app.services.builder_executor import iter_executor
+
+    preview = None
+    public = None
+    async for event in iter_executor(
+        project=project, owner_id=owner_id, instruction=instruction, classify=classify,
+        blueprint=blueprint, draft_landing=draft_landing, draft_section=draft_section,
+        judge=judge, previous=previous, created_at=created_at,
+    ):
+        if event.get("type") == "result":
+            preview = event["preview"]
+            public = event["public"]
+    if preview is None or public is None:
+        raise PipelineError("landing_unavailable")
+    return {"preview": preview, "public": public}
