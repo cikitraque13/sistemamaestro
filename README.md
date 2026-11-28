@@ -1,6 +1,6 @@
 # Sistema Maestro
 
-Estado leído en `main` a partir de `08c8734` (28 de noviembre de 2026). Este archivo describe el producto y el despliegue; no sustituye `docs/control/`.
+Estado leído en `main` a partir de `e9fe97f` (28 de noviembre de 2026). Este archivo describe el producto y el despliegue; no sustituye `docs/control/`.
 
 Repositorio: [cikitraque13/sistemamaestro](https://github.com/cikitraque13/sistemamaestro). Producción: [sistemamaestro.com](https://sistemamaestro.com). Salud: [sistemamaestro.com/health](https://sistemamaestro.com/health).
 
@@ -18,25 +18,18 @@ La marca en la cabecera es «Dirección, IA y continuidad».
 
 ## Flujo
 
-1. **Home.** Ruta `/`. Vive en `frontend/src/features/home`. Se restauró el 2026-11-23 al revertir el PR #115 (`f917e76a`) y el copy de cierre el 2026-11-28 (`02c2076`, revierte #163 solo en esa carpeta). La carpeta queda congelada: el trabajo del builder no la modifica. «Iniciar sesión» va a `/login` y, tras entrar, a `/dashboard`.
-2. **Dashboard.** El lanzador (`DashboardBuilderLauncher`) crea el proyecto con `POST /projects`. El backend llama a `analyze_with_ai`, que usa Grok, y guarda el `diagnosis` en el proyecto.
+1. **Home.** Ruta `/`. Vive en `frontend/src/features/home`. Se restauró el 2026-11-23 al revertir el PR #115 (`f917e76a`) y el copy de cierre el 2026-11-28 (`02c2076`, revierte #163 solo en esa carpeta). La carpeta queda congelada: el trabajo posterior no la modifica. «Iniciar sesión» va a `/login` y, tras entrar, a `/dashboard`.
+2. **Resumen.** El lanzador (`DashboardBuilderLauncher`) crea el proyecto con `POST /projects`. El backend llama a `analyze_with_ai` y guarda el `diagnosis` en el proyecto.
 3. **Builder.** El lanzador abre `/dashboard/builder?project_id=`.
-4. **Ejecutor.** Pipeline lineal de cinco pasos, en `backend/app/services/builder_executor.py`:
+4. **Ejecutor.** Bucle acotado en `backend/app/services/builder_executor.py`. Cada vuelta recorre cinco pasos. Por defecto hay 3 vueltas (`BUILDER_EXECUTOR_MAX_ITERATIONS`; el código no pasa de 3) y un tope de 110 s (`BUILDER_EXECUTOR_TIMEOUT_SECONDS`).
 
    | Paso | Qué hace |
    | --- | --- |
-   | Entendiendo tu negocio | Grok clasifica la intención (`classify_intent`). |
-   | Estructura de secciones | Grok escribe el blueprint (`generate_blueprint`). La preview usa como máximo 4 prioridades. |
-   | Textos | El writer redacta la cabecera y cada sección. Por defecto es Claude. |
+   | Entendiendo tu negocio | Clasifica la intención (`classify_intent`). |
+   | Estructura de secciones | Escribe el blueprint (`generate_blueprint`). La preview usa como máximo 4 prioridades. |
+   | Textos | El writer redacta la cabecera y cada sección. |
    | Diseño | Plantilla HTML fija (`render_preview_html`). No hay un generador aparte de componentes de aplicación. |
-   | Revisión final | El juez puntúa con una rúbrica acotada. Si no encaja, se reintenta una vez: máximo 2 intentos (`MAX_DRAFT_ATTEMPTS`). |
-
-   Clasificar y el blueprint llaman siempre a Grok. Los selectores cambian el juez y el writer:
-
-   | Variable | Por defecto | Valores |
-   | --- | --- | --- |
-   | `BUILDER_EXECUTOR_ORCHESTRATOR` | `grok` | `grok` o `anthropic`. El juez usa este nombre. Un valor desconocido falla cerrado. |
-   | `BUILDER_EXECUTOR_WRITER` | `anthropic` | `anthropic` (Claude) o `grok`. |
+   | Revisión final | Una rúbrica acotada y, si encaja, el juez. Si no llega, se reintenta dentro del tope de vueltas. |
 
    El vivo llega por SSE en `POST /api/builder/preview/stream`. Eventos: `state`, `step`, `section`, `done`, `error`. Un paso en silencio también emite comentarios `: heartbeat` cada 10 s. El evento interno `result` no se envía al navegador.
 
@@ -44,21 +37,34 @@ La marca en la cabecera es «Dirección, IA y continuidad».
 
    El cobro de gemas pasa por `run_economic_operation` y el libro `credit_ledger` (nombre por defecto de `CREDIT_LEDGER_COLLECTION`). Si `BUILDER_FREE_TEST_MODE` está encendido, un administrador no reserva gemas. El modo está apagado cuando la variable no existe.
 
-`BUILDER_ENABLED` no está en los `.env.example`. Si no está definida, los endpoints del builder responden 503 («El Builder está en construcción») y no reservan créditos. Un administrador entra igual. La lista de variables del servicio de producción en Railway no incluye ese nombre.
+`BUILDER_ENABLED` no está en los `.env.example`. Si no está definida, o no vale `true`, `1`, `yes` u `on`, los endpoints del builder responden 503 («El Builder está en construcción. No se ha generado nada y no se han usado créditos.») y no reservan créditos. Un administrador entra igual. En el servicio de producción el nombre sí está; este archivo no copia el valor.
 
-## Estado por PR
+## Estado actual (28/11/2026)
 
-Comprobado en GitHub el 2026-11-28. `main` está en el merge de #180.
+`main` está en `e9fe97f`. La portada no entra en estos cambios.
 
-| PR | Estado | Qué aporta |
+| Pieza | Dónde | Qué hay en `main` |
 | --- | --- | --- |
-| [#176](https://github.com/cikitraque13/sistemamaestro/pull/176) | Merged (`9393bce`, 2026-11-28) | Pasos reales del ejecutor y streaming SSE. |
-| [#177](https://github.com/cikitraque13/sistemamaestro/pull/177) | Merged (`1825bab`, 2026-11-28) | Publicar la landing y dominio propio. Los flags siguen apagados. |
-| [#178](https://github.com/cikitraque13/sistemamaestro/pull/178) | Merged (`2e50951`, 2026-11-28) | Snippet del agente de voz embebible. `EMBED_AGENT_ENABLED` sigue apagado. |
-| [#179](https://github.com/cikitraque13/sistemamaestro/pull/179) | Merged (`adee2e2`, 2026-11-28) | Menú de cuenta arriba a la derecha del builder. El despliegue vigente de `main` lo incluye. La fila «Conoce a tu asesor» está visible y deshabilitada, con la marca Próximamente. |
-| [#180](https://github.com/cikitraque13/sistemamaestro/pull/180) | Merged (`08c8734`, 2026-11-28) | Backend de los módulos de agente: chat, voz, WhatsApp y citas. `AGENT_MODULE_*` siguen apagados. |
-| [#181](https://github.com/cikitraque13/sistemamaestro/pull/181) | Abierta, en curso. Base `08c8734`, mergeable. | Cierra el stream de preview cuando el cobro de gemas falla antes de empezar el trabajo. En `main` ese fallo deja el SSE en heartbeats. |
-| [#182](https://github.com/cikitraque13/sistemamaestro/pull/182) | Abierta. Base `08c8734`, mergeable. | Flujo «Conoce a tu asesor». El flag `ADVISOR_FLOW_ENABLED` no está en `main` ni en los `.env.example`; en la PR queda apagado. |
+| Builder | Estudio, [#189](https://github.com/cikitraque13/sistemamaestro/pull/189) | Modo prueba conservado. La barra de herramientas de la preview no está. El botón Publicar queda en la columna del chat, bajo el paso En vivo. |
+| Resumen v5 | [#191](https://github.com/cikitraque13/sistemamaestro/pull/191) | Lanzador con «Crear mi web», «Mejorar mi web» e «Instalar agente». App web y Automatización no se muestran. |
+| Panel v5 | [#192](https://github.com/cikitraque13/sistemamaestro/pull/192) | Barra lateral: Proyectos (desplegable), Agencia de IA, Agente de voz, Agente de chat. Facturación abajo, sobre la cuenta. |
+| Activación al publicar | [#193](https://github.com/cikitraque13/sistemamaestro/pull/193) | Publicar enciende chat y citas de ese proyecto, salvo baja del dueño. Voz y WhatsApp solo si ya hay credenciales. |
+| Demo de Nova | `frontend/src/features/home` | Sección `agencia-ia`. El botón dice «Habla con Nova». |
+| Tope de coste | [#195](https://github.com/cikitraque13/sistemamaestro/pull/195) | Topes de tokens, cortacircuitos por coste estimado y topes por usuario (día y mes). No mueve el libro de gemas. |
+
+Reservas vive en Agente de chat (lista y horario). El menú no tiene Reservas, Vídeo ni App móvil. Agente de voz no lista reservas. `/dashboard/reservas` sigue en el router como «Próximamente» y no sale en la barra.
+
+Al publicar, la landing gana un enlace sin script, «Habla con nosotros · Reserva cita», hacia `/atencion/{proyecto}`. La página pública solo responde si el proyecto está publicado. Con los flags de módulo apagados, el chat y las citas públicos siguen cerrados.
+
+### Pendiente
+
+| Tema | Marca | Qué falta |
+| --- | --- | --- |
+| Facturación | pendiente | [#194](https://github.com/cikitraque13/sistemamaestro/pull/194), abierta. En `main` la página sigue con saldo, plan actual, sugerencia, tarjetas e historial. La PR deja solo las tarjetas de plan. |
+| Precios de tres planes | pendiente | Propuesta, no cerrada: Prueba gratis, Agencia mensual ~149 €/mes (referencia de borrador) y Red por negocio con precio por volumen. No está en el código. Stripe sigue con Gratis 0 €, Blueprint 29 €, Sistema 79 € y Premium 199 € (`backend/app/domain/plans.py`). |
+| Correo de bienvenida | pendiente | No hay envío con Mailjet en el repo. |
+| Chat y citas públicos | pendiente | `AGENT_MODULE_CHAT_ENABLED` y `AGENT_MODULE_CITAS_ENABLED` salen en `false` en los ejemplos y no están en las variables de producción. Ausente cuenta como apagado. |
+| WhatsApp y teléfono | pendiente | El panel lo dice: WhatsApp no está conectado y las llamadas no se contratan ahí. El recordatorio de 24 h no sale si nadie llama a la ruta y falta `BOOKINGS_REMINDER_SECRET`. |
 
 ## Feature flags
 
@@ -72,13 +78,15 @@ Nombres tomados de [`.env.example`](.env.example) y [`backend/.env.example`](bac
 | `PUBLISH_RESOLVE_CUSTOM_HOSTS` | apagada | Busca dominios de cliente aunque el paso de dominio siga cerrado. |
 | `EMBED_AGENT_ENABLED` | apagada | Agente de voz embebible. Un administrador puede ver el paso de instalación con el flag apagado; la sesión pública sigue cerrada salvo la clave de un administrador. |
 | `AGENT_MODULE_CHAT_ENABLED` | `false` | Chat del agente del cliente. Sin flag, el tráfico anónimo recibe 404 y una sesión normal recibe 503. |
-| `AGENT_MODULE_VOZ_ENABLED` | `false` | Voz. El adaptador concreto es una propuesta de Twilio Programmable Voice. |
-| `AGENT_MODULE_WHATSAPP_ENABLED` | `false` | WhatsApp Cloud API. |
+| `AGENT_MODULE_VOZ_ENABLED` | `false` | Voz. Sin número entrante guardado, publicar no lo enciende. |
+| `AGENT_MODULE_WHATSAPP_ENABLED` | `false` | WhatsApp. Sin identificador de número guardado, publicar no lo enciende. |
 | `AGENT_MODULE_CITAS_ENABLED` | `false` | Citas. |
 
-Un administrador puede usar publicación, dominio, embed y el runtime de módulos con el flag global apagado. El interruptor del proyecto, en los módulos de agente, sigue haciendo falta. Los ejemplos comentan también topes y nombres de credencial (`EMBED_AGENT_DAILY_CAP`, `TWILIO_AUTH_TOKEN`, `WHATSAPP_ACCESS_TOKEN`, `BOOKINGS_REMINDER_SECRET` y el resto). Esos nombres están vacíos en los ejemplos.
+Un administrador puede usar publicación, dominio, embed y el runtime de módulos con el flag global apagado. El interruptor del proyecto, en los módulos de agente, sigue haciendo falta. Los ejemplos comentan también topes y nombres de credencial (`EMBED_AGENT_DAILY_CAP`, `BOOKINGS_REMINDER_SECRET` y el resto). Esos nombres están vacíos en los ejemplos.
 
-`PUBLISH_BASE_DOMAIN`, `PUBLISH_CNAME_TARGET`, `PUBLISH_APEX_TARGET` y `PUBLISH_APP_HOSTS` salen vacíos: sin dominio base el servidor no inventa `sistemamaestro.com`.
+`PUBLISH_BASE_DOMAIN`, `PUBLISH_CNAME_TARGET`, `PUBLISH_APEX_TARGET` y `PUBLISH_APP_HOSTS` salen vacíos en los ejemplos. Sin dominio base no hay URL `https://{slug}.{base}`. El enlace de atención, si el dominio base no vale, usa `sistemamaestro.com`.
+
+Consulta Railway del 2026-11-28, solo nombres. El servicio de producción incluye `BUILDER_ENABLED`, `BUILDER_FREE_TEST_MODE`, `PUBLISH_LANDING_ENABLED`, `PUBLISH_BASE_DOMAIN` y `ADVISOR_FLOW_ENABLED`. No incluye `AGENT_MODULE_CHAT_ENABLED`, `AGENT_MODULE_CITAS_ENABLED`, `AGENT_MODULE_VOZ_ENABLED`, `AGENT_MODULE_WHATSAPP_ENABLED`, `EMBED_AGENT_ENABLED`, `CUSTOM_DOMAIN_ENABLED`, `BOOKINGS_REMINDER_SECRET` ni ningún nombre `AI_*`. Este archivo no copia valores.
 
 ## Stack
 
@@ -89,7 +97,8 @@ Un contenedor. El frontend se construye y el backend lo sirve.
 | Backend | FastAPI (`fastapi==0.110.1`) y Uvicorn. Entrada `backend.app.main:app`. Python 3.11 (`.python-version` y la imagen del `Dockerfile`). |
 | Frontend | React 18.2 y Vite 8 (`frontend/package.json`). Node 22.22.2. |
 | Datos | MongoDB, con Motor y PyMongo. Base por defecto `sistemamaestro` (`DB_NAME`). |
-| Modelos | Grok, vía xAI (`GROK_API_KEY`, `GROK_MODEL`). Claude, vía Anthropic (`ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`). Los ejemplos dejan `grok-4.3` y `claude-haiku-5-5`. |
+
+Los proveedores de texto y de voz se configuran por variables de entorno. Los nombres están en los `.env.example`.
 
 ## Desarrollo local
 
@@ -112,7 +121,7 @@ npm start
 
 ## Despliegue
 
-El servicio Railway `sistemamaestro` (proyecto `sistemamaestro-project`) construye el repo `cikitraque13/sistemamaestro`, rama `main`, con el `Dockerfile`. `railway.json` fija el builder `DOCKERFILE`, `healthcheckPath` `/health`, timeout 300 s y reinicio `ON_FAILURE`. No hay `nixpacks.toml`. Un push a `main` despliega: el merge de #180 creó el despliegue `SUCCESS` del commit `08c8734`.
+El servicio Railway `sistemamaestro` (proyecto `sistemamaestro-project`) construye el repo `cikitraque13/sistemamaestro`, rama `main`, con el `Dockerfile`. `railway.json` fija el builder `DOCKERFILE`, `healthcheckPath` `/health`, timeout 300 s y reinicio `ON_FAILURE`. No hay `nixpacks.toml`. Un push a `main` despliega. El despliegue vigente es `SUCCESS` sobre `e9fe97f` (28 de noviembre de 2026).
 
 El contenedor escucha `${PORT:-8080}`:
 
@@ -122,12 +131,12 @@ python -m uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}
 
 `GET /health` responde `{"status":"ok"}`.
 
-Dominios del servicio, ambos en el puerto 8080, verificados, con certificado válido (consulta Railway del 2026-11-28):
+Dominios del servicio, ambos en el puerto 8080, verificados y con certificado válido (consulta Railway del 2026-11-28):
 
 - `sistemamaestro.com`
 - `*.sistemamaestro.com`, para las landings publicadas
 
-Publicar sigue apagado: sin `PUBLISH_LANDING_ENABLED` el producto no sirve esas landings, y el adaptador de dominio responde «Pendiente de activación por Sistema Maestro». El código no llama a la API de Railway ni escribe DNS.
+El código no llama a la API de Railway ni escribe DNS. El adaptador de dominio propio, con su flag apagado, responde «Pendiente de activación por Sistema Maestro».
 
 ## Tests
 
@@ -140,7 +149,7 @@ for f in backend/tests/test_*.py; do
 done
 ```
 
-Hay 30 archivos `backend/tests/test_*.py`. Los de Atlas se saltan si no hay base.
+Hay 40 archivos `backend/tests/test_*.py`. Los de Atlas se saltan si no hay base.
 
 Frontend, dentro de `frontend/`:
 
