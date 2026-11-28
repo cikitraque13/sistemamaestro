@@ -92,11 +92,14 @@ def _judge_scores(parsed):
 
 async def judge_draft(draft, instruction):
     """Bounded review. Failures log a category and never the draft or the key."""
+    from backend.app.ai.guards.llm_budget import llm_scope
+
     name = orchestrator_name()
     content = json.dumps(judge_request_body(draft, instruction), ensure_ascii=False)
-    if name == "grok":
-        return await _judge_grok(content)
-    return await _judge_anthropic(content)
+    with llm_scope(feature="evaluation"):
+        if name == "grok":
+            return await _judge_grok(content)
+        return await _judge_anthropic(content)
 
 
 async def _judge_grok(content):
@@ -134,13 +137,17 @@ async def _judge_grok(content):
         parsed = json.loads(raw)
     except PipelineError:
         raise
-    except TimeoutError:
-        _log("timeout")
-        raise PipelineError("judge_unavailable") from None
-    except json.JSONDecodeError:
-        _log("schema")
-        raise PipelineError("judge_unavailable") from None
-    except Exception:
+    except Exception as exc:
+        from backend.app.ai.guards.llm_budget import LlmBudgetError
+
+        if isinstance(exc, LlmBudgetError):
+            raise
+        if isinstance(exc, TimeoutError):
+            _log("timeout")
+            raise PipelineError("judge_unavailable") from None
+        if isinstance(exc, json.JSONDecodeError):
+            _log("schema")
+            raise PipelineError("judge_unavailable") from None
         _log("provider")
         raise PipelineError("judge_unavailable") from None
     return _judge_result(parsed)
@@ -171,10 +178,14 @@ async def _judge_anthropic(content):
             user=content, max_tokens=MAX_JUDGE_OUTPUT_TOKENS, effort="low",
         )
         parsed = json.loads(raw or "{}")
-    except json.JSONDecodeError:
-        _log("schema")
-        raise PipelineError("judge_unavailable") from None
-    except Exception:
+    except Exception as exc:
+        from backend.app.ai.guards.llm_budget import LlmBudgetError
+
+        if isinstance(exc, LlmBudgetError):
+            raise
+        if isinstance(exc, json.JSONDecodeError):
+            _log("schema")
+            raise PipelineError("judge_unavailable") from None
         _log("provider")
         raise PipelineError("judge_unavailable") from None
     return _judge_result(parsed)

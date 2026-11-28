@@ -31,6 +31,7 @@ from backend.app.routers.embed_agent import router as embed_agent_router
 from backend.app.routers.nova_voice import router as nova_voice_router
 from backend.app.routers.public import router as public_router
 from backend.app.routers.agent_modules import router as agent_modules_router
+from backend.app.routers.llm_usage import router as llm_usage_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,6 +60,7 @@ app.include_router(public_router)
 app.include_router(nova_voice_router)
 app.include_router(embed_agent_router)
 app.include_router(agent_modules_router)
+app.include_router(llm_usage_router)
 app.include_router(opportunities_router)
 app.include_router(consumption_router)
 app.include_router(builder_ai.router)
@@ -103,6 +105,14 @@ async def startup_event():
         unique=True,
         partialFilterExpression={"custom_domain.host": {"$type": "string"}},
     )
+    usage_events = getattr(db, "llm_usage_events", None)
+    if usage_events is not None:
+        await usage_events.create_index([("user_id", 1), ("created_at", -1)])
+        await usage_events.create_index([("project_id", 1), ("created_at", -1)])
+        await usage_events.create_index([("feature", 1), ("created_at", -1)])
+        from backend.app.ai.guards.llm_budget import install_usage_collection
+
+        install_usage_collection(usage_events)
     app.state.j06_receipt_compaction_task = asyncio.create_task(run_receipt_compaction_worker(db.projects))
 
 

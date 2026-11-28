@@ -240,8 +240,11 @@ async def run_direct_analysis(
         envelope.get("request_id"),
     )
 
+    from backend.app.ai.guards.llm_budget import llm_scope
+
     try:
-        response = await client_ai.chat.completions.create(
+        with llm_scope(feature="classifier"):
+            response = await client_ai.chat.completions.create(
             model=GROK_MODEL,
             response_format={"type": "json_object"},
             messages=[

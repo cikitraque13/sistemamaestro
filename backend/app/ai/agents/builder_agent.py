@@ -132,7 +132,10 @@ async def run_builder_agent(
     if not ANTHROPIC_API_KEY or ANTHROPIC_MODEL not in ANTHROPIC_RATES:
         raise RuntimeError("ANTHROPIC_API_KEY no está configurada o el modelo no tiene tarifa fijada")
 
-    raw_content = await complete_builder_json(
+    from backend.app.ai.guards.llm_budget import llm_scope
+
+    with llm_scope(feature="builder"):
+        raw_content = await complete_builder_json(
         api_key=ANTHROPIC_API_KEY,
         model=ANTHROPIC_MODEL,
         system=SYSTEM_PROMPT,

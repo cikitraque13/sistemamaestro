@@ -229,8 +229,11 @@ async def review_project_memory(project: Dict[str, Any]) -> ReviewSnapshot:
         max_retries=0,
         base_url=base_url,
     )
+    from backend.app.ai.guards.llm_budget import LlmBudgetError, llm_scope
+
     try:
-        response = await client.chat.completions.create(
+        with llm_scope(feature="classifier"):
+            response = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -242,6 +245,8 @@ async def review_project_memory(project: Dict[str, Any]) -> ReviewSnapshot:
             reasoning_effort="none",
         )
         content = response.choices[0].message.content
+    except LlmBudgetError as exc:
+        raise MemoryReviewError(exc.code, 429) from None
     except asyncio.TimeoutError:
         raise MemoryReviewError("memory_review_unavailable") from None
     except Exception:

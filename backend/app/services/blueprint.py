@@ -89,8 +89,11 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
 """
 
     try:
+        from backend.app.ai.guards.llm_budget import LlmBudgetError, llm_scope
+
         try:
-            response = await client_ai.chat.completions.create(
+            with llm_scope(feature="builder"):
+                response = await client_ai.chat.completions.create(
                 model=GROK_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -101,6 +104,8 @@ Análisis de URL: {project.get('url_analysis', 'N/A')}
                 response_format={"type": "json_object"},
                 reasoning_effort="low",
             )
+        except LlmBudgetError as exc:
+            raise BlueprintGenerationError(exc.code) from None
         except Exception as exc:
             logger.error("Blueprint provider unavailable: %s", type(exc).__name__)
             raise BlueprintGenerationError(PROVIDER_UNAVAILABLE) from exc
