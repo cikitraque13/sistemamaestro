@@ -71,6 +71,15 @@ def _checked_preview(owner_id: str, project_id: str, preview: dict) -> dict:
     versions = preview.get("versions")
     if not isinstance(versions, list) or not versions or len(versions) > MAX_PREVIEW_VERSIONS:
         raise LandingStateError("invalid_record", 422)
+    for item in versions:
+        if not isinstance(item, dict):
+            raise LandingStateError("invalid_record", 422)
+        number = item.get("version")
+        html = item.get("html")
+        if isinstance(number, bool) or not isinstance(number, int) or number < 1:
+            raise LandingStateError("invalid_record", 422)
+        if not isinstance(html, str) or not html.strip():
+            raise LandingStateError("invalid_record", 422)
     encoded = json.dumps(preview, ensure_ascii=False)
     if len(encoded.encode("utf-8")) > MAX_RECORD_BYTES:
         raise LandingStateError("record_too_large", 413)
