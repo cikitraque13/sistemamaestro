@@ -33,9 +33,11 @@ EXPECTED_AGENT_STATUS = {
     "copy_agent": "spec_only",
     "visual_agent": "spec_only",
     "trust_agent": "spec_only",
+    "cro_agent": "spec_only",
 }
 
-REMOVED_EMPTY_AGENTS = {
+# Files stay absent. The orchestrator may keep a NOT_DEMONSTRATED contract.
+CONTRACT_ONLY_AGENTS = {
     "discovery_agent",
     "audit_agent",
     "cro_agent",
@@ -201,9 +203,17 @@ def validate_agent_alignment(specs: Dict[str, dict], orchestrator_agents: Dict[s
         if actual != expected:
             fail(f"unexpected agent status for {agent_key}: expected={expected} actual={actual}")
 
-    revived = sorted(REMOVED_EMPTY_AGENTS & (set(files) | set(orchestrator_agents)))
-    if revived:
-        fail(f"empty agents must stay removed: {revived}")
+    revived_files = sorted(
+        name for name in CONTRACT_ONLY_AGENTS if (AGENTS_DIR / f"{name}.py").exists()
+    )
+    if revived_files:
+        fail(f"empty agent files must stay absent: {revived_files}")
+    for name in sorted(CONTRACT_ONLY_AGENTS):
+        contract = orchestrator_agents.get(name)
+        if not isinstance(contract, dict):
+            fail(f"missing NOT_DEMONSTRATED contract: {name}")
+        if contract.get("phase") != "NOT_DEMONSTRATED":
+            fail(f"{name} contract must stay NOT_DEMONSTRATED, not executable")
 
     specs_without_logic = sorted(key for key, status in matrix.items() if status == "spec_only")
     if not {"copy_agent", "visual_agent", "trust_agent"}.issubset(specs_without_logic):

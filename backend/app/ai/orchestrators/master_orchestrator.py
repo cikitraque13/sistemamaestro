@@ -8,7 +8,9 @@ State:
 - not connected to runtime
 - does not route real calls
 - defines manifest and base contracts for modules that exist
+- the eight former empty agents are contracts only: phase NOT_DEMONSTRATED, not imported, not executable
 - runtime_multiagent stays false
+- J07 stays NOT_OPENED
 """
 
 from dataclasses import dataclass, asdict
@@ -86,6 +88,80 @@ AGENT_REGISTRY: Dict[str, AgentContract] = {
         forbidden_domains=("repo_writer", "autonomous_deploy", "live_attack_execution", "payment_mutation", "production_access"),
         output_type="red_team_findings",
         phase="next",
+    ),
+    # Contracts only. The modules were empty and are not restored.
+    # NOT_DEMONSTRATED, not imported, not executable. J07 is not opened.
+    "discovery_agent": AgentContract(
+        key="discovery_agent",
+        role="entry_and_discovery",
+        mission="Classify early-stage user intent and reduce ambiguity.",
+        allowed_tools=("intent_classifier", "route_mapper"),
+        forbidden_domains=("deploy", "payments", "code_write"),
+        output_type="discovery_brief",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "audit_agent": AgentContract(
+        key="audit_agent",
+        role="url_market_audit",
+        mission="Audit URLs, market signals and visible structural friction.",
+        allowed_tools=("url_reader", "signal_analyzer"),
+        forbidden_domains=("deploy", "code_write", "payments"),
+        output_type="audit_report",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "rescue_sre_agent": AgentContract(
+        key="rescue_sre_agent",
+        role="runtime_reliability",
+        mission="Diagnose runtime failures, healthcheck issues and deploy incidents.",
+        allowed_tools=("log_reader", "runtime_probe", "env_validator"),
+        forbidden_domains=("ux_redesign", "pricing_strategy"),
+        output_type="incident_diagnosis",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "growth_agent": AgentContract(
+        key="growth_agent",
+        role="growth",
+        mission="Detect growth opportunities in activation, retention and monetization.",
+        allowed_tools=("funnel_mapper", "growth_hypothesis_engine"),
+        forbidden_domains=("runtime_patch", "security_policy"),
+        output_type="growth_actions",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "cro_agent": AgentContract(
+        key="cro_agent",
+        role="conversion",
+        mission="Reduce conversion friction and improve CTA continuity.",
+        allowed_tools=("journey_analyzer", "cta_mapper"),
+        forbidden_domains=("backend_runtime", "auth_security"),
+        output_type="cro_recommendations",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "seo_architect_agent": AgentContract(
+        key="seo_architect_agent",
+        role="technical_seo",
+        mission="Improve indexable architecture and technical SEO signals.",
+        allowed_tools=("seo_mapper", "semantic_structure_checker"),
+        forbidden_domains=("payments", "runtime_patch"),
+        output_type="seo_architecture_notes",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "deploy_agent": AgentContract(
+        key="deploy_agent",
+        role="deploy_ops",
+        mission="Validate deploy paths, runtime configuration and release readiness.",
+        allowed_tools=("deploy_checklist", "env_validator", "health_probe"),
+        forbidden_domains=("pricing_strategy", "ui_copy"),
+        output_type="deploy_status",
+        phase="NOT_DEMONSTRATED",
+    ),
+    "algorithmic_auditor_agent": AgentContract(
+        key="algorithmic_auditor_agent",
+        role="quality_audit",
+        mission="Audit consistency, bias and structural quality of AI outputs.",
+        allowed_tools=("output_sampler", "consistency_checker"),
+        forbidden_domains=("code_write", "deploy", "payments"),
+        output_type="algorithmic_audit",
+        phase="NOT_DEMONSTRATED",
     ),
 }
 

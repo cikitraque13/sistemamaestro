@@ -143,9 +143,45 @@ warnings
 
 ---
 
-## 5. Contratos retirados
+## 5. Contrato `rescue_sre_agent`
 
-Los archivos vacíos `rescue_sre_agent`, `audit_agent`, `deploy_agent`, `algorithmic_auditor_agent`, `discovery_agent`, `growth_agent`, `cro_agent` y `seo_architect_agent` se borraron en #166. Sus contratos de esta página eran históricos y no describen runtime. J07 y J08 siguen NOT_DEMONSTRATED.
+### Misión
+
+Diagnosticar y corregir fallos de arranque, runtime o estabilidad.
+
+### Entradas
+
+- logs;
+- errores;
+- healthchecks;
+- estado de runtime;
+- configuración;
+- diferencias de deploy.
+
+### Herramientas permitidas
+
+- log analysis;
+- env validation;
+- runtime checks;
+- dependency checks.
+
+### Límites
+
+No debe:
+
+- rediseñar producto;
+- tocar UX comercial;
+- decidir pricing;
+- modificar datos de usuario;
+- hacer cambios destructivos sin confirmación.
+
+### Salida esperada
+
+- causa raíz probable;
+- evidencia;
+- corrección mínima segura;
+- validación esperada;
+- rollback si aplica.
 
 ---
 
@@ -238,7 +274,32 @@ No debe:
 
 ---
 
-## 8. Contrato `report_agent`
+## 8. Contrato `audit_agent`
+
+### Misión
+
+Detectar fricciones de negocio, claridad, estructura, conversión y monetización.
+
+### Entradas
+
+- idea;
+- URL;
+- proyecto;
+- contenido;
+- señales de usuario.
+
+### Salida esperada
+
+- diagnóstico;
+- fortalezas;
+- debilidades;
+- quick wins;
+- acciones prioritarias;
+- recomendación de continuidad.
+
+---
+
+## 9. Contrato `report_agent`
 
 ### Misión
 
@@ -255,7 +316,7 @@ Convertir diagnóstico en informe estructurado y accionable.
 
 ---
 
-## 9. Contrato `system_architect_agent`
+## 10. Contrato `system_architect_agent`
 
 ### Misión
 
@@ -274,7 +335,41 @@ Convertir una intención en arquitectura de proyecto.
 
 ---
 
-## 10. Relación con guards
+## 11. Contrato `deploy_agent`
+
+### Misión
+
+Validar despliegue y runtime.
+
+### Salida esperada
+
+- ruta canónica de deploy;
+- variables requeridas;
+- healthcheck;
+- build;
+- runtime;
+- fallos probables;
+- corrección mínima.
+
+---
+
+## 12. Contrato `algorithmic_auditor_agent`
+
+### Misión
+
+Auditar decisiones algorítmicas, scoring y consistencia.
+
+### Salida esperada
+
+- inconsistencia detectada;
+- regla afectada;
+- impacto;
+- recomendación;
+- test o caso de validación.
+
+---
+
+## 13. Relación con guards
 
 Todo agente sensible debe pasar por guards.
 
@@ -290,7 +385,7 @@ Especialmente:
 
 ---
 
-## 11. Relación con créditos
+## 14. Relación con créditos
 
 Un agente puede recomendar una acción.
 
@@ -304,7 +399,7 @@ Consumption Engine
 
 ---
 
-## 12. Veredicto operativo
+## 15. Veredicto operativo
 
 Un agente válido tiene una misión estrecha, una salida verificable y límites claros.
 

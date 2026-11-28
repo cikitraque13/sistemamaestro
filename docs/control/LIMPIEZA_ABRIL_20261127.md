@@ -28,7 +28,7 @@ Base: `d2d56f3` (main después de #168 y #169). Criterio de fecha: `git log --di
 
 No hizo falta cambiar imports: ninguno de estos archivos tenía callers.
 
-Los ocho agentes vacíos ya no tienen archivo desde `#166` (`e78e7a2`). En este PR se quitaron sus contratos vigentes de `docs/architecture/02-ai-orchestration.md` y `03-agent-contracts.md` (queda una nota: históricos, no runtime; J07 y J08 siguen NOT_DEMONSTRATED) y la spec `cro_agent` de `agent_envelope.py`. Los tests de alineación los tratan como eliminados. `BuilderAgentPane.js` sigue con `agentSpecId: 'cro_agent'` y no se edita (UI de builder excluida). `01-DECISIONES-CERRADAS` §62 y el registro de jornada del 23-24 se dejan: son actas fechadas, no el mapa vigente.
+Los ocho módulos de 0 bytes siguen ausentes (`01-system-layers.md` prohíbe archivos vacíos). Corrección del 2026-11-28, autorizada por Lucas: se restauran los contratos, no los archivos. `02-ai-orchestration.md` y `03-agent-contracts.md` vuelven enteros, con el orden de activación por olas. `agent_envelope.py` recupera la spec `cro_agent` (`spec_only`). `AGENT_REGISTRY`, `DEFAULT_POLICY` y las evals `audit_eval` / `rescue_eval` recuperan las entradas, con `phase=NOT_DEMONSTRATED`, sin import y sin ejecución. J06 sigue OPEN. J07 sigue NOT_OPENED. J07 y J08 siguen NOT_DEMONSTRATED.
 
 ## Diferidos (los borra el PR del pipeline del builder)
 
@@ -36,11 +36,11 @@ La auditoría (§8.2) los marca como DELETE. Lucas los asigna al otro agente. Es
 
 | Path | Commit y fecha | Decisión | Por qué |
 |---|---|---|---|
-| `frontend/src/features/builder/components/BuilderChatDock.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Sin imports. UI de builder. Lo posee el PR del pipeline |
-| `frontend/src/features/builder/workspace/state/builderWorkspaceState.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Sin imports. Lo posee el PR del pipeline |
-| `frontend/src/features/builder/intelligence/builderVisualIntelligence.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Sin imports. Lo posee el PR del pipeline |
-| `frontend/src/features/builder/intelligence/index.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Barril. Lo posee el PR del pipeline |
-| `frontend/src/features/builder/playbooks/index.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Barril. Lo posee el PR del pipeline |
+| `frontend/src/features/builder/components/BuilderChatDock.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Sin imports. Ninguna jornada lo reclama. No se borra en esta corrección |
+| `frontend/src/features/builder/workspace/state/builderWorkspaceState.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | Sin imports. Ninguna jornada lo reclama. No se borra en esta corrección |
+| `frontend/src/features/builder/intelligence/builderVisualIntelligence.js` | `15a32a5c9b` 2026-04-26 | KEEP | J10 (dirección visual). No es un borrado diferido |
+| `frontend/src/features/builder/intelligence/index.js` | `15a32a5c9b` 2026-04-26 | KEEP | J10. Barril de la capa visual. No es un borrado diferido |
+| `frontend/src/features/builder/playbooks/index.js` | `15a32a5c9b` 2026-04-26 | KEEP | J10. Barril de playbooks. No es un borrado diferido |
 
 ## Candidatos, sin ejecutar
 
@@ -74,7 +74,7 @@ Destino según `AUDITORIA_INGENIERIA_BUILDER_20261127` §8.1 y §8.2. Nada de es
 | `backend/app/ai/evals/agent_eval_registry.py` | `c1d9247628` 2026-04-18 | CANDIDATE REPURPOSE, pending the target architecture | Sigue en `evals/`. Registro sin scoring vivo |
 | `backend/app/ai/guards/abuse_guard.py` | `c1d9247628` 2026-04-18 | CANDIDATE REPURPOSE, pending the target architecture | Sigue en `guards/`. No está cableado; enchufarlo exige `builder_ai.py`, que está excluido |
 | `backend/app/ai/tools/tool_registry.py` | `c1d9247628` 2026-04-18 | CANDIDATE REPURPOSE, pending the target architecture | Sigue en `tools/`. Manifiesto, no herramientas ejecutables |
-| `frontend/src/features/builder/intelligence/builderVisualIntelligence.js` | `15a32a5c9b` 2026-04-26 | CANDIDATE REPURPOSE, pending the target architecture | Decisiones visuales junto a la preview CLARA, cuando el mapa del pipeline lo diga. Hoy nadie lo importa |
+| `frontend/src/features/builder/intelligence/builderVisualIntelligence.js` | `15a32a5c9b` 2026-04-26 | KEEP | J10. Dirección visual (CTA, cards, color, tipografía, spacing, trust). No borrar |
 | `frontend/src/features/builder/workspace/state/builderWorkspaceState.js` | `15a32a5c9b` 2026-04-26 | CANDIDATE MOVE, pending the target architecture | Estado de workspace del runtime vivo del builder, si el mapa lo conserva. Hoy nadie lo importa |
 | `frontend/src/features/builder/components/BuilderChatDock.js` | `15a32a5c9b` 2026-04-26 | DEFERRED | UI de builder excluida. Nadie lo monta. No se edita en esta pasada |
 
