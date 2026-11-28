@@ -9,6 +9,8 @@ import Login from './features/auth/LoginPage';
 import Register from './features/auth/RegisterPage';
 import AuthCallback from './features/auth/AuthCallbackPage';
 import Dashboard from './features/dashboard/DashboardPage';
+import ComingSoon from './features/dashboard/ComingSoonPage';
+import AgentModulePage from './features/dashboard/AgentModulePage';
 import BuilderRoute from './features/builder/BuilderRoute';
 import Projects from './features/projects/ProjectsPage';
 import ProjectDetail from './features/projects/detail/ProjectDetailPage';
@@ -76,6 +78,9 @@ const AppRouter = () => {
       <Route path="/terms" element={<Terms />} />
 
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/dashboard/agente-voz" element={<ProtectedRoute><AgentModulePage title="Agente de voz" /></ProtectedRoute>} />
+      <Route path="/dashboard/agente-chat" element={<ProtectedRoute><AgentModulePage title="Agente de chat" /></ProtectedRoute>} />
+      <Route path="/dashboard/reservas" element={<ProtectedRoute><ComingSoon title="Reservas" /></ProtectedRoute>} />
       <Route path="/dashboard/builder" element={<ProtectedRoute><BuilderRoute /></ProtectedRoute>} />
       <Route path="/dashboard/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
       <Route path="/dashboard/project/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />

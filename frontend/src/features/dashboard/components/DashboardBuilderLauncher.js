@@ -1,339 +1,48 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Microphone, Plus } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 
 import { api } from '../../../lib/apiClient';
 import { economicPost } from '../../../lib/economicRequest';
+import { useVoice } from '../../../hooks/useVoice';
 import { builderEntryIsOpen } from '../../builder/builderAccess';
+import { loadOwnerProjects } from '../../builder/components/BuilderProjectSelect';
+import { DASHBOARD_HEADLINE, DASHBOARD_SUBTITLE } from '../dashboardCopy';
+import {
+  DASHBOARD_TABS,
+  PROJECT_CONTEXTS,
+  buildLaunchPrompt,
+  dashboardSendLabel,
+  dashboardTabById,
+  dashboardTabForMode,
+  embedOriginFromHost,
+  launcherModeById,
+  resolveActiveProject,
+  resolveLauncherMode,
+} from '../dashboardModel';
+import DashboardProjectMenu from './DashboardProjectMenu';
 
-const MODES = [
-  {
-    id: 'landing',
-    label: 'Landing',
-    inputType: 'text',
-    placeholder: 'Describe la landing: negocio, objetivo, público, oferta y CTA principal...',
-    starter:
-      'Quiero una landing premium para captar clientes cualificados, explicar bien el servicio y cerrar con un CTA claro de activación.',
-  },
-  {
-    id: 'webapp',
-    label: 'Web/App',
-    inputType: 'text',
-    placeholder: 'Describe la web, app, dashboard, herramienta o sistema que quieres construir...',
-    starter:
-      'Quiero una app con dashboard, proyectos, estados, acciones rápidas y experiencia premium para usuario final.',
-  },
-  {
-    id: 'automation',
-    label: 'Automatización',
-    inputType: 'text',
-    placeholder: 'Describe el flujo o proceso que quieres automatizar...',
-    starter:
-      'Quiero automatizar un proceso interno con entrada, clasificación, seguimiento y salida final clara.',
-  },
-  {
-    id: 'url',
-    label: 'Analizar URL',
-    inputType: 'url',
-    placeholder: 'Pega una URL y explica qué quieres mejorar: conversión, claridad, CTA, diseño...',
-    starter:
-      'https://miweb.com — analiza la web y reconstruye una versión más premium, más clara y más orientada a conversión.',
-  },
-];
-
-const PROJECT_CONTEXTS = [
-  {
-    id: '',
-    label: 'Servicio',
-    context: '',
-  },
-  {
-    id: 'restaurant',
-    label: 'Restaurante',
-    context: 'restaurante u hostelería: carta, fotos, reseñas y ubicación',
-  },
-  {
-    id: 'clinic',
-    label: 'Clínica',
-    context: 'clínica o salud: servicios, confianza, reseñas y contacto',
-  },
-  {
-    id: 'agency',
-    label: 'Agencia',
-    context: 'agencia o consultoría: servicios, autoridad, casos, llamada comercial y captación',
-  },
-  {
-    id: 'realestate',
-    label: 'Inmobiliaria',
-    context: 'inmobiliaria: propiedades, valoración, leads, visitas y confianza',
-  },
-  {
-    id: 'architecture',
-    label: 'Arquitectura',
-    context: 'arquitectura o estudio creativo: portfolio, proyectos, método, autoridad y contacto',
-  },
-  {
-    id: 'ecommerce',
-    label: 'Ecommerce',
-    context: 'ecommerce: producto, oferta, reseñas, garantías, envíos y compra',
-  },
-  {
-    id: 'saas',
-    label: 'SaaS',
-    context: 'SaaS o herramienta digital: demo, features, onboarding, prueba social y activación',
-  },
-  {
-    id: 'local',
-    label: 'Servicio local',
-    context: 'servicio local: zona, confianza, reseñas y contacto',
-  },
-  {
-    id: 'education',
-    label: 'Educación',
-    context: 'educación o formación: alumnos, programa, autoridad, prueba social y matrícula',
-  },
-  {
-    id: 'foodshop',
-    label: 'Frutería / tienda',
-    context: 'tienda local o alimentación: productos, pedidos, reparto, confianza y contacto directo',
-  },
-  {
-    id: 'other',
-    label: 'Otro servicio',
-    context: 'servicio personalizado: definir cliente objetivo, oferta, confianza y acción principal',
-  },
-];
-
-const PROJECT_GOALS = [
-  {
-    id: '',
-    label: 'Objetivo',
-    context: '',
-  },
-  {
-    id: 'reservations',
-    label: 'Reservas',
-    context: 'conseguir reservas o solicitudes directas',
-  },
-  {
-    id: 'leads',
-    label: 'Leads',
-    context: 'captar leads cualificados',
-  },
-  {
-    id: 'sales',
-    label: 'Ventas',
-    context: 'aumentar ventas y reducir fricción de compra',
-  },
-  {
-    id: 'automation',
-    label: 'Menos trabajo manual',
-    context: 'reducir trabajo manual en el borrador',
-  },
-  {
-    id: 'redesign',
-    label: 'Rediseño',
-    context: 'rediseñar una experiencia existente para hacerla más premium y efectiva',
-  },
-  {
-    id: 'budget',
-    label: 'Presupuestos',
-    context: 'conseguir solicitudes de presupuesto con más calidad',
-  },
-  {
-    id: 'calls',
-    label: 'Llamadas',
-    context: 'conseguir llamadas comerciales o diagnósticos cualificados',
-  },
-];
-
-const getErrorMessage = (error) => {
+const detailMessage = (error, fallback) => {
   const detail = error?.response?.data?.detail;
-
-  if (typeof detail === 'string') return detail;
-
-  if (Array.isArray(detail)) {
-    return detail
-      .map((item) => item?.msg || JSON.stringify(item))
-      .filter(Boolean)
-      .join(' ');
-  }
-
-  if (detail && typeof detail === 'object') {
-    return detail.msg || JSON.stringify(detail);
-  }
-
-  return error?.message || 'No se pudo crear el proyecto.';
+  if (typeof detail === 'string' && detail.trim()) return detail;
+  if (detail && typeof detail.message === 'string' && detail.message.trim()) return detail.message;
+  return fallback;
 };
 
-const getUserFirstName = (user) => {
-  const rawName = user?.name || user?.email?.split('@')?.[0] || '';
-  const cleanName = String(rawName)
-    .replace(/[_-]+/g, ' ')
-    .trim()
-    .split(/\s+/)[0];
+const getErrorMessage = (error) => detailMessage(error, 'No se pudo crear el proyecto.');
 
-  if (!cleanName) return '';
-
-  return cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
-};
-
-const resolveLauncherMode = (launcherState = null) => {
-  const rawMode = String(
-    launcherState?.initialMode ||
-    launcherState?.launchContext?.route ||
-    launcherState?.inputType ||
-    ''
-  ).toLowerCase();
-
-  const modeMap = {
-    landing: 'landing',
-    sell: 'landing',
-    sell_and_charge: 'landing',
-    idea: 'landing',
-    idea_to_project: 'landing',
-    text: 'landing',
-    web: 'webapp',
-    app: 'webapp',
-    webapp: 'webapp',
-    dashboard: 'webapp',
-    automate: 'automation',
-    automation: 'automation',
-    automate_operation: 'automation',
-    url: 'url',
-    improve: 'url',
-    improve_existing: 'url',
-  };
-
-  return modeMap[rawMode] || 'landing';
-};
-
-const buildLaunchPrompt = ({
-  prompt,
-  selectedMode,
-  selectedContext,
-  selectedGoal,
-}) => {
-  const cleanPrompt = prompt.trim();
-
-  const contextLines = [
-    selectedMode?.label ? `Tipo de proyecto: ${selectedMode.label}.` : '',
-    selectedContext?.context ? `Contexto de negocio: ${selectedContext.context}.` : '',
-    selectedGoal?.context ? `Objetivo principal: ${selectedGoal.context}.` : '',
-  ].filter(Boolean);
-
-  if (!contextLines.length) return cleanPrompt;
-
-  return [
-    cleanPrompt,
-    '',
-    'Contexto seleccionado en Resumen:',
-    ...contextLines.map((line) => `- ${line}`),
-  ].join('\n');
-};
-
-const CompactDropUp = ({
-  id,
-  value,
-  options,
-  onChange,
-  ariaLabel,
-  openMenu,
-  setOpenMenu,
-}) => {
-  const menuRef = useRef(null);
-  const isOpen = openMenu === id;
-  const selectedOption =
-    options.find((item) => item.id === value) ||
-    options[0];
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-
-    const handlePointerDown = (event) => {
-      if (!menuRef.current?.contains(event.target)) {
-        setOpenMenu(null);
-      }
-    };
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        setOpenMenu(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, setOpenMenu]);
-
-  return (
-    <div ref={menuRef} className="relative inline-flex shrink-0">
-      <button
-        type="button"
-        aria-label={ariaLabel}
-        aria-expanded={isOpen}
-        onClick={() => setOpenMenu(isOpen ? null : id)}
-        className={`inline-flex h-8 min-w-[116px] items-center justify-between gap-3 rounded-full border px-3 text-xs font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] transition ${
-          isOpen
-            ? 'border-black/25 bg-white/55 text-black'
-            : 'border-black/10 bg-white/35 text-black/75 hover:bg-white/50 hover:text-black'
-        }`}
-      >
-        <span className="truncate">{selectedOption?.label}</span>
-        <span className="text-[10px] text-black/45">
-          ▴
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="absolute bottom-full left-0 z-50 mb-2 w-[220px] overflow-hidden rounded-2xl border border-black/10 bg-gradient-to-br from-[#FFE4A3] via-[#FFD2A1] to-[#F28BA5] p-1.5 text-black shadow-[0_24px_70px_rgba(0,0,0,0.38)]">
-          <div className="max-h-[235px] overflow-auto pr-1">
-            {options.map((item) => {
-              const isActive = item.id === value;
-
-              return (
-                <button
-                  key={item.id || `empty-${item.label}`}
-                  type="button"
-                  onClick={() => {
-                    onChange(item.id);
-                    setOpenMenu(null);
-                  }}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium transition ${
-                    isActive
-                      ? 'bg-black text-white'
-                      : 'text-black/75 hover:bg-white/35 hover:text-black'
-                  }`}
-                >
-                  <span className="truncate">{item.label}</span>
-                  {isActive && (
-                    <span className="ml-3 text-xs">
-                      ✓
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
+const DashboardBuilderLauncher = ({ launcherState = null, user = null, freeTestMode = false }) => {
   const navigate = useNavigate();
+  const promptRef = useRef(null);
+  const voice = useVoice();
 
-  const [activeMode, setActiveMode] = useState('landing');
+  const [activeTabId, setActiveTabId] = useState(() => dashboardTabForMode(resolveLauncherMode(launcherState)).id);
   const [selectedContextId, setSelectedContextId] = useState('');
-  const [selectedGoalId, setSelectedGoalId] = useState('');
-  const [openMenu, setOpenMenu] = useState(null);
   const [prompt, setPrompt] = useState('');
+  const [host, setHost] = useState('');
+  const [agentChannel, setAgentChannel] = useState('voz');
+  const [snippet, setSnippet] = useState('');
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -345,6 +54,7 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
       launcherState.initialPrompt || '',
       launcherState.initialMode || '',
       launcherState.inputType || '',
+      launcherState.resetPrompt ? 'reset' : '',
       launcherState.launchContext?.opportunityId || '',
       launcherState.launchContext?.route || '',
     ].join('|');
@@ -352,6 +62,15 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
 
   useEffect(() => {
     if (!launcherState || launcherState.focus !== 'builder-launcher') return;
+
+    if (launcherState.resetPrompt) {
+      setPrompt('');
+      setHost('');
+      setSnippet('');
+      setSelectedContextId('');
+      setError('');
+      setActiveTabId('landing');
+    }
 
     const incomingPrompt =
       typeof launcherState.initialPrompt === 'string'
@@ -363,31 +82,33 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
       setError('');
     }
 
-    setActiveMode(resolveLauncherMode(launcherState));
+    if (!launcherState.resetPrompt) {
+      setActiveTabId(dashboardTabForMode(resolveLauncherMode(launcherState)).id);
+    }
+    promptRef.current?.focus({ preventScroll: true });
   }, [launcherState, launcherHydrationKey]);
 
-  const selectedMode = useMemo(
-    () => MODES.find((item) => item.id === activeMode) || MODES[0],
-    [activeMode]
-  );
+  useEffect(() => {
+    if (!voice.transcript) return;
+    setPrompt(voice.transcript);
+    setError('');
+  }, [voice.transcript]);
 
-  const selectedContext = useMemo(
-    () => PROJECT_CONTEXTS.find((item) => item.id === selectedContextId) || null,
-    [selectedContextId]
-  );
+  const activeTab = dashboardTabById(activeTabId);
+  const activeMode = launcherModeById(activeTab.modeId || 'landing');
+  const selectedContext = PROJECT_CONTEXTS.find((item) => item.id === selectedContextId) || null;
+  const sendLabel = dashboardSendLabel(activeTab.id, freeTestMode);
+  const installing = activeTab.id === 'install';
 
-  const selectedGoal = useMemo(
-    () => PROJECT_GOALS.find((item) => item.id === selectedGoalId) || null,
-    [selectedGoalId]
-  );
-
-  const firstName = getUserFirstName(user);
-
-  const projectLabel = user?.name
-    ? `${user.name} Project`
-    : user?.email
-      ? user.email
-      : 'Proyecto actual';
+  const startNewProject = () => {
+    setPrompt('');
+    setHost('');
+    setSnippet('');
+    setSelectedContextId('');
+    setError('');
+    setActiveTabId('landing');
+    promptRef.current?.focus({ preventScroll: true });
+  };
 
   const submitToBuilder = async () => {
     setCreating(true);
@@ -412,9 +133,9 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
 
     const launchPrompt = buildLaunchPrompt({
       prompt: cleanPrompt,
-      selectedMode,
+      selectedMode: activeMode,
       selectedContext,
-      selectedGoal,
+      selectedGoal: null,
     });
 
     setError('');
@@ -422,7 +143,7 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
 
     try {
       const response = await economicPost(api, '/projects', {
-        input_type: selectedMode.inputType,
+        input_type: activeMode.inputType,
         input_content: launchPrompt,
       });
 
@@ -438,180 +159,216 @@ const DashboardBuilderLauncher = ({ user, launcherState = null }) => {
         state: {
           projectId: project.project_id,
           initialPrompt: launchPrompt,
-          initialMode: activeMode,
+          initialMode: activeMode.id,
           launchContext: {
-            mode: selectedMode?.label || '',
+            mode: activeMode.label,
             context: selectedContext?.label || '',
-            goal: selectedGoal?.label || '',
           },
           source: 'dashboard-launch-console',
         },
       });
     } catch (requestError) {
-      const message = getErrorMessage(requestError);
-
-      setError(message);
+      setError(getErrorMessage(requestError));
       toast.error('Error al abrir Builder');
     } finally {
       setCreating(false);
     }
   };
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter' && !event.shiftKey && !creating) {
-      event.preventDefault();
-      submitToBuilder();
+  const installVoiceAgent = async () => {
+    const origin = embedOriginFromHost(host);
+    if (!origin) {
+      setError('Escribe el dominio completo, por ejemplo https://tuempresa.com.');
+      return;
+    }
+
+    setCreating(true);
+    setError('');
+    try {
+      const projects = await loadOwnerProjects().catch(() => []);
+      const project = resolveActiveProject(projects);
+      if (!project?.project_id) {
+        navigate('/dashboard/agente-voz', { state: { embedOrigin: origin } });
+        return;
+      }
+      const response = await api.post('/embed/agents', {
+        project_id: project.project_id,
+        allowed_origins: [origin],
+      });
+      setSnippet(typeof response?.data?.snippet === 'string' ? response.data.snippet : '');
+      if (!response?.data?.snippet) {
+        setError('El agente no devolvió el fragmento de instalación.');
+      }
+    } catch (requestError) {
+      setSnippet('');
+      setError(detailMessage(requestError, 'No se ha podido crear el agente.'));
+    } finally {
+      setCreating(false);
     }
   };
 
-  const applyStarter = () => {
-    setPrompt(selectedMode.starter);
-    setError('');
+  const onPrimary = () => {
+    if (installing) {
+      installVoiceAgent();
+      return;
+    }
+    submitToBuilder();
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey && !creating) {
+      event.preventDefault();
+      onPrimary();
+    }
   };
 
   return (
-    <section className="relative isolate overflow-hidden px-4 py-2 md:px-6 md:py-3">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-52 w-52 -translate-x-1/2 rounded-full bg-cyan-300/5 blur-3xl" />
-        <div className="absolute bottom-5 left-1/2 h-40 w-40 -translate-x-[125%] rounded-full bg-amber-300/7 blur-3xl" />
-        <div className="absolute bottom-5 left-1/2 h-40 w-40 translate-x-[45%] rounded-full bg-pink-400/6 blur-3xl" />
+    <section className="relative flex h-full min-h-0 w-full flex-col items-center justify-center">
+      <DashboardProjectMenu onNewProject={startNewProject} />
+
+      <div className="mt-5 flex max-w-[760px] flex-col items-center px-2 text-center">
+        <p className="dash-kicker text-[11px] font-semibold">SISTEMA MAESTRO</p>
+        <h2 className="dash-headline mt-3">{DASHBOARD_HEADLINE}</h2>
+        <p className="mx-auto mt-3 max-w-[40rem] text-[18px] leading-7 text-[#b4bec8]">
+          {DASHBOARD_SUBTITLE}
+        </p>
       </div>
 
-      <div className="relative mx-auto flex max-w-[960px] flex-col items-center text-center">
-        <button
-          type="button"
-          className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-semibold text-zinc-300 shadow-[0_18px_40px_rgba(0,0,0,0.22)] transition hover:border-cyan-300/25 hover:text-white"
-          title={projectLabel}
-        >
-          <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_14px_rgba(52,211,153,0.65)]" />
-          <span className="truncate">{projectLabel}</span>
-          <span className="text-zinc-600">▾</span>
-        </button>
+      <div className="dash-tabs mt-5 inline-flex items-center gap-1 p-1">
+        {DASHBOARD_TABS.map((tab) => {
+          const isActive = tab.id === activeTab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              data-testid={`dashboard-tab-${tab.id}`}
+              aria-pressed={isActive}
+              onClick={() => {
+                setActiveTabId(tab.id);
+                setError('');
+                setSnippet('');
+              }}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                isActive ? 'dash-tab-active' : 'text-zinc-300 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
 
-        <div className="mt-3 max-w-[760px]">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-100/70">
-            Builder
-          </p>
-
-          <p className="mt-2 text-sm font-medium text-zinc-400 md:text-base">
-            {firstName ? `Qué tal, ${firstName}.` : 'Bienvenido a Sistema Maestro.'}
-          </p>
-
-          <h1 className="mt-1 text-3xl font-semibold tracking-[-0.055em] text-white md:text-4xl">
-            ¿Qué tienes en mente hoy?
-          </h1>
-        </div>
-
-        <div className="mt-4 w-full max-w-[880px]">
-          <div className="relative z-10 -mb-px flex max-w-full items-end gap-1 overflow-x-auto px-3">
-            {MODES.map((mode) => {
-              const isActive = mode.id === activeMode;
-
-              return (
+      <div className="dash-composer mt-5 w-full max-w-[760px]">
+        <div className="dash-composer-inner relative">
+          {installing ? (
+            <div className="px-5 pb-16 pt-4">
+              <label className="block text-sm text-zinc-300" htmlFor="dashboard-embed-host">
+                <span className="sr-only">Dominio</span>
+                <span className="flex h-11 items-center overflow-hidden rounded-xl border border-white/10 bg-black/30">
+                  <span className="border-r border-white/10 px-3 text-sm text-zinc-400">https://</span>
+                  <input
+                    id="dashboard-embed-host"
+                    data-testid="dashboard-embed-host"
+                    value={host}
+                    placeholder="tunegocio.com"
+                    autoComplete="off"
+                    spellCheck="false"
+                    onChange={(event) => {
+                      setHost(event.target.value.replace(/^https?:\/\//i, ''));
+                      if (error) setError('');
+                    }}
+                    onKeyDown={handleKeyDown}
+                    className="h-full w-full bg-transparent px-3 text-[15px] text-white outline-none placeholder:text-zinc-500"
+                  />
+                </span>
+              </label>
+              <div className="mt-3 inline-flex rounded-full border border-white/10 p-1" role="group" aria-label="Canal del agente">
                 <button
-                  key={mode.id}
                   type="button"
-                  onClick={() => {
-                    setActiveMode(mode.id);
-                    setError('');
-                    setOpenMenu(null);
-                  }}
-                  className={`shrink-0 rounded-t-2xl border border-b-0 px-4 py-2 text-xs font-semibold transition ${
-                    isActive
-                      ? 'border-amber-100/65 bg-gradient-to-r from-[#FFE4A3] via-[#FFD2A1] to-[#F28BA5] text-black shadow-[0_-8px_24px_rgba(251,191,36,0.10)]'
-                      : 'border-white/[0.075] bg-[#0B0C0E]/90 text-zinc-500 hover:border-amber-100/25 hover:bg-[#111214] hover:text-amber-100'
+                  data-testid="dashboard-agent-voz"
+                  aria-pressed={agentChannel === 'voz'}
+                  onClick={() => setAgentChannel('voz')}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    agentChannel === 'voz'
+                      ? 'bg-amber-200/15 text-[#fde68a] shadow-[0_0_16px_rgba(251,191,36,0.45)]'
+                      : 'text-zinc-400'
                   }`}
-                  title={mode.label}
                 >
-                  {mode.label}
+                  Voz
                 </button>
-              );
-            })}
-          </div>
-
-          <div className="rounded-[30px] border border-amber-100/35 bg-gradient-to-br from-[#FFE4A3] via-[#FFD2A1] to-[#F28BA5] p-3 text-left text-black shadow-[0_26px_90px_rgba(0,0,0,0.30)]">
+                <button
+                  type="button"
+                  data-testid="dashboard-agent-chat"
+                  disabled
+                  className="cursor-not-allowed rounded-full px-3 py-1 text-xs text-zinc-500"
+                >
+                  Chat · Próximamente
+                </button>
+              </div>
+              {snippet ? (
+                <pre className="mt-3 max-h-24 overflow-auto rounded-xl border border-white/10 bg-black/40 p-3 text-left text-[11px] leading-5 text-cyan-50">
+                  <code data-testid="dashboard-embed-snippet">{snippet}</code>
+                </pre>
+              ) : null}
+            </div>
+          ) : (
             <textarea
+              ref={promptRef}
+              data-testid="dashboard-prompt"
               value={prompt}
               onChange={(event) => {
                 setPrompt(event.target.value);
                 if (error) setError('');
               }}
-              onFocus={() => setOpenMenu(null)}
               onKeyDown={handleKeyDown}
-              placeholder={selectedMode.placeholder}
+              placeholder={activeTab.placeholder}
               rows={3}
               disabled={creating}
-              className="min-h-[104px] w-full resize-none rounded-[24px] border border-white/10 bg-[#060708] px-5 py-4 text-left text-base leading-7 text-white placeholder:text-zinc-600 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition focus:border-amber-100/25 focus:bg-[#070809] disabled:opacity-60 md:min-h-[112px] md:text-lg"
+              className="h-[148px] w-full resize-none rounded-[20px] bg-transparent px-5 pb-16 pt-4 text-[15px] leading-6 text-white outline-none placeholder:text-zinc-500 disabled:opacity-60"
             />
+          )}
 
-            <div className="mt-3 flex flex-col gap-3 border-t border-black/10 pt-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <CompactDropUp
-                    id="service"
-                    value={selectedContextId}
-                    options={PROJECT_CONTEXTS}
-                    onChange={(value) => {
-                      setSelectedContextId(value);
-                      setError('');
-                    }}
-                    ariaLabel="Seleccionar servicio"
-                    openMenu={openMenu}
-                    setOpenMenu={setOpenMenu}
-                  />
-
-                  <CompactDropUp
-                    id="goal"
-                    value={selectedGoalId}
-                    options={PROJECT_GOALS}
-                    onChange={(value) => {
-                      setSelectedGoalId(value);
-                      setError('');
-                    }}
-                    ariaLabel="Seleccionar objetivo"
-                    openMenu={openMenu}
-                    setOpenMenu={setOpenMenu}
-                  />
-                </div>
-
-                <div className="flex shrink-0 items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={applyStarter}
-                    disabled={creating}
-                    className="inline-flex h-8 items-center justify-center rounded-full border border-black/10 bg-black/10 px-3 text-xs font-semibold text-black transition hover:bg-black/15 disabled:opacity-50"
-                  >
-                    Inspirarme
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={submitToBuilder}
-                    disabled={creating}
-                    className="inline-flex h-8 items-center justify-center rounded-full border border-black/15 bg-black px-4 text-xs font-semibold text-white transition hover:scale-[1.01] hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {creating ? 'Creando...' : 'Crear →'}
-                  </button>
-                </div>
-              </div>
-
-              {error && (
-                <p className="text-center text-sm font-semibold text-red-950">
-                  {error}
-                </p>
-              )}
+          <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              data-testid="dashboard-attach"
+              aria-label="Adjuntar"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-zinc-300"
+            >
+              <Plus size={18} aria-hidden="true" />
+            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                data-testid="dashboard-mic"
+                aria-label={voice.isListening ? 'Detener dictado' : 'Dictar'}
+                aria-pressed={voice.isListening}
+                disabled={!voice.isSupported || creating || installing}
+                onClick={() => (voice.isListening ? voice.stopListening() : voice.startListening())}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-300/15 text-[#67e8f9] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Microphone size={18} weight={voice.isListening ? 'fill' : 'regular'} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                data-testid="dashboard-send"
+                aria-label={installing ? 'Instalar agente' : 'Enviar'}
+                onClick={onPrimary}
+                disabled={creating || (installing && agentChannel !== 'voz')}
+                className="inline-flex h-10 items-center rounded-full bg-[linear-gradient(95deg,#fde68a,#fbbf24,#f9a8d4,#67e8f9)] px-4 text-sm font-extrabold text-[#04141a] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {sendLabel}
+              </button>
             </div>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={() => navigate('/dashboard/billing')}
-          className="mt-3 inline-flex items-center gap-2 rounded-full border border-amber-200/15 bg-amber-200/[0.05] px-4 py-2 text-xs font-semibold text-amber-100 transition hover:border-amber-200/35 hover:bg-amber-200/[0.08]"
-        >
-          Gema Maestra · gemas disponibles →
-        </button>
       </div>
+
+      {error ? (
+        <p role="alert" className="mt-2 text-center text-sm text-red-300">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 };
