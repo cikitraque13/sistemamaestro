@@ -104,6 +104,7 @@ async def save_generated_preview(projects, landings, owner_id: str, project_id: 
             "user_id": owner_id,
             "preview": preview,
             "preview_updated_at": stamp,
+            "stage": "draft",
         }},
         upsert=True,
     )

@@ -17,15 +17,22 @@ ORCHESTRATORS = {"grok", "anthropic"}
 WRITERS = {"grok", "anthropic"}
 # Judge input is clipped. Worst case at grok-4.7 for 1500 in / 256 out is
 # (1500 * 2 + 256 * 6) / 1_000_000 = 0.004536. The ceiling stays just above it.
-MAX_JUDGE_INPUT_TOKENS = 1500
-MAX_JUDGE_OUTPUT_TOKENS = 256
-MAX_JUDGE_COST_USD = 0.005
+# Full section text, not headings. grok-4.7 worst case at these caps:
+# (4500 * 2 + 400 * 6) / 1_000_000 = 0.0114. The ceiling stays just above it.
+MAX_JUDGE_INPUT_TOKENS = 4500
+MAX_JUDGE_OUTPUT_TOKENS = 400
+MAX_JUDGE_COST_USD = 0.012
 JUDGE_TIMEOUT_SECONDS = 20
 
 JUDGE_SYSTEM = (
-    "Juzgas una landing contra el encargo. Devuelve solo JSON con ok (boolean) y summary (una frase en español, máximo 160 caracteres). "
-    "ok es true solo si el título o una sección nombra el negocio del encargo, el CTA es concreto y hay al menos una sección con texto propio. "
-    "ok es false si el texto es la plantilla genérica. No añadas otras claves."
+    "Juzgas la landing completa contra el encargo. Lees título, subtítulo, CTA y el texto de cada sección, no solo los encabezados. "
+    "Devuelve solo JSON con ok (boolean), summary (una frase en español, máximo 160 caracteres), "
+    "scores (objeto con visual_hierarchy, selling_microcopy, objections y specificity, enteros de 0 a 5) y total (la suma). "
+    "visual_hierarchy: hay título, subtítulo, CTA y secciones distintas. "
+    "selling_microcopy: el CTA y las frases venden este negocio, no un lema genérico. "
+    "objections: alguna sección responde una duda real de este cliente. "
+    "specificity: el texto nombra el negocio y el oficio del encargo. "
+    "ok es true solo si el texto no es una plantilla y las puntuaciones son altas. No añadas otras claves."
 )
 
 
@@ -51,21 +58,42 @@ def _log(category):
     logger.warning("executor_rejected category=%s", category)
 
 
+def judge_request_body(draft, instruction) -> dict:
+    """The judge sees the copy, not a list of headings."""
+    sections = []
+    for item in ((draft or {}).get("sections") or []):
+        if not isinstance(item, dict):
+            continue
+        sections.append({
+            "title": _clip(item.get("title"), 120),
+            "text": _clip(item.get("text"), 800),
+        })
+        if len(sections) == 6:
+            break
+    return {
+        "instruction": _clip(instruction, 400),
+        "title": _clip((draft or {}).get("title"), 160),
+        "subtitle": _clip((draft or {}).get("subtitle"), 400),
+        "cta": _clip((draft or {}).get("cta"), 80),
+        "sections": sections,
+    }
+
+
+def _judge_scores(parsed):
+    from backend.app.services.builder_evaluation import EVAL_CRITERIA, model_scores
+
+    if not isinstance(parsed, dict):
+        return None
+    scores = model_scores({"scores": parsed.get("scores")})
+    if scores is None:
+        return None
+    return {key: scores[key] for key in EVAL_CRITERIA}
+
+
 async def judge_draft(draft, instruction):
     """Bounded review. Failures log a category and never the draft or the key."""
     name = orchestrator_name()
-    payload = {
-        "instruction": _clip(instruction, 400),
-        "title": _clip((draft or {}).get("title"), 160),
-        "subtitle": _clip((draft or {}).get("subtitle"), 240),
-        "cta": _clip((draft or {}).get("cta"), 80),
-        "sections": [
-            _clip(item.get("title"), 80)
-            for item in ((draft or {}).get("sections") or [])
-            if isinstance(item, dict)
-        ][:6],
-    }
-    content = json.dumps(payload, ensure_ascii=False)
+    content = json.dumps(judge_request_body(draft, instruction), ensure_ascii=False)
     if name == "grok":
         return await _judge_grok(content)
     return await _judge_anthropic(content)
@@ -115,10 +143,19 @@ async def _judge_grok(content):
     except Exception:
         _log("provider")
         raise PipelineError("judge_unavailable") from None
+    return _judge_result(parsed)
+
+
+def _judge_result(parsed):
     if not isinstance(parsed, dict) or not isinstance(parsed.get("ok"), bool):
         _log("schema")
         raise PipelineError("judge_unavailable")
-    return {"ok": parsed["ok"], "summary": _clip(parsed.get("summary"), 160)}
+    result = {"ok": parsed["ok"], "summary": _clip(parsed.get("summary"), 160)}
+    scores = _judge_scores(parsed)
+    if scores is not None:
+        result["scores"] = scores
+        result["total"] = sum(scores.values())
+    return result
 
 
 async def _judge_anthropic(content):
@@ -140,10 +177,7 @@ async def _judge_anthropic(content):
     except Exception:
         _log("provider")
         raise PipelineError("judge_unavailable") from None
-    if not isinstance(parsed, dict) or not isinstance(parsed.get("ok"), bool):
-        _log("schema")
-        raise PipelineError("judge_unavailable")
-    return {"ok": parsed["ok"], "summary": _clip(parsed.get("summary"), 160)}
+    return _judge_result(parsed)
 
 
 def writer_payload(data) -> str:
@@ -151,7 +185,10 @@ def writer_payload(data) -> str:
 
 
 async def draft_page(data):
-    return await _draft(writer_payload(data), kind="page")
+    if writer_name() == "grok":
+        return await _draft_grok(writer_payload(data), kind="page")
+    from backend.app.services.builder_claude_loop import write_landing_with_tools
+    return await write_landing_with_tools(landing_brief(data))
 
 
 async def draft_piece(data):

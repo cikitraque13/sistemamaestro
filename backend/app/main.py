@@ -1,4 +1,5 @@
 ﻿from backend.app.routers import builder_ai, builder_preview
+from backend.app.services.builder_telemetry import router as builder_telemetry_router
 from backend.app.routers.builder_publish import router as builder_publish_router
 import logging
 import asyncio
@@ -62,6 +63,7 @@ app.include_router(opportunities_router)
 app.include_router(consumption_router)
 app.include_router(builder_ai.router)
 app.include_router(builder_preview.router)
+app.include_router(builder_telemetry_router)
 app.include_router(builder_publish_router)
 
 
@@ -93,6 +95,9 @@ async def startup_event():
         unique=True,
     )
     await db.builder_publications.create_index("slug", unique=True)
+    await db.builder_preferences.create_index("user_id", unique=True)
+    await db.builder_funnel_events.create_index([("user_id", 1), ("created_at", -1)])
+    await db.builder_funnel_events.create_index([("step", 1), ("outcome", 1)])
     await db.builder_publications.create_index(
         "custom_domain.host",
         unique=True,
