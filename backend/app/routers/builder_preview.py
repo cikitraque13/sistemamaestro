@@ -1,8 +1,10 @@
 """Generate a saved landing preview. Publication stays off."""
+import asyncio
 import os
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
+from starlette.responses import StreamingResponse
 
 from backend.app.ai.agents.intent_clarification import ClassifierUnavailable, classify_intent
 from backend.app.ai.providers.model_pricing import ANTHROPIC_RATES
@@ -19,6 +21,8 @@ from backend.app.services.builder_landing_state import (
     load_generated_preview,
     save_generated_preview,
 )
+from backend.app.services.builder_executor import encode_sse, iter_executor, with_heartbeats
+from backend.app.services.builder_executor_providers import draft_page, draft_piece, judge_draft
 from backend.app.services.builder_pipeline import GENERIC_MESSAGE, PipelineError, public_preview, run_pipeline
 from backend.app.services.builder_test_mode import builder_charge_waived, run_builder_operation
 from backend.app.services.economic_operation import request_operation_id, run_economic_operation
@@ -43,6 +47,8 @@ def _http_error(error: PipelineError) -> HTTPException:
         "CLASSIFIER_UNAVAILABLE",
         "blueprint_provider_unavailable",
         "landing_unavailable",
+        "landing_rejected",
+        "judge_unavailable",
         "publish_disabled",
     } else 422
     return HTTPException(status, detail={"message": error.message})
@@ -64,26 +70,11 @@ async def classify_for_pipeline(data):
 
 
 async def draft_landing_with_claude(data):
-    from backend.app.ai.providers.anthropic_json import complete_builder_json
+    return await draft_page(data)
 
-    raw = await complete_builder_json(
-        api_key=ANTHROPIC_API_KEY,
-        model=ANTHROPIC_MODEL,
-        system=(
-            "Escribes el texto visible de una landing en español. "
-            "Devuelve solo JSON con title, subtitle, cta y sections. "
-            "Cada section tiene title y text. No incluyas HTML, scripts ni promesas de publicación."
-        ),
-        user=str({
-            "instruction": data.get("instruction"),
-            "intent": data.get("intent", {}).get("title"),
-            "blueprint": data.get("blueprint", {}).get("title"),
-        }),
-        max_tokens=4000,
-        effort="medium",
-    )
-    import json
-    return json.loads(raw or "{}")
+
+async def draft_section_with_writer(data):
+    return await draft_piece(data)
 
 
 @router.get("/session")
@@ -156,6 +147,7 @@ async def create_preview(body: PreviewRequest, request: Request):
             classify=classify_for_pipeline,
             blueprint=generate_blueprint,
             draft_landing=draft_landing_with_claude,
+            judge=judge_draft,
             previous=previous,
         )
         saved = await save_generated_preview(
@@ -178,6 +170,114 @@ async def create_preview(body: PreviewRequest, request: Request):
         raise
     except Exception as exc:
         raise HTTPException(503, detail={"message": GENERIC_MESSAGE}) from exc
+
+
+@router.post("/preview/stream")
+async def stream_preview(body: PreviewRequest, request: Request):
+    await ensure_builder_available(request)
+    missing = providers_ready()
+    if missing:
+        raise _http_error(PipelineError(missing))
+    user = await get_current_user(request)
+    expected = expected_project_revision(request)
+    project = await db.projects.find_one(
+        {"project_id": body.projectId, "user_id": user["user_id"]},
+        {"_id": 0},
+    )
+    if not project:
+        raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
+    assert_project_revision(project, expected)
+    try:
+        current = await load_generated_preview(
+            db.projects, db.builder_landing_states, user["user_id"], body.projectId,
+        )
+        previous = current["preview"]
+    except LandingStateError:
+        previous = None
+    operation_id = request_operation_id(request, "builder_preview")
+    payload = BuilderAIInput(
+        userInput=body.instruction,
+        projectId=body.projectId,
+        mode="iterate" if previous else "build",
+        contextUse="project_overview",
+    )
+    consumption = build_builder_consumption_request(
+        user=user, project=project, payload=payload, operation_id=operation_id,
+    )
+    queue = asyncio.Queue()
+
+    async def work(_consumption):
+        try:
+            fresh = await db.projects.find_one(
+                {"project_id": body.projectId, "user_id": user["user_id"]},
+                {"_id": 0, "updated_at": 1},
+            )
+            if not fresh:
+                raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
+            assert_project_revision(fresh, expected)
+            async for event in with_heartbeats(iter_executor(
+                project=project,
+                owner_id=user["user_id"],
+                instruction=body.instruction,
+                classify=classify_for_pipeline,
+                blueprint=generate_blueprint,
+                draft_landing=draft_landing_with_claude,
+                draft_section=draft_section_with_writer,
+                judge=judge_draft,
+                previous=previous,
+            )):
+                await queue.put(event)
+                if event.get("type") == "error":
+                    raise PipelineError("landing_unavailable")
+                if event.get("type") == "result":
+                    saved = await save_generated_preview(
+                        db.projects, db.builder_landing_states, user["user_id"], body.projectId, event["preview"],
+                    )
+                    done = {**event["public"], "updated_at": saved["updated_at"], "summary": event.get("summary") or ""}
+                    await queue.put({"type": "done", **done})
+                    return done
+            raise PipelineError("landing_unavailable")
+        finally:
+            await queue.put(None)
+
+    async def frames():
+        task = asyncio.create_task(run_builder_operation(
+            user=user,
+            action="builder_preview",
+            consumption_payload=consumption,
+            inputs={"projectId": body.projectId, "instruction": body.instruction, "expected": expected, "stream": True},
+            work=work,
+            charge=run_economic_operation,
+        ))
+        sent_error = False
+        try:
+            while True:
+                try:
+                    item = await asyncio.wait_for(queue.get(), timeout=10)
+                except asyncio.TimeoutError:
+                    yield encode_sse({"type": "heartbeat"})
+                    continue
+                if item is None:
+                    break
+                if item.get("type") == "result":
+                    continue
+                if item.get("type") == "error":
+                    sent_error = True
+                yield encode_sse(item)
+            try:
+                await task
+            except Exception:
+                if not sent_error:
+                    yield encode_sse({"type": "error", "message": GENERIC_MESSAGE})
+        finally:
+            if not task.done():
+                task.cancel()
+
+    return StreamingResponse(
+        frames(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @router.post("/publish/{project_id}")

@@ -3,7 +3,7 @@ import { validatedProjectIdentity, requireOutputIdentity } from '../../state/pro
 import { staticTrustDecision } from '../../state/staticSectionMutation.mjs';
 import useDurableLandingTransaction from './useDurableLandingTransaction';
 import { parseLandingChange } from '../../command/parseLandingChange.mjs';
-import { generateLandingPreview, loadLandingPreview, previewErrorMessage } from '../../api/builderPreviewClient';
+import { loadLandingPreview, previewErrorMessage, stepNeedsPatience, streamLandingPreview } from '../../api/builderPreviewClient';
 
 const autoPreviewJobs = new Map();
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
@@ -64,9 +64,6 @@ import {
   isAtomicBuilderCommandAllowed,
   verifyAtomicBuilderCommandDelta,
 } from '../../command/applyAtomicBuilderCommand.mjs';
-
-const DEFAULT_PROGRESS_STEP = 2;
-const DEFAULT_PROGRESS_INTERVAL = 950;
 
 const createStableProjectKey = ({
   projectId = '',
@@ -639,6 +636,12 @@ export default function useBuilderWorkspaceRuntime({
   const [generatedPreview, setGeneratedPreview] = useState(null);
   const [previewNotice, setPreviewNotice] = useState('');
   const [previewPhase, setPreviewPhase] = useState(autoStart ? 'working' : '');
+  const [executorPhase, setExecutorPhase] = useState(autoStart ? 'construyendo' : 'idle');
+  const [executorMessage, setExecutorMessage] = useState(autoStart ? 'Construyendo tu página.' : 'El ejecutor está listo.');
+  const [executorSteps, setExecutorSteps] = useState([]);
+  const [executorLog, setExecutorLog] = useState([]);
+  const [partialHtml, setPartialHtml] = useState('');
+  const [slowStep, setSlowStep] = useState(false);
 
   let identity = null;
   try { identity = validatedProjectIdentity(project, ownerId, project?.project_id); } catch { /* fail closed */ }
@@ -746,6 +749,72 @@ export default function useBuilderWorkspaceRuntime({
     setIsRunning(true);
   }, []);
 
+  const applyExecutorEvent = useCallback((event) => {
+    if (!event || event.type === 'heartbeat') return;
+    if (event.type === 'state') {
+      setExecutorPhase(event.phase || 'construyendo');
+      setExecutorMessage(event.message || '');
+      if (event.phase === 'construyendo' || event.phase === 'iterando') setPreviewPhase('working');
+      if (event.phase === 'completado') setPreviewPhase('ready');
+      if (event.phase === 'error') setPreviewPhase('error');
+    }
+    if (event.type === 'step') {
+      setExecutorSteps((current) => {
+        const index = current.findIndex((item) => item.id === event.id);
+        const previous = index >= 0 ? current[index] : null;
+        const startedAt = event.status === 'in_progress' ? Date.now() : previous?.startedAt;
+        const item = { ...event, startedAt };
+        if (index < 0) return [...current, item];
+        return current.map((entry, position) => (position === index ? item : entry));
+      });
+    }
+    if (event.type === 'section' && event.html) setPartialHtml(event.html);
+    if (event.type === 'done') {
+      setGeneratedPreview(event);
+      setPartialHtml('');
+      setExecutorPhase('completado');
+      setExecutorMessage(event.summary || 'Página guardada.');
+      setPreviewPhase('ready');
+      setPreviewNotice('');
+      if (event.summary) setExecutorLog((current) => [...current, { role: 'agent', text: event.summary }]);
+    }
+    if (event.type === 'error') {
+      const message = event.message || 'No se ha podido preparar la preview. No se ha publicado nada.';
+      setPreviewNotice(message);
+      setPreviewPhase('error');
+      setExecutorPhase('error');
+      setExecutorMessage(message);
+      setPartialHtml('');
+    }
+  }, []);
+
+  const activeExecutorStep = executorSteps.find((step) => step.status === 'in_progress');
+  useEffect(() => {
+    if (!activeExecutorStep?.startedAt) {
+      setSlowStep(false);
+      return undefined;
+    }
+    const wait = Math.max(0, 20000 - (Date.now() - activeExecutorStep.startedAt));
+    setSlowStep(stepNeedsPatience(activeExecutorStep.startedAt));
+    const timer = window.setTimeout(() => setSlowStep(true), wait);
+    return () => window.clearTimeout(timer);
+  }, [activeExecutorStep?.id, activeExecutorStep?.status, activeExecutorStep?.startedAt]);
+
+  const runPreview = useCallback(async (projectValue, instruction) => {
+    const iterating = Boolean(generatedPreview?.html);
+    setExecutorPhase(iterating ? 'iterando' : 'construyendo');
+    setExecutorMessage(iterating ? 'Iterando sobre la versión guardada.' : 'Construyendo tu página.');
+    setPreviewPhase('working');
+    setPreviewNotice('');
+    setPartialHtml('');
+    setExecutorLog((current) => [...current, { role: 'user', text: instruction }]);
+    const preview = await streamLandingPreview(projectValue, instruction, applyExecutorEvent);
+    setGeneratedPreview(preview);
+    setPreviewPhase('ready');
+    setPreviewNotice('');
+    return preview;
+  }, [applyExecutorEvent, generatedPreview?.html]);
+
   const submitMessage = useCallback(
     async (text) => {
       const value = String(text || '').trim();
@@ -768,17 +837,14 @@ export default function useBuilderWorkspaceRuntime({
         }
       }
       if (project?.project_id) {
-        setPreviewPhase('working');
-        setPreviewNotice('');
         try {
-          const preview = await generateLandingPreview(project, value);
-          setGeneratedPreview(preview);
-          setPreviewNotice('');
-          setPreviewPhase(preview?.html ? 'ready' : 'error');
-          if (!preview?.html) setPreviewNotice('No se ha podido preparar la preview. No se ha publicado nada.');
+          await runPreview(project, value);
         } catch (error) {
-          setPreviewNotice(previewErrorMessage(error));
+          const message = previewErrorMessage(error);
+          setPreviewNotice(message);
           setPreviewPhase('error');
+          setExecutorPhase('error');
+          setExecutorMessage(message);
         }
         return;
       }
@@ -995,24 +1061,23 @@ export default function useBuilderWorkspaceRuntime({
       progress,
       project,
       projectSnapshot,
+      runPreview,
     ]
   );
 
   const retryPreview = useCallback(async () => {
     const instruction = String(initialPrompt || project?.input_content || '').trim();
     if (!instruction || !project?.project_id || !projectReady) return;
-    setPreviewPhase('working');
-    setPreviewNotice('');
     try {
-      const preview = await generateLandingPreview(project, instruction);
-      setGeneratedPreview(preview);
-      setPreviewPhase(preview?.html ? 'ready' : 'error');
-      if (!preview?.html) setPreviewNotice('No se ha podido preparar la preview. No se ha publicado nada.');
+      await runPreview(project, instruction);
     } catch (error) {
-      setPreviewNotice(previewErrorMessage(error));
+      const message = previewErrorMessage(error);
+      setPreviewNotice(message);
       setPreviewPhase('error');
+      setExecutorPhase('error');
+      setExecutorMessage(message);
     }
-  }, [initialPrompt, project, projectReady]);
+  }, [initialPrompt, project, projectReady, runPreview]);
 
   const handleDecision = useCallback(
     (option) => {
@@ -1195,7 +1260,7 @@ export default function useBuilderWorkspaceRuntime({
       : seededKernelResult;
 
     setProgress(4);
-    setIsRunning(true);
+    setIsRunning(false);
     setManualMessages([]);
     setActiveCodeTab('tsx');
     setDirection('balanced');
@@ -1238,7 +1303,10 @@ export default function useBuilderWorkspaceRuntime({
     const job = autoPreviewJobs.get(currentProjectId) || (async () => {
       const existing = await loadLandingPreview(currentProjectId);
       if (existing?.html) return { preview: existing };
-      const created = await generateLandingPreview(project, instruction);
+      setExecutorPhase('construyendo');
+      setExecutorMessage('Construyendo tu página.');
+      setExecutorLog((current) => [...current, { role: 'user', text: instruction }]);
+      const created = await streamLandingPreview(project, instruction, applyExecutorEvent);
       return { preview: created };
     })();
     if (!autoPreviewJobs.has(currentProjectId)) autoPreviewJobs.set(currentProjectId, job);
@@ -1255,33 +1323,20 @@ export default function useBuilderWorkspaceRuntime({
     return () => { cancelled = true; };
   }, [autoStart, projectReady, project, initialPrompt]);
 
-  useEffect(() => {
-    if (!isRunning) return undefined;
-
-    const interval = window.setInterval(() => {
-      setProgress((current) => {
-        const next = Math.min(current + DEFAULT_PROGRESS_STEP, 100);
-
-        if (next >= 100) {
-          window.clearInterval(interval);
-          setIsRunning(false);
-        }
-
-        return next;
-      });
-    }, DEFAULT_PROGRESS_INTERVAL);
-
-    return () => window.clearInterval(interval);
-  }, [
-    isRunning,
-  ]);
-
   return {
     landingTransaction,
     generatedPreview,
     previewNotice,
     previewPhase,
     retryPreview,
+    executor: {
+      phase: executorPhase,
+      message: executorMessage,
+      steps: executorSteps,
+      log: executorLog,
+      partialHtml,
+      slow: slowStep || stepNeedsPatience(activeExecutorStep?.startedAt),
+    },
     copy,
     progress,
     isRunning,

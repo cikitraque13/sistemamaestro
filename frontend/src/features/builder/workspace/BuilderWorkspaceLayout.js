@@ -2,6 +2,7 @@ import React from 'react';
 
 import { GemaMaestra } from '../../app-shell/layout/AppShellLayout';
 import BuilderAgentPane from '../components/BuilderAgentPane';
+import ExecutorChat from '../components/ExecutorChat';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
 import { PUBLISH_LANDING_ENABLED } from '../api/builderPreviewClient';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
@@ -139,12 +140,23 @@ function WorkspaceSidePanel({
         </button>
       </div>
 
-      <GemaMaestra credits={credits} bonus={bonus} usageLabel={usageLabel} />
+      <div className="flex flex-wrap items-center gap-2">
+        <GemaMaestra credits={credits} bonus={bonus} usageLabel={usageLabel} />
+      </div>
       {freeTestMode ? (
         <p className="w-fit rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100">
           Modo prueba · sin gemas
         </p>
       ) : null}
+
+      <ExecutorChat
+        phase={runtime.executor?.phase || 'idle'}
+        message={runtime.executor?.message || 'El ejecutor está listo.'}
+        steps={runtime.executor?.steps || []}
+        log={runtime.executor?.log || []}
+        slow={Boolean(runtime.executor?.slow)}
+        onSubmit={runtime.submitMessage}
+      />
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
         <BuilderAgentPane
@@ -193,22 +205,40 @@ export default function BuilderWorkspaceLayout({
   });
 
   const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
+  const executorPhase = runtime.executor?.phase || '';
+  const busy = executorPhase === 'construyendo' || executorPhase === 'iterando' || runtime.previewPhase === 'working';
+  const failed = executorPhase === 'error' || runtime.previewPhase === 'error';
+  const liveHtml = (busy && runtime.executor?.partialHtml) || runtime.generatedPreview?.html || '';
+  const workStatus = (busy || (failed && liveHtml)) ? (
+    <div role="status" className="border-b border-white/10 bg-[#10141c] px-4 py-3 text-sm text-zinc-100">
+      <p className="font-semibold">{runtime.executor?.message || (busy ? 'Construyendo tu página.' : runtime.previewNotice)}</p>
+      {runtime.executor?.slow ? <p className="mt-1 text-amber-100">sigue trabajando…</p> : null}
+    </div>
+  ) : null;
   let main = <EmptyState />;
   if (loadingProject) main = <LoadingState />;
   else if (projectError) main = <ErrorState projectError={projectError} />;
-  else if (project && visibleTab !== 'extract' && runtime.generatedPreview?.html) {
+  else if (project && visibleTab !== 'extract' && liveHtml) {
     main = (
-      <iframe
-        title="Preview de la landing"
-        sandbox=""
-        srcDoc={runtime.generatedPreview.html}
-        className="h-full min-h-[70vh] w-full border-0 bg-[#090b12] lg:min-h-0"
-      />
+      <div className="flex h-full min-h-[70vh] flex-col lg:min-h-0">
+        {workStatus}
+        <iframe
+          title="Preview de la landing"
+          sandbox=""
+          srcDoc={liveHtml}
+          className="min-h-0 w-full flex-1 border-0 bg-[#090b12]"
+        />
+      </div>
     );
-  } else if (project && visibleTab !== 'extract' && runtime.previewPhase === 'working') {
-    main = <PreparingPreview />;
-  } else if (project && visibleTab !== 'extract' && runtime.previewPhase === 'error') {
-    main = <PreviewFailed message={runtime.previewNotice || 'No se ha podido preparar la preview. No se ha publicado nada.'} onRetry={runtime.retryPreview} />;
+  } else if (project && visibleTab !== 'extract' && busy) {
+    main = (
+      <div>
+        {workStatus}
+        <PreparingPreview />
+      </div>
+    );
+  } else if (project && visibleTab !== 'extract' && failed) {
+    main = <PreviewFailed message={runtime.previewNotice || runtime.executor?.message || 'No se ha podido preparar la preview. No se ha publicado nada.'} onRetry={runtime.retryPreview} />;
   } else if (project) {
     main = (
       <BuilderCanvasPane
@@ -225,7 +255,7 @@ export default function BuilderWorkspaceLayout({
 
   return (
     <section className="h-full min-h-0 overflow-auto rounded-[24px] border border-white/10 bg-[#06080B] shadow-[0_0_90px_rgba(0,0,0,0.38)] lg:overflow-hidden">
-      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[20.5rem_minmax(0,1fr)] lg:overflow-hidden">
+      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[380px_minmax(0,1fr)] lg:overflow-hidden">
         <div className="order-1 min-h-[70vh] overflow-hidden lg:order-2 lg:min-h-0 lg:h-full">
           {main}
         </div>

@@ -4,8 +4,9 @@ vi.mock('../../../../lib/apiClient', () => ({ api: { get: vi.fn(), put: vi.fn() 
 
 vi.mock('../../api/builderPreviewClient', () => ({
   loadLandingPreview: vi.fn(),
-  generateLandingPreview: vi.fn(),
+  streamLandingPreview: vi.fn(),
   previewErrorMessage: () => 'No se ha podido preparar la preview. No se ha publicado nada.',
+  stepNeedsPatience: () => false,
 }));
 
 import React from 'react';
@@ -15,7 +16,7 @@ import { webcrypto } from 'crypto';
 import { TextEncoder } from 'util';
 import { vi } from 'vitest';
 import useBuilderWorkspaceRuntime from './useBuilderWorkspaceRuntime';
-import { generateLandingPreview, loadLandingPreview } from '../../api/builderPreviewClient';
+import { loadLandingPreview, streamLandingPreview } from '../../api/builderPreviewClient';
 
 Object.defineProperty(globalThis, 'crypto', { value: webcrypto });
 globalThis.TextEncoder = TextEncoder;
@@ -55,7 +56,7 @@ async function mount(props) {
 beforeEach(() => {
   api.get.mockResolvedValue({ data: {} });
   loadLandingPreview.mockReset();
-  generateLandingPreview.mockReset();
+  streamLandingPreview.mockReset();
   localStorage.clear();
   Object.defineProperty(navigator, 'locks', {
     configurable: true,
@@ -65,15 +66,20 @@ beforeEach(() => {
 
 test('Crear starts the real preview and keeps version 1', async () => {
   loadLandingPreview.mockResolvedValue(null);
-  generateLandingPreview.mockResolvedValue(saved);
+  streamLandingPreview.mockImplementation(async (_project, _instruction, onEvent) => {
+    onEvent({ type: 'state', phase: 'construyendo', message: 'Construyendo tu página.' });
+    onEvent({ type: 'section', index: 0, title: 'Consulta', text: 'Clara atiende en Madrid', html: saved.html });
+    onEvent({ type: 'done', ...saved, summary: 'Clara atiende en Madrid' });
+    return saved;
+  });
   const { runtime, root, node } = await mount({
     project: project('proj-auto-clara'),
     ownerId: 'test-owner',
     initialPrompt: 'Clara, psicóloga en Madrid',
     autoStart: true,
   });
-  expect(generateLandingPreview).toHaveBeenCalledTimes(1);
-  expect(generateLandingPreview.mock.calls[0][1]).toBe('Clara, psicóloga en Madrid');
+  expect(streamLandingPreview).toHaveBeenCalledTimes(1);
+  expect(streamLandingPreview.mock.calls[0][1]).toBe('Clara, psicóloga en Madrid');
   expect(runtime.generatedPreview.html).toContain('Clara atiende en Madrid');
   expect(runtime.generatedPreview.versions[0].version).toBe(1);
   expect(runtime.previewPhase).toBe('ready');
@@ -83,7 +89,7 @@ test('Crear starts the real preview and keeps version 1', async () => {
 
 test('a failed automatic build stays on the error and does not invent a page', async () => {
   loadLandingPreview.mockResolvedValue(null);
-  generateLandingPreview.mockRejectedValue(new Error('down'));
+  streamLandingPreview.mockRejectedValue(new Error('down'));
   const { runtime, root } = await mount({
     project: project('proj-auto-fail'),
     ownerId: 'test-owner',

@@ -55,7 +55,7 @@ function Harness() {
 test('workspace shows the sector preview and hides code, landing controls and engineering tabs', () => {
   const { node, root } = mount(<Harness />);
 
-  expect(node.querySelector('section > div').className).toContain('lg:grid-cols-[20.5rem_minmax(0,1fr)]');
+  expect(node.querySelector('section > div').className).toContain('lg:grid-cols-[380px_minmax(0,1fr)]');
   expect(node.querySelector('aside').className).toContain('lg:order-1');
   expect(node.querySelector('iframe')).toBeNull();
   expect(node.textContent).toContain('Convierte dudas en decisiones claras');

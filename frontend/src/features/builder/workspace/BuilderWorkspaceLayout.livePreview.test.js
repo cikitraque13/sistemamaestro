@@ -47,6 +47,7 @@ test('a build in progress does not show the generic template', () => {
   runtime.previewPhase = 'working';
   runtime.generatedPreview = null;
   runtime.previewNotice = '';
+  runtime.executor = null;
   const { node, root } = render();
   expect(node.textContent).toContain('Preparando tu página…');
   expect(node.textContent).not.toContain('Convierte dudas en decisiones claras');
@@ -54,9 +55,29 @@ test('a build in progress does not show the generic template', () => {
   act(() => root.unmount());
 });
 
+test('iterating keeps the saved page and the working state visible', () => {
+  runtime.previewPhase = 'working';
+  runtime.generatedPreview = { html: '<h1>Clara atiende</h1>', versions: [] };
+  runtime.executor = {
+    phase: 'iterando',
+    message: 'Iterando sobre la versión guardada.',
+    partialHtml: '',
+    slow: true,
+    steps: [{ id: 'textos', label: 'Textos', status: 'in_progress' }],
+    log: [],
+  };
+  const { node, root } = render();
+  expect(node.querySelector('iframe')).not.toBeNull();
+  expect(node.textContent).toContain('Iterando sobre la versión guardada.');
+  expect(node.textContent).toContain('sigue trabajando…');
+  expect(node.textContent).not.toContain('Convierte dudas en decisiones claras');
+  act(() => root.unmount());
+});
+
 test('a failed build keeps the error and the retry button, not the generic template', () => {
   runtime.previewPhase = 'error';
   runtime.generatedPreview = null;
+  runtime.executor = { phase: 'error', message: '', partialHtml: '', slow: false, steps: [], log: [] };
   runtime.previewNotice = 'El clasificador no está disponible ahora. No se ha generado ningún resultado.';
   runtime.retryPreview = vi.fn();
   const { node, root } = render();
