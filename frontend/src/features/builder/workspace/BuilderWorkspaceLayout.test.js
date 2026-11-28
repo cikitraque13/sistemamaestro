@@ -64,9 +64,23 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.textContent).not.toContain('Gema Maestra');
   expect(node.textContent).not.toContain('12 créditos');
   expect(node.textContent).not.toContain('+ 3');
-  expect(node.textContent).toContain('Aún no hay cambios');
-  expect(node.textContent).toContain('Extracción');
-  expect(node.textContent).toContain('Siguiente paso recomendado');
+  expect(node.textContent).not.toContain('Aún no hay cambios');
+  expect(node.textContent).not.toContain('Siguiente paso recomendado');
+  expect(node.textContent).not.toContain('Historial');
+  expect(node.textContent).toContain('Ejecutor');
+  expect(node.querySelector('[aria-label="Mensaje para el ejecutor"]').getAttribute('placeholder')).toBe('Pide un cambio de la página');
+  expect([...node.querySelectorAll('button')].some((button) => button.textContent.trim() === 'Enviar')).toBe(true);
+  const aside = node.querySelector('[data-testid="builder-side-panel"]');
+  expect(aside.className).toContain('overflow-hidden');
+  expect(aside.className).not.toMatch(/overflow-(auto|scroll|y-auto|y-scroll)/);
+  expect(aside.childElementCount).toBe(1);
+  expect(aside.firstElementChild.getAttribute('aria-label')).toBe('Ejecutor');
+  expect(aside.firstElementChild.className).toContain('flex-1');
+  expect(aside.firstElementChild.className).toContain('h-full');
+  const sideButtons = [...aside.querySelectorAll('button')].map((button) => button.textContent.trim());
+  expect(sideButtons).not.toContain('Preview');
+  expect(sideButtons).not.toContain('Extracción');
+  expect(sideButtons).not.toContain('Instalar en tu web');
   expect(node.textContent).not.toContain('Código del proyecto');
   expect(node.textContent).not.toContain('Codigo en construccion');
   expect(node.textContent).not.toContain('Código en construcción');
@@ -79,12 +93,6 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.textContent).not.toContain('TSX');
   expect(node.textContent).not.toContain('Estructura');
   expect(node.querySelectorAll('button').length).toBeGreaterThan(0);
-
-  act(() => {
-    [...node.querySelectorAll('button')].find((button) => button.textContent === 'Extracción').click();
-  });
-  expect(node.textContent).toContain('Lo que el sistema ha entendido');
-  expect(node.textContent).toContain('Lectura del diagnóstico');
   expect(node.textContent).not.toContain('Gema Maestra');
   expect(node.textContent).not.toContain('+ 3');
   expect(node.textContent).not.toContain('Código del proyecto');
@@ -92,11 +100,36 @@ test('workspace shows the sector preview and hides code, landing controls and en
   act(() => root.unmount());
 });
 
-test('free test mode shows the no-gems badge', () => {
+test('extraction stays available when the workspace tab is extract, without a sidebar button', () => {
+  const { node, root } = mount(
+    <BuilderWorkspaceLayout
+      ownerId="alice"
+      project={project}
+      activeWorkspaceTab="extract"
+      credits={12}
+      bonus={3}
+      usageLabel="Créditos visibles"
+    />
+  );
+
+  expect(node.textContent).toContain('Lo que el sistema ha entendido');
+  expect(node.textContent).toContain('Lectura del diagnóstico');
+  expect([...node.querySelectorAll('[data-testid="builder-side-panel"] button')].map((button) => button.textContent.trim())).not.toContain('Extracción');
+  expect(node.textContent).not.toContain('Gema Maestra');
+  expect(node.textContent).not.toContain('Código del proyecto');
+  act(() => root.unmount());
+});
+
+test('the sidebar is only the executor chat', () => {
   const { node, root } = mount(
     <BuilderWorkspaceLayout freeTestMode project={project} ownerId="alice" credits={12} bonus={0} usageLabel="" />
   );
-  expect(node.textContent).toContain('Modo prueba · sin gemas');
-  expect(node.textContent).not.toContain('Gema Maestra');
+  const aside = node.querySelector('[data-testid="builder-side-panel"]');
+  expect(aside.childElementCount).toBe(1);
+  expect(aside.textContent).not.toContain('Modo prueba · sin gemas');
+  expect(aside.textContent).not.toContain('Siguiente paso recomendado');
+  expect(aside.textContent).not.toContain('Historial');
+  expect(aside.textContent).not.toContain('Aún no hay cambios');
+  expect(node.querySelector('[data-testid="builder-free-test-badge"]')).toBeNull();
   act(() => root.unmount());
 });

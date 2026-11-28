@@ -43,12 +43,12 @@ export default function ExecutorChat({
   };
 
   return (
-    <section aria-label="Ejecutor" className="flex min-h-[280px] flex-col rounded-2xl border border-white/10 bg-black/30">
-      <header className="border-b border-white/10 px-3 py-2">
+    <section aria-label="Ejecutor" className="flex h-full min-h-[11rem] min-w-0 flex-1 flex-col overflow-hidden lg:min-h-0">
+      <header className="shrink-0 border-b border-white/10 px-3 py-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">Ejecutor</p>
         <p className="mt-1 text-sm text-zinc-200" role="status">{executorStatusText(phase, message)}</p>
       </header>
-      <div className="min-h-0 flex-1 space-y-2 overflow-auto px-3 py-2">
+      <div className="min-h-0 flex-1 space-y-1 overflow-x-hidden overflow-y-auto px-3 py-2">
         {log.map((item, index) => (
           <p key={`${item.role}-${index}`} className={item.role === 'user' ? 'text-sm text-white' : 'text-sm text-zinc-300'}>
             {item.role === 'user' ? 'Tú: ' : 'Ejecutor: '}{item.text}
@@ -66,7 +66,7 @@ export default function ExecutorChat({
         </ul>
       </div>
       <form
-        className="flex items-center gap-2 border-t border-white/10 p-2"
+        className="flex shrink-0 items-center gap-2 border-t border-white/10 p-2"
         onSubmit={(event) => { event.preventDefault(); send(); }}
       >
         <input

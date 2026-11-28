@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 import { realCreditBalance } from './BuilderAccountMenu';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
+import APP_SHELL_NAVIGATION from '../../app-shell/navigation/appShellNavigation';
 
 const mocks = vi.hoisted(() => ({
   user: {
@@ -16,10 +17,21 @@ const mocks = vi.hoisted(() => ({
   },
   logout: vi.fn(async () => {}),
   newProject: vi.fn(),
+  get: vi.fn(async () => ({
+    data: [
+      { project_id: 'p', input_content: 'Proyecto demo' },
+      { project_id: 'q', input_content: 'Otro proyecto' },
+    ],
+    headers: {},
+  })),
 }));
 
 vi.mock('../../../context/AuthContext', () => ({
   useAuth: () => ({ user: mocks.user, logout: mocks.logout }),
+}));
+
+vi.mock('../../../lib/apiClient', () => ({
+  api: { get: (...args) => mocks.get(...args) },
 }));
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -51,7 +63,12 @@ function BuilderRoute({ screen }) {
               credits={574}
               bonus={605}
               onNewProject={mocks.newProject}
+              activeProjectId="p"
+              onProjectChange={() => {}}
               projectItems={[{ id: 'p', label: 'Proyecto', status: 'Abierto', accent: 'cyan' }]}
+              contextTitle="QUIERO CONVERTIR ESTA OPORTUNIDAD EN PROYECTO"
+              contextBody="QUIERO CONVERTIR ESTA OPORTUNIDAD EN PROYECTO: Clara"
+              freeTestMode
             >
               <div>{screen}</div>
             </AppShellLayout>
@@ -110,6 +127,7 @@ test('real balance ignores the lifetime grant figure', () => {
 
 test('account menu renders on builder screens and shows only the real balance', async () => {
   const { root, rerender } = mount('Preview');
+  await flush();
   const trigger = document.querySelector('[data-testid="builder-account-menu"]');
 
   const header = document.querySelector('[data-testid="builder-shell-header"]');
@@ -132,6 +150,21 @@ test('account menu renders on builder screens and shows only the real balance', 
   expect(header.textContent).not.toContain('Proyecto abierto');
   expect(header.textContent).not.toContain('Nuevo proyecto');
   expect(header.querySelector('[data-testid="builder-header-upgrade"]').getAttribute('href')).toBe('/dashboard/billing');
+  expect(header.querySelector('[data-testid="builder-header-upgrade"]').textContent).toContain('Mejorar plan');
+  const badge = header.querySelector('[data-testid="builder-free-test-badge"]');
+  expect(badge.textContent).toContain('Modo prueba · sin gemas');
+  expect(actions.contains(badge)).toBe(true);
+  expect(badge.nextElementSibling).toBe(trigger);
+  expect(badge.compareDocumentPosition(trigger.querySelector('[data-testid="builder-account-avatar"]')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(header.querySelector('[data-testid="builder-back-summary"]').getAttribute('href')).toBe('/dashboard');
+  expect(header.querySelector('[data-testid="builder-back-summary"]').textContent).toContain('←');
+  expect(header.querySelector('[aria-label="Secciones"]')).toBeNull();
+  expect(header.querySelector('[data-testid="builder-project-select"]')).not.toBeNull();
+  ['Resumen', 'Builder', 'Proyectos', 'Oportunidades', 'Facturación', 'Ajustes'].forEach((label) => {
+    const tab = [...header.querySelectorAll('button, a')].find((item) => item.textContent.trim() === label);
+    expect(tab).toBeUndefined();
+  });
+  expect(document.body.textContent).not.toContain('QUIERO CONVERTIR ESTA OPORTUNIDAD EN PROYECTO');
   expect(document.body.textContent).not.toMatch(/\+\s*605/);
   expect(document.body.textContent).not.toContain('605');
 
@@ -153,6 +186,8 @@ test('account menu renders on builder screens and shows only the real balance', 
   expect(panel.textContent).not.toContain('GitHub');
   expect(panel.textContent).not.toContain('Comunidad');
   expect(document.querySelector('[data-testid="builder-account-upgrade"]').getAttribute('href')).toBe('/dashboard/billing');
+  expect(document.querySelector('[data-testid="builder-account-upgrade"]').textContent).toContain('Añadir créditos');
+  expect(document.querySelector('[data-testid="builder-account-upgrade"]').textContent).not.toContain('Mejorar plan');
   expect(document.querySelector('[data-testid="builder-account-manage-plan"]').getAttribute('href')).toBe('/dashboard/billing');
   expect(document.querySelector('[data-testid="builder-account-settings"]').getAttribute('href')).toBe('/dashboard/settings');
   expect(document.querySelector('[data-testid="builder-account-settings"]').textContent).toContain('Configuración de cuenta');
@@ -280,5 +315,17 @@ test('the non-builder shell does not render the account menu', () => {
   expect(node.querySelector('[data-testid="builder-account-menu"]')).toBeNull();
   expect(node.textContent).toContain('Cuenta principal');
   expect(node.textContent).toContain('Sistema Maestro');
+  expect(APP_SHELL_NAVIGATION.map((item) => item.id)).toEqual([
+    'overview',
+    'builder',
+    'projects',
+    'opportunities',
+    'billing',
+    'settings',
+  ]);
+  expect(node.textContent).toContain('Resumen');
+  expect(node.textContent).toContain('Oportunidades');
+  expect(node.textContent).toContain('Facturación');
+  expect(node.textContent).toContain('Ajustes');
   act(() => root.unmount());
 });

@@ -1,23 +1,10 @@
 import React from 'react';
 
-import BuilderAgentPane from '../components/BuilderAgentPane';
 import ExecutorChat from '../components/ExecutorChat';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
 import BuilderPublishDock from '../publish/BuilderPublishDock';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 import EmbedInstallStep from '../embed/EmbedInstallStep';
-
-const HISTORY_LABELS = {
-  ACCEPT_WARNING: 'Aceptó la advertencia',
-  REJECT_CHANGE: 'Rechazó el cambio',
-  REQUIRES_CLARIFICATION: 'Pidió una aclaración',
-};
-
-const historyText = (item) => {
-  const label = HISTORY_LABELS[item?.type] || String(item?.type || 'Cambio');
-  const reason = String(item?.rationale || '').trim();
-  return reason ? `${label}. ${reason}` : label;
-};
 
 const LoadingState = () => (
   <div className="flex h-full min-h-[520px] items-center justify-center p-6">
@@ -48,43 +35,6 @@ const EmptyState = () => (
     </div>
   </div>
 );
-
-const viewButtonClass = (active) =>
-  `rounded-full border px-3 py-2 text-sm font-semibold transition ${
-    active
-      ? 'border-cyan-300/50 bg-cyan-300/10 text-cyan-100'
-      : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20 hover:text-white'
-  }`;
-
-function ProjectHistory({ audit, versions }) {
-  const saved = Array.isArray(versions) ? versions.filter((item) => item && item.instruction) : [];
-  const items = Array.isArray(audit) ? audit.filter((item) => item && (item.type || item.rationale)) : [];
-
-  return (
-    <section aria-label="Historial" className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Historial</p>
-      {saved.length === 0 && items.length === 0 ? (
-        <p className="mt-2 text-sm text-zinc-400">Aún no hay cambios</p>
-      ) : (
-        <ul className="mt-3 space-y-2">
-          {saved.slice().reverse().map((item) => (
-            <li key={`v-${item.version}`} className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm leading-6 text-zinc-200">
-              {`Versión ${item.version}. ${item.instruction}`}
-            </li>
-          ))}
-          {items.slice().reverse().map((item, index) => (
-            <li
-              key={item.decisionId || `${item.type}-${index}`}
-              className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm leading-6 text-zinc-200"
-            >
-              {historyText(item)}
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
 
 function PreparingPreview() {
   return (
@@ -118,41 +68,12 @@ function PreviewFailed({ message, onRetry }) {
   );
 }
 
-function WorkspaceSidePanel({
-  activeWorkspaceTab,
-  onWorkspaceTabChange,
-  freeTestMode = false,
-  embedInstall = false,
-  runtime,
-}) {
-  const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
-
+function WorkspaceSidePanel({ runtime }) {
   return (
-    <aside className="order-2 flex min-h-0 flex-col gap-3 overflow-auto border-t border-white/10 bg-[#08070D] p-3 lg:order-1 lg:h-full lg:border-r lg:border-t-0">
-      <div className="grid grid-cols-2 gap-2" aria-label="Vista del Builder">
-        <button type="button" className={viewButtonClass(visibleTab === 'preview')} onClick={() => onWorkspaceTabChange?.('preview')}>
-          Preview
-        </button>
-        <button type="button" className={viewButtonClass(visibleTab === 'extract')} onClick={() => onWorkspaceTabChange?.('extract')}>
-          Extracción
-        </button>
-      </div>
-      {embedInstall ? (
-        <button
-          type="button"
-          className={viewButtonClass(activeWorkspaceTab === 'install')}
-          onClick={() => onWorkspaceTabChange?.('install')}
-        >
-          Instalar en tu web
-        </button>
-      ) : null}
-
-      {freeTestMode ? (
-        <p className="w-fit rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100">
-          Modo prueba · sin gemas
-        </p>
-      ) : null}
-
+    <aside
+      data-testid="builder-side-panel"
+      className="order-2 flex min-h-0 flex-col overflow-hidden border-t border-white/10 bg-[#08070D] lg:order-1 lg:h-full lg:overflow-hidden lg:border-r lg:border-t-0"
+    >
       <ExecutorChat
         phase={runtime.executor?.phase || 'idle'}
         message={runtime.executor?.message || 'El ejecutor está listo.'}
@@ -161,25 +82,6 @@ function WorkspaceSidePanel({
         slow={Boolean(runtime.executor?.slow)}
         onSubmit={runtime.submitMessage}
       />
-
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
-        <BuilderAgentPane
-          project={runtime.project}
-          copy={runtime.copy}
-          progress={runtime.progress}
-          activeCodeTab={runtime.activeCodeTab}
-          onCodeTabChange={runtime.setActiveCodeTab}
-          messages={runtime.messages}
-          agentStatus={runtime.agentStatus}
-          onSubmitMessage={runtime.submitMessage}
-          onStartBuild={runtime.startBuild}
-          builderIntelligence={runtime.builderIntelligence}
-        />
-      </div>
-
-      {runtime.previewNotice ? <p role="alert" className="text-sm text-amber-100">{runtime.previewNotice}</p> : null}
-
-      <ProjectHistory audit={runtime.landingTransaction?.audit} versions={runtime.generatedPreview?.versions} />
     </aside>
   );
 }
@@ -191,9 +93,7 @@ export default function BuilderWorkspaceLayout({
   project = null,
   loadingProject = false,
   projectError = '',
-  onWorkspaceTabChange = () => {},
   autoStart = false,
-  freeTestMode = false,
   publishLanding = false,
   customDomain = false,
   embedInstall = false,
@@ -271,13 +171,7 @@ export default function BuilderWorkspaceLayout({
         <div className="order-1 min-h-[70vh] overflow-hidden lg:order-2 lg:min-h-0 lg:h-full">
           {main}
         </div>
-        <WorkspaceSidePanel
-          activeWorkspaceTab={visibleTab}
-          onWorkspaceTabChange={onWorkspaceTabChange}
-          freeTestMode={freeTestMode}
-          embedInstall={embedInstall}
-          runtime={{ ...runtime, project }}
-        />
+        <WorkspaceSidePanel runtime={{ ...runtime, project }} />
       </div>
     </section>
   );

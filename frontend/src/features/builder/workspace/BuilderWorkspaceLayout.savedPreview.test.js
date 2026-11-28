@@ -47,7 +47,8 @@ test('saved Clara landing renders in the preview instead of the sector template'
   expect(frame.getAttribute('srcdoc')).toContain('Clara atiende la consulta esta semana');
   expect(frame.getAttribute('srcdoc')).toContain('Pedir cita con Clara');
   expect(frame.getAttribute('srcdoc')).not.toContain('Convierte dudas en decisiones claras');
-  expect(node.textContent).toContain('Landing de Clara para consultas de empresa');
+  expect(node.textContent).not.toContain('Versión 1');
+  expect(node.textContent).not.toContain('Historial');
   expect(node.textContent).not.toContain('Convierte dudas en decisiones claras');
   act(() => root.unmount());
 });
