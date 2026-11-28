@@ -34,7 +34,7 @@ const BAR_BASE = Array.from({ length: BAR_COUNT }, (_, i) => {
 });
 
 const PHASE_UI = {
-  idle: { pill: 'Disponible', color: 'text-[#C6F432]', ripple: 'text-[#A78BFA]' },
+  idle: { pill: 'Disponible ahora', color: 'text-[#C6F432]', ripple: 'text-[#A78BFA]' },
   connecting: { pill: 'Conectando', color: 'text-[#38BDF8]', ripple: 'text-[#38BDF8]' },
   listening: { pill: 'Te escucha', color: 'text-[#C6F432]', ripple: 'text-[#C6F432]' },
   speaking: { pill: 'Hablando', color: 'text-[#D8B4FE]', ripple: 'text-[#A78BFA]' },

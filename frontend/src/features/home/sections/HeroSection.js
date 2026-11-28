@@ -5,9 +5,9 @@ import '../homeFlow.css';
 import { BRAND_GRADIENT_TEXT } from '../brandText';
 
 const LEAD = ['Describe', 'tu', 'negocio:'];
-const REST = ['diagnóstico,', 'preview', 'y'];
-const GRADIENT = ['borrador'];
-const TAIL = ['de', 'prompt.'];
+const REST = ['creamos', 'tu', 'web,', 'la', 'lanzamos', 'y', 'tu'];
+const GRADIENT = ['agente', 'de', 'IA'];
+const TAIL = ['atiende'];
 
 // Cada palabra sube una tras otra; todo termina en menos de 1 s y solo al cargar.
 const STEP_MS = 45;
@@ -69,7 +69,7 @@ const HeroSection = () => {
             href="#agencia-ia"
             className="group mt-6 flex w-fit flex-col items-start gap-2 text-sm font-medium text-zinc-300 transition hover:text-white"
           >
-            <span>Agencia de IA</span>
+            <span>Y además, un agente que trabaja por ti.</span>
             <span className="sm-fall ml-1" aria-hidden="true" />
           </a>
         </div>
