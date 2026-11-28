@@ -14,6 +14,7 @@ import os
 import re
 import secrets
 from dataclasses import dataclass
+from html import escape
 
 from starlette.responses import HTMLResponse
 
@@ -236,6 +237,45 @@ def safe_html(html) -> bool:
     return isinstance(html, str) and bool(html.strip()) and _UNSAFE_HTML.search(html) is None
 
 
+ATTENDANT_LABEL = "Habla con nosotros · Reserva cita"
+_ATTENDANT_ID = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+_ATTENDANT_HOST = re.compile(
+    r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$"
+)
+
+
+def attendant_page_url(project_id: str, settings: PublishSettings) -> str | None:
+    """Public chat and booking page on the product host. No script on the landing."""
+    if not _ATTENDANT_ID.fullmatch(project_id or ""):
+        return None
+    host = (settings.base_domain or "sistemamaestro.com").strip().lower().rstrip(".")
+    if not _ATTENDANT_HOST.fullmatch(host):
+        host = "sistemamaestro.com"
+    return f"https://{host}/atencion/{project_id}"
+
+
+def with_attendant_link(html: str, project_id: str, settings: PublishSettings) -> str:
+    """Insert one scriptless link. A landing that already has the marker is left as-is."""
+    if not isinstance(html, str) or "data-sm-attention=" in html:
+        return html
+    url = attendant_page_url(project_id, settings)
+    if not url:
+        return html
+    snippet = (
+        '<p><a href="'
+        + escape(url, quote=True)
+        + '" data-sm-attention="1">'
+        + ATTENDANT_LABEL
+        + "</a></p>"
+    )
+    match = re.search(r"</body>", html, flags=re.IGNORECASE)
+    linked = html + snippet if match is None else html[: match.start()] + snippet + html[match.start() :]
+    if not safe_html(linked):
+        logger.warning("publish_attendant_link_rejected")
+        return html
+    return linked
+
+
 def _now_iso(now: str | None) -> str:
     if now:
         return now
@@ -421,12 +461,14 @@ async def _slug_available(publications, slug: str, project_id: str) -> None:
 async def publish_project(
     projects, landings, publications, *, owner_id: str, project_id: str, slug: str,
     now: str | None = None, settings: PublishSettings | None = None,
+    modules=None,
 ) -> dict:
     """Copy the latest saved version into an immutable snapshot and mark it published.
 
     The version has to pass assert_promotable first. A missing score or a
     total under the threshold is a 422, including for an admin. This path
-    does not charge gems.
+    does not charge gems. After the snapshot is stored, chat and citas turn
+    on. That step logs and continues if it fails; the publication stays.
     TODO(founder): gem charge for publishing is still not wired.
     """
     settings = settings or publish_settings()
@@ -436,6 +478,7 @@ async def publish_project(
     version = _latest_version(loaded["preview"])
     _require_promotable(version)
     snapshot = copy.deepcopy(_snapshot(version, loaded.get("updated_at") or "", stamp))
+    snapshot["html"] = with_attendant_link(snapshot["html"], project_id, settings)
     await _slug_available(publications, chosen, project_id)
     current = await _publication_for(publications, owner_id, project_id)
     history = []
@@ -465,18 +508,24 @@ async def publish_project(
         upsert=True,
     )
     stored = await _publication_for(publications, owner_id, project_id)
+    from backend.app.services.agent_modules import activate_published_attendant
+
+    await activate_published_attendant(
+        modules, {"project_id": project_id, "user_id": owner_id},
+    )
     return public_publication(stored, settings)
 
 
 async def republish_project(
     projects, landings, publications, *, owner_id: str, project_id: str,
     now: str | None = None, settings: PublishSettings | None = None,
+    modules=None,
 ) -> dict:
     current = await _require_publication(publications, owner_id, project_id)
     return await publish_project(
         projects, landings, publications,
         owner_id=owner_id, project_id=project_id, slug=current.get("slug") or "",
-        now=now, settings=settings,
+        now=now, settings=settings, modules=modules,
     )
 
 

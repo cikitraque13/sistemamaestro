@@ -874,3 +874,96 @@ def test_erasure_removes_conversations_and_bookings(monkeypatch):
     )
     assert SECRET_TEXT not in blob
     assert "ana@example.com" not in blob
+
+
+def test_public_attention_uses_the_spend_cap_and_does_not_fake_a_booking(monkeypatch):
+    flags_on(monkeypatch, "chat", "citas")
+    calls = patch_reply(monkeypatch, "Puedo ayudarte con la cita.")
+    fake = FakeDB()
+    seed(fake)
+    visitor, actor = open_client(fake)
+    actor.user = OWNER
+    enable(visitor, "chat")
+    enable(visitor, "citas", {"weekly_hours": OFFICE, "timezone": "Europe/Madrid"})
+
+    missing = visitor.get(f"/api/public/attention/{PROJECT_ID}")
+    assert missing.status_code == 404
+    closed = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/messages",
+        json={"message": "Hola"},
+    )
+    assert closed.status_code == 404
+    assert fake.agent_conversations.docs == []
+    assert calls == []
+
+    fake.builder_publications.docs.append({
+        "project_id": PROJECT_ID,
+        "user_id": "owner-1",
+        "status": "published",
+        "slug": "clinica",
+    })
+    monkeypatch.setenv("AGENT_CHAT_DAILY_COST_CAP_USD", "0")
+    capped = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/messages",
+        json={"message": "Hola"},
+    )
+    assert capped.status_code == 429
+    assert capped.json()["detail"]["code"] == "cost_cap"
+    assert "reply" not in capped.json()
+    assert calls == []
+    assert fake.agent_conversations.docs == []
+
+    monkeypatch.setenv("AGENT_CHAT_DAILY_COST_CAP_USD", "1")
+    answered = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/messages",
+        json={"message": "Hola"},
+    )
+    assert answered.status_code == 200, answered.text
+    assert answered.json()["reply"] == "Puedo ayudarte con la cita."
+    assert answered.json()["booking_id"] is None
+    assert "sk-live-SHOULD-NOT-LEAK" not in answered.text
+    assert len(calls) == 1
+
+    monkeypatch.setenv("AGENT_CHAT_RATE_LIMIT", "2")
+    limited = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/messages",
+        json={"message": "Otra vez"},
+    )
+    assert limited.status_code == 429
+    assert limited.json()["detail"]["code"] == "rate_limited"
+    assert len(calls) == 1
+
+    monkeypatch.setenv("AGENT_CHAT_RATE_LIMIT", "20")
+    slots = visitor.get(f"/api/public/attention/{PROJECT_ID}/availability?day=2027-01-04")
+    assert slots.status_code == 200, slots.text
+    open_slots = slots.json()["slots"]
+    assert open_slots
+    booked = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/bookings",
+        json={"slot_start": open_slots[0], "customer_name": "Ana", "contact": "ana@example.com"},
+    )
+    assert booked.status_code == 200, booked.text
+    assert booked.json()["status"] == "confirmed"
+    assert booked.json()["booking_id"]
+    overlap = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/bookings",
+        json={"slot_start": open_slots[0], "customer_name": "Luis", "contact": "luis@example.com"},
+    )
+    assert overlap.status_code == 409
+    assert overlap.json()["detail"]["code"] == "slot_taken"
+    assert len(fake.agent_bookings.docs) == 1
+
+    monkeypatch.setenv("AGENT_MODULE_CITAS_ENABLED", "false")
+    refused = visitor.post(
+        f"/api/public/attention/{PROJECT_ID}/bookings",
+        json={"slot_start": open_slots[0], "customer_name": "Ana", "contact": "ana@example.com"},
+    )
+    assert refused.status_code == 404
+    assert len(fake.agent_bookings.docs) == 1
+    desk = visitor.get(f"/api/public/attention/{PROJECT_ID}")
+    assert desk.status_code == 200
+    assert desk.json()["title"] == "Clínica Sol"
+    assert desk.json()["chat"] is True
+    assert desk.json()["citas"] is False
+    assert "sk-live-SHOULD-NOT-LEAK" not in desk.text
+    assert "widget_key" not in desk.text

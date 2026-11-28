@@ -78,6 +78,7 @@ async def publish_landing(project_id: str, request: Request):
             db.projects, db.builder_landing_states, db.builder_publications,
             owner_id=user["user_id"], project_id=project_id, slug=str(body.get("slug") or ""),
             settings=publish_settings(),
+            modules=db.agent_project_modules,
         )
     except PublishError as exc:
         raise _http(exc) from None
@@ -92,6 +93,7 @@ async def republish_landing(project_id: str, request: Request):
         return await republish_project(
             db.projects, db.builder_landing_states, db.builder_publications,
             owner_id=user["user_id"], project_id=project_id, settings=publish_settings(),
+            modules=db.agent_project_modules,
         )
     except PublishError as exc:
         raise _http(exc) from None

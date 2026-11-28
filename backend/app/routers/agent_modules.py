@@ -70,9 +70,14 @@ def _module_for_path(path: str) -> str:
         return "voz"
     if "/whatsapp/" in path:
         return "whatsapp"
-    if "/bookings" in path:
+    if "/bookings" in path or path.endswith("/availability"):
         return "citas"
-    if "/chat/" in path or "/agent-conversations/" in path or path.endswith("/agent-data"):
+    if (
+        "/chat/" in path
+        or "/agent-conversations/" in path
+        or path.endswith("/agent-data")
+        or path.endswith("/messages")
+    ):
         return "chat"
     return "modules"
 
@@ -657,6 +662,147 @@ async def run_reminders(request: Request):
         now=datetime.now(timezone.utc),
     )
     return await bookings.run_due_reminders(db)
+
+
+def attention_title(project: dict) -> str:
+    knowledge = agent_chat.knowledge_for(project if isinstance(project, dict) else {})
+    title = knowledge.get("blueprintTitle") or knowledge.get("instruction") or "este negocio"
+    return " ".join(str(title).split())[:80]
+
+
+async def published_attention(project_id: str):
+    """A published landing is the only project a visitor can talk to."""
+    publication = await db.builder_publications.find_one({
+        "project_id": project_id,
+        "status": "published",
+    })
+    if not publication:
+        log_failure("not_found", "chat")
+        raise AgentModuleError("not_found", 404)
+    project = await public_project(db.projects, project_id)
+    view = await load_modules(db.agent_project_modules, project["project_id"])
+    return project, view
+
+
+def attention_open(view: dict) -> tuple[bool, bool]:
+    chat_on = module_enabled(view, "chat") and runtime_block("chat", None) is None
+    citas_on = module_enabled(view, "citas") and runtime_block("citas", None) is None
+    return chat_on, citas_on
+
+
+@router.get("/public/attention/{project_id}")
+async def get_public_attention(project_id: str):
+    require_id(project_id, "chat")
+    await prepare()
+    project, view = await published_attention(project_id)
+    chat_on, citas_on = attention_open(view)
+    return {
+        "project_id": project["project_id"],
+        "title": attention_title(project),
+        "chat": chat_on,
+        "citas": citas_on,
+    }
+
+
+@router.post("/public/attention/{project_id}/messages")
+async def post_public_attention_message(project_id: str, request: Request):
+    """Visitor chat. Same turn, spend cap, and rate limit as the widget, without its key."""
+    require_id(project_id, "chat")
+    require_runtime("chat", None)
+    raw = await read_limited(request, CHAT_BODY_MAX, "chat")
+    data = parse_json_object(raw, "chat", max_depth=3, max_items=8)
+    reject_unknown(data, {"message", "conversation_id"}, "chat")
+    if "message" not in data:
+        raise _schema(422)
+    message = require_plain_text(data["message"], max_len=CHAT_MESSAGE_MAX, module="chat")
+    conversation_id = data.get("conversation_id")
+    if conversation_id is not None and not isinstance(conversation_id, str):
+        raise _schema(422)
+    if isinstance(conversation_id, str) and not _conversation_id_ok(conversation_id):
+        raise AgentModuleError("not_found", 404)
+    await prepare()
+    project, view = await published_attention(project_id)
+    require_project_module(view, "chat")
+    bookings_on, citas_settings = citas_ready(view, None)
+    return await agent_chat.handle_turn(
+        db,
+        project=project,
+        channel="chat",
+        text=message,
+        conversation_id=conversation_id,
+        caller=client_host(request),
+        bookings_on=bookings_on,
+        citas_settings=citas_settings,
+        create_if_missing=True,
+    )
+
+
+@router.get("/public/attention/{project_id}/availability")
+async def get_public_availability(project_id: str, request: Request, day: str = ""):
+    require_id(project_id, "citas")
+    require_runtime("citas", None)
+    if not _DAY.fullmatch(day or ""):
+        raise AgentModuleError("invalid_slot", 422)
+    try:
+        parsed = date.fromisoformat(day)
+    except ValueError:
+        raise AgentModuleError("invalid_slot", 422) from None
+    await prepare()
+    project, view = await published_attention(project_id)
+    require_project_module(view, "citas")
+    settings = bookings.normalize_citas_settings(module_settings(view, "citas"))
+    await agent_chat.consume_rate(
+        db.agent_rate_windows,
+        project_id=project["project_id"],
+        channel="citas",
+        caller=client_host(request),
+        now=datetime.now(timezone.utc),
+    )
+    return {
+        "day": day,
+        "slots": await bookings.open_slots(db, project["project_id"], settings, parsed),
+    }
+
+
+@router.post("/public/attention/{project_id}/bookings")
+async def post_public_booking(project_id: str, request: Request):
+    require_id(project_id, "citas")
+    require_runtime("citas", None)
+    raw = await read_limited(request, BOOKING_BODY_MAX, "citas")
+    fields = _booking_fields(parse_json_object(raw, "citas", max_depth=3, max_items=8))
+    idempotency_key = optional_idempotency_key(request.headers.get("idempotency-key"))
+    moment = datetime.now(timezone.utc)
+    from backend.app.services.agent_guard import parse_slot_text
+
+    start = parse_slot_text(fields["slot_start"], now=moment)
+    bookings.clean_name(fields["customer_name"])
+    bookings.clean_contact(fields["contact"])
+    bookings.clean_note(fields["note"])
+    await prepare()
+    project, view = await published_attention(project_id)
+    require_project_module(view, "citas")
+    settings = bookings.normalize_citas_settings(module_settings(view, "citas"))
+    if not bookings.slot_is_open(start, settings):
+        raise AgentModuleError("outside_hours", 422)
+    await agent_chat.consume_rate(
+        db.agent_rate_windows,
+        project_id=project["project_id"],
+        channel="citas",
+        caller=client_host(request),
+        now=moment,
+    )
+    return await bookings.create_booking(
+        db,
+        project=project,
+        settings=settings,
+        slot_start=fields["slot_start"],
+        customer_name=fields["customer_name"],
+        contact=fields["contact"],
+        note=fields["note"],
+        channel="chat",
+        now=moment,
+        idempotency_key=idempotency_key,
+    )
 
 
 def _conversation_id_ok(value: str) -> bool:
