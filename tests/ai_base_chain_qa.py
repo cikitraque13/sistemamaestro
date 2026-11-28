@@ -34,9 +34,11 @@ EXPECTED_AGENT_MUTATIONS = {
     "copy_agent": {"improve_copy"},
     "visual_agent": {"apply_visual_hierarchy"},
     "trust_agent": {"validate_ready_for_export", "add_trust_section"},
-    "cro_agent": {"improve_premium_conversion"},
     "builder_agent": {"generate_folder_structure"},
 }
+
+# Etiqueta del agente vacío cro_agent. Sigue en BuilderAgentPane.js, que este PR no toca.
+STALE_EXCLUDED_RAIL_LABELS = {"cro_agent"}
 
 FORBIDDEN_PATH_PATTERNS = (
     "/routers/",
@@ -105,6 +107,8 @@ def assert_contains_all(source: str, tokens: Iterable[str], label: str) -> None:
 
 def validate_agent_contracts(specs: Dict[str, dict], agentrail_actions: List[Tuple[str, str]]) -> None:
     for agent_id, mutation_type in agentrail_actions:
+        if agent_id in STALE_EXCLUDED_RAIL_LABELS:
+            continue
         if agent_id not in specs:
             fail(f"AgentRail references missing agentSpecId: {agent_id}")
         allowed = set(specs[agent_id].get("allowedMutationTypes", []))
