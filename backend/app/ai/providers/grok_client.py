@@ -41,6 +41,7 @@ class GrokChatClient:
         max_tokens: Optional[int] = None,
         response_format: Optional[Dict[str, Any]] = None,
         reasoning_effort: Optional[str] = None,
+        tools: Optional[List[Dict[str, Any]]] = None,
     ):
         import httpx
 
@@ -55,6 +56,9 @@ class GrokChatClient:
             payload["response_format"] = response_format
         if reasoning_effort is not None:
             payload["reasoning_effort"] = reasoning_effort
+        # Optional. The builder never passes tools. The client agent does.
+        if tools:
+            payload["tools"] = tools
 
         if self._http is None:
             self._http = httpx.AsyncClient(timeout=self.timeout)
@@ -68,11 +72,23 @@ class GrokChatClient:
         data = response.json()
         choice = (data.get("choices") or [{}])[0]
         message = choice.get("message") or {}
+        calls = []
+        for item in message.get("tool_calls") or []:
+            if not isinstance(item, dict):
+                continue
+            function = item.get("function") if isinstance(item.get("function"), dict) else {}
+            calls.append(
+                SimpleNamespace(
+                    id=str(item.get("id") or ""),
+                    name=str(function.get("name") or ""),
+                    arguments=function.get("arguments") if isinstance(function.get("arguments"), str) else "",
+                )
+            )
         return SimpleNamespace(
             choices=[
                 SimpleNamespace(
                     finish_reason=choice.get("finish_reason"),
-                    message=SimpleNamespace(content=message.get("content")),
+                    message=SimpleNamespace(content=message.get("content"), tool_calls=calls),
                 )
             ]
         )

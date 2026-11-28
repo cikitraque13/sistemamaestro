@@ -29,6 +29,7 @@ from backend.app.routers.projects import router as projects_router
 from backend.app.routers.embed_agent import router as embed_agent_router
 from backend.app.routers.nova_voice import router as nova_voice_router
 from backend.app.routers.public import router as public_router
+from backend.app.routers.agent_modules import router as agent_modules_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -56,6 +57,7 @@ app.include_router(billing_router)
 app.include_router(public_router)
 app.include_router(nova_voice_router)
 app.include_router(embed_agent_router)
+app.include_router(agent_modules_router)
 app.include_router(opportunities_router)
 app.include_router(consumption_router)
 app.include_router(builder_ai.router)
