@@ -16,6 +16,8 @@ from backend.app.core.config import (
     FRONTEND_BUILD_DIR,
     FRONTEND_STATIC_DIR,
 )
+from backend.app.core.embed_cors import EmbedPublicCORSMiddleware
+from backend.app.services.embed_assets import resolve_embed_asset
 from backend.app.services.frontend_cache import cache_control_for
 from backend.app.db.mongodb import client, db
 from backend.app.routers.auth import router as auth_router
@@ -24,6 +26,7 @@ from backend.app.routers.consumption import router as consumption_router
 from backend.app.routers.opportunities import router as opportunities_router
 from backend.app.routers.payments import router as payments_router
 from backend.app.routers.projects import router as projects_router
+from backend.app.routers.embed_agent import router as embed_agent_router
 from backend.app.routers.nova_voice import router as nova_voice_router
 from backend.app.routers.public import router as public_router
 
@@ -44,6 +47,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(EmbedPublicCORSMiddleware)
 
 app.include_router(auth_router)
 app.include_router(projects_router)
@@ -51,6 +55,7 @@ app.include_router(payments_router)
 app.include_router(billing_router)
 app.include_router(public_router)
 app.include_router(nova_voice_router)
+app.include_router(embed_agent_router)
 app.include_router(opportunities_router)
 app.include_router(consumption_router)
 app.include_router(builder_ai.router)
@@ -74,6 +79,9 @@ async def startup_event():
     await db.login_attempts.create_index("identifier")
     await db.newsletter_subscribers.create_index("email", unique=True)
     await db.analysis_requests.create_index("created_at")
+    await db.embed_agents.create_index("key", unique=True)
+    await db.embed_agents.create_index([("user_id", 1), ("project_id", 1)], unique=True)
+    await db.embed_agent_usage.create_index([("agent_id", 1), ("day", 1)], unique=True)
     await db.builder_landing_states.create_index(
         [("user_id", 1), ("project_id", 1)],
         unique=True,
@@ -102,6 +110,16 @@ if FRONTEND_STATIC_DIR.exists():
 
 def _frontend_response(path, relative: str):
     return FileResponse(str(path), headers={"Cache-Control": cache_control_for(relative)})
+
+
+@app.get("/embed/{asset_path:path}", include_in_schema=False)
+async def serve_embed(asset_path: str):
+    root = FRONTEND_BUILD_DIR / "embed"
+    asset = resolve_embed_asset(root, asset_path)
+    if asset is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+    relative = asset.relative_to(root.resolve()).as_posix()
+    return _frontend_response(asset, relative)
 
 
 @app.get("/", include_in_schema=False)
