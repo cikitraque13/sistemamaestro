@@ -1,9 +1,16 @@
 """Real builder steps, streamed as events.
 
-Grok classifies, plans and judges. Claude writes the visible copy. There is
-no backend that configures a chat agent on the page, so the last step says so.
+Grok classifies, plans and judges the full page. Claude writes the copy with
+tools. Each attempt critiques the text against the versioned system prompt
+before the judge scores it. A provider error or the time budget stops the
+loop. Iterations stay inside this one call, so the gem charge is still one.
+
+There is no backend that configures a chat agent on the page, so the last
+step says so.
 """
 import logging
+import os
+import time
 
 from backend.app.services.blueprint import BlueprintGenerationError
 from backend.app.services.builder_pipeline import (
@@ -20,7 +27,22 @@ from backend.app.services.builder_pipeline import (
 
 logger = logging.getLogger(__name__)
 
-MAX_DRAFT_ATTEMPTS = 2
+def executor_max_iterations() -> int:
+    raw = (os.environ.get("BUILDER_EXECUTOR_MAX_ITERATIONS") or "").strip()
+    try:
+        value = int(raw) if raw else 3
+    except ValueError:
+        value = 3
+    return min(max(value, 1), 3)
+
+
+def executor_timeout_seconds() -> int:
+    raw = (os.environ.get("BUILDER_EXECUTOR_TIMEOUT_SECONDS") or "").strip()
+    try:
+        value = int(raw) if raw else 110
+    except ValueError:
+        value = 110
+    return min(max(value, 15), 140)
 AGENT_HONESTY = (
     "No hay un servicio para configurar un agente de chat en la web; no se ha fingido."
 )
@@ -65,12 +87,19 @@ async def _maybe_await(value):
     return value
 
 
-async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_section):
+def _critique_context(*, text, intent, plan, project):
+    return {"instruction": text, "intent": intent, "plan": plan, "project": project}
+
+
+async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_section, project, memory=None, revision_notes=""):
     payload = {
         "instruction": text,
         "intent": intent,
         "blueprint": plan,
         "diagnosis": diagnosis,
+        "preferences": memory or {},
+        "revisionNotes": revision_notes,
+        "project": project,
     }
     sections = []
     if draft_section is not None:
@@ -126,10 +155,18 @@ async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_
     return draft, events
 
 
-async def iter_executor(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None):
+async def iter_executor(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None, now=None, timeout_seconds=None, max_iterations=None):
+    from backend.app.services.builder_copy_rubric import critique_copy
+    from backend.app.services.builder_evaluation import evaluation_from_verdict
+    from backend.app.services.builder_memory import infer_preference
+
     text = " ".join(str(instruction or "").split())
     if not text:
         raise PipelineError("empty_instruction")
+    clock = now or time.monotonic
+    budget = executor_timeout_seconds() if timeout_seconds is None else timeout_seconds
+    attempts = executor_max_iterations() if max_iterations is None else max_iterations
+    started = clock()
     phase = "iterando" if previous else "construyendo"
     yield {"type": "state", "phase": phase, "message": STATE_MESSAGES[phase]}
 
@@ -169,9 +206,12 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
     yield _step("estructura", "done", "Secciones: " + ", ".join(slots))
 
     diagnosis = _diagnosis(project)
-    draft = None
-    section_events = []
-    for attempt in range(1, MAX_DRAFT_ATTEMPTS + 1):
+    context = _critique_context(text=text, intent=intent, plan=plan, project=project)
+    revision_notes = ""
+    for attempt in range(1, attempts + 1):
+        if clock() - started >= budget:
+            yield _step("textos", "error", "La generación ha tardado demasiado.")
+            raise PipelineError("executor_timeout")
         if attempt > 1:
             yield {"type": "state", "phase": "iterando", "message": STATE_MESSAGES["iterando"]}
         yield _step("textos", "in_progress")
@@ -179,6 +219,7 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
             draft, section_events = await _produce_draft(
                 text=text, intent=intent, plan=plan, diagnosis=diagnosis,
                 draft_landing=draft_landing, draft_section=draft_section,
+                project=project, memory=memory, revision_notes=revision_notes,
             )
         except PipelineError:
             yield _step("textos", "error", "No se ha podido escribir el texto.")
@@ -203,6 +244,18 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
         )
 
         yield _step("revision", "in_progress")
+        if clock() - started >= budget:
+            yield _step("revision", "error", "La generación ha tardado demasiado.")
+            raise PipelineError("executor_timeout")
+        critique = critique_copy(draft, context)
+        if not critique["ok"]:
+            _log("rubric")
+            revision_notes = critique["summary"]
+            if attempt >= attempts:
+                yield _step("revision", "error", "La página no encaja con lo pedido.")
+                raise PipelineError("landing_rejected")
+            yield _step("revision", "error", "La página no encaja con lo pedido. Se reintenta.")
+            continue
         try:
             verdict = await _call_judge(judge, draft, text)
         except PipelineError:
@@ -212,17 +265,22 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
             _log("schema")
             yield _step("revision", "error", "No se ha podido revisar la página.")
             raise PipelineError("judge_unavailable")
-        if verdict.get("ok") is True:
+        evaluation = evaluation_from_verdict(verdict, draft, context)
+        if evaluation["passed"]:
             summary = _clip(verdict.get("summary") or draft["title"], 160)
             summary = f"{summary} {AGENT_HONESTY}"
             yield _step("revision", "done", summary)
-            preview = _next_preview(previous, owner_id, project["project_id"], text, intent, plan, html, created_at)
+            preview = _next_preview(
+                previous, owner_id, project["project_id"], text, intent, plan, html, created_at,
+                evaluation=evaluation, preference=infer_preference(draft),
+            )
             public = public_preview(preview)
             yield {"type": "state", "phase": "completado", "message": summary}
-            yield {"type": "result", "preview": preview, "public": public, "summary": summary}
+            yield {"type": "result", "preview": preview, "public": public, "summary": summary, "evaluation": evaluation}
             return
         _log("rubric")
-        if attempt >= MAX_DRAFT_ATTEMPTS:
+        revision_notes = _clip(verdict.get("summary") or "La evaluación no llega al mínimo.", 160)
+        if attempt >= attempts:
             yield _step("revision", "error", "La página no encaja con lo pedido.")
             raise PipelineError("landing_rejected")
         yield _step("revision", "error", "La página no encaja con lo pedido. Se reintenta.")

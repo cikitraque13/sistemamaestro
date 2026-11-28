@@ -74,6 +74,25 @@ test('iterating keeps the saved page and the working state visible', () => {
   act(() => root.unmount());
 });
 
+test('a section event paints the right pane while the executor is still building', () => {
+  runtime.previewPhase = 'working';
+  runtime.generatedPreview = null;
+  runtime.previewNotice = '';
+  runtime.executor = {
+    phase: 'construyendo',
+    message: 'Construyendo tu página.',
+    partialHtml: '<h1>Clara parcial</h1>',
+    slow: false,
+    steps: [],
+    log: [],
+  };
+  const { node, root } = render();
+  expect(node.querySelector('iframe').getAttribute('srcdoc')).toContain('Clara parcial');
+  expect(node.textContent).toContain('Pensando');
+  expect(node.textContent).not.toContain('Completado');
+  act(() => root.unmount());
+});
+
 test('a failed build keeps the error and the retry button, not the generic template', () => {
   runtime.previewPhase = 'error';
   runtime.generatedPreview = null;

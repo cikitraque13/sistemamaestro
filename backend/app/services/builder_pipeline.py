@@ -17,6 +17,7 @@ USER_MESSAGES = {
     "judge_unavailable": "La revisión no está disponible ahora. No se ha sustituido la versión guardada.",
     "empty_instruction": "Escribe qué quieres en la página.",
     "publish_disabled": "La publicación no está disponible.",
+    "executor_timeout": "La generación ha tardado demasiado. No se ha guardado la página.",
 }
 GENERIC_MESSAGE = "No se ha podido preparar la preview. No se ha publicado nada."
 
@@ -49,7 +50,11 @@ def normalize_draft(raw):
         heading = _clip(item.get("title"), 120)
         body = _clip(item.get("text"), 800)
         if heading and body:
-            sections.append({"title": heading, "text": body})
+            section = {"title": heading, "text": body}
+            role = item.get("role")
+            if role in {"oferta", "prueba", "objecion", "paso", "cierre"}:
+                section["role"] = role
+            sections.append(section)
         if len(sections) == 6:
             break
     if not title or not subtitle or not cta or not sections:
@@ -69,7 +74,7 @@ def landing_brief(data) -> dict:
             priorities.append(text)
         if len(priorities) == 6:
             break
-    return {
+    brief = {
         "instruction": _clip(data.get("instruction"), 2000),
         "intentTitle": _clip(intent.get("title"), 160),
         "intentGoal": _clip(intent.get("goal"), 400),
@@ -79,6 +84,21 @@ def landing_brief(data) -> dict:
         "diagnosis": _clip(diagnosis.get("summary"), 500),
         "slot": _clip(data.get("slot"), 80),
     }
+    preferences = data.get("preferences")
+    if isinstance(preferences, dict) and preferences:
+        brief["preferences"] = {
+            "tone": preferences.get("tone"),
+            "style": preferences.get("style"),
+            "structure": preferences.get("structure") if isinstance(preferences.get("structure"), list) else [],
+            "kept": preferences.get("kept") if isinstance(preferences.get("kept"), int) else 0,
+            "reverted": preferences.get("reverted") if isinstance(preferences.get("reverted"), int) else 0,
+        }
+    notes = _clip(data.get("revisionNotes"), 240)
+    if notes:
+        brief["revisionNotes"] = notes
+    from backend.app.services.builder_system_prompt import PROMPT_VERSION
+    brief["promptVersion"] = PROMPT_VERSION
+    return brief
 
 
 def section_slots(plan) -> list:
@@ -150,29 +170,38 @@ def public_preview(preview: dict) -> dict:
     }
 
 
-def _next_preview(previous, owner_id, project_id, instruction, intent, blueprint, html, created_at):
+def _next_preview(previous, owner_id, project_id, instruction, intent, blueprint, html, created_at, evaluation=None, preference=None):
+    from backend.app.services.builder_system_prompt import PROMPT_VERSION
+
     versions = []
     if isinstance(previous, dict) and previous.get("schema") == PREVIEW_SCHEMA:
         versions = [item for item in previous.get("versions") or [] if isinstance(item, dict)]
     number = versions[-1].get("version", len(versions)) + 1 if versions else 1
-    versions.append({
+    version = {
         "version": number,
         "instruction": _clip(instruction, 280),
         "createdAt": created_at,
         "intentTitle": _clip((intent or {}).get("title"), 160),
         "blueprintTitle": _clip((blueprint or {}).get("title"), 160),
         "html": html,
-    })
+        "promptVersion": PROMPT_VERSION,
+    }
+    if isinstance(evaluation, dict):
+        version["evaluation"] = evaluation
+    if isinstance(preference, dict):
+        version["preference"] = preference
+    versions.append(version)
     versions = versions[-MAX_PREVIEW_VERSIONS:]
     return {
         "schema": PREVIEW_SCHEMA,
         "ownerId": owner_id,
         "projectId": project_id,
+        "promptVersion": PROMPT_VERSION,
         "versions": versions,
     }
 
 
-async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None):
+async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None):
     from backend.app.services.builder_executor import iter_executor
 
     preview = None
@@ -180,7 +209,7 @@ async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, d
     async for event in iter_executor(
         project=project, owner_id=owner_id, instruction=instruction, classify=classify,
         blueprint=blueprint, draft_landing=draft_landing, draft_section=draft_section,
-        judge=judge, previous=previous, created_at=created_at,
+        judge=judge, previous=previous, created_at=created_at, memory=memory,
     ):
         if event.get("type") == "result":
             preview = event["preview"]

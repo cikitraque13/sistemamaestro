@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 
 from backend.app.routers import builder_preview
 from backend.app.routers.builder_publish import router as publish_router
+from backend.app.services.builder_evaluation import EVAL_CRITERIA, EVAL_PASS_THRESHOLD, EVAL_RUBRIC_VERSION
 from backend.app.services.builder_pipeline import render_preview_html
 from backend.app.services.builder_publish import (
     ACTIVATION_PENDING,
@@ -51,6 +52,17 @@ SETTINGS = PublishSettings(
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def passing_evaluation():
+    scores = {key: 4 for key in EVAL_CRITERIA}
+    return {
+        "rubricVersion": EVAL_RUBRIC_VERSION,
+        "threshold": EVAL_PASS_THRESHOLD,
+        "scores": scores,
+        "total": sum(scores.values()),
+        "passed": True,
+    }
+
+
 def preview(owner, project_id, html, version=1, instruction="Landing de Clara"):
     return {
         "schema": "sm.builder.preview.v1",
@@ -61,6 +73,7 @@ def preview(owner, project_id, html, version=1, instruction="Landing de Clara"):
             "instruction": instruction,
             "createdAt": "2026-11-28T01:00:00+00:00",
             "html": html,
+            "evaluation": passing_evaluation(),
         }],
     }
 
@@ -191,6 +204,7 @@ def test_publish_copies_the_latest_version_and_republish_keeps_the_old_snapshot(
             "instruction": "Hueco del jueves",
             "createdAt": "2026-11-28T02:00:00+00:00",
             "html": second,
+            "evaluation": passing_evaluation(),
         })
         await republish_project(
             projects, landings, publications,
@@ -521,6 +535,62 @@ def test_landing_host_does_not_reach_the_api_and_the_app_host_does():
     assert product[0] == 200
     assert '"app":true' in product[2].replace(" ", "")
     assert hits["api"] == 1
+
+
+def test_publish_and_republish_refuse_a_missing_or_low_score():
+    projects, landings, publications, _html = world()
+    landings.documents[0]["preview"]["versions"][0].pop("evaluation")
+
+    async def missing():
+        try:
+            await publish_project(
+                projects, landings, publications,
+                owner_id="alice", project_id="proj_clara", slug="clara", now="t1", settings=SETTINGS,
+            )
+        except PublishError as exc:
+            return exc
+        return None
+
+    error = run(missing())
+    assert error.status == 422
+    assert error.code == "evaluation_required"
+    assert "evaluación" in error.message
+    assert "No se ha publicado" in error.message
+    assert publications.documents == []
+
+    landings.documents[0]["preview"]["versions"][0]["evaluation"] = passing_evaluation()
+    run(publish_project(
+        projects, landings, publications,
+        owner_id="alice", project_id="proj_clara", slug="clara", now="t1", settings=SETTINGS,
+    ))
+    saved_html = publications.documents[0]["snapshot"]["html"]
+    low = passing_evaluation()
+    low["scores"] = {key: 1 for key in low["scores"]}
+    low["total"] = 4
+    low["passed"] = True
+    landings.documents[0]["preview"]["versions"].append({
+        "version": 2,
+        "instruction": "baja",
+        "createdAt": "2026-11-28T02:00:00+00:00",
+        "html": "<h1>baja</h1>",
+        "evaluation": low,
+    })
+
+    async def again():
+        try:
+            await republish_project(
+                projects, landings, publications,
+                owner_id="alice", project_id="proj_clara", now="t2", settings=SETTINGS,
+            )
+        except PublishError as exc:
+            return exc
+        return None
+
+    blocked = run(again())
+    assert blocked.status == 422
+    assert blocked.code == "evaluation_required"
+    assert publications.documents[0]["snapshot"]["html"] == saved_html
+    assert publications.documents[0]["status"] == "published"
 
 
 def test_publish_code_does_not_call_railway_or_charge_gems():

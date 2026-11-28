@@ -25,8 +25,11 @@ from backend.app.services.builder_landing_state import (
     save_generated_preview,
 )
 from backend.app.services.builder_executor import encode_sse, iter_executor, with_heartbeats
-from backend.app.services.builder_executor_providers import draft_page, draft_piece, judge_draft
+from backend.app.services.builder_executor_providers import draft_page, judge_draft
+from backend.app.services.builder_memory import load_owner_memory, remember_owner_preview
 from backend.app.services.builder_pipeline import GENERIC_MESSAGE, PipelineError, public_preview, run_pipeline
+from backend.app.services.builder_sandbox import DraftBoundary
+from backend.app.services.builder_telemetry import note_funnel
 from backend.app.services.builder_charge_policy import emit_replay_or_conflict, settle_uncharged_stream
 from backend.app.services.builder_publish import (
     publish_landing_enabled,
@@ -63,6 +66,7 @@ def _http_error(error: PipelineError) -> HTTPException:
         "landing_rejected",
         "judge_unavailable",
         "publish_disabled",
+        "executor_timeout",
     } else 422
     return HTTPException(status, detail={"message": error.message})
 
@@ -86,10 +90,6 @@ async def draft_landing_with_claude(data):
     return await draft_page(data)
 
 
-async def draft_section_with_writer(data):
-    return await draft_piece(data)
-
-
 @router.get("/session")
 async def builder_session(request: Request):
     await ensure_builder_available(request)
@@ -111,6 +111,10 @@ async def read_preview(project_id: str, request: Request):
         )
     except LandingStateError as exc:
         if exc.code == "not_found":
+            await note_funnel(
+                db, user_id=user["user_id"], project_id=project_id,
+                step="placeholder", outcome="started",
+            )
             raise HTTPException(404, detail={"message": "Aún no hay una preview guardada."}) from None
         raise HTTPException(exc.status, detail={"message": GENERIC_MESSAGE}) from None
     return public_preview(loaded["preview"])
@@ -131,13 +135,11 @@ async def create_preview(body: PreviewRequest, request: Request):
     if not project:
         raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
     assert_project_revision(project, expected)
-    try:
-        current = await load_generated_preview(
-            db.projects, db.builder_landing_states, user["user_id"], body.projectId,
-        )
-        previous = current["preview"]
-    except LandingStateError:
-        previous = None
+    boundary = DraftBoundary(
+        db.projects, db.builder_landing_states, user["user_id"], body.projectId,
+        load=load_generated_preview, save=save_generated_preview,
+    )
+    previous = await boundary.load()
     operation_id = request_operation_id(request, "builder_preview")
     payload = BuilderAIInput(
         userInput=body.instruction,
@@ -148,6 +150,8 @@ async def create_preview(body: PreviewRequest, request: Request):
     consumption = build_builder_consumption_request(
         user=user, project=project, payload=payload, operation_id=operation_id,
     )
+    memory = await load_owner_memory(db, user["user_id"])
+    funnel_step = "iteration" if previous else "first_message"
 
     async def work(_consumption):
         fresh = await db.projects.find_one(
@@ -157,18 +161,33 @@ async def create_preview(body: PreviewRequest, request: Request):
         if not fresh:
             raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
         assert_project_revision(fresh, expected)
-        result = await run_pipeline(
-            project=project,
-            owner_id=user["user_id"],
-            instruction=body.instruction,
-            classify=classify_for_pipeline,
-            blueprint=generate_blueprint,
-            draft_landing=draft_landing_with_claude,
-            judge=judge_draft,
-            previous=previous,
+        await note_funnel(
+            db, user_id=user["user_id"], project_id=body.projectId,
+            step=funnel_step, outcome="started",
         )
-        saved = await save_generated_preview(
-            db.projects, db.builder_landing_states, user["user_id"], body.projectId, result["preview"],
+        try:
+            result = await run_pipeline(
+                project=project,
+                owner_id=user["user_id"],
+                instruction=body.instruction,
+                classify=classify_for_pipeline,
+                blueprint=generate_blueprint,
+                draft_landing=draft_landing_with_claude,
+                judge=judge_draft,
+                previous=previous,
+                memory=memory,
+            )
+        except PipelineError:
+            await note_funnel(
+                db, user_id=user["user_id"], project_id=body.projectId,
+                step=funnel_step, outcome="failed",
+            )
+            raise
+        saved = await boundary.save(result["preview"])
+        await remember_owner_preview(db, user["user_id"], result["preview"])
+        await note_funnel(
+            db, user_id=user["user_id"], project_id=body.projectId,
+            step=funnel_step, outcome="completed",
         )
         return {**result["public"], "updated_at": saved["updated_at"]}
 
@@ -204,13 +223,11 @@ async def stream_preview(body: PreviewRequest, request: Request):
     if not project:
         raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
     assert_project_revision(project, expected)
-    try:
-        current = await load_generated_preview(
-            db.projects, db.builder_landing_states, user["user_id"], body.projectId,
-        )
-        previous = current["preview"]
-    except LandingStateError:
-        previous = None
+    boundary = DraftBoundary(
+        db.projects, db.builder_landing_states, user["user_id"], body.projectId,
+        load=load_generated_preview, save=save_generated_preview,
+    )
+    previous = await boundary.load()
     operation_id = request_operation_id(request, "builder_preview")
     payload = BuilderAIInput(
         userInput=body.instruction,
@@ -223,11 +240,17 @@ async def stream_preview(body: PreviewRequest, request: Request):
     )
     queue = asyncio.Queue()
     work_started = False
+    memory = await load_owner_memory(db, user["user_id"])
+    funnel = {"step": "iteration" if previous else "first_message", "closed": False}
 
     async def work(_consumption):
         nonlocal work_started
         work_started = True
         try:
+            await note_funnel(
+                db, user_id=user["user_id"], project_id=body.projectId,
+                step=funnel["step"], outcome="started",
+            )
             fresh = await db.projects.find_one(
                 {"project_id": body.projectId, "user_id": user["user_id"]},
                 {"_id": 0, "updated_at": 1},
@@ -242,18 +265,27 @@ async def stream_preview(body: PreviewRequest, request: Request):
                 classify=classify_for_pipeline,
                 blueprint=generate_blueprint,
                 draft_landing=draft_landing_with_claude,
-                draft_section=draft_section_with_writer,
                 judge=judge_draft,
                 previous=previous,
+                memory=memory,
             )):
                 await queue.put(event)
                 if event.get("type") == "error":
+                    await note_funnel(
+                        db, user_id=user["user_id"], project_id=body.projectId,
+                        step=funnel["step"], outcome="failed",
+                    )
+                    funnel["closed"] = True
                     raise PipelineError("landing_unavailable")
                 if event.get("type") == "result":
-                    saved = await save_generated_preview(
-                        db.projects, db.builder_landing_states, user["user_id"], body.projectId, event["preview"],
-                    )
+                    saved = await boundary.save(event["preview"])
+                    await remember_owner_preview(db, user["user_id"], event["preview"])
                     done = {**event["public"], "updated_at": saved["updated_at"], "summary": event.get("summary") or ""}
+                    await note_funnel(
+                        db, user_id=user["user_id"], project_id=body.projectId,
+                        step=funnel["step"], outcome="completed",
+                    )
+                    funnel["closed"] = True
                     await queue.put({"type": "done", **done})
                     return done
             raise PipelineError("landing_unavailable")
@@ -345,13 +377,21 @@ async def stream_preview(body: PreviewRequest, request: Request):
                 yield encode_sse({"type": "error", "message": GENERIC_MESSAGE})
                 sent_terminal = True
         finally:
-            await _cancel_task(getter)
-            if not task.done():
-                task.cancel()
-                try:
-                    await task
-                except (asyncio.CancelledError, Exception):
-                    pass
+            try:
+                if work_started and not funnel["closed"]:
+                    await note_funnel(
+                        db, user_id=user["user_id"], project_id=body.projectId,
+                        step=funnel["step"], outcome="failed" if sent_error else "abandoned",
+                    )
+                    funnel["closed"] = True
+            finally:
+                await _cancel_task(getter)
+                if not task.done():
+                    task.cancel()
+                    try:
+                        await task
+                    except (asyncio.CancelledError, Exception):
+                        pass
 
     return StreamingResponse(
         frames(),
