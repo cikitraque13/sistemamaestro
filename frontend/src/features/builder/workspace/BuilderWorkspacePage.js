@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../lib/apiClient';
 import { loadBuilderSession } from '../api/builderPreviewClient';
+import { embedEntryIsOpen } from '../embed/embedAccess';
+import { isExistingAdmin } from '../builderAccess';
 import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
@@ -199,6 +201,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   const [freeTestMode, setFreeTestMode] = useState(false);
   const [publishLanding, setPublishLanding] = useState(false);
   const [customDomain, setCustomDomain] = useState(false);
+  const [embedInstall, setEmbedInstall] = useState(() => isExistingAdmin(user));
   const autoStart = location.state?.source === 'dashboard-launch-console';
 
   useEffect(() => {
@@ -211,6 +214,14 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     });
     return () => { live = false; };
   }, []);
+
+  useEffect(() => {
+    let live = true;
+    embedEntryIsOpen(user).then((open) => {
+      if (live) setEmbedInstall(open);
+    });
+    return () => { live = false; };
+  }, [user]);
 
   const [project, setProject] = useState(null);
   const [loadingProject, setLoadingProject] = useState(Boolean(runtimeProjectId));
@@ -396,6 +407,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         freeTestMode={freeTestMode}
         publishLanding={publishLanding}
         customDomain={customDomain}
+        embedInstall={embedInstall}
       />
     </AppShellLayout>
   );

@@ -6,6 +6,7 @@ import ExecutorChat from '../components/ExecutorChat';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
 import BuilderPublishDock from '../publish/BuilderPublishDock';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
+import EmbedInstallStep from '../embed/EmbedInstallStep';
 
 const HISTORY_LABELS = {
   ACCEPT_WARNING: 'Aceptó la advertencia',
@@ -125,6 +126,7 @@ function WorkspaceSidePanel({
   bonus,
   usageLabel,
   freeTestMode = false,
+  embedInstall = false,
   runtime,
 }) {
   const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
@@ -139,6 +141,15 @@ function WorkspaceSidePanel({
           Extracción
         </button>
       </div>
+      {embedInstall ? (
+        <button
+          type="button"
+          className={viewButtonClass(activeWorkspaceTab === 'install')}
+          onClick={() => onWorkspaceTabChange?.('install')}
+        >
+          Instalar en tu web
+        </button>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <GemaMaestra credits={credits} bonus={bonus} usageLabel={usageLabel} />
@@ -195,6 +206,7 @@ export default function BuilderWorkspaceLayout({
   freeTestMode = false,
   publishLanding = false,
   customDomain = false,
+  embedInstall = false,
 }) {
   const runtime = useBuilderWorkspaceRuntime({
     project,
@@ -206,6 +218,7 @@ export default function BuilderWorkspaceLayout({
   });
 
   const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
+  const installOpen = Boolean(embedInstall && activeWorkspaceTab === 'install' && project);
   const executorPhase = runtime.executor?.phase || '';
   const busy = executorPhase === 'construyendo' || executorPhase === 'iterando' || runtime.previewPhase === 'working';
   const failed = executorPhase === 'error' || runtime.previewPhase === 'error';
@@ -219,6 +232,7 @@ export default function BuilderWorkspaceLayout({
   let main = <EmptyState />;
   if (loadingProject) main = <LoadingState />;
   else if (projectError) main = <ErrorState projectError={projectError} />;
+  else if (installOpen) main = <EmbedInstallStep projectId={project.project_id} />;
   else if (project && visibleTab !== 'extract' && liveHtml) {
     main = (
       <div className="flex h-full min-h-[70vh] flex-col lg:min-h-0">
@@ -274,6 +288,7 @@ export default function BuilderWorkspaceLayout({
           bonus={bonus}
           usageLabel={usageLabel}
           freeTestMode={freeTestMode}
+          embedInstall={embedInstall}
           runtime={{ ...runtime, project }}
         />
       </div>

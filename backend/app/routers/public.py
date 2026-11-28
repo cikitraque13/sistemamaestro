@@ -6,6 +6,7 @@ from pydantic import BaseModel, EmailStr
 from pymongo.errors import DuplicateKeyError
 
 from backend.app.core.builder_access import builder_enabled
+from backend.app.services.embed_agent import embed_agent_enabled
 from backend.app.core.config import get_google_client_id
 from backend.app.db.mongodb import db
 
@@ -22,6 +23,7 @@ async def get_public_config():
     return {
         "google_client_id": get_google_client_id(),
         "builder_enabled": builder_enabled(),
+        "embed_agent_enabled": embed_agent_enabled(),
     }
 
 

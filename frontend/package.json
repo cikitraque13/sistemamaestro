@@ -58,7 +58,9 @@
   "scripts": {
     "start": "vite --host 0.0.0.0",
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && npm run build:embed",
+    "build:embed": "vite build --config vite.embed.frame.config.js && vite build --config vite.embed.loader.config.js",
+    "test:embed-page": "node embed/local-test.mjs",
     "test": "vitest run",
     "test:mjs": "node --test src/lib/economicRequest.test.mjs src/features/billing/paymentCompletion.test.mjs src/features/builder/preview/functionalLandingValidation.test.mjs src/features/builder/state/authorizationBoundary.test.mjs src/features/builder/state/boundedLandingRepair.test.mjs src/features/builder/state/builderChangeReview.test.mjs src/features/builder/state/builderChangeTransaction.test.mjs src/features/builder/state/compositeChange.test.mjs src/features/builder/state/ctaDestinationIntent.test.mjs src/features/builder/state/ctaSemanticCoherence.test.mjs src/features/builder/state/durableLandingWorkspace.test.mjs src/features/builder/state/humanSemanticDecision.test.mjs src/features/builder/state/landingPersistence.test.mjs src/features/builder/state/pendingWorkRecovery.test.mjs src/features/builder/state/staticSectionMutation.test.mjs src/features/home/voice/novaVoiceConfig.test.mjs"
   },
