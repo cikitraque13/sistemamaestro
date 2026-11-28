@@ -82,8 +82,7 @@ const CreditSummaryCard = ({ creditSummary }) => {
           </p>
 
           <p className="text-xs leading-relaxed text-[#A3A3A3]">
-            El saldo y las gemas incluidas por plan ya son visibles. Consumo,
-            recargas y salida con coste quedan preparados para la siguiente microfase.
+            El saldo y las gemas incluidas por plan ya son visibles.
           </p>
         </div>
       </div>

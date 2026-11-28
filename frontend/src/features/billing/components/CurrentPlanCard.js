@@ -252,7 +252,7 @@ const CurrentPlanCard = ({
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <p className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                Marco operativo del plan
+                Qué incluye este plan
               </p>
 
               <p className="mt-2 text-sm leading-6 text-white/70">
@@ -269,9 +269,8 @@ const CurrentPlanCard = ({
 
           <div className="mt-5 rounded-2xl border border-white/8 bg-black/24 px-4 py-3">
             <p className="text-xs leading-6 text-[#BFCFD2]">
-              <span className="font-medium text-white">Gema Maestra</span> =
-              capacidad operativa disponible dentro del sistema. Consumo,
-              recargas y salida con coste se activarán en la siguiente microfase.
+              <span className="font-medium text-white">Gema Maestra</span> es
+              la capacidad disponible en tu cuenta.
             </p>
           </div>
         </div>

@@ -13,7 +13,6 @@ import {
 
 import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
-import DashboardProjectTabs from '../features/dashboard/components/DashboardProjectTabs';
 import DashboardSidebarProjects from '../features/dashboard/components/DashboardSidebarProjects';
 import '../features/dashboard/dashboardAurora.css';
 import {
@@ -221,53 +220,16 @@ const DashboardLayout = ({ children, title = 'Workspace', headerExtra = null }) 
         </div>
       </aside>
 
-      <main className={`relative flex min-w-0 flex-1 flex-col ${isResumen ? 'dashboard-stage h-screen overflow-hidden' : 'min-h-screen'}`}>
-        {isResumen ? null : (
-        <header className="sticky top-0 z-30 shrink-0 border-b border-white/6 bg-[#050505]">
-          <div className={`flex items-center justify-between gap-4 px-5 md:px-6 ${isResumen ? 'py-2.5' : 'py-4'}`}>
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                className="text-zinc-400 transition hover:text-white lg:hidden"
-                aria-label="Abrir menú"
-              >
-                <List size={24} />
-              </button>
-
-              <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
-                  Workspace
-                </p>
-
-                <h1 className="text-lg font-semibold leading-tight text-white">
-                  {title}
-                </h1>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {headerExtra}
-            </div>
-          </div>
-
-          <div className="border-t border-white/6 px-5 py-3 md:px-6">
-            <DashboardProjectTabs />
-          </div>
-        </header>
-        )}
-
-        {isResumen ? (
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="absolute left-4 top-4 z-20 text-zinc-300 lg:hidden"
-            aria-label="Abrir menú"
-          >
-            <List size={24} />
-          </button>
-        ) : null}
-        <div className={isResumen ? 'relative flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3 md:px-6' : 'flex-1 px-5 py-6 md:px-6'}>
+      <main className={`dashboard-stage relative flex min-w-0 flex-1 flex-col ${isResumen ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="absolute left-4 top-4 z-20 text-zinc-300 lg:hidden"
+          aria-label="Abrir menú"
+        >
+          <List size={24} />
+        </button>
+        <div className={isResumen ? 'relative flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-3 md:px-6' : 'relative flex-1 overflow-auto px-5 py-8 md:px-8'}>
           {children}
         </div>
       </main>

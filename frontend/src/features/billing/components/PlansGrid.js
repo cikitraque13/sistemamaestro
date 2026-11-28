@@ -44,7 +44,7 @@ const PlansGrid = ({
 
           <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/10 px-4 py-3">
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-cyan-100">
-              Progresión interna
+              Planes
             </p>
 
             <p className="mt-1 text-sm text-[#DDFBFF]">
@@ -79,10 +79,8 @@ const PlansGrid = ({
             </p>
 
             <p className="text-sm leading-6 text-[#D5D5D5]">
-              El usuario registrado parte con gemas iniciales para probar valor real.
-              Los planes amplían recorrido, Builder, continuidad y capacidad operativa.
-              Gema Maestra representa la capacidad operativa del sistema. Consumo,
-              recargas y salida con coste se activarán en la siguiente microfase.
+              El usuario registrado parte con gemas iniciales. Los planes amplían el recorrido.
+              Las gemas incluidas se ven en cada plan.
             </p>
           </div>
         </div>
