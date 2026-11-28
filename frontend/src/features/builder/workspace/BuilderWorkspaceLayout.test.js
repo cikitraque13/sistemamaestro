@@ -61,8 +61,9 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.textContent).toContain('Convierte dudas en decisiones claras');
   expect(node.textContent).toContain('Asesoramiento experto');
   expect(node.textContent).toContain('Agendar consulta');
-  expect(node.textContent).toContain('Gema Maestra');
-  expect(node.textContent).toContain('12 créditos');
+  expect(node.textContent).not.toContain('Gema Maestra');
+  expect(node.textContent).not.toContain('12 créditos');
+  expect(node.textContent).not.toContain('+ 3');
   expect(node.textContent).toContain('Aún no hay cambios');
   expect(node.textContent).toContain('Extracción');
   expect(node.textContent).toContain('Siguiente paso recomendado');
@@ -84,6 +85,8 @@ test('workspace shows the sector preview and hides code, landing controls and en
   });
   expect(node.textContent).toContain('Lo que el sistema ha entendido');
   expect(node.textContent).toContain('Lectura del diagnóstico');
+  expect(node.textContent).not.toContain('Gema Maestra');
+  expect(node.textContent).not.toContain('+ 3');
   expect(node.textContent).not.toContain('Código del proyecto');
   expect(node.textContent).not.toContain('Destino del CTA');
   act(() => root.unmount());
@@ -94,5 +97,6 @@ test('free test mode shows the no-gems badge', () => {
     <BuilderWorkspaceLayout freeTestMode project={project} ownerId="alice" credits={12} bonus={0} usageLabel="" />
   );
   expect(node.textContent).toContain('Modo prueba · sin gemas');
+  expect(node.textContent).not.toContain('Gema Maestra');
   act(() => root.unmount());
 });

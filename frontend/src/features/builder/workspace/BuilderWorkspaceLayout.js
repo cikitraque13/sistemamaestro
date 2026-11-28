@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { GemaMaestra } from '../../app-shell/layout/AppShellLayout';
 import BuilderAgentPane from '../components/BuilderAgentPane';
 import ExecutorChat from '../components/ExecutorChat';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
@@ -122,9 +121,6 @@ function PreviewFailed({ message, onRetry }) {
 function WorkspaceSidePanel({
   activeWorkspaceTab,
   onWorkspaceTabChange,
-  credits,
-  bonus,
-  usageLabel,
   freeTestMode = false,
   embedInstall = false,
   runtime,
@@ -151,9 +147,6 @@ function WorkspaceSidePanel({
         </button>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <GemaMaestra credits={credits} bonus={bonus} usageLabel={usageLabel} />
-      </div>
       {freeTestMode ? (
         <p className="w-fit rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100">
           Modo prueba · sin gemas
@@ -199,9 +192,6 @@ export default function BuilderWorkspaceLayout({
   loadingProject = false,
   projectError = '',
   onWorkspaceTabChange = () => {},
-  credits = 0,
-  bonus = 0,
-  usageLabel = '',
   autoStart = false,
   freeTestMode = false,
   publishLanding = false,
@@ -284,9 +274,6 @@ export default function BuilderWorkspaceLayout({
         <WorkspaceSidePanel
           activeWorkspaceTab={visibleTab}
           onWorkspaceTabChange={onWorkspaceTabChange}
-          credits={credits}
-          bonus={bonus}
-          usageLabel={usageLabel}
           freeTestMode={freeTestMode}
           embedInstall={embedInstall}
           runtime={{ ...runtime, project }}

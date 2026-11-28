@@ -4,6 +4,7 @@ import BuilderCreditBar from '../components/BuilderCreditBar';
 import BuilderProjectTabs from '../navigation/BuilderProjectTabs';
 import BuilderWorkspaceTabs from '../navigation/BuilderWorkspaceTabs';
 import APP_SHELL_NAVIGATION from '../navigation/appShellNavigation';
+import BuilderShellHeader from '../../builder/components/BuilderShellHeader';
 
 const DEFAULT_PROJECTS = [
   { id: 'project-alpha', label: 'Sistema Maestro', status: 'Base operativa', accent: 'cyan' },
@@ -111,21 +112,17 @@ export default function AppShellLayout({
   onNewProject = () => {},
   contextTitle = 'Builder activo',
   contextBody = 'Diagnóstico, preview y borrador en el Builder.',
-  showHeaderGema = true,
 }) {
   const isBuilderMode = activeNavId === 'builder';
 
   if (isBuilderMode) {
     return (
       <div className="flex h-screen flex-col overflow-hidden bg-[#06080A] text-white">
-        <AppShellTopbar
+        <BuilderShellHeader
           productLabel={productLabel}
           navigationItems={navigationItems}
           activeNavId={activeNavId}
           onNavChange={onNavChange}
-          projectCount={projectItems.length}
-          creditLabel={`${credits} créditos`}
-          userLabel={userLabel}
           onNewProject={onNewProject}
         />
 
@@ -139,7 +136,7 @@ export default function AppShellLayout({
             credits={credits}
             bonus={bonus}
             usageLabel={usageLabel}
-            showGema={showHeaderGema}
+            showGema={false}
           />
 
           <section className="min-h-0 flex-1 overflow-hidden">
