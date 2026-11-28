@@ -33,12 +33,12 @@ EXPECTED_AGENT_STATUS = {
     "copy_agent": "spec_only",
     "visual_agent": "spec_only",
     "trust_agent": "spec_only",
-    "cro_agent": "spec_only",
 }
 
 REMOVED_EMPTY_AGENTS = {
     "discovery_agent",
     "audit_agent",
+    "cro_agent",
     "seo_architect_agent",
     "growth_agent",
     "deploy_agent",
