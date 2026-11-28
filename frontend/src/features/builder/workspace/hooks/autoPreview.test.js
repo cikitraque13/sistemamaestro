@@ -2,12 +2,16 @@ import { api } from '../../../../lib/apiClient';
 
 vi.mock('../../../../lib/apiClient', () => ({ api: { get: vi.fn(), put: vi.fn() } }));
 
-vi.mock('../../api/builderPreviewClient', () => ({
-  loadLandingPreview: vi.fn(),
-  streamLandingPreview: vi.fn(),
-  previewErrorMessage: () => 'No se ha podido preparar la preview. No se ha publicado nada.',
-  stepNeedsPatience: () => false,
-}));
+vi.mock('../../api/builderPreviewClient', async () => {
+  const actual = await vi.importActual('../../api/builderPreviewClient');
+  return {
+    ...actual,
+    loadLandingPreview: vi.fn(),
+    streamLandingPreview: vi.fn(),
+    previewErrorMessage: () => 'No se ha podido preparar la preview. No se ha publicado nada.',
+    stepNeedsPatience: () => false,
+  };
+});
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';

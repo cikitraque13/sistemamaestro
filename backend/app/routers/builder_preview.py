@@ -27,6 +27,7 @@ from backend.app.services.builder_landing_state import (
 from backend.app.services.builder_executor import encode_sse, iter_executor, with_heartbeats
 from backend.app.services.builder_executor_providers import draft_page, draft_piece, judge_draft
 from backend.app.services.builder_pipeline import GENERIC_MESSAGE, PipelineError, public_preview, run_pipeline
+from backend.app.services.builder_charge_policy import emit_replay_or_conflict, settle_uncharged_stream
 from backend.app.services.builder_publish import (
     publish_landing_enabled,
     user_may_custom_domain,
@@ -36,6 +37,17 @@ from backend.app.services.builder_test_mode import builder_charge_waived, run_bu
 from backend.app.services.economic_operation import request_operation_id, run_economic_operation
 
 router = APIRouter(prefix="/api/builder", tags=["builder-preview"])
+STREAM_HEARTBEAT_SECONDS = 10
+
+
+async def _cancel_task(task):
+    if task is None or task.done():
+        return
+    task.cancel()
+    try:
+        await task
+    except (asyncio.CancelledError, Exception):
+        return
 
 
 class PreviewRequest(BaseModel):
@@ -210,8 +222,11 @@ async def stream_preview(body: PreviewRequest, request: Request):
         user=user, project=project, payload=payload, operation_id=operation_id,
     )
     queue = asyncio.Queue()
+    work_started = False
 
     async def work(_consumption):
+        nonlocal work_started
+        work_started = True
         try:
             fresh = await db.projects.find_one(
                 {"project_id": body.projectId, "user_id": user["user_id"]},
@@ -245,6 +260,33 @@ async def stream_preview(body: PreviewRequest, request: Request):
         finally:
             await queue.put(None)
 
+    async def charge_for_stream(*, user, consumption_payload, inputs, work):
+        try:
+            result = await run_economic_operation(
+                user=user,
+                consumption_payload=consumption_payload,
+                inputs=inputs,
+                work=work,
+            )
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            if work_started:
+                raise
+            await settle_uncharged_stream(
+                exc,
+                user=user,
+                project_id=body.projectId,
+                operation_id=operation_id,
+                work=work,
+                publish=queue.put,
+                database=db,
+            )
+            return {"status": "closed", "reason": "charge_not_applied"}
+        if not work_started:
+            await emit_replay_or_conflict(result, queue.put)
+        return result
+
     async def frames():
         task = asyncio.create_task(run_builder_operation(
             user=user,
@@ -252,31 +294,64 @@ async def stream_preview(body: PreviewRequest, request: Request):
             consumption_payload=consumption,
             inputs={"projectId": body.projectId, "instruction": body.instruction, "expected": expected, "stream": True},
             work=work,
-            charge=run_economic_operation,
+            charge=charge_for_stream,
         ))
+        getter = None
         sent_error = False
+        sent_terminal = False
         try:
             while True:
-                try:
-                    item = await asyncio.wait_for(queue.get(), timeout=10)
-                except asyncio.TimeoutError:
+                getter = asyncio.create_task(queue.get())
+                done, _pending = await asyncio.wait(
+                    {getter, task},
+                    timeout=STREAM_HEARTBEAT_SECONDS,
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+                if getter not in done:
+                    await _cancel_task(getter)
+                    getter = None
+                    if task.done():
+                        break
                     yield encode_sse({"type": "heartbeat"})
                     continue
+                item = getter.result()
+                getter = None
                 if item is None:
                     break
                 if item.get("type") == "result":
                     continue
                 if item.get("type") == "error":
                     sent_error = True
+                    sent_terminal = True
+                elif item.get("type") == "done":
+                    sent_terminal = True
                 yield encode_sse(item)
-            try:
-                await task
-            except Exception:
-                if not sent_error:
-                    yield encode_sse({"type": "error", "message": GENERIC_MESSAGE})
+            failure = None
+            if task.done():
+                if not task.cancelled():
+                    failure = task.exception()
+            else:
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    raise
+                except Exception as exc:
+                    failure = exc
+            if failure is not None and not sent_error:
+                yield encode_sse({"type": "error", "message": GENERIC_MESSAGE})
+                sent_error = True
+                sent_terminal = True
+            if not sent_terminal:
+                yield encode_sse({"type": "error", "message": GENERIC_MESSAGE})
+                sent_terminal = True
         finally:
+            await _cancel_task(getter)
             if not task.done():
                 task.cancel()
+                try:
+                    await task
+                except (asyncio.CancelledError, Exception):
+                    pass
 
     return StreamingResponse(
         frames(),

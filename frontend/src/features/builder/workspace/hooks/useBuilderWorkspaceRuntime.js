@@ -3,7 +3,16 @@ import { validatedProjectIdentity, requireOutputIdentity } from '../../state/pro
 import { staticTrustDecision } from '../../state/staticSectionMutation.mjs';
 import useDurableLandingTransaction from './useDurableLandingTransaction';
 import { parseLandingChange } from '../../command/parseLandingChange.mjs';
-import { loadLandingPreview, previewErrorMessage, stepNeedsPatience, streamLandingPreview } from '../../api/builderPreviewClient';
+import {
+  PREVIEW_STREAM_COPY,
+  loadLandingPreview,
+  previewErrorMessage,
+  previewStreamStalled,
+  stepNeedsPatience,
+  streamLandingPreview,
+  streamTerminalState,
+  streamWatchdog,
+} from '../../api/builderPreviewClient';
 
 const autoPreviewJobs = new Map();
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
@@ -635,6 +644,7 @@ export default function useBuilderWorkspaceRuntime({
   const [appliedDecisionTypes, setAppliedDecisionTypes] = useState([]);
   const [generatedPreview, setGeneratedPreview] = useState(null);
   const [previewNotice, setPreviewNotice] = useState('');
+  const [streamProgressAt, setStreamProgressAt] = useState(0);
   const [previewPhase, setPreviewPhase] = useState(autoStart ? 'working' : '');
   const [executorPhase, setExecutorPhase] = useState(autoStart ? 'construyendo' : 'idle');
   const [executorMessage, setExecutorMessage] = useState(autoStart ? 'Construyendo tu página.' : 'El ejecutor está listo.');
@@ -751,6 +761,22 @@ export default function useBuilderWorkspaceRuntime({
 
   const applyExecutorEvent = useCallback((event) => {
     if (!event || event.type === 'heartbeat') return;
+    setStreamProgressAt(Date.now());
+    const outcome = streamTerminalState(event);
+    if (outcome && !outcome.terminal) {
+      setPreviewNotice(outcome.notice);
+      setExecutorMessage(outcome.message);
+      setExecutorLog((current) => [...current, { role: 'agent', text: outcome.notice }]);
+      return;
+    }
+    if (outcome?.terminal && outcome.phase === 'error') {
+      setPreviewNotice(outcome.notice);
+      setPreviewPhase('error');
+      setExecutorPhase('error');
+      setExecutorMessage(outcome.message);
+      setPartialHtml('');
+      return;
+    }
     if (event.type === 'state') {
       setExecutorPhase(event.phase || 'construyendo');
       setExecutorMessage(event.message || '');
@@ -773,20 +799,30 @@ export default function useBuilderWorkspaceRuntime({
       setGeneratedPreview(event);
       setPartialHtml('');
       setExecutorPhase('completado');
-      setExecutorMessage(event.summary || 'Página guardada.');
+      setExecutorMessage(event.summary || PREVIEW_STREAM_COPY.done);
       setPreviewPhase('ready');
-      setPreviewNotice('');
+      setPreviewNotice((current) => (
+        typeof current === 'string' && current.includes(PREVIEW_STREAM_COPY.pending) ? current : ''
+      ));
       if (event.summary) setExecutorLog((current) => [...current, { role: 'agent', text: event.summary }]);
     }
-    if (event.type === 'error') {
-      const message = event.message || 'No se ha podido preparar la preview. No se ha publicado nada.';
-      setPreviewNotice(message);
+  }, []);
+
+  useEffect(() => {
+    const active = executorPhase === 'construyendo' || executorPhase === 'iterando';
+    if (!active) return undefined;
+    const startedAt = streamProgressAt || Date.now();
+    const wait = Math.max(0, streamWatchdog.ms - (Date.now() - startedAt));
+    const timer = window.setTimeout(() => {
+      if (!previewStreamStalled(startedAt, Date.now(), streamWatchdog.ms)) return;
+      const stalled = streamTerminalState({ type: 'timeout' });
+      setPreviewNotice(stalled.notice);
       setPreviewPhase('error');
       setExecutorPhase('error');
-      setExecutorMessage(message);
-      setPartialHtml('');
-    }
-  }, []);
+      setExecutorMessage(stalled.message);
+    }, wait);
+    return () => window.clearTimeout(timer);
+  }, [executorPhase, streamProgressAt]);
 
   const activeExecutorStep = executorSteps.find((step) => step.status === 'in_progress');
   useEffect(() => {
@@ -811,7 +847,10 @@ export default function useBuilderWorkspaceRuntime({
     const preview = await streamLandingPreview(projectValue, instruction, applyExecutorEvent);
     setGeneratedPreview(preview);
     setPreviewPhase('ready');
-    setPreviewNotice('');
+    setExecutorPhase('completado');
+    setPreviewNotice((current) => (
+      typeof current === 'string' && current.includes(PREVIEW_STREAM_COPY.pending) ? current : ''
+    ));
     return preview;
   }, [applyExecutorEvent, generatedPreview?.html]);
 
@@ -1313,8 +1352,12 @@ export default function useBuilderWorkspaceRuntime({
     job.then((result) => {
       if (cancelled) return;
       setGeneratedPreview(result.preview);
-      setPreviewNotice(result.preview?.html ? '' : 'No se ha podido preparar la preview. No se ha publicado nada.');
+      setPreviewNotice((current) => {
+        if (typeof current === 'string' && current.includes(PREVIEW_STREAM_COPY.pending)) return current;
+        return result.preview?.html ? '' : 'No se ha podido preparar la preview. No se ha publicado nada.';
+      });
       setPreviewPhase(result.preview?.html ? 'ready' : 'error');
+      if (result.preview?.html) setExecutorPhase('completado');
     }).catch((error) => {
       if (cancelled) return;
       setPreviewNotice(previewErrorMessage(error));
