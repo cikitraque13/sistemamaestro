@@ -6,25 +6,25 @@ import { BRAND_GRADIENT_TEXT } from '../brandText';
 const items = [
   {
     title: 'Clínicas y consultas',
-    text: 'Diagnóstico de la web y borrador de la oferta.',
+    text: 'Dudas de pacientes respondidas sin coger el teléfono.',
     classes: 'bg-[linear-gradient(180deg,rgba(249,115,22,0.30),rgba(249,115,22,0.12))]',
     glow: 'rgba(249,115,22,0.30)',
   },
   {
     title: 'Inmobiliarias',
-    text: 'Preview de la captación y prioridades.',
+    text: 'Cada contacto atendido al momento, a cualquier hora.',
     classes: 'bg-[linear-gradient(180deg,rgba(198,244,50,0.22),rgba(198,244,50,0.08))]',
     glow: 'rgba(198,244,50,0.26)',
   },
   {
     title: 'Restaurantes y comercios',
-    text: 'Lectura de la web y borrador de prompt.',
+    text: 'Preguntas y reservas resueltas mientras tú trabajas.',
     classes: 'bg-[linear-gradient(180deg,rgba(216,180,254,0.26),rgba(167,139,250,0.12))]',
     glow: 'rgba(167,139,250,0.32)',
   },
   {
     title: 'Agencias y freelancers',
-    text: 'Un diagnóstico y una preview por cliente.',
+    text: 'Entregan web y agente a sus clientes desde un solo sistema.',
     classes: 'bg-[linear-gradient(180deg,rgba(56,189,248,0.26),rgba(56,189,248,0.10))]',
     glow: 'rgba(56,189,248,0.30)',
   },
@@ -40,12 +40,12 @@ const AudienceSection = () => {
           </p>
 
           <h2 className="text-3xl font-semibold tracking-tight text-white md:text-[3rem] md:leading-[0.97]">
-            Para negocios que quieren un <span className={BRAND_GRADIENT_TEXT}>diagnóstico</span> y una{' '}
-            <span className={BRAND_GRADIENT_TEXT}>preview</span>.
+            Para negocios que quieren <span className={BRAND_GRADIENT_TEXT}>su web</span> y{' '}
+            <span className={BRAND_GRADIENT_TEXT}>su agente</span> trabajando por ellos.
           </h2>
 
           <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300 md:text-lg">
-            El canal disponible es la web. WhatsApp, calendario y CRM están previstos.
+            Si atiendes clientes por chat, web o WhatsApp, Sistema Maestro construye tu web y pone un agente de IA a atenderlos por ti.
           </p>
         </div>
 
