@@ -845,6 +845,13 @@ export default function useBuilderWorkspaceRuntime({
     setPartialHtml('');
     setExecutorLog((current) => [...current, { role: 'user', text: instruction }]);
     const preview = await streamLandingPreview(projectValue, instruction, applyExecutorEvent);
+    if (!preview?.html) {
+      setPreviewPhase('error');
+      setExecutorPhase('error');
+      setExecutorMessage('No se ha podido preparar la preview. No se ha publicado nada.');
+      setPartialHtml('');
+      return preview;
+    }
     setGeneratedPreview(preview);
     setPreviewPhase('ready');
     setExecutorPhase('completado');
@@ -1360,8 +1367,12 @@ export default function useBuilderWorkspaceRuntime({
       if (result.preview?.html) setExecutorPhase('completado');
     }).catch((error) => {
       if (cancelled) return;
-      setPreviewNotice(previewErrorMessage(error));
+      const message = previewErrorMessage(error);
+      setPreviewNotice(message);
       setPreviewPhase('error');
+      setExecutorPhase('error');
+      setExecutorMessage(message);
+      setPartialHtml('');
     });
     return () => { cancelled = true; };
   }, [autoStart, projectReady, project, initialPrompt]);

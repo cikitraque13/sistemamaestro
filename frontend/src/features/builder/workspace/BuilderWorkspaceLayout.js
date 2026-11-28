@@ -110,8 +110,8 @@ export default function BuilderWorkspaceLayout({
   const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
   const installOpen = Boolean(embedInstall && activeWorkspaceTab === 'install' && project);
   const executorPhase = runtime.executor?.phase || '';
-  const busy = executorPhase === 'construyendo' || executorPhase === 'iterando' || runtime.previewPhase === 'working';
   const failed = executorPhase === 'error' || runtime.previewPhase === 'error';
+  const busy = !failed && (executorPhase === 'construyendo' || executorPhase === 'iterando' || runtime.previewPhase === 'working');
   const liveHtml = (busy && runtime.executor?.partialHtml) || runtime.generatedPreview?.html || '';
   const workStatus = (busy || (failed && liveHtml)) ? (
     <div role="status" className="border-b border-white/10 bg-[#10141c] px-4 py-3 text-sm text-zinc-100">
@@ -167,7 +167,7 @@ export default function BuilderWorkspaceLayout({
 
   return (
     <section className="h-full min-h-0 overflow-auto rounded-[24px] border border-white/10 bg-[#06080B] shadow-[0_0_90px_rgba(0,0,0,0.38)] lg:overflow-hidden">
-      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-[380px_minmax(0,1fr)] lg:overflow-hidden">
+      <div className="flex min-h-full flex-col lg:grid lg:h-full lg:min-h-0 lg:grid-cols-2 lg:overflow-hidden">
         <div className="order-1 min-h-[70vh] overflow-hidden lg:order-2 lg:min-h-0 lg:h-full">
           {main}
         </div>

@@ -101,6 +101,8 @@ test('a failed automatic build stays on the error and does not invent a page', a
     autoStart: true,
   });
   expect(runtime.previewPhase).toBe('error');
+  expect(runtime.executor.phase).toBe('error');
+  expect(runtime.executor.phase).not.toBe('completado');
   expect(runtime.previewNotice).toMatch(/preview|publicado/i);
   expect(runtime.generatedPreview).toBeNull();
   act(() => root.unmount());
