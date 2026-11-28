@@ -1,6 +1,6 @@
 # Sistema Maestro
 
-Estado leído en `main` a partir de `e9fe97f` (28 de noviembre de 2026). Este archivo describe el producto y el despliegue; no sustituye `docs/control/`.
+Estado leído en `main` a partir de `6529327` (28 de noviembre de 2026). Este archivo describe el producto y el despliegue; no sustituye `docs/control/`.
 
 Repositorio: [cikitraque13/sistemamaestro](https://github.com/cikitraque13/sistemamaestro). Producción: [sistemamaestro.com](https://sistemamaestro.com). Salud: [sistemamaestro.com/health](https://sistemamaestro.com/health).
 
@@ -41,7 +41,7 @@ La marca en la cabecera es «Dirección, IA y continuidad».
 
 ## Estado actual (28/11/2026)
 
-`main` está en `e9fe97f`. La portada no entra en estos cambios.
+`main` está en `6529327`: Facturación ([#194](https://github.com/cikitraque13/sistemamaestro/pull/194)) sobre este README ([#196](https://github.com/cikitraque13/sistemamaestro/pull/196)) sobre el control de coste ([#195](https://github.com/cikitraque13/sistemamaestro/pull/195)). La portada no entra en estos cambios.
 
 | Pieza | Dónde | Qué hay en `main` |
 | --- | --- | --- |
@@ -50,6 +50,7 @@ La marca en la cabecera es «Dirección, IA y continuidad».
 | Panel v5 | [#192](https://github.com/cikitraque13/sistemamaestro/pull/192) | Barra lateral: Proyectos (desplegable), Agencia de IA, Agente de voz, Agente de chat. Facturación abajo, sobre la cuenta. |
 | Activación al publicar | [#193](https://github.com/cikitraque13/sistemamaestro/pull/193) | Publicar enciende chat y citas de ese proyecto, salvo baja del dueño. Voz y WhatsApp solo si ya hay credenciales. |
 | Demo de Nova | `frontend/src/features/home` | Sección `agencia-ia`. El botón dice «Habla con Nova». |
+| Facturación | [#194](https://github.com/cikitraque13/sistemamaestro/pull/194) | La página muestra solo las tarjetas de plan, sin saldo, plan actual, sugerencia ni historial de pagos. Los precios y el pago no cambian: Stripe sigue con 0, 29, 79 y 199 €. |
 | Tope de coste | [#195](https://github.com/cikitraque13/sistemamaestro/pull/195) | Topes de tokens, cortacircuitos por coste estimado y topes por usuario (día y mes). No mueve el libro de gemas. |
 
 Reservas vive en Agente de chat (lista y horario). El menú no tiene Reservas, Vídeo ni App móvil. Agente de voz no lista reservas. `/dashboard/reservas` sigue en el router como «Próximamente» y no sale en la barra.
@@ -60,8 +61,7 @@ Al publicar, la landing gana un enlace sin script, «Habla con nosotros · Reser
 
 | Tema | Marca | Qué falta |
 | --- | --- | --- |
-| Facturación | pendiente | [#194](https://github.com/cikitraque13/sistemamaestro/pull/194), abierta. En `main` la página sigue con saldo, plan actual, sugerencia, tarjetas e historial. La PR deja solo las tarjetas de plan. |
-| Precios de tres planes | pendiente | Propuesta, no cerrada: Prueba gratis, Agencia mensual ~149 €/mes (referencia de borrador) y Red por negocio con precio por volumen. No está en el código. Stripe sigue con Gratis 0 €, Blueprint 29 €, Sistema 79 € y Premium 199 € (`backend/app/domain/plans.py`). |
+| Precios de tres planes | pendiente | Propuesta, no cerrada: Prueba gratis, Agencia mensual ~149 €/mes (referencia de borrador) y Red por negocio con precio por volumen. No está en el código. Stripe sigue con Gratis 0 €, Blueprint 29 €, Sistema 79 € y Premium 199 € (`backend/app/domain/plans.py`). Hay además una propuesta de escala de pago único (versión 6): Prueba 0 €, Web en vivo 290 €, Agencia montada 1.500 € al quedar en verde y Red a 1.200, 1.000 y 800 € por negocio. Está pendiente de decisión y no está en el código. |
 | Correo de bienvenida | pendiente | No hay envío con Mailjet en el repo. |
 | Chat y citas públicos | pendiente | `AGENT_MODULE_CHAT_ENABLED` y `AGENT_MODULE_CITAS_ENABLED` salen en `false` en los ejemplos y no están en las variables de producción. Ausente cuenta como apagado. |
 | WhatsApp y teléfono | pendiente | El panel lo dice: WhatsApp no está conectado y las llamadas no se contratan ahí. El recordatorio de 24 h no sale si nadie llama a la ruta y falta `BOOKINGS_REMINDER_SECRET`. |
@@ -121,7 +121,7 @@ npm start
 
 ## Despliegue
 
-El servicio Railway `sistemamaestro` (proyecto `sistemamaestro-project`) construye el repo `cikitraque13/sistemamaestro`, rama `main`, con el `Dockerfile`. `railway.json` fija el builder `DOCKERFILE`, `healthcheckPath` `/health`, timeout 300 s y reinicio `ON_FAILURE`. No hay `nixpacks.toml`. Un push a `main` despliega. El despliegue vigente es `SUCCESS` sobre `e9fe97f` (28 de noviembre de 2026).
+El servicio Railway `sistemamaestro` (proyecto `sistemamaestro-project`) construye el repo `cikitraque13/sistemamaestro`, rama `main`, con el `Dockerfile`. `railway.json` fija el builder `DOCKERFILE`, `healthcheckPath` `/health`, timeout 300 s y reinicio `ON_FAILURE`. No hay `nixpacks.toml`. Un push a `main` despliega. El despliegue vigente es `SUCCESS` sobre `6529327` (28 de noviembre de 2026).
 
 El contenedor escucha `${PORT:-8080}`:
 
