@@ -8,8 +8,15 @@ import asyncio
 import json
 import logging
 
+import pytest
+
 from backend.app.services.builder_claude_loop import (
+    CACHE_MIN_INPUT_TOKENS,
+    TOKEN_USD_PER_MILLION,
     build_copy_request,
+    cache_min_tokens,
+    cached_prefix_tokens,
+    executor_cost_usd,
     run_copy_tool_loop,
     stable_context,
     thinking_config,
@@ -104,7 +111,8 @@ def test_tool_schema_is_closed_and_repairs_invented_fields():
     assert any(item.startswith("enum:") for item in problems)
 
 
-def test_request_caches_the_stable_prefix_and_does_not_send_a_thinking_budget():
+@pytest.mark.parametrize("model", ["claude-haiku-5-5", "claude-sonnet-5-5"])
+def test_request_caches_the_stable_prefix_and_does_not_send_a_thinking_budget(model):
     brief = {
         "instruction": CLARA,
         "intentTitle": "Clara",
@@ -113,27 +121,56 @@ def test_request_caches_the_stable_prefix_and_does_not_send_a_thinking_budget():
         "promptVersion": PROMPT_VERSION,
     }
     request = build_copy_request(
-        model="claude-haiku-5-5", brief=brief,
+        model=model, brief=brief,
         messages=[{"role": "user", "content": "Escribe la landing."}],
         max_tokens=4096, effort="high",
     )
     encoded = json.dumps(request)
+    assert request["model"] == model
     assert "budget_tokens" not in encoded
     assert request["thinking"] == {"type": "adaptive", "display": "summarized"}
-    assert thinking_config("claude-sonnet-5-5")["type"] == "adaptive"
+    assert request["thinking"]["type"] != "disabled"
+    assert request["tool_choice"] == {"type": "auto"}
     assert request["max_tokens"] == 4096
+    assert request["output_config"] == {"effort": "high"}
     assert request["system"][0]["cache_control"]["type"] == "ephemeral"
     assert request["system"][1]["cache_control"]["type"] == "ephemeral"
     assert "sobrio" in request["system"][1]["text"]
     assert "Falta el oficio" not in request["system"][1]["text"]
     assert "Falta el oficio" in request["messages"][0]["content"]
     assert "revisionNotes" not in stable_context(brief)
+    assert cached_prefix_tokens(brief) >= cache_min_tokens(model)
+    assert cache_min_tokens(model) == CACHE_MIN_INPUT_TOKENS[model] == 512
     try:
         thinking_config("claude-opus-secret")
     except PipelineError as exc:
         assert exc.code == "landing_unavailable"
     else:
         raise AssertionError("an unpriced model must not be called")
+
+
+def test_sonnet_worst_case_and_typical_use_the_production_card():
+    brief = {"instruction": CLARA, "promptVersion": PROMPT_VERSION}
+    prefix = cached_prefix_tokens(brief)
+    card = TOKEN_USD_PER_MILLION["claude-sonnet-5-5"]
+    assert card == {"input": 2.0, "output": 10.0, "cache_read": 0.10, "cache_write_5m": 2.50}
+    common = {
+        "output_tokens_per_call": 4096,
+        "prefix_tokens": prefix,
+        "uncached_tokens_per_call": 200,
+    }
+    worst = executor_cost_usd("claude-sonnet-5-5", iterations=3, tool_turns_per_iteration=3, **common)
+    typical = executor_cost_usd("claude-sonnet-5-5", iterations=1, tool_turns_per_iteration=1, **common)
+    haiku = executor_cost_usd("claude-haiku-5-5", iterations=3, tool_turns_per_iteration=3, **common)
+    assert worst["calls"] == 9
+    assert typical["calls"] == 1
+    assert abs(worst["output_usd"] - (9 * 4096 * 10 / 1_000_000)) < 1e-9
+    assert abs(typical["output_usd"] - (4096 * 10 / 1_000_000)) < 1e-9
+    assert worst["cache_write_usd"] == prefix * 2.50 / 1_000_000
+    assert worst["cache_read_usd"] == 8 * prefix * 0.10 / 1_000_000
+    assert typical["cache_read_usd"] == 0
+    assert worst["total_usd"] > typical["total_usd"] > 0
+    assert worst["total_usd"] > haiku["total_usd"]
 
 
 def test_tool_loop_repairs_then_rejects_a_bad_enum_without_leaking_the_value(caplog):

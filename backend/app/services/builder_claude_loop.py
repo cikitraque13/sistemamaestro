@@ -53,11 +53,102 @@ def executor_thinking_effort() -> str:
     return raw
 
 
+# Anthropic thinking table, 2026-11-28:
+# https://platform.claude.com/docs/en/build-with-claude/thinking
+# Both priced models reject budget_tokens (HTTP 400).
+# Haiku 5.5: adaptive by default; thinking.type=disabled works at high or below;
+#   between_tools is a 400.
+# Sonnet 5.5: adaptive by default; thinking.type=disabled is always a 400;
+#   between_tools only turns up-front thinking off, and only at high or below.
+# The executor keeps thinking on for both, so the request is adaptive.
+# The bound is max_tokens (thinking counts toward it) plus effort high or lower.
+MODEL_THINKING = {
+    "claude-haiku-5-5": {"type": "adaptive", "display": "summarized"},
+    "claude-sonnet-5-5": {"type": "adaptive", "display": "summarized"},
+}
+
+# Cache minimums, same docs page for prompt caching, 2026-11-28.
+# A shorter prefix is billed in full and cache_read stays 0.
+CACHE_MIN_INPUT_TOKENS = {
+    "claude-haiku-5-5": 512,
+    "claude-sonnet-5-5": 512,
+}
+
+# USD per million tokens. Sonnet cache prices are the production card Lucas set
+# (read $0.10, 5-minute write $2.50). Haiku cache is the published ephemeral
+# multiplier on its $0.10 input price: read 0.1×, 5-minute write 1.25×.
+# These figures explain a build. They are not the gem charge.
+TOKEN_USD_PER_MILLION = {
+    "claude-haiku-5-5": {
+        "input": 0.10,
+        "output": 0.50,
+        "cache_read": 0.01,
+        "cache_write_5m": 0.125,
+    },
+    "claude-sonnet-5-5": {
+        "input": 2.00,
+        "output": 10.00,
+        "cache_read": 0.10,
+        "cache_write_5m": 2.50,
+    },
+}
+
+
 def thinking_config(model: str) -> dict:
-    """Adaptive thinking. budget_tokens is not sent for the priced models."""
-    if model not in ANTHROPIC_RATES:
+    """Adaptive thinking for the priced model. Never sends budget_tokens."""
+    spec = MODEL_THINKING.get(model)
+    if spec is None or model not in ANTHROPIC_RATES:
         raise PipelineError("landing_unavailable")
-    return {"type": "adaptive", "display": "summarized"}
+    if "budget_tokens" in spec or spec.get("type") == "enabled":
+        raise PipelineError("landing_unavailable")
+    if model == "claude-sonnet-5-5" and spec.get("type") == "disabled":
+        raise PipelineError("landing_unavailable")
+    return dict(spec)
+
+
+def cache_min_tokens(model: str) -> int:
+    if model not in CACHE_MIN_INPUT_TOKENS:
+        raise PipelineError("landing_unavailable")
+    return CACHE_MIN_INPUT_TOKENS[model]
+
+
+def cached_prefix_tokens(brief: dict) -> int:
+    from backend.app.ai.providers.model_pricing import estimate_tokens
+
+    return (
+        estimate_tokens(json.dumps(tool_definition(), ensure_ascii=False))
+        + estimate_tokens(SYSTEM_PROMPT)
+        + estimate_tokens(stable_context(brief or {}))
+    )
+
+
+def executor_cost_usd(
+    model: str,
+    *,
+    iterations: int,
+    tool_turns_per_iteration: int,
+    output_tokens_per_call: int,
+    prefix_tokens: int,
+    uncached_tokens_per_call: int,
+) -> dict:
+    """One build. The first call writes the prefix; later calls read it."""
+    price = TOKEN_USD_PER_MILLION.get(model)
+    if price is None:
+        raise PipelineError("landing_unavailable")
+    calls = max(int(iterations), 0) * max(int(tool_turns_per_iteration), 0)
+    output = calls * output_tokens_per_call * price["output"] / 1_000_000
+    write = (prefix_tokens * price["cache_write_5m"] / 1_000_000) if calls else 0.0
+    reads = max(calls - 1, 0) * prefix_tokens * price["cache_read"] / 1_000_000
+    fresh = calls * uncached_tokens_per_call * price["input"] / 1_000_000
+    total = output + write + reads + fresh
+    return {
+        "calls": calls,
+        "output_usd": output,
+        "cache_write_usd": write,
+        "cache_read_usd": reads,
+        "fresh_input_usd": fresh,
+        "total_usd": total,
+    }
 
 
 def stable_context(brief: dict) -> str:
