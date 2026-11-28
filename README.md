@@ -1,382 +1,106 @@
 # Sistema Maestro
 
-> **Orientación rápida (revisión 2026-11-23).**
-> - **Qué es:** plataforma guiada que convierte una necesidad, una idea, una URL o un activo existente en una estructura digital activable, construible y monetizable.
-> - **Papel en el ecosistema:** producto propio de Lucas Díaz; se trabaja para migrar su desarrollo a Claude.
-> - **Repositorio:** `cikitraque13/sistemamaestro`. Rama publicada: `main` (protegida).
-> - **Producción:** Railway, servicio `sistemamaestro`, despliega automáticamente desde `main` sin rutas vigiladas: cualquier merge a `main`, también solo de documentación, despliega. Web: https://sistemamaestro.com, salud en `/health`.
-> - **Stack:** backend FastAPI con MongoDB; frontend Vite con React 18; un solo contenedor definido en el `Dockerfile`.
->
-> **Dónde está cada documento canónico**
->
-> | Tema | Documento |
-> |---|---|
-> | Estado de madurez (S14–S18, J04–J16) | [Master Maturity Roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) |
-> | Índice de gobierno | [00-INDICE-MAESTRO](docs/control/00-INDICE-MAESTRO.md) |
-> | Backlog | [02-PENDIENTES-PRIORIZADOS](docs/control/02-PENDIENTES-PRIORIZADOS.md) |
-> | Garantías y limitaciones | [10-REGISTRO-GARANTIAS-PENDIENTES](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md) |
-> | Producción y despliegues | [04-runtime-and-deploy-truth](docs/architecture/04-runtime-and-deploy-truth.md) y [DEPLOY_RAILWAY](DEPLOY_RAILWAY.md) |
-> | Decisiones cerradas | [01-DECISIONES-CERRADAS](docs/control/01-DECISIONES-CERRADAS.md) |
-> | Inventario y backups | [03-INVENTARIO-TECNICO](docs/control/03-INVENTARIO-TECNICO.md) |
-> | Incidencias | [05-INCIDENCIAS-Y-DIAGNOSTICOS](docs/control/05-INCIDENCIAS-Y-DIAGNOSTICOS.md) |
-> | Procedimientos, Git y gates | [06](docs/control/06-PROCEDIMIENTOS-OPERATIVOS.md), [07](docs/control/07-GIT-DEPLOY-HIGIENE.md), [09](docs/control/09-JOURNEY-GATE-OPERATING-RULES.md) |
-> | Arquitectura | [docs/architecture](docs/architecture/) |
-> | Producto y doctrina | [docs/product/sistema-maestro](docs/product/sistema-maestro/00-INDICE.md) |
-> | Créditos | [docs/system/credits](docs/system/credits/00-POLITICA-CANONICA-CREDITOS-V1.md) |
->
-> El estado que sigue es el texto canónico vigente y no se modifica en esta revisión.
+Estado leído en `main` a partir de `08c8734` (28 de noviembre de 2026). Este archivo describe el producto y el despliegue; no sustituye `docs/control/`.
 
-## Estado actual — 2026-10-25
+Repositorio: [cikitraque13/sistemamaestro](https://github.com/cikitraque13/sistemamaestro). Producción: [sistemamaestro.com](https://sistemamaestro.com). Salud: [sistemamaestro.com/health](https://sistemamaestro.com/health).
 
-S14, S15 y S16 están COMPLETED. S17 está CLOSED_BY_HUMAN_ACCEPTANCE para el recorrido visual aceptado, sin TECHNICAL_PASS del harness E2E. S18 está CLOSED_BY_HUMAN_ACCEPTANCE_WITH_LIMITATIONS, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO; J03 permanece cerrado con limitaciones. J04 sigue CLOSED_BY_HUMAN_ACCEPTANCE dentro del alcance V1–V3, TECHNICAL_STATUS=PARTIAL y TECHNICAL_PASS=NO. J05 está técnicamente completada frente a su contrato canónico (`TECHNICAL_PASS=YES`), con riesgos residuales de precisión semántica y cobertura descritos en el roadmap y el registro acumulativo. El checkpoint `GOLD_FREEZE_POST_J05_2026-10-20`, con origen `e7370c323267f5c2f105a3c3b7265ea9723719a7`, tiene integridad y restauración PASS; las limitaciones de exclusión de secretos constan en el inventario técnico. J06 permanece OPEN mientras se reconcilia y acepta formalmente su cierre global: Phase 3A y Phase 3B están publicadas y verificadas; J07 sigue NOT_OPENED. El [roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) es la fuente de verdad de madurez; el [registro acumulativo](docs/control/10-REGISTRO-GARANTIAS-PENDIENTES.md) conserva limitaciones y revalidación.
+## Qué es
 
-La identidad de GitHub main, la observación de Railway y sus diferencias están en [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md). El documento [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) conserva el registro histórico de esa etapa; no es el estado vigente de S14–S18.
+La portada, en `frontend/src/features/home`, lo dice así:
 
-Sistema Maestro es una plataforma guiada de transformación digital diseñada para convertir una necesidad, una idea o un activo existente en una solución digital estructurada, monetizable y operable.
+> Describe tu negocio: creamos tu web, la lanzamos y tu agente de IA atiende.
 
-El sistema no se limita a dar una respuesta superficial. Analiza, ordena, propone una ruta y prepara continuidad para que el proyecto pueda avanzar con más claridad, menos fricción y mejor base de crecimiento.
+> Sistema Maestro interpreta tu idea o tu web y ordena prioridades.
 
----
+> Si atiendes clientes por chat, web o WhatsApp, Sistema Maestro construye tu web y pone un agente de IA a atenderlos por ti.
 
-## Qué representa este repositorio
+La marca en la cabecera es «Dirección, IA y continuidad».
 
-Este repositorio contiene la base operativa real de Sistema Maestro.
+## Flujo
 
-Su función actual no es servir como escaparate estático, sino como sistema en evolución con:
+1. **Home.** Ruta `/`. Vive en `frontend/src/features/home`. Se restauró el 2026-11-23 al revertir el PR #115 (`f917e76a`) y el copy de cierre el 2026-11-28 (`02c2076`, revierte #163 solo en esa carpeta). La carpeta queda congelada: el trabajo del builder no la modifica. «Iniciar sesión» va a `/login` y, tras entrar, a `/dashboard`.
+2. **Dashboard.** El lanzador (`DashboardBuilderLauncher`) crea el proyecto con `POST /projects`. El backend llama a `analyze_with_ai`, que usa Grok, y guarda el `diagnosis` en el proyecto.
+3. **Builder.** El lanzador abre `/dashboard/builder?project_id=`.
+4. **Ejecutor.** Pipeline lineal de cinco pasos, en `backend/app/services/builder_executor.py`:
 
-- capa pública de entrada y captación;
-- flujo de activación;
-- autenticación;
-- dashboard;
-- builder;
-- oportunidades;
-- billing;
-- backend modular;
-- motor de consumo y créditos;
-- y una capa de IA en consolidación estructural.
+   | Paso | Qué hace |
+   | --- | --- |
+   | Entendiendo tu negocio | Grok clasifica la intención (`classify_intent`). |
+   | Estructura de secciones | Grok escribe el blueprint (`generate_blueprint`). La preview usa como máximo 4 prioridades. |
+   | Textos | El writer redacta la cabecera y cada sección. Por defecto es Claude. |
+   | Diseño | Plantilla HTML fija (`render_preview_html`). No hay un generador aparte de componentes de aplicación. |
+   | Revisión final | El juez puntúa con una rúbrica acotada. Si no encaja, se reintenta una vez: máximo 2 intentos (`MAX_DRAFT_ATTEMPTS`). |
 
-Este `README.md` no sustituye la documentación canónica de `docs/control/`, pero sí debe reflejar el estado real del sistema sin arrastres antiguos ni referencias obsoletas.
+   Clasificar y el blueprint llaman siempre a Grok. Los selectores cambian el juez y el writer:
 
----
+   | Variable | Por defecto | Valores |
+   | --- | --- | --- |
+   | `BUILDER_EXECUTOR_ORCHESTRATOR` | `grok` | `grok` o `anthropic`. El juez usa este nombre. Un valor desconocido falla cerrado. |
+   | `BUILDER_EXECUTOR_WRITER` | `anthropic` | `anthropic` (Claude) o `grok`. |
 
-## Qué hace Sistema Maestro
+   El vivo llega por SSE en `POST /api/builder/preview/stream`. Eventos: `state`, `step`, `section`, `done`, `error`. Un paso en silencio también emite comentarios `: heartbeat` cada 10 s. El evento interno `result` no se envía al navegador.
 
-Sistema Maestro está pensado para ayudar a usuarios, operadores, agencias y equipos a:
+   Cada versión aceptada se guarda en `builder_landing_states`. Se conservan como máximo 8 (`MAX_PREVIEW_VERSIONS`).
 
-1. **Mejorar algo existente**  
-   Analiza una URL o activo digital y propone una ruta de mejora estructurada.
+   El cobro de gemas pasa por `run_economic_operation` y el libro `credit_ledger` (nombre por defecto de `CREDIT_LEDGER_COLLECTION`). Si `BUILDER_FREE_TEST_MODE` está encendido, un administrador no reserva gemas. El modo está apagado cuando la variable no existe.
 
-2. **Vender y cobrar**  
-   Ayuda a ordenar una propuesta, una lógica de valor y una estructura de cobro.
+`BUILDER_ENABLED` no está en los `.env.example`. Si no está definida, los endpoints del builder responden 503 («El Builder está en construcción») y no reservan créditos. Un administrador entra igual. La lista de variables del servicio de producción en Railway no incluye ese nombre.
 
-3. **Automatizar operación**  
-   Detecta fricción operativa y ayuda a plantear una secuencia más escalable.
+## Estado por PR
 
-4. **Convertir una idea en proyecto**  
-   Transforma una idea en una estructura digital con continuidad real.
+Comprobado en GitHub el 2026-11-28. `main` está en el merge de #180.
 
----
+| PR | Estado | Qué aporta |
+| --- | --- | --- |
+| [#176](https://github.com/cikitraque13/sistemamaestro/pull/176) | Merged (`9393bce`, 2026-11-28) | Pasos reales del ejecutor y streaming SSE. |
+| [#177](https://github.com/cikitraque13/sistemamaestro/pull/177) | Merged (`1825bab`, 2026-11-28) | Publicar la landing y dominio propio. Los flags siguen apagados. |
+| [#178](https://github.com/cikitraque13/sistemamaestro/pull/178) | Merged (`2e50951`, 2026-11-28) | Snippet del agente de voz embebible. `EMBED_AGENT_ENABLED` sigue apagado. |
+| [#179](https://github.com/cikitraque13/sistemamaestro/pull/179) | Merged (`adee2e2`, 2026-11-28) | Menú de cuenta arriba a la derecha del builder. El despliegue vigente de `main` lo incluye. La fila «Conoce a tu asesor» está visible y deshabilitada, con la marca Próximamente. |
+| [#180](https://github.com/cikitraque13/sistemamaestro/pull/180) | Merged (`08c8734`, 2026-11-28) | Backend de los módulos de agente: chat, voz, WhatsApp y citas. `AGENT_MODULE_*` siguen apagados. |
+| [#181](https://github.com/cikitraque13/sistemamaestro/pull/181) | Abierta, en curso. Base `08c8734`, mergeable. | Cierra el stream de preview cuando el cobro de gemas falla antes de empezar el trabajo. En `main` ese fallo deja el SSE en heartbeats. |
+| [#182](https://github.com/cikitraque13/sistemamaestro/pull/182) | Abierta. Base `08c8734`, mergeable. | Flujo «Conoce a tu asesor». El flag `ADVISOR_FLOW_ENABLED` no está en `main` ni en los `.env.example`; en la PR queda apagado. |
 
-## Estado real del producto
+## Feature flags
 
-La lectura correcta del sistema hoy es esta:
+Nombres tomados de [`.env.example`](.env.example) y [`backend/.env.example`](backend/.env.example). En el código, ausente cuenta como apagado (`true`, `1`, `yes` u `on` encienden). No hay valores de secreto en este archivo.
 
-- el proyecto ya no es una simple landing;
-- el frontend ya está modularizado por features;
-- el backend ya está modularizado en `backend/app/`;
-- el builder ya existe como pieza real del producto;
-- el sistema ya contiene auth, dashboard, billing, opportunities, projects y flow;
-- existe una capa de créditos y consumo con contratos, catálogos y reglas;
-- existe una capa de IA y orquestación en consolidación;
+| Variable | Por defecto | Qué hace |
+| --- | --- | --- |
+| `PUBLISH_LANDING_ENABLED` | apagada | Abre publicar, volver a publicar y despublicar la landing. |
+| `BUILDER_PUBLISH_ENABLED` | apagada | Mismo interruptor de publicación, con el nombre anterior. |
+| `CUSTOM_DOMAIN_ENABLED` | apagada | Abre el dominio propio y la búsqueda de ese `Host`. |
+| `PUBLISH_RESOLVE_CUSTOM_HOSTS` | apagada | Busca dominios de cliente aunque el paso de dominio siga cerrado. |
+| `EMBED_AGENT_ENABLED` | apagada | Agente de voz embebible. Un administrador puede ver el paso de instalación con el flag apagado; la sesión pública sigue cerrada salvo la clave de un administrador. |
+| `AGENT_MODULE_CHAT_ENABLED` | `false` | Chat del agente del cliente. Sin flag, el tráfico anónimo recibe 404 y una sesión normal recibe 503. |
+| `AGENT_MODULE_VOZ_ENABLED` | `false` | Voz. El adaptador concreto es una propuesta de Twilio Programmable Voice. |
+| `AGENT_MODULE_WHATSAPP_ENABLED` | `false` | WhatsApp Cloud API. |
+| `AGENT_MODULE_CITAS_ENABLED` | `false` | Citas. |
 
----
+Un administrador puede usar publicación, dominio, embed y el runtime de módulos con el flag global apagado. El interruptor del proyecto, en los módulos de agente, sigue haciendo falta. Los ejemplos comentan también topes y nombres de credencial (`EMBED_AGENT_DAILY_CAP`, `TWILIO_AUTH_TOKEN`, `WHATSAPP_ACCESS_TOKEN`, `BOOKINGS_REMINDER_SECRET` y el resto). Esos nombres están vacíos en los ejemplos.
 
-## Arquitectura general del sistema
+`PUBLISH_BASE_DOMAIN`, `PUBLISH_CNAME_TARGET`, `PUBLISH_APEX_TARGET` y `PUBLISH_APP_HOSTS` salen vacíos: sin dominio base el servidor no inventa `sistemamaestro.com`.
 
-### Raíz real del proyecto
+## Stack
 
-Las rutas base reales del sistema son:
+Un contenedor. El frontend se construye y el backend lo sirve.
 
-- `frontend/`
-- `backend/`
-- `docs/`
-
-La memoria canónica de gobierno técnico vive en:
-
-- `docs/control/`
-
-### Referencias de legado
-
-El inventario siguiente conserva referencias históricas a piezas identificadas como legacy/no canónicas; no acredita su ausencia del repositorio ni su exclusión del runtime actual:
-
-- `backend/server.py`
-- `railway/server_railway.py`
-- `railway/requirements.txt`
-- `memory/`
-- `test_reports/`
-
-El registro histórico describe decisiones de retirada y, cuando aplicó, movimientos a un área externa de safety; ese registro no acredita el estado físico actual de cada ruta.
-
-### Ruta auxiliar vigente
-
-La ruta auxiliar que sigue viva como soporte interno es:
-
-- `tests/`
-
----
-
-## Frontend
-
-### Fuente real
-
-La fuente real del frontend vive en:
-
-- `frontend/src/`
-- `frontend/public/`
-
-La capa principal del producto frontend vive en:
-
-- `frontend/src/features/`
-
-La carpeta `frontend/src/pages/` queda como capa residual temporal y no debe tratarse como la vía principal de crecimiento del producto.
-
-### Features reconocidas
-
-Actualmente el frontend contiene, al menos, estas features reales:
-
-- `app-shell`
-- `auth`
-- `billing`
-- `builder`
-- `dashboard`
-- `flow`
-- `home`
-- `opportunities`
-- `projects`
-- `reports`
-- `settings`
-
-### Estado del root de frontend
-
-La fuente canónica del producto visible sigue viviendo dentro de `src/` y `public/`.
-
-Los archivos técnicos de raíz de `frontend/` como `package.json`, `package-lock.json`, configs del toolchain y documentación local deben tratarse como soporte de capa, no como producto enrutable.
-
----
-
-## Home actual
-
-La Home ya no es una portada simple. Está planteada como capa de entrada, activación y demostración del sistema.
-
-### Lectura funcional de Home
-
-La Home actual ya refleja una dirección clara:
-
-- entrada basada en intención del usuario;
-- lógica de tipos de proyecto;
-- previews de flujo, outputs y estructura;
-- bloque visible del constructor;
-- pricing;
-- captación;
-- continuidad comercial;
-- y CTA final.
-
-Además, la Home ya incorpora componentes ligados al constructor, lo que confirma continuidad con Builder y App Shell.
-
----
-
-## Builder
-
-El Builder ya no debe tratarse como idea futura difusa. Existe como módulo real y debe leerse como pieza central del producto.
-
-### Estructura del Builder
-
-La feature `frontend/src/features/builder/` contiene estructura real de:
-
-- componentes;
-- datos;
-- panels;
-- tabs;
-- utils;
-- workspace.
-
-### Lectura correcta del Builder
-
-Builder no debe tratarse como demo cosmética.
-
-La evidencia actual lo sitúa como:
-
-- entorno de trabajo real;
-- pieza central del sistema;
-- capa donde confluyen estructura, preview, deploy, créditos y continuidad del proyecto.
-
----
-
-## App Shell
-
-La feature `app-shell` ya actúa como carcasa operativa del producto.
-
-### Función
-
-Sirve como base para:
-
-- navegación;
-- proyectos;
-- créditos;
-- tabs;
-- y módulos internos.
-
----
-
-## Dashboard y auth
-
-El sistema ya contiene operación interna real más allá de la Home y del acceso.
-
-### Capas reales
-
-- `frontend/src/features/dashboard/`
-- `frontend/src/features/auth/`
-
-### Lectura correcta
-
-No deben tratarse como promesa futura, sino como partes ya integradas del sistema vivo.
-
----
-
-## Backend
-
-### Estructura real
-
-La capa modular real del backend vive en:
-
-- `backend/app/`
-
-Dentro de ella existen estas subcapas:
-
-- `ai`
-- `core`
-- `db`
-- `domain`
-- `routers`
-- `schemas`
-- `services`
-
-### Entrada canónica del backend
-
-La referencia canónica de runtime del backend es:
-
-```bash
-uvicorn backend.app.main:app --reload --port 8000
-```
-
-La app canónica de runtime queda fijada como:
-
-- `backend.app.main:app`
-
-### Referencia histórica: backend/server.py
-
-La pieza plana heredada:
-
-- `backend/server.py`
-
-El historial documental registra su retirada a safety. Ese registro histórico no acredita su ausencia del repositorio actual ni su exclusión del runtime live.
-
-### Routers backend detectados
-
-La capa de routers contiene, al menos:
-
-- `auth`
-- `billing`
-- `consumption`
-- `opportunities`
-- `payments`
-- `projects`
-- `public`
-
-### Lectura correcta
-
-El backend ya no debe tratarse como archivo único o API improvisada. La arquitectura real es modular.
-
----
-
-## Capa de IA
-
-Existe una capa real de IA y orquestación en:
-
-- `backend/app/ai/`
-
-### Lectura correcta
-
-La arquitectura de IA ya está plantada y forma parte del backend real, aunque no toda su lógica esté viva al mismo nivel funcional.
-
----
-
-## Créditos y consumo
-
-Existe una capa real de créditos en:
-
-- `backend/config/credits/`
-
-### Qué confirma esto
-
-La economía del sistema ya no es solo una idea comercial. Existe una base técnica para:
-
-- acciones con consumo;
-- tiers;
-- reglas de umbral;
-- contratos;
-- y relación con billing y ejecución.
-
----
-
-## Stack técnico actual
-
-### Frontend
-
-- React 18
-- Tailwind CSS
-- Framer Motion
-- React Router
-- Vite
-- Radix UI
-- Recharts
-- Sonner
-- Axios
-
-### Backend
-
-- FastAPI
-- Uvicorn
-- Motor / MongoDB
-- Stripe
-- xAI Grok
-- Anthropic Claude
-- JWT
-- bcrypt
-- httpx
-
-Desde la raíz del repositorio, el frontend usa scripts activos con:
-
-```bash
-cd frontend
-npm ci
-npm start
-npm run build
-```
-
----
+| Capa | Qué usa el repo |
+| --- | --- |
+| Backend | FastAPI (`fastapi==0.110.1`) y Uvicorn. Entrada `backend.app.main:app`. Python 3.11 (`.python-version` y la imagen del `Dockerfile`). |
+| Frontend | React 18.2 y Vite 8 (`frontend/package.json`). Node 22.22.2. |
+| Datos | MongoDB, con Motor y PyMongo. Base por defecto `sistemamaestro` (`DB_NAME`). |
+| Modelos | Grok, vía xAI (`GROK_API_KEY`, `GROK_MODEL`). Claude, vía Anthropic (`ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`). Los ejemplos dejan `grok-4.3` y `claude-haiku-5-5`. |
 
 ## Desarrollo local
 
-### Backend
+Desde la raíz del repositorio. Las variables van en `backend/.env` (el proceso las carga desde ahí). Hacen falta al menos `MONGO_URL` y `JWT_SECRET` de 32 caracteres o más. Los nombres están en los `.env.example`.
 
 ```bash
-# desde la raíz del repositorio (backend.app.main necesita la raíz en el path)
 python -m pip install -r requirements.txt
 uvicorn backend.app.main:app --reload --port 8000
 ```
 
-### Frontend
+`requirements.txt` incluye `backend/requirements.txt` y pytest.
 
 ```bash
 cd frontend
@@ -384,104 +108,46 @@ npm ci
 npm start
 ```
 
----
+`npm start` y `npm run dev` ejecutan `vite --host 0.0.0.0`. El ejemplo del frontend usa `VITE_API_BASE_URL=http://127.0.0.1:8000`.
 
-## Runtime y despliegue
+## Despliegue
 
-### Runtime de aplicación declarado en archivos versionados
+El servicio Railway `sistemamaestro` (proyecto `sistemamaestro-project`) construye el repo `cikitraque13/sistemamaestro`, rama `main`, con el `Dockerfile`. `railway.json` fija el builder `DOCKERFILE`, `healthcheckPath` `/health`, timeout 300 s y reinicio `ON_FAILURE`. No hay `nixpacks.toml`. Un push a `main` despliega: el merge de #180 creó el despliegue `SUCCESS` del commit `08c8734`.
 
-- servidor canónico: `backend/app/main.py`
-- app canónica: `backend.app.main:app`
+El contenedor escucha `${PORT:-8080}`:
 
-### Archivos de deploy versionados en el repositorio
-
-- `Dockerfile`
-- `railway.json`
-
-### Endpoint `/health` de la aplicación
-
-- `/health`
-
-Estos datos describen el runtime y los archivos versionados del repositorio, no el runtime ni la configuración efectiva verificada de Railway. Los metadatos live reportan `RAILPACK`, con procedencia `UNVERIFIED`; `/health` respondió HTTP 200, pero el healthcheck efectivo de Railway no está verificado. Véase [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md).
-
-### Regla
-
-- mantener una sola verdad de arranque;
-- no reactivar legacy runtime;
-- no ampliar legado;
-- consultar [Runtime and Deploy Truth](docs/architecture/04-runtime-and-deploy-truth.md) para la relación vigente entre estado local y producción.
-
----
-
-## Variables de entorno mínimas
-
-La configuración exacta puede evolucionar, pero a nivel mínimo el backend requiere una base como esta:
-
-```env
-GROK_API_KEY=
-GROK_MODEL=grok-4.3
-ANTHROPIC_API_KEY=
-ANTHROPIC_MODEL=claude-haiku-5-5
-STRIPE_SECRET_KEY=sk_xxx
-MONGO_URL=[MongoDB Atlas connection URI removed; configure credentials privately.]/sistemamaestro
-DB_NAME=sistemamaestro
-JWT_SECRET=clave_segura_larga
-ALLOWED_ORIGINS=http://localhost:5173,https://tu-dominio.com
+```bash
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080}
 ```
 
-Y el frontend:
+`GET /health` responde `{"status":"ok"}`.
 
-```env
-VITE_API_BASE_URL=http://127.0.0.1:8000
-VITE_GOOGLE_CLIENT_ID=
+Dominios del servicio, ambos en el puerto 8080, verificados, con certificado válido (consulta Railway del 2026-11-28):
+
+- `sistemamaestro.com`
+- `*.sistemamaestro.com`, para las landings publicadas
+
+Publicar sigue apagado: sin `PUBLISH_LANDING_ENABLED` el producto no sirve esas landings, y el adaptador de dominio responde «Pendiente de activación por Sistema Maestro». El código no llama a la API de Railway ni escribe DNS.
+
+## Tests
+
+Backend, desde la raíz, un proceso por archivo. Varios tests fijan el entorno e importan `backend.app.core.config` al cargar el módulo; un solo proceso de pytest arrastra ese estado de un archivo a otro.
+
+```bash
+python -m pip install -r requirements.txt
+for f in backend/tests/test_*.py; do
+  python -m pytest "$f" || exit 1
+done
 ```
 
-No deben subirse secretos reales al repositorio.
+Hay 30 archivos `backend/tests/test_*.py`. Los de Atlas se saltan si no hay base.
 
----
+Frontend, dentro de `frontend/`:
 
-## Estado de Journey 03
+```bash
+npx vitest run
+npm run test:mjs
+npm run build
+```
 
-Consultar el [Master Maturity Roadmap](docs/product/sistema-maestro/08-MASTER-MATURITY-ROADMAP.md) para el estado vigente de S14–S18. El documento [Journey 03 PRE-S14](docs/product/sistema-maestro/07-JOURNEY-03-ESTADO-PRE-S14.md) es histórico.
-
----
-
-## Qué no debe interpretarse mal
-
-- las rutas descritas como legacy no se consideran canónicas; su ausencia del repositorio y su exclusión del runtime actual no están verificadas;
-- `node_modules`, builds y cachés no forman parte del producto real;
-- `tests/` es soporte técnico, no núcleo canónico;
-- la Home actual ya no es una landing plana;
-- el Builder ya no es una demo cosmética;
-- la capa de IA y créditos ya existe a nivel estructural, aunque no toda esté cerrada al mismo nivel funcional.
-
----
-
-## Checklist técnico mínimo
-
-- [ ] backend arrancando con `backend.app.main:app`
-- [ ] sin referencias activas de runtime legacy en el repo activo
-- [ ] frontend trabajando desde `frontend/src/features/`
-- [ ] builder tratado como núcleo del producto
-- [ ] app-shell operativo como carcasa interna
-- [ ] créditos y consumo alineados con backend y billing
-- [ ] auth, dashboard y projects conectados con continuidad real
-- [ ] sin secretos reales en repositorio
-- [ ] sin confundir entorno regenerable con producto
-- [ ] documentación canónica mantenida en `docs/control/`
-
----
-
-## Criterio de trabajo del sistema
-
-Sistema Maestro no debe seguir creciendo por acumulación de parches, rutas heredadas y referencias contradictorias.
-
-La secuencia correcta sigue siendo:
-
-1. control estructural;
-2. clasificación;
-3. canonicidad;
-4. higiene técnica;
-5. reanudación del producto.
-
-Este repositorio debe evolucionar con esa lógica.
+`npm test` es `vitest run`. `npm run build` construye la app y los bundles de embed.
