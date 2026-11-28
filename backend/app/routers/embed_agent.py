@@ -366,6 +366,25 @@ async def embed_public_session(request: Request):
     if not reserved:
         return _closed(429, "daily_cap")
 
+    from backend.app.ai.guards.llm_budget import authorize_voice, persist_recorded
+    from backend.app.services.nova_voice import TOKEN_SECONDS
+
+    grant = authorize_voice(
+        surface="embed",
+        subject=str(record.get("agent_id") or ""),
+        token_seconds=TOKEN_SECONDS,
+        user_id=str(record.get("user_id") or ""),
+        project_id=str(record.get("project_id") or ""),
+        plan=str(record.get("plan") or ""),
+    )
+    if not grant["allowed"]:
+        await release_daily_slot(usage_collection(), record["agent_id"], day)
+        return JSONResponse(
+            status_code=429,
+            content={"provider": "browser", "detail": "usage_limit", "message": grant["message"]},
+        )
+    await persist_recorded(grant.get("event"))
+
     try:
         minted = await mint_ephemeral_token(api_key)
     except NovaVoiceUnavailable:

@@ -81,6 +81,17 @@ async def nova_voice_session(request: Request):
     if not api_key:
         return public_config("browser")
 
+    from backend.app.ai.guards.llm_budget import authorize_voice, persist_recorded
+    from backend.app.services.nova_voice import TOKEN_SECONDS
+
+    grant = authorize_voice(surface="demo", subject=_client_key(request), token_seconds=TOKEN_SECONDS)
+    if not grant["allowed"]:
+        return JSONResponse(
+            status_code=429,
+            content={"provider": "browser", "detail": "usage_limit", "message": grant["message"]},
+        )
+    await persist_recorded(grant.get("event"))
+
     try:
         minted = await mint_ephemeral_token(api_key)
     except NovaVoiceUnavailable:

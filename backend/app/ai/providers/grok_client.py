@@ -60,17 +60,38 @@ class GrokChatClient:
         if tools:
             payload["tools"] = tools
 
+        from backend.app.ai.guards.llm_budget import (
+            LlmBudgetError,
+            guard_chat_payload,
+            record_call,
+            usage_from_grok_payload,
+        )
+
+        payload, decision = await guard_chat_payload(payload, provider="xai")
         if self._http is None:
             self._http = httpx.AsyncClient(timeout=self.timeout)
         # max_retries is part of the call contract and stays at 0: one attempt.
-        response = await self._http.post(
-            f"{self.base_url}/chat/completions",
-            headers={"Authorization": f"Bearer {self.api_key}"},
-            json=payload,
+        try:
+            response = await self._http.post(
+                f"{self.base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {self.api_key}"},
+                json=payload,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except LlmBudgetError:
+            raise
+        except Exception:
+            await record_call(decision)
+            raise
+        usage = usage_from_grok_payload(data if isinstance(data, dict) else {})
+        await record_call(
+            decision,
+            input_tokens=usage["input_tokens"],
+            output_tokens=usage["output_tokens"],
+            cached_tokens=usage["cached_tokens"],
         )
-        response.raise_for_status()
-        data = response.json()
-        choice = (data.get("choices") or [{}])[0]
+        choice = (data.get("choices") or [{}])[0] if isinstance(data, dict) else {}
         message = choice.get("message") or {}
         calls = []
         for item in message.get("tool_calls") or []:
@@ -85,6 +106,13 @@ class GrokChatClient:
                 )
             )
         return SimpleNamespace(
+            usage=SimpleNamespace(
+                input_tokens=usage["input_tokens"],
+                output_tokens=usage["output_tokens"],
+                cached_tokens=usage["cached_tokens"],
+                prompt_tokens=usage["input_tokens"],
+                completion_tokens=usage["output_tokens"],
+            ),
             choices=[
                 SimpleNamespace(
                     finish_reason=choice.get("finish_reason"),

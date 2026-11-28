@@ -18,6 +18,11 @@ USER_MESSAGES = {
     "empty_instruction": "Escribe qué quieres en la página.",
     "publish_disabled": "La publicación no está disponible.",
     "executor_timeout": "La generación ha tardado demasiado. No se ha guardado la página.",
+    "usage_limit": "Has alcanzado el límite de uso de hoy",
+    "usage_limit_month": "Has alcanzado el límite de uso de este mes",
+    "usage_limit_request": "No se ha podido completar la solicitud.",
+    "input_too_long": "La solicitud es demasiado larga.",
+    "voice_limit": "La sesión de voz ha alcanzado su límite.",
 }
 GENERIC_MESSAGE = "No se ha podido preparar la preview. No se ha publicado nada."
 

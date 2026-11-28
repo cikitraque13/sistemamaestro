@@ -176,6 +176,10 @@ async def assert_project_memory_compatible(project):
         detail = {"code": exc.code}
         if exc.question_ids:
             detail["question_ids"] = list(exc.question_ids)
+        from backend.app.ai.guards.llm_budget import PUBLIC_MESSAGES
+
+        if exc.code in PUBLIC_MESSAGES:
+            detail["message"] = PUBLIC_MESSAGES[exc.code]
         raise HTTPException(exc.status_code, detail=detail) from exc
     if review.groups:
         kind = "project_memory_conflict" if any(

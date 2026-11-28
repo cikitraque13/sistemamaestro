@@ -453,6 +453,17 @@ async def run_due_reminders(database, *, now: datetime | None = None, send=None)
             {"booking_id": row["booking_id"]},
             {"$set": {"reminder_sent_at": moment}},
         )
+        from backend.app.ai.guards.llm_budget import persist_recorded, record_template
+
+        try:
+            event = record_template(
+                user_id=str((project or {}).get("user_id") or ""),
+                project_id=str(row.get("project_id") or ""),
+                now=moment,
+            )
+            await persist_recorded(event)
+        except Exception:
+            log_failure("store", "citas")
         sent += 1
     return {"checked": len(rows), "sent": sent, "skipped": skipped, "failed": failed}
 

@@ -69,6 +69,14 @@ def resolve_writer_model(pace) -> str:
 
 
 def _http_error(error: PipelineError) -> HTTPException:
+    if error.code in {
+        "usage_limit",
+        "usage_limit_month",
+        "usage_limit_request",
+        "input_too_long",
+        "voice_limit",
+    }:
+        return HTTPException(429, detail={"code": error.code, "message": error.message})
     status = 503 if error.code in {
         "CLASSIFIER_UNAVAILABLE",
         "blueprint_provider_unavailable",
@@ -90,8 +98,12 @@ def providers_ready() -> str | None:
 
 
 async def classify_for_pipeline(data):
+    from backend.app.ai.guards.llm_budget import LlmBudgetError
+
     try:
         return await classify_intent(data)
+    except LlmBudgetError as exc:
+        raise PipelineError(exc.code) from None
     except ClassifierUnavailable as exc:
         raise PipelineError("CLASSIFIER_UNAVAILABLE") from exc
 
@@ -178,19 +190,27 @@ async def create_preview(body: PreviewRequest, request: Request):
             db, user_id=user["user_id"], project_id=body.projectId,
             step=funnel_step, outcome="started",
         )
+        from backend.app.ai.guards.llm_budget import llm_scope
+
         try:
-            result = await run_pipeline(
-                project=project,
-                owner_id=user["user_id"],
-                instruction=body.instruction,
-                classify=classify_for_pipeline,
-                blueprint=generate_blueprint,
-                draft_landing=draft_landing_with_claude,
-                judge=judge_draft,
-                previous=previous,
-                memory=memory,
-                writer_model=writer_model,
-            )
+            with llm_scope(
+                user_id=str(user.get("user_id") or ""),
+                project_id=body.projectId,
+                plan=str(user.get("plan") or "free"),
+                feature="builder",
+            ):
+                result = await run_pipeline(
+                    project=project,
+                    owner_id=user["user_id"],
+                    instruction=body.instruction,
+                    classify=classify_for_pipeline,
+                    blueprint=generate_blueprint,
+                    draft_landing=draft_landing_with_claude,
+                    judge=judge_draft,
+                    previous=previous,
+                    memory=memory,
+                    writer_model=writer_model,
+                )
         except PipelineError:
             await note_funnel(
                 db, user_id=user["user_id"], project_id=body.projectId,
@@ -273,38 +293,46 @@ async def stream_preview(body: PreviewRequest, request: Request):
             if not fresh:
                 raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
             assert_project_revision(fresh, expected)
-            async for event in with_heartbeats(iter_executor(
-                project=project,
-                owner_id=user["user_id"],
-                instruction=body.instruction,
-                classify=classify_for_pipeline,
-                blueprint=generate_blueprint,
-                draft_landing=draft_landing_with_claude,
-                judge=judge_draft,
-                previous=previous,
-                memory=memory,
-                writer_model=writer_model,
-            )):
-                await queue.put(event)
-                if event.get("type") == "error":
-                    await note_funnel(
-                        db, user_id=user["user_id"], project_id=body.projectId,
-                        step=funnel["step"], outcome="failed",
-                    )
-                    funnel["closed"] = True
-                    raise PipelineError("landing_unavailable")
-                if event.get("type") == "result":
-                    saved = await boundary.save(event["preview"])
-                    await remember_owner_preview(db, user["user_id"], event["preview"])
-                    done = {**event["public"], "updated_at": saved["updated_at"], "summary": event.get("summary") or ""}
-                    await note_funnel(
-                        db, user_id=user["user_id"], project_id=body.projectId,
-                        step=funnel["step"], outcome="completed",
-                    )
-                    funnel["closed"] = True
-                    await queue.put({"type": "done", **done})
-                    return done
-            raise PipelineError("landing_unavailable")
+            from backend.app.ai.guards.llm_budget import llm_scope
+
+            with llm_scope(
+                user_id=str(user.get("user_id") or ""),
+                project_id=body.projectId,
+                plan=str(user.get("plan") or "free"),
+                feature="builder",
+            ):
+                async for event in with_heartbeats(iter_executor(
+                    project=project,
+                    owner_id=user["user_id"],
+                    instruction=body.instruction,
+                    classify=classify_for_pipeline,
+                    blueprint=generate_blueprint,
+                    draft_landing=draft_landing_with_claude,
+                    judge=judge_draft,
+                    previous=previous,
+                    memory=memory,
+                    writer_model=writer_model,
+                )):
+                    await queue.put(event)
+                    if event.get("type") == "error":
+                        await note_funnel(
+                            db, user_id=user["user_id"], project_id=body.projectId,
+                            step=funnel["step"], outcome="failed",
+                        )
+                        funnel["closed"] = True
+                        raise PipelineError("landing_unavailable")
+                    if event.get("type") == "result":
+                        saved = await boundary.save(event["preview"])
+                        await remember_owner_preview(db, user["user_id"], event["preview"])
+                        done = {**event["public"], "updated_at": saved["updated_at"], "summary": event.get("summary") or ""}
+                        await note_funnel(
+                            db, user_id=user["user_id"], project_id=body.projectId,
+                            step=funnel["step"], outcome="completed",
+                        )
+                        funnel["closed"] = True
+                        await queue.put({"type": "done", **done})
+                        return done
+                raise PipelineError("landing_unavailable")
         finally:
             await queue.put(None)
 

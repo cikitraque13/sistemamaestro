@@ -68,6 +68,15 @@ def _log(category):
     logger.warning("executor_rejected category=%s", category)
 
 
+_BUDGET_CODES = {"usage_limit", "usage_limit_month", "usage_limit_request", "input_too_long", "voice_limit"}
+
+
+def _failure_text(exc, fallback: str) -> str:
+    if getattr(exc, "code", "") in _BUDGET_CODES:
+        return exc.message
+    return fallback
+
+
 def _step(step_id, status, summary=""):
     label = dict(STEPS)[step_id]
     event = {"type": "step", "id": step_id, "label": label, "status": status}
@@ -140,6 +149,10 @@ async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_
     except PipelineError:
         raise
     except Exception as exc:
+        from backend.app.ai.guards.llm_budget import LlmBudgetError
+
+        if isinstance(exc, LlmBudgetError):
+            raise
         raise PipelineError("landing_unavailable") from exc
     events = []
     built = []
@@ -158,6 +171,15 @@ async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_
 
 
 async def iter_executor(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None, now=None, timeout_seconds=None, max_iterations=None, writer_model=""):
+    from backend.app.ai.guards.llm_budget import (
+        LlmBudgetError,
+        decide_writer_escalation,
+        default_writer_model,
+        llm_scope,
+        mark_escalation,
+        max_judge_calls_per_web,
+        max_regenerations_per_web,
+    )
     from backend.app.services.builder_copy_rubric import critique_copy
     from backend.app.services.builder_evaluation import evaluation_from_verdict
     from backend.app.services.builder_memory import infer_preference
@@ -168,6 +190,34 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
     clock = now or time.monotonic
     budget = executor_timeout_seconds() if timeout_seconds is None else timeout_seconds
     attempts = executor_max_iterations() if max_iterations is None else max_iterations
+    attempts = min(attempts, 1 + max_regenerations_per_web())
+    # The first draft is the cheap writer. A low score may escalate once.
+    # writer_model from pace is ignored until that escalation.
+    active_writer = default_writer_model()
+    if writer_model == active_writer:
+        active_writer = writer_model
+    judge_calls = 0
+    judge_cap = max_judge_calls_per_web()
+    project_id = str((project or {}).get("project_id") or "")
+    scope = llm_scope(user_id=str(owner_id or ""), project_id=project_id, feature="builder")
+    scope.__enter__()
+    try:
+        async for event in _iter_scoped(
+            text=text, clock=clock, budget=budget, attempts=attempts, active_writer=active_writer,
+            judge_calls=judge_calls, judge_cap=judge_cap, project_id=project_id,
+            project=project, owner_id=owner_id, classify=classify, blueprint=blueprint,
+            draft_landing=draft_landing, previous=previous, created_at=created_at, judge=judge,
+            draft_section=draft_section, memory=memory, critique_copy=critique_copy,
+            evaluation_from_verdict=evaluation_from_verdict, infer_preference=infer_preference,
+            decide_writer_escalation=decide_writer_escalation, mark_escalation=mark_escalation,
+            LlmBudgetError=LlmBudgetError,
+        ):
+            yield event
+    finally:
+        scope.__exit__(None, None, None)
+
+
+async def _iter_scoped(*, text, clock, budget, attempts, active_writer, judge_calls, judge_cap, project_id, project, owner_id, classify, blueprint, draft_landing, previous, created_at, judge, draft_section, memory, critique_copy, evaluation_from_verdict, infer_preference, decide_writer_escalation, mark_escalation, LlmBudgetError):
     started = clock()
     phase = "iterando" if previous else "construyendo"
     yield {"type": "state", "phase": phase, "message": STATE_MESSAGES[phase]}
@@ -179,9 +229,12 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
             "input_content": project.get("input_content") or "",
             "route": project.get("route") or "",
         }))
-    except PipelineError:
-        yield _step("entender", "error", "No se ha podido leer el negocio.")
+    except PipelineError as exc:
+        yield _step("entender", "error", _failure_text(exc, "No se ha podido leer el negocio."))
         raise
+    except LlmBudgetError as exc:
+        yield _step("entender", "error", exc.message)
+        raise PipelineError(exc.code) from None
     except Exception as exc:
         yield _step("entender", "error", "No se ha podido leer el negocio.")
         raise PipelineError("CLASSIFIER_UNAVAILABLE") from exc
@@ -198,8 +251,11 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
     except BlueprintGenerationError as exc:
         yield _step("estructura", "error", "No se ha podido preparar la estructura.")
         raise PipelineError(exc.code) from exc
-    except PipelineError:
-        yield _step("estructura", "error", "No se ha podido preparar la estructura.")
+    except LlmBudgetError as exc:
+        yield _step("estructura", "error", exc.message)
+        raise PipelineError(exc.code) from None
+    except PipelineError as exc:
+        yield _step("estructura", "error", _failure_text(exc, "No se ha podido preparar la estructura."))
         raise
     except Exception as exc:
         yield _step("estructura", "error", "No se ha podido preparar la estructura.")
@@ -221,12 +277,15 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
             draft, section_events = await _produce_draft(
                 text=text, intent=intent, plan=plan, diagnosis=diagnosis,
                 draft_landing=draft_landing, draft_section=draft_section,
-                project=project, memory=memory, revision_notes=revision_notes,
-                writer_model=writer_model,
+                project=project, memory=memory,                 revision_notes=revision_notes,
+                writer_model=active_writer,
             )
-        except PipelineError:
-            yield _step("textos", "error", "No se ha podido escribir el texto.")
+        except PipelineError as exc:
+            yield _step("textos", "error", _failure_text(exc, "No se ha podido escribir el texto."))
             raise
+        except LlmBudgetError as exc:
+            yield _step("textos", "error", exc.message)
+            raise PipelineError(exc.code) from None
         for event in section_events:
             yield event
         yield _step("textos", "done", f"{len(draft['sections'])} secciones escritas.")
@@ -259,11 +318,19 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
                 raise PipelineError("landing_rejected")
             yield _step("revision", "error", "La página no encaja con lo pedido. Se reintenta.")
             continue
+        if judge is not None and judge_calls >= judge_cap:
+            yield _step("revision", "error", PipelineError("usage_limit").message)
+            raise PipelineError("usage_limit")
         try:
             verdict = await _call_judge(judge, draft, text)
         except PipelineError:
             yield _step("revision", "error", "No se ha podido revisar la página.")
             raise
+        except LlmBudgetError as exc:
+            yield _step("revision", "error", exc.message)
+            raise PipelineError(exc.code) from None
+        if judge is not None:
+            judge_calls += 1
         if not isinstance(verdict, dict) or "ok" not in verdict:
             _log("schema")
             yield _step("revision", "error", "No se ha podido revisar la página.")
@@ -283,6 +350,15 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
             return
         _log("rubric")
         revision_notes = _clip(verdict.get("summary") or "La evaluación no llega al mínimo.", 160)
+        choice = decide_writer_escalation(score=evaluation["total"], project_id=project_id)
+        if choice == "stop":
+            yield _step("revision", "error", PipelineError("usage_limit").message)
+            raise PipelineError("usage_limit")
+        if choice == "escalate" and attempt < attempts:
+            from backend.app.ai.guards.llm_budget import escalation_model
+
+            active_writer = escalation_model()
+            mark_escalation(project_id)
         if attempt >= attempts:
             yield _step("revision", "error", "La página no encaja con lo pedido.")
             raise PipelineError("landing_rejected")
@@ -299,6 +375,10 @@ async def _call_judge(judge, draft, instruction):
     except PipelineError:
         raise
     except Exception as exc:
+        from backend.app.ai.guards.llm_budget import LlmBudgetError
+
+        if isinstance(exc, LlmBudgetError):
+            raise
         _log("provider")
         raise PipelineError("judge_unavailable") from exc
     return verdict

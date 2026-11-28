@@ -173,17 +173,22 @@ def _failure_category(exc):
 async def _complete_once(*, model, content, data, api_key, base_url):
     from backend.app.ai.providers.grok_client import GrokChatClient
 
+    from backend.app.ai.guards.llm_budget import LlmBudgetError, llm_scope
+
     try:
         async with asyncio.timeout(TIMEOUT_SECONDS):
-            async with GrokChatClient(
-                api_key=api_key, timeout=TIMEOUT_SECONDS, max_retries=0, base_url=base_url,
-            ) as client:
-                response = await client.chat.completions.create(
+            with llm_scope(feature="classifier"):
+                async with GrokChatClient(
+                    api_key=api_key, timeout=TIMEOUT_SECONDS, max_retries=0, base_url=base_url,
+                ) as client:
+                    response = await client.chat.completions.create(
                     model=model, temperature=0, max_tokens=MAX_OUTPUT_TOKENS,
                     response_format={"type": "json_object"}, reasoning_effort="none",
                     messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
                 )
     except ClassifierUnavailable:
+        raise
+    except LlmBudgetError:
         raise
     except Exception as exc:
         raise ClassifierUnavailable(_failure_category(exc)) from None
@@ -212,6 +217,7 @@ async def _complete_once(*, model, content, data, api_key, base_url):
 
 async def classify_intent(data):
     """Classify with the configured Grok model. Failures stay unavailable."""
+    from backend.app.ai.guards.llm_budget import LlmBudgetError
     from backend.app.core.config import GROK_API_KEY, GROK_BASE_URL, GROK_MODEL
 
     content = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
@@ -235,6 +241,8 @@ async def classify_intent(data):
                 model=model, content=content, data=data,
                 api_key=GROK_API_KEY, base_url=GROK_BASE_URL,
             )
+        except LlmBudgetError:
+            raise
         except ClassifierUnavailable as exc:
             last = exc
             _log_rejection(exc.category, attempt)

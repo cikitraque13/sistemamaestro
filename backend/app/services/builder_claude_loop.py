@@ -250,6 +250,8 @@ async def run_copy_tool_loop(brief, complete) -> dict:
 
     A provider exception fails the build. It is not retried here.
     """
+    from backend.app.ai.guards.llm_budget import LlmBudgetError
+
     messages = [{
         "role": "user",
         "content": "Escribe la landing de este negocio con submit_landing_copy.",
@@ -259,6 +261,8 @@ async def run_copy_tool_loop(brief, complete) -> dict:
         try:
             response = await complete(messages)
         except PipelineError:
+            raise
+        except LlmBudgetError:
             raise
         except Exception as exc:
             logger.warning("executor_rejected category=provider")
@@ -297,14 +301,38 @@ async def write_landing_with_tools(brief: dict, model: str | None = None) -> dic
     effort = executor_thinking_effort()
     client = AsyncAnthropic(api_key=ANTHROPIC_API_KEY, max_retries=0, timeout=40.0)
 
+    from backend.app.ai.guards.llm_budget import (
+        LlmBudgetError,
+        guard_anthropic_request,
+        record_call,
+        usage_from_anthropic_response,
+    )
+
     async def complete(messages):
         request = build_copy_request(
             model=model, brief=brief, messages=messages, max_tokens=max_tokens, effort=effort,
         )
-        return await client.messages.create(**request)
+        guarded, decision = await guard_anthropic_request(request)
+        try:
+            response = await client.messages.create(**guarded)
+        except LlmBudgetError:
+            raise
+        except Exception:
+            await record_call(decision)
+            raise
+        usage = usage_from_anthropic_response(response)
+        await record_call(
+            decision,
+            input_tokens=usage["input_tokens"],
+            output_tokens=usage["output_tokens"],
+            cached_tokens=usage["cached_tokens"],
+        )
+        return response
 
     try:
         return await run_copy_tool_loop(brief, complete)
+    except LlmBudgetError as exc:
+        raise PipelineError(exc.code) from None
     finally:
         closer = getattr(client, "close", None)
         if closer is not None:
