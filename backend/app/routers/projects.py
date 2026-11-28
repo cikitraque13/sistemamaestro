@@ -637,6 +637,7 @@ def _landing_http_error(error: LandingStateError) -> HTTPException:
         "not_found": "No hay una landing guardada para este proyecto.",
         "invalid_record": "El borrador de la landing no es válido.",
         "record_too_large": "El borrador de la landing es demasiado grande.",
+        "revision_conflict": "La landing cambió en otra pestaña. Recarga antes de guardar.",
     }
     return HTTPException(
         status_code=error.status,
@@ -658,6 +659,9 @@ async def get_project_landing(project_id: str, request: Request):
 async def put_project_landing(project_id: str, body: LandingRecordBody, request: Request):
     await ensure_builder_available(request)
     user = await get_current_user(request)
+    expected = request.headers.get("If-Match")
+    if not expected:
+        raise HTTPException(428, detail={"message": "Falta la versión de la landing. Vuelve a cargarla."})
     try:
         return await save_landing(
             db.projects,
@@ -665,6 +669,7 @@ async def put_project_landing(project_id: str, body: LandingRecordBody, request:
             user["user_id"],
             project_id,
             body.record,
+            expected_updated_at=expected,
         )
     except LandingStateError as error:
         raise _landing_http_error(error) from None

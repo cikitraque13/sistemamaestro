@@ -3,6 +3,7 @@ import { validatedProjectIdentity, requireOutputIdentity } from '../../state/pro
 import { staticTrustDecision } from '../../state/staticSectionMutation.mjs';
 import useDurableLandingTransaction from './useDurableLandingTransaction';
 import { parseLandingChange } from '../../command/parseLandingChange.mjs';
+import { generateLandingPreview, loadLandingPreview, previewErrorMessage } from '../../api/builderPreviewClient';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 import {
@@ -632,6 +633,8 @@ export default function useBuilderWorkspaceRuntime({
   const [builderDecisionMessage, setBuilderDecisionMessage] = useState(null);
   const [builderBuildSummary, setBuilderBuildSummary] = useState(null);
   const [appliedDecisionTypes, setAppliedDecisionTypes] = useState([]);
+  const [generatedPreview, setGeneratedPreview] = useState(null);
+  const [previewNotice, setPreviewNotice] = useState('');
 
   let identity = null;
   try { identity = validatedProjectIdentity(project, ownerId, project?.project_id); } catch { /* fail closed */ }
@@ -744,10 +747,14 @@ export default function useBuilderWorkspaceRuntime({
       const value = String(text || '').trim();
 
       if (!value || !projectReady) return;
-      // Existing-project requests are reviewed in the intent panel; confirmation
-      // does not chain into construction in this first J06.1 slice.
       if (project?.project_id) {
-        landingTransaction.reject('No disponible.');
+        try {
+          const preview = await generateLandingPreview(project, value);
+          setGeneratedPreview(preview);
+          setPreviewNotice('');
+        } catch (error) {
+          setPreviewNotice(previewErrorMessage(error));
+        }
         return;
       }
       const requestIdentity = liveIdentity.current;
@@ -1158,8 +1165,14 @@ export default function useBuilderWorkspaceRuntime({
     setLastDelta(null);
     setLastOperation(null);
     setAppliedDecisionTypes([]);
+    setGeneratedPreview(null);
+    setPreviewNotice('');
 
     applyKernelResult(initialKernelResult);
+    const requestIdentity = JSON.stringify(identity);
+    loadLandingPreview(projectId).then((preview) => {
+      if (liveIdentity.current === requestIdentity && preview?.html) setGeneratedPreview(preview);
+    }).catch(() => {});
   }, [
     applyKernelResult,
     projectId,
@@ -1193,6 +1206,8 @@ export default function useBuilderWorkspaceRuntime({
 
   return {
     landingTransaction,
+    generatedPreview,
+    previewNotice,
     copy,
     progress,
     isRunning,

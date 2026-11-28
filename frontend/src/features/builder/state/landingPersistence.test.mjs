@@ -58,6 +58,23 @@ test('a failed load keeps the local cache and a remote record replaces it', asyn
   assert.equal(storage.getItem(key), 'from-server');
 });
 
+test('a failed save is reported instead of ignored', async () => {
+  const notices = [];
+  const sync = createLandingSync({
+    storage: memoryStorage(),
+    load: async () => null,
+    save: async () => {
+      const error = new Error('offline');
+      error.response = { status: 503, data: { detail: { message: 'No se ha podido guardar la landing. El cambio sigue en este navegador.' } } };
+      throw error;
+    },
+    onError: (message) => notices.push(message),
+  });
+  sync.noteWrite('p1', 'cambio', '0');
+  await sync.flush();
+  assert.deepEqual(notices, ['No se ha podido guardar la landing. El cambio sigue en este navegador.']);
+});
+
 test('writes are debounced into one save', async () => {
   const saved = [];
   const sync = createLandingSync({

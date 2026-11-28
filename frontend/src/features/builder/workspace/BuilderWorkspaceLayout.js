@@ -3,6 +3,7 @@ import React from 'react';
 import { GemaMaestra } from '../../app-shell/layout/AppShellLayout';
 import BuilderAgentPane from '../components/BuilderAgentPane';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
+import { PUBLISH_LANDING_ENABLED } from '../api/builderPreviewClient';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 
 const HISTORY_LABELS = {
@@ -54,16 +55,22 @@ const viewButtonClass = (active) =>
       : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20 hover:text-white'
   }`;
 
-function ProjectHistory({ audit }) {
+function ProjectHistory({ audit, versions }) {
+  const saved = Array.isArray(versions) ? versions.filter((item) => item && item.instruction) : [];
   const items = Array.isArray(audit) ? audit.filter((item) => item && (item.type || item.rationale)) : [];
 
   return (
     <section aria-label="Historial" className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Historial</p>
-      {items.length === 0 ? (
+      {saved.length === 0 && items.length === 0 ? (
         <p className="mt-2 text-sm text-zinc-400">Aún no hay cambios</p>
       ) : (
         <ul className="mt-3 space-y-2">
+          {saved.slice().reverse().map((item) => (
+            <li key={`v-${item.version}`} className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm leading-6 text-zinc-200">
+              {`Versión ${item.version}. ${item.instruction}`}
+            </li>
+          ))}
           {items.slice().reverse().map((item, index) => (
             <li
               key={item.decisionId || `${item.type}-${index}`}
@@ -116,7 +123,10 @@ function WorkspaceSidePanel({
         />
       </div>
 
-      <ProjectHistory audit={runtime.landingTransaction?.audit} />
+      {runtime.previewNotice ? <p role="alert" className="text-sm text-amber-100">{runtime.previewNotice}</p> : null}
+      {PUBLISH_LANDING_ENABLED ? <button type="button">Publicar</button> : null}
+
+      <ProjectHistory audit={runtime.landingTransaction?.audit} versions={runtime.generatedPreview?.versions} />
     </aside>
   );
 }
@@ -145,7 +155,16 @@ export default function BuilderWorkspaceLayout({
   let main = <EmptyState />;
   if (loadingProject) main = <LoadingState />;
   else if (projectError) main = <ErrorState projectError={projectError} />;
-  else if (project) {
+  else if (project && visibleTab !== 'extract' && runtime.generatedPreview?.html) {
+    main = (
+      <iframe
+        title="Preview de la landing"
+        sandbox=""
+        srcDoc={runtime.generatedPreview.html}
+        className="h-full min-h-[70vh] w-full border-0 bg-[#090b12] lg:min-h-0"
+      />
+    );
+  } else if (project) {
     main = (
       <BuilderCanvasPane
         activeWorkspaceTab={visibleTab}

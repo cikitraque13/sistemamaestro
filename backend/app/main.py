@@ -1,4 +1,4 @@
-﻿from backend.app.routers import builder_ai
+﻿from backend.app.routers import builder_ai, builder_preview
 import logging
 import asyncio
 from contextlib import suppress
@@ -125,4 +125,5 @@ async def shutdown_db_client():
     client.close()
 
 app.include_router(builder_ai.router)
+app.include_router(builder_preview.router)
 

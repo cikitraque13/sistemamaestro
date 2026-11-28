@@ -34,9 +34,11 @@ test('full Builder submit path produces exact candidate projections and reversib
   expect(await contentHash(runtime.builderBuildState)).toBe(proposal.baseHash);
   expect(global.fetch).not.toHaveBeenCalled();
 });
-test('invalid local intent never invokes provider or mutates state',async()=>{
-  const before=runtime.builderBuildState;
-  await act(async()=>{await runtime.submitMessage('CTA principal a "Aceptar" y acento rojo');});
-  expect(runtime.landingTransaction.error).toBeTruthy();expect(runtime.landingTransaction.pending).toBe(null);
-  expect(runtime.builderBuildState).toBe(before);expect(global.fetch).not.toHaveBeenCalled();
+test('a real project instruction is sent on and does not mutate the local landing', async () => {
+  const before = runtime.builderBuildState;
+  await act(async () => { await runtime.submitMessage('CTA principal a "Aceptar" y acento rojo'); });
+  expect(runtime.previewNotice).toMatch(/preview|publicado/i);
+  expect(runtime.previewNotice).not.toMatch(/No disponible|CLASSIFIER_/);
+  expect(runtime.landingTransaction.pending).toBeNull();
+  expect(runtime.builderBuildState).toBe(before);
 });
