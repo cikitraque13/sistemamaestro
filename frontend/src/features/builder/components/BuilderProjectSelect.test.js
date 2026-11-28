@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { act } from 'react-dom/test-utils';
+import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom';
 import { vi } from 'vitest';
 
 import BuilderProjectSelect, { loadOwnerProjects } from './BuilderProjectSelect';
@@ -85,13 +86,16 @@ test('the selector lists the owner projects and switches project id', async () =
   await flush();
 
   const trigger = document.querySelector('[data-testid="builder-project-select"]');
-  expect(trigger.textContent).toContain('Clara, psicóloga en Madrid');
+  expect(trigger.textContent).toBe('Proyectos ▾');
+  expect(trigger.textContent).not.toContain('Clara');
   expect(apiMocks.get).toHaveBeenCalledWith('/projects', { params: { limit: 200 } });
 
   act(() => activate(trigger));
   await flush();
   const option = document.querySelector('[data-testid="builder-project-option-q"]');
+  const current = document.querySelector('[data-testid="builder-project-option-p"]');
   expect(option.textContent).toContain('Taller de bicicletas');
+  expect(current.getAttribute('aria-current')).toBe('true');
   act(() => activate(option));
   expect(onProjectChange).toHaveBeenCalledWith('q');
 
@@ -115,7 +119,84 @@ test('a failed project list keeps the open project', async () => {
   });
   await flush();
 
-  expect(document.querySelector('[data-testid="builder-project-select"]').textContent).toContain('Proyecto abierto ahora');
+  const trigger = document.querySelector('[data-testid="builder-project-select"]');
+  expect(trigger.textContent).toBe('Proyectos ▾');
+  act(() => activate(trigger));
+  await flush();
+  expect(document.querySelector('[data-testid="builder-project-option-p"]').textContent).toContain('Proyecto abierto ahora');
+  act(() => root.unmount());
+  node.remove();
+});
+
+function RoutedProjects() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  return (
+    <>
+      <div data-testid="builder-location">{`${location.pathname}${location.search}`}</div>
+      <BuilderProjectSelect
+        activeProjectId="p"
+        projectItems={[
+          { id: 'p', label: 'Clara' },
+          { id: 'q', label: 'Taller' },
+        ]}
+        onProjectChange={(id) => navigate(`/dashboard/builder?project_id=${id}`)}
+        onNewProject={() => navigate('/dashboard')}
+      />
+    </>
+  );
+}
+
+test('choosing a project navigates and the menu closes on escape and outside click', async () => {
+  apiMocks.get.mockResolvedValue({
+    data: [
+      { project_id: 'p', input_content: 'Clara' },
+      { project_id: 'q', input_content: 'Taller' },
+    ],
+    headers: {},
+  });
+  const node = document.createElement('div');
+  document.body.appendChild(node);
+  const root = createRoot(node);
+  await act(async () => {
+    root.render(
+      <MemoryRouter initialEntries={['/dashboard/builder?project_id=p']}>
+        <RoutedProjects />
+      </MemoryRouter>,
+    );
+  });
+  await flush();
+
+  const trigger = document.querySelector('[data-testid="builder-project-select"]');
+  expect(trigger.textContent).toBe('Proyectos ▾');
+  act(() => activate(trigger));
+  await flush();
+  act(() => activate(document.querySelector('[data-testid="builder-project-option-q"]')));
+  await flush();
+  expect(document.querySelector('[data-testid="builder-location"]').textContent).toBe('/dashboard/builder?project_id=q');
+  expect(document.querySelector('[data-testid="builder-project-options"]')).toBeNull();
+
+  act(() => activate(trigger));
+  await flush();
+  act(() => {
+    document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  });
+  expect(document.querySelector('[data-testid="builder-project-options"]')).toBeNull();
+
+  act(() => activate(trigger));
+  await flush();
+  expect(document.querySelector('[data-testid="builder-project-new"]').textContent).toBe('Nuevo proyecto');
+  act(() => {
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, button: 0 }));
+  });
+  expect(document.querySelector('[data-testid="builder-project-options"]')).toBeNull();
+
+  act(() => activate(trigger));
+  await flush();
+  act(() => activate(document.querySelector('[data-testid="builder-project-new"]')));
+  await flush();
+  expect(document.querySelector('[data-testid="builder-location"]').textContent).toBe('/dashboard');
+
   act(() => root.unmount());
   node.remove();
 });

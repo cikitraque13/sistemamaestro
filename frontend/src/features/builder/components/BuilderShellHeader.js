@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChatCircle, GridFour, Plus } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
+import { ChatCircle, GridFour } from '@phosphor-icons/react';
 
 import AdvisorFlowPanel from '../advisor/AdvisorFlowPanel';
 import { useAdvisorFlowConfig } from '../advisor/useAdvisorFlowConfig';
 import { useBuilderStudio } from '../studio/BuilderStudioContext';
 import '../studio/studio.css';
-import { projectHumanName } from '../workspace/projectLabel';
 import AdvisorMark from './AdvisorMark';
 import BuilderAccountMenu from './BuilderAccountMenu';
 import BuilderProjectSelect from './BuilderProjectSelect';
@@ -18,14 +17,10 @@ export default function BuilderShellHeader({
   onNewProject = () => {},
   freeTestMode = false,
 }) {
-  const navigate = useNavigate();
   const studio = useBuilderStudio();
   const advisor = useAdvisorFlowConfig();
   const [advisorOpen, setAdvisorOpen] = useState(false);
   const [advisorNote, setAdvisorNote] = useState('');
-  const active = projectItems.find((item) => (item.project_id || item.id) === activeProjectId);
-  const projectName = active ? projectHumanName({ ...active, project_id: active.project_id || active.id, title: active.title || active.label }) : '';
-
   const openAdvisor = () => {
     if (!advisor.enabled) {
       setAdvisorNote('Próximamente disponible.');
@@ -51,26 +46,12 @@ export default function BuilderShellHeader({
           <GridFour size={14} aria-hidden="true" />
           Inicio
         </Link>
-        <span className="tab on">
-          <i className="live" />
-          <BuilderProjectSelect
-            variant="tab"
-            projectItems={projectItems}
-            activeProjectId={activeProjectId}
-            onProjectChange={onProjectChange}
-          />
-          <button
-            type="button"
-            className="x"
-            aria-label={projectName ? `Cerrar ${projectName}` : 'Cerrar proyecto'}
-            onClick={() => navigate('/dashboard')}
-          >
-            ×
-          </button>
-        </span>
-        <button type="button" aria-label="Nuevo proyecto" onClick={onNewProject} className="sq">
-          <Plus size={15} aria-hidden="true" />
-        </button>
+        <BuilderProjectSelect
+          projectItems={projectItems}
+          activeProjectId={activeProjectId}
+          onProjectChange={onProjectChange}
+          onNewProject={onNewProject}
+        />
       </div>
       <div data-testid="builder-header-actions" className="tr">
         <button type="button" data-testid="builder-advisor-pill" onClick={openAdvisor} className="pill-adv">

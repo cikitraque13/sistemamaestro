@@ -50,21 +50,22 @@ function render() {
   return { node, root };
 }
 
-test('Publicar stays disabled under the evaluation bar and enables once the score passes', async () => {
+test('the score stays on the step bar and the preview toolbar stays out', async () => {
   runtime.generatedPreview.evaluation = { total: 11, max: 20, threshold: 12, passed: false };
   const low = render();
-  const button = low.node.querySelector('[data-testid="builder-publish-button"]');
-  expect(button.disabled).toBe(true);
-  expect(button.getAttribute('title')).toContain('No se ha publicado');
-  expect(low.node.querySelector('[data-testid="builder-score-badge"]').textContent).toBe('11/20');
+  expect(low.node.querySelector('[data-testid="builder-preview-toolbar"]')).toBeNull();
+  expect(low.node.querySelector('[data-testid="builder-publish-button"]')).toBeNull();
+  expect(low.node.querySelector('[data-testid="builder-score-badge"]')).toBeNull();
+  expect(low.node.querySelector('[data-testid="builder-step-bar"]').textContent).toContain('Evaluación 11/20');
+  expect(low.node.textContent).toContain('12/20');
   expect(low.node.querySelector('[data-testid="builder-resume-strip"]').textContent).toContain('vista previa estática');
   act(() => low.root.unmount());
 
   runtime.generatedPreview.evaluation = { total: 13, max: 20, threshold: 12, passed: true };
   const high = render();
-  expect(high.node.querySelector('[data-testid="builder-publish-button"]').disabled).toBe(false);
-  expect(high.node.querySelector('[data-testid="builder-score-badge"]').textContent).toBe('13/20');
-  expect(high.node.querySelector('[data-step-bar], [data-testid="builder-step-bar"]').textContent).toContain('Evaluación 13/20');
+  expect(high.node.querySelector('[data-testid="builder-preview-toolbar"]')).toBeNull();
+  expect(high.node.textContent).not.toContain('(12/20)');
+  expect(high.node.querySelector('[data-testid="builder-step-bar"]').textContent).toContain('Evaluación 13/20');
   act(() => high.root.unmount());
 });
 
