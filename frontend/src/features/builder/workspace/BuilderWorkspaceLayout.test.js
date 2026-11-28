@@ -55,8 +55,8 @@ function Harness() {
 test('workspace shows the sector preview and hides code, landing controls and engineering tabs', () => {
   const { node, root } = mount(<Harness />);
 
-  expect(node.querySelector('section > div').className).toContain('lg:grid-cols-2');
-  expect(node.querySelector('aside').className).toContain('lg:order-1');
+  expect(node.querySelector('section > div').className).toContain('lg:grid-cols-[minmax(0,39fr)_minmax(0,61fr)]');
+  expect(node.querySelector('aside').className).toContain('bg-black');
   expect(node.querySelector('iframe')).toBeNull();
   expect(node.textContent).toContain('Convierte dudas en decisiones claras');
   expect(node.textContent).toContain('Asesoramiento experto');
@@ -67,16 +67,14 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.textContent).not.toContain('Aún no hay cambios');
   expect(node.textContent).not.toContain('Siguiente paso recomendado');
   expect(node.textContent).not.toContain('Historial');
-  expect(node.textContent).toContain('Ejecutor');
-  expect(node.querySelector('[aria-label="Mensaje para el ejecutor"]').getAttribute('placeholder')).toBe('Pide un cambio de la página');
-  expect([...node.querySelectorAll('button')].some((button) => button.textContent.trim() === 'Enviar')).toBe(true);
+  expect(node.querySelector('[aria-label="Ejecutor"]')).not.toBeNull();
+  expect(node.querySelector('[aria-label="Mensaje para el ejecutor"]').getAttribute('placeholder')).toBe('Esperando tu próximo mensaje');
+  expect(node.querySelector('[aria-label="Enviar"]')).not.toBeNull();
   const aside = node.querySelector('[data-testid="builder-side-panel"]');
   expect(aside.className).toContain('overflow-hidden');
   expect(aside.className).not.toMatch(/overflow-(auto|scroll|y-auto|y-scroll)/);
-  expect(aside.childElementCount).toBe(1);
-  expect(aside.firstElementChild.getAttribute('aria-label')).toBe('Ejecutor');
-  expect(aside.firstElementChild.className).toContain('flex-1');
-  expect(aside.firstElementChild.className).toContain('h-full');
+  expect(aside.getAttribute('aria-label')).toBe('Ejecutor');
+  expect(aside.querySelector('[data-testid="builder-executor-thread"]').className).toContain('flex-1');
   const sideButtons = [...aside.querySelectorAll('button')].map((button) => button.textContent.trim());
   expect(sideButtons).not.toContain('Preview');
   expect(sideButtons).not.toContain('Extracción');
@@ -125,7 +123,7 @@ test('the sidebar is only the executor chat', () => {
     <BuilderWorkspaceLayout freeTestMode project={project} ownerId="alice" credits={12} bonus={0} usageLabel="" />
   );
   const aside = node.querySelector('[data-testid="builder-side-panel"]');
-  expect(aside.childElementCount).toBe(1);
+  expect(aside.querySelector('[data-testid="builder-executor-input"]')).not.toBeNull();
   expect(aside.textContent).not.toContain('Modo prueba · sin gemas');
   expect(aside.textContent).not.toContain('Siguiente paso recomendado');
   expect(aside.textContent).not.toContain('Historial');

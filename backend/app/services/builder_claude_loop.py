@@ -285,12 +285,12 @@ async def run_copy_tool_loop(brief, complete) -> dict:
     raise PipelineError("landing_unavailable")
 
 
-async def write_landing_with_tools(brief: dict) -> dict:
+async def write_landing_with_tools(brief: dict, model: str | None = None) -> dict:
     from anthropic import AsyncAnthropic
 
     from backend.app.core.config import ANTHROPIC_API_KEY, ANTHROPIC_MODEL
 
-    model = (ANTHROPIC_MODEL or "").strip()
+    model = (model or ANTHROPIC_MODEL or "").strip()
     if model not in ANTHROPIC_RATES or not (ANTHROPIC_API_KEY or "").strip():
         raise PipelineError("landing_unavailable")
     max_tokens = executor_max_tokens()

@@ -54,6 +54,7 @@ export default function BuilderPublishSteps({
   onUnpublish = () => {},
   onSaveDomain = () => {},
   onVerifyDomain = () => {},
+  scoreAllowed = true,
 }) {
   if (!publishLanding || !hasPreview) return null;
 
@@ -97,9 +98,10 @@ export default function BuilderPublishSteps({
         {publication?.message ? <p className="mt-3 text-sm leading-6 text-zinc-200">{publication.message}</p> : null}
         {publication?.url ? <p className="mt-2 text-sm text-cyan-100">{publication.url}</p> : null}
         <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" className={buttonClass} disabled={locked || !check.ok} onClick={() => onPublish(check.slug)}>
+          <button type="button" className={buttonClass} disabled={locked || !check.ok || !scoreAllowed} onClick={() => onPublish(check.slug)}>
             Publicar
           </button>
+          {!scoreAllowed ? <p className="mt-2 text-sm text-amber-100">La versión no ha superado la evaluación. No se ha publicado.</p> : null}
           {publication?.status && publication.status !== 'none' ? (
             <button type="button" className={buttonClass} disabled={locked || !publication?.slug} onClick={onRepublish}>
               Volver a publicar

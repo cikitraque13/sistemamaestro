@@ -70,14 +70,14 @@ function SoonItem({ testId, icon: Icon, label }) {
   );
 }
 
-function AccountAvatar({ name, picture }) {
+function AccountAvatar({ name, picture, compact = false }) {
   const [failed, setFailed] = useState(false);
   const showPhoto = Boolean(picture) && !failed;
 
   return (
     <span
       data-testid="builder-account-avatar"
-      className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#12343A] text-sm font-semibold text-white"
+      className={`grid shrink-0 place-items-center overflow-hidden rounded-full text-sm font-semibold text-white ${compact ? 'h-8 w-8 bg-[#6d28d9]' : 'h-9 w-9 bg-[#6d28d9]'}`}
     >
       {showPhoto ? (
         <img
@@ -94,7 +94,7 @@ function AccountAvatar({ name, picture }) {
   );
 }
 
-export default function BuilderAccountMenu({ onNewProject = () => {}, advisorConfig = null }) {
+export default function BuilderAccountMenu({ onNewProject = () => {}, advisorConfig = null, compact = false }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const logoutPending = useRef(false);
@@ -123,11 +123,13 @@ export default function BuilderAccountMenu({ onNewProject = () => {}, advisorCon
       <DropdownMenuTrigger
         data-testid="builder-account-menu"
         aria-label={`Cuenta de ${name}`}
-        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-black/30 py-1 pl-1 pr-2 text-left text-sm font-medium text-white outline-none transition hover:border-white/20 hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-cyan-300/70 sm:pr-3"
+        className={compact
+          ? 'grid h-8 w-8 place-items-center rounded-full bg-[#6d28d9] text-sm font-semibold text-white outline-none'
+          : 'inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-black/30 py-1 pl-1 pr-2 text-left text-sm font-medium text-white outline-none transition hover:border-white/20 hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-cyan-300/70 sm:pr-3'}
       >
-        <AccountAvatar name={name} picture={picture} />
-        <span className="hidden max-w-[9rem] truncate sm:inline">{name}</span>
-        <CaretDown aria-hidden="true" size={14} className="shrink-0 text-zinc-400" />
+        <AccountAvatar name={name} picture={picture} compact={compact} />
+        {compact ? null : <span className="hidden max-w-[9rem] truncate sm:inline">{name}</span>}
+        {compact ? null : <CaretDown aria-hidden="true" size={14} className="shrink-0 text-zinc-400" />}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent

@@ -131,9 +131,15 @@ function previewStreamError(message) {
   return error;
 }
 
-export async function streamLandingPreview(project, instruction, onEvent) {
-  const url = `${String(API_BASE || '').replace(/\/$/, '')}/builder/preview/stream`;
+export function previewRequestBody(project, instruction, pace) {
   const body = { projectId: project.project_id, instruction };
+  if (pace === 'rapido' || pace === 'profundo') body.pace = pace;
+  return body;
+}
+
+export async function streamLandingPreview(project, instruction, onEvent, options = {}) {
+  const url = `${String(API_BASE || '').replace(/\/$/, '')}/builder/preview/stream`;
+  const body = previewRequestBody(project, instruction, options.pace);
   let preview = null;
   await runEconomicRequest(url, { body, expectedRevision: project.updated_at || '0' }, async (key) => {
     const controller = new AbortController();

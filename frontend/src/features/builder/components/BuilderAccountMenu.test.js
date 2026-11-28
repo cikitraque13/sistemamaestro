@@ -132,17 +132,16 @@ test('account menu renders on builder screens and shows only the real balance', 
 
   const header = document.querySelector('[data-testid="builder-shell-header"]');
   const actions = header.querySelector('[data-testid="builder-header-actions"]');
-  const mark = header.querySelector('[data-testid="builder-workspace-mark"]');
 
   expect(trigger).not.toBeNull();
   expect(actions.contains(trigger)).toBe(true);
-  expect(mark.textContent).toContain('SM');
-  expect(mark.textContent).toContain('Sistema Maestro');
-  expect(mark.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(trigger.textContent).toContain('Lucas Diaz');
+  expect(header.textContent).toContain('Creador de apps');
+  expect(header.querySelector('[data-testid="builder-inicio"]').getAttribute('href')).toBe('/dashboard');
+  expect(header.querySelector('[data-testid="builder-inicio"]').textContent).toContain('Inicio');
+  expect(header.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(trigger.getAttribute('aria-label')).toBe('Cuenta de Lucas Diaz');
   expect(trigger.querySelector('[data-testid="builder-account-avatar"]').textContent).toBe('L');
   expect(trigger.querySelector('[data-testid="builder-account-photo"]')).toBeNull();
-  expect(trigger.querySelector('span.hidden').className).toContain('sm:inline');
   expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
   expect(trigger.getAttribute('aria-expanded')).toBe('false');
   expect(trigger.getAttribute('aria-label')).toBe('Cuenta de Lucas Diaz');
@@ -156,8 +155,7 @@ test('account menu renders on builder screens and shows only the real balance', 
   expect(actions.contains(badge)).toBe(true);
   expect(badge.nextElementSibling).toBe(trigger);
   expect(badge.compareDocumentPosition(trigger.querySelector('[data-testid="builder-account-avatar"]')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(header.querySelector('[data-testid="builder-back-summary"]').getAttribute('href')).toBe('/dashboard');
-  expect(header.querySelector('[data-testid="builder-back-summary"]').textContent).toContain('←');
+  expect(header.querySelector('[data-testid="builder-inicio"]').getAttribute('href')).toBe('/dashboard');
   expect(header.querySelector('[aria-label="Secciones"]')).toBeNull();
   expect(header.querySelector('[data-testid="builder-project-select"]')).not.toBeNull();
   ['Resumen', 'Builder', 'Proyectos', 'Oportunidades', 'Facturación', 'Ajustes'].forEach((label) => {
@@ -214,7 +212,7 @@ test('account menu renders on builder screens and shows only the real balance', 
 
   rerender('Extracción');
   expect(document.body.textContent).toContain('Extracción');
-  expect(document.querySelector('[data-testid="builder-account-menu"]').textContent).toContain('Lucas Diaz');
+  expect(document.querySelector('[data-testid="builder-account-menu"]').getAttribute('aria-label')).toContain('Lucas Diaz');
   expect(document.body.textContent).not.toMatch(/\+\s*605/);
   expect(document.querySelector('[data-testid="builder-shell-header"]').textContent).not.toContain('Estado');
 

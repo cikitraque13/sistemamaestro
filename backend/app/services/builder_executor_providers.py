@@ -188,7 +188,8 @@ async def draft_page(data):
     if writer_name() == "grok":
         return await _draft_grok(writer_payload(data), kind="page")
     from backend.app.services.builder_claude_loop import write_landing_with_tools
-    return await write_landing_with_tools(landing_brief(data))
+    model = data.get("writerModel") if isinstance(data, dict) else None
+    return await write_landing_with_tools(landing_brief(data), model=model if isinstance(model, str) else None)
 
 
 async def draft_piece(data):

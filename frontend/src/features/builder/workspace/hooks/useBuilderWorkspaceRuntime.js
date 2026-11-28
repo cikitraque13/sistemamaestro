@@ -836,15 +836,16 @@ export default function useBuilderWorkspaceRuntime({
     return () => window.clearTimeout(timer);
   }, [activeExecutorStep?.id, activeExecutorStep?.status, activeExecutorStep?.startedAt]);
 
-  const runPreview = useCallback(async (projectValue, instruction) => {
+  const runPreview = useCallback(async (projectValue, instruction, pace) => {
     const iterating = Boolean(generatedPreview?.html);
     setExecutorPhase(iterating ? 'iterando' : 'construyendo');
     setExecutorMessage(iterating ? 'Iterando sobre la versión guardada.' : 'Construyendo tu página.');
     setPreviewPhase('working');
     setPreviewNotice('');
     setPartialHtml('');
+    setExecutorSteps([]);
     setExecutorLog((current) => [...current, { role: 'user', text: instruction }]);
-    const preview = await streamLandingPreview(projectValue, instruction, applyExecutorEvent);
+    const preview = await streamLandingPreview(projectValue, instruction, applyExecutorEvent, { pace });
     if (!preview?.html) {
       setPreviewPhase('error');
       setExecutorPhase('error');
@@ -862,7 +863,7 @@ export default function useBuilderWorkspaceRuntime({
   }, [applyExecutorEvent, generatedPreview?.html]);
 
   const submitMessage = useCallback(
-    async (text) => {
+    async (text, pace) => {
       const value = String(text || '').trim();
 
       if (!value || !projectReady) return;
@@ -884,7 +885,7 @@ export default function useBuilderWorkspaceRuntime({
       }
       if (project?.project_id) {
         try {
-          await runPreview(project, value);
+          await runPreview(project, value, pace);
         } catch (error) {
           const message = previewErrorMessage(error);
           setPreviewNotice(message);
@@ -1110,6 +1111,31 @@ export default function useBuilderWorkspaceRuntime({
       runPreview,
     ]
   );
+
+  const reloadPreview = useCallback(async () => {
+    if (!project?.project_id || !projectReady) return null;
+    try {
+      const loaded = await loadLandingPreview(project.project_id);
+      if (!loaded?.html) {
+        const message = 'No hay una vista previa guardada para reanudar.';
+        setPreviewNotice(message);
+        setPreviewPhase('error');
+        setExecutorMessage(message);
+        return null;
+      }
+      setGeneratedPreview(loaded);
+      setPreviewPhase('ready');
+      setPreviewNotice('');
+      return loaded;
+    } catch (error) {
+      const message = previewErrorMessage(error);
+      setPreviewNotice(message);
+      setPreviewPhase('error');
+      setExecutorPhase('error');
+      setExecutorMessage(message);
+      return null;
+    }
+  }, [project, projectReady]);
 
   const retryPreview = useCallback(async () => {
     const instruction = String(initialPrompt || project?.input_content || '').trim();
@@ -1383,6 +1409,7 @@ export default function useBuilderWorkspaceRuntime({
     previewNotice,
     previewPhase,
     retryPreview,
+    reloadPreview,
     executor: {
       phase: executorPhase,
       message: executorMessage,

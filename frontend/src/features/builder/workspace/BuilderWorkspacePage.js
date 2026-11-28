@@ -13,6 +13,8 @@ import { embedEntryIsOpen } from '../embed/embedAccess';
 import { isExistingAdmin } from '../builderAccess';
 import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
+import { realCreditBalance } from '../components/BuilderAccountMenu';
+import { BuilderStudioProvider } from '../studio/BuilderStudioContext';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
 
 const ACTIVE_BUILDER_PROJECT_STORAGE_KEY =
@@ -336,7 +338,10 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
     : initialPrompt
       ? `Entrada recibida: "${initialPrompt}". El Builder espera un proyecto guardado.`
       : 'Builder para el diagnóstico y la preview.';
+  const gemBalance = realCreditBalance(user);
+  const credits = gemBalance === '—' ? 0 : Number(gemBalance);
   return (
+    <BuilderStudioProvider credits={credits} freeTestMode={freeTestMode}>
     <AppShellLayout
       productLabel="Sistema Maestro"
       activeNavId="builder"
@@ -382,7 +387,9 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         publishLanding={publishLanding}
         customDomain={customDomain}
         embedInstall={embedInstall}
+        onLeave={() => navigate('/dashboard')}
       />
     </AppShellLayout>
+    </BuilderStudioProvider>
   );
 }
