@@ -5,7 +5,7 @@ import logging
 from typing import Any, Dict, Optional, Union, Annotated
 from pydantic import Discriminator, Tag
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Body, HTTPException, Request
 from starlette.responses import JSONResponse
 
 from backend.app.ai.agents.builder_agent import run_builder_agent
@@ -39,6 +39,20 @@ def _builder_input_kind(value):
     return "build"
 
 BuilderEndpointInput = Annotated[Union[Annotated[IntentOperation, Tag("intent")], Annotated[PlanOperation, Tag("plan")], Annotated[BuilderAIInput, Tag("build")]], Discriminator(_builder_input_kind)]
+
+
+def coerce_builder_body(data: Dict[str, Any]):
+    """Accept the same JSON object the client posts. FastAPI 0.110 treats a
+    discriminated union as a query unless it is an explicit body model.
+    """
+    if not isinstance(data, dict):
+        raise HTTPException(422, detail={"message": "El cuerpo tiene que ser un objeto JSON."})
+    kind = data.get("kind")
+    if kind == "intent" or (data.get("operation_type") and "userInput" not in data):
+        return IntentOperation.model_validate(data)
+    if kind == "plan":
+        return PlanOperation.model_validate(data)
+    return BuilderAIInput.model_validate(data)
 
 router = APIRouter(prefix="/api/builder", tags=["builder-ai"])
 logger = logging.getLogger(__name__)
@@ -239,6 +253,10 @@ def build_guard_warnings(guards: Dict[str, Dict[str, Any]]) -> list[str]:
 
 
 @router.post("/build")
+async def build_with_ai_route(request: Request, body: Dict[str, Any] = Body(...)):
+    return await build_with_ai(coerce_builder_body(body), request)
+
+
 async def build_with_ai(payload: BuilderEndpointInput, request: Request):
     await ensure_builder_available(request)
     from backend.app.routers.projects import expected_project_revision, assert_project_revision, next_project_revision

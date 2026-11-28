@@ -3,7 +3,16 @@
 
 export const LANDING_SAVE_DELAY_MS = 400;
 
-export function createLandingSync({ storage, load, save, delayMs = LANDING_SAVE_DELAY_MS }) {
+export function landingSaveMessage(error) {
+  const message = error?.response?.data?.detail?.message;
+  if (typeof message === 'string' && message.trim() && !/^[A-Z0-9_]+$/.test(message.trim())) {
+    return message.trim();
+  }
+  if (error?.response?.status === 409) return 'La landing cambió en otra pestaña. Recarga antes de guardar.';
+  return 'No se ha podido guardar la landing. El cambio sigue en este navegador.';
+}
+
+export function createLandingSync({ storage, load, save, delayMs = LANDING_SAVE_DELAY_MS, onError = null }) {
   let timer = null;
   let pending = null;
 
@@ -13,9 +22,9 @@ export function createLandingSync({ storage, load, save, delayMs = LANDING_SAVE_
     timer = null;
     if (!job) return;
     try {
-      await save(job.projectId, job.record);
-    } catch {
-      // The local cache already holds the edit.
+      await save(job.projectId, job.record, job.expected);
+    } catch (error) {
+      onError?.(landingSaveMessage(error));
     }
   }
 
@@ -38,9 +47,9 @@ export function createLandingSync({ storage, load, save, delayMs = LANDING_SAVE_
       return cached ? 'local' : 'empty';
     },
 
-    noteWrite(projectId, record) {
+    noteWrite(projectId, record, expected = '0') {
       if (typeof record !== 'string' || !record.length) return;
-      pending = { projectId, record };
+      pending = { projectId, record, expected };
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => { writeRemote(); }, delayMs);
     },
@@ -53,7 +62,7 @@ export function createLandingSync({ storage, load, save, delayMs = LANDING_SAVE_
   };
 }
 
-export function createCachedLandingStore(localStore, sync, projectId) {
+export function createCachedLandingStore(localStore, sync, projectId, expected = () => '0') {
   return {
     transaction: async (key, operation) => {
       let written;
@@ -62,7 +71,7 @@ export function createCachedLandingStore(localStore, sync, projectId) {
         if (typeof result?.write === 'string') written = result.write;
         return result;
       });
-      if (written !== undefined) sync.noteWrite(projectId, written);
+      if (written !== undefined) sync.noteWrite(projectId, written, expected());
       return value;
     },
   };

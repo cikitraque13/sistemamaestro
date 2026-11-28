@@ -1,21 +1,26 @@
 import { decisionRequired } from '../../state/humanSemanticDecision.mjs';
 import { useEffect, useRef, useState } from 'react';
 import { createDurableLandingWorkspace, createLocalWorkspaceStore, durableWorkspaceKey } from '../../state/durableLandingWorkspace.mjs';
-import { createCachedLandingStore, createLandingSync } from '../../state/landingPersistence.mjs';
+import { createCachedLandingStore, createLandingSync, landingSaveMessage } from '../../state/landingPersistence.mjs';
 import { contentHash } from '../../state/builderChangeTransaction.mjs';
 import { api } from '../../../../lib/apiClient';
 
-function landingSyncFor(storage) {
+function landingSyncFor(storage, revision, onError) {
   return createLandingSync({
     storage,
+    onError,
     load: async (projectId) => {
       const response = await api.get(`/projects/${encodeURIComponent(projectId)}/landing`);
+      revision.current = response?.data?.updated_at || '0';
       const record = response?.data?.record;
       return typeof record === 'string' ? record : null;
     },
     save: async (projectId, record) => {
       if (typeof api.put !== 'function') return;
-      await api.put(`/projects/${encodeURIComponent(projectId)}/landing`, { record });
+      const response = await api.put(`/projects/${encodeURIComponent(projectId)}/landing`, { record }, {
+        headers: { 'If-Match': revision.current || '0' },
+      });
+      revision.current = response?.data?.updated_at || revision.current;
     },
   });
 }
@@ -45,12 +50,15 @@ export default function useDurableLandingTransaction(activeState, onCommit, owne
       setView({ pending: null, review: null, decision: null, revision: record.workspace.revision, canRevert: record.workspace.history.at(-1)?.kind === 'apply', hasSavedDraft: Boolean(record.pendingDraft), draftVersion: record.draftVersion || 0, audit: (record.decisions || []).map(d => ({...d, effectiveStatus: record.workspace.history.some(e => e.humanDecision?.decisionId === d.decisionId) ? 'APPLIED_HISTORICAL' : d.type === 'REJECT_CHANGE' ? 'REJECTED' : 'STALE_DECISION'})), status: 'ready', error: '', busy: false });
     };
     token.publish = publish; token.assertCurrent = assertCurrent;
-    const sync = landingSyncFor(window.localStorage);
+    const revision = { current: '0' };
+    const sync = landingSyncFor(window.localStorage, revision, (message) => {
+      if (token.alive) setView((v) => ({ ...v, error: landingSaveMessage({ response: { data: { detail: { message } } } }) }));
+    });
     const key = durableWorkspaceKey(ownerId, projectId);
     try {
       const localStore = createLocalWorkspaceStore(window.localStorage, navigator.locks);
       token.repository = createDurableLandingWorkspace(
-        createCachedLandingStore(localStore, sync, projectId),
+        createCachedLandingStore(localStore, sync, projectId, () => revision.current || '0'),
         ownerId,
         projectId,
         assertCurrent,
