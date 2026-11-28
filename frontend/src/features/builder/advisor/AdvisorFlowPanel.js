@@ -238,7 +238,7 @@ export default function AdvisorFlowPanel({ open = false, onOpenChange = () => {}
               </p>
               {bookingUrl ? null : (
                 <p data-testid="advisor-booking-unavailable" className="mt-1 text-center text-xs text-zinc-500">
-                  El calendario todavía no está conectado.
+                  Próximamente disponible
                 </p>
               )}
             </section>

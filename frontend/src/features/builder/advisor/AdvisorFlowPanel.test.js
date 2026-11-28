@@ -70,7 +70,8 @@ test('flag on offers Nova chat and a disabled booking button when the url is mis
   expect(booking.tagName).toBe('BUTTON');
   expect(booking.disabled).toBe(true);
   expect(booking.getAttribute('href')).toBeNull();
-  expect(document.querySelector('[data-testid="advisor-booking-unavailable"]')).not.toBeNull();
+  expect(booking.closest('a')).toBeNull();
+  expect(document.querySelector('[data-testid="advisor-booking-unavailable"]').textContent).toContain('Próximamente disponible');
   expect(document.querySelector('[data-testid="advisor-testimonials"]')).toBeNull();
   expect(document.querySelector('[data-testid="advisor-photo"]')).toBeNull();
   expect(document.querySelector('[data-testid="advisor-nova-avatar"]')).not.toBeNull();
