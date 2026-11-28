@@ -149,6 +149,12 @@ def _user_is_admin(user) -> bool:
 
 
 def user_may_publish(user) -> bool:
+    """Admins can open publish while PUBLISH_LANDING_ENABLED is off.
+
+    That bypass does not skip the score. publish_project still refuses a
+    version that missed the evaluation, for an admin and for anyone else.
+    This route does not charge gems.
+    """
     return publish_landing_enabled() or _user_is_admin(user)
 
 
@@ -397,6 +403,15 @@ async def _require_publication(publications, owner_id: str, project_id: str):
     return document
 
 
+def _require_promotable(version: dict) -> None:
+    from backend.app.services.builder_sandbox import PromotionBlocked, assert_promotable
+
+    try:
+        assert_promotable(version)
+    except PromotionBlocked as exc:
+        raise PublishError("evaluation_required", 422, str(exc)) from exc
+
+
 async def _slug_available(publications, slug: str, project_id: str) -> None:
     taken = await publications.find_one({"slug": slug})
     if taken and taken.get("project_id") != project_id:
@@ -409,13 +424,17 @@ async def publish_project(
 ) -> dict:
     """Copy the latest saved version into an immutable snapshot and mark it published.
 
-    TODO(founder): this path does not charge gems.
+    The version has to pass assert_promotable first. A missing score or a
+    total under the threshold is a 422, including for an admin. This path
+    does not charge gems.
+    TODO(founder): gem charge for publishing is still not wired.
     """
     settings = settings or publish_settings()
     stamp = _now_iso(now)
     chosen = validate_slug(slug)
     loaded = await _owned_preview(projects, landings, owner_id, project_id)
     version = _latest_version(loaded["preview"])
+    _require_promotable(version)
     snapshot = copy.deepcopy(_snapshot(version, loaded.get("updated_at") or "", stamp))
     await _slug_available(publications, chosen, project_id)
     current = await _publication_for(publications, owner_id, project_id)

@@ -2,7 +2,7 @@
 
 Each builder build writes a draft on `builder_landing_states` (`stage: draft`) through `DraftBoundary`. That object can load and save the owner's draft. It is not given `builder_publications`, and it has no publish method.
 
-`assert_promotable` refuses a version that missed `EVAL_PASS_THRESHOLD`. The publish service is unchanged in this change; wiring that check into publication is a separate front. The executor never calls it and never receives `builder_publications`.
+`publish_project` and republish call `assert_promotable` before copying a draft. A missing score or a total under `EVAL_PASS_THRESHOLD` is HTTP 422 `evaluation_required`. Admins can open the route while `PUBLISH_LANDING_ENABLED` is off; that bypass does not skip the score. Publishing stays free. The executor never receives `builder_publications`.
 
 The process is the API process. This change does not start a worker, a container, or a Railway service.
 

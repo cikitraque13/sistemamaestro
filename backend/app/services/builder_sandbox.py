@@ -2,8 +2,9 @@
 
 The build can load and save its own draft on builder_landing_states. It does
 not receive the publications collection and it cannot mark a page published.
-assert_promotable is the rule a later publish change can call. This front
-does not edit the publish service.
+The publish route calls assert_promotable before it copies a draft. Admins
+can open that route while the product flag is off; they still need a passing
+score. Publishing does not charge gems.
 
 A separate worker or an ephemeral container is not started here. That would
 be a new Railway service (CPU, memory and egress on every build). The design
