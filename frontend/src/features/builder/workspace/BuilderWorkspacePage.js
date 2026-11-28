@@ -357,6 +357,7 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
       usageLabel="Créditos visibles para análisis, Builder y blueprint."
       userLabel={user?.name || user?.email || 'Workspace activo'}
       onNewProject={handleNewProject}
+      freeTestMode={freeTestMode}
       contextTitle={resolved ? projectHumanName(resolved) : 'Builder activo'}
       contextBody={contextBody}
     >
@@ -378,7 +379,6 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         bonus={user?.credit_lifetime_granted ?? 0}
         usageLabel="Créditos visibles para análisis, Builder y blueprint."
         autoStart={autoStart}
-        freeTestMode={freeTestMode}
         publishLanding={publishLanding}
         customDomain={customDomain}
         embedInstall={embedInstall}

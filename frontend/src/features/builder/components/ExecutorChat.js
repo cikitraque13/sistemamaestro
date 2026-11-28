@@ -43,7 +43,7 @@ export default function ExecutorChat({
   };
 
   return (
-    <section aria-label="Ejecutor" className="flex min-h-[11rem] min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/30 lg:min-h-0">
+    <section aria-label="Ejecutor" className="flex h-full min-h-[11rem] min-w-0 flex-1 flex-col overflow-hidden lg:min-h-0">
       <header className="shrink-0 border-b border-white/10 px-3 py-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">Ejecutor</p>
         <p className="mt-1 text-sm text-zinc-200" role="status">{executorStatusText(phase, message)}</p>

@@ -68,6 +68,7 @@ function BuilderRoute({ screen }) {
               projectItems={[{ id: 'p', label: 'Proyecto', status: 'Abierto', accent: 'cyan' }]}
               contextTitle="QUIERO CONVERTIR ESTA OPORTUNIDAD EN PROYECTO"
               contextBody="QUIERO CONVERTIR ESTA OPORTUNIDAD EN PROYECTO: Clara"
+              freeTestMode
             >
               <div>{screen}</div>
             </AppShellLayout>
@@ -150,6 +151,11 @@ test('account menu renders on builder screens and shows only the real balance', 
   expect(header.textContent).not.toContain('Nuevo proyecto');
   expect(header.querySelector('[data-testid="builder-header-upgrade"]').getAttribute('href')).toBe('/dashboard/billing');
   expect(header.querySelector('[data-testid="builder-header-upgrade"]').textContent).toContain('Mejorar plan');
+  const badge = header.querySelector('[data-testid="builder-free-test-badge"]');
+  expect(badge.textContent).toContain('Modo prueba · sin gemas');
+  expect(actions.contains(badge)).toBe(true);
+  expect(badge.nextElementSibling).toBe(trigger);
+  expect(badge.compareDocumentPosition(trigger.querySelector('[data-testid="builder-account-avatar"]')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(header.querySelector('[data-testid="builder-back-summary"]').getAttribute('href')).toBe('/dashboard');
   expect(header.querySelector('[data-testid="builder-back-summary"]').textContent).toContain('←');
   expect(header.querySelector('[aria-label="Secciones"]')).toBeNull();

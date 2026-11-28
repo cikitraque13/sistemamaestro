@@ -59,6 +59,7 @@ export default function AppShellLayout({
   usageLabel = 'Análisis · Builder · blueprint',
   userLabel = 'Cuenta principal',
   onNewProject = () => {},
+  freeTestMode = false,
   contextTitle = 'Builder activo',
   contextBody = 'Diagnóstico, preview y borrador en el Builder.',
 }) {
@@ -74,6 +75,7 @@ export default function AppShellLayout({
           activeProjectId={activeProjectId}
           onProjectChange={onProjectChange}
           onNewProject={onNewProject}
+          freeTestMode={freeTestMode}
         />
 
         <main className="mx-auto flex min-h-0 w-full max-w-[1840px] flex-1 flex-col overflow-hidden px-4 pb-4 pt-3 md:px-5">

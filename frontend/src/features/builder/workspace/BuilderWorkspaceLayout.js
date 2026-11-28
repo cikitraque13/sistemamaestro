@@ -1,23 +1,10 @@
 import React from 'react';
 
-import BuilderAgentPane from '../components/BuilderAgentPane';
 import ExecutorChat from '../components/ExecutorChat';
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
 import BuilderPublishDock from '../publish/BuilderPublishDock';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 import EmbedInstallStep from '../embed/EmbedInstallStep';
-
-const HISTORY_LABELS = {
-  ACCEPT_WARNING: 'Aceptó la advertencia',
-  REJECT_CHANGE: 'Rechazó el cambio',
-  REQUIRES_CLARIFICATION: 'Pidió una aclaración',
-};
-
-const historyText = (item) => {
-  const label = HISTORY_LABELS[item?.type] || String(item?.type || 'Cambio');
-  const reason = String(item?.rationale || '').trim();
-  return reason ? `${label}. ${reason}` : label;
-};
 
 const LoadingState = () => (
   <div className="flex h-full min-h-[520px] items-center justify-center p-6">
@@ -48,36 +35,6 @@ const EmptyState = () => (
     </div>
   </div>
 );
-
-function ProjectHistory({ audit, versions }) {
-  const saved = Array.isArray(versions) ? versions.filter((item) => item && item.instruction) : [];
-  const items = Array.isArray(audit) ? audit.filter((item) => item && (item.type || item.rationale)) : [];
-
-  return (
-    <section aria-label="Historial" className="max-h-28 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Historial</p>
-      {saved.length === 0 && items.length === 0 ? (
-        <p className="mt-1 text-xs text-zinc-400">Aún no hay cambios</p>
-      ) : (
-        <ul className="mt-1.5 space-y-1">
-          {saved.slice().reverse().map((item) => (
-            <li key={`v-${item.version}`} className="truncate rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-xs leading-5 text-zinc-200">
-              {`Versión ${item.version}. ${item.instruction}`}
-            </li>
-          ))}
-          {items.slice().reverse().map((item, index) => (
-            <li
-              key={item.decisionId || `${item.type}-${index}`}
-              className="truncate rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-xs leading-5 text-zinc-200"
-            >
-              {historyText(item)}
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
 
 function PreparingPreview() {
   return (
@@ -111,14 +68,11 @@ function PreviewFailed({ message, onRetry }) {
   );
 }
 
-function WorkspaceSidePanel({
-  freeTestMode = false,
-  runtime,
-}) {
+function WorkspaceSidePanel({ runtime }) {
   return (
     <aside
       data-testid="builder-side-panel"
-      className="order-2 flex min-h-0 flex-col gap-2 overflow-hidden border-t border-white/10 bg-[#08070D] p-2.5 lg:order-1 lg:h-full lg:overflow-hidden lg:border-r lg:border-t-0"
+      className="order-2 flex min-h-0 flex-col overflow-hidden border-t border-white/10 bg-[#08070D] lg:order-1 lg:h-full lg:overflow-hidden lg:border-r lg:border-t-0"
     >
       <ExecutorChat
         phase={runtime.executor?.phase || 'idle'}
@@ -128,34 +82,6 @@ function WorkspaceSidePanel({
         slow={Boolean(runtime.executor?.slow)}
         onSubmit={runtime.submitMessage}
       />
-
-      {freeTestMode ? (
-        <p
-          data-testid="builder-free-test-badge"
-          className="w-fit shrink-0 rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100"
-        >
-          Modo prueba · sin gemas
-        </p>
-      ) : null}
-
-      {runtime.previewNotice ? <p role="alert" className="shrink-0 text-xs leading-5 text-amber-100">{runtime.previewNotice}</p> : null}
-
-      <div className="shrink-0 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
-        <BuilderAgentPane
-          project={runtime.project}
-          copy={runtime.copy}
-          progress={runtime.progress}
-          activeCodeTab={runtime.activeCodeTab}
-          onCodeTabChange={runtime.setActiveCodeTab}
-          messages={runtime.messages}
-          agentStatus={runtime.agentStatus}
-          onSubmitMessage={runtime.submitMessage}
-          onStartBuild={runtime.startBuild}
-          builderIntelligence={runtime.builderIntelligence}
-        />
-      </div>
-
-      <ProjectHistory audit={runtime.landingTransaction?.audit} versions={runtime.generatedPreview?.versions} />
     </aside>
   );
 }
@@ -168,7 +94,6 @@ export default function BuilderWorkspaceLayout({
   loadingProject = false,
   projectError = '',
   autoStart = false,
-  freeTestMode = false,
   publishLanding = false,
   customDomain = false,
   embedInstall = false,
@@ -246,10 +171,7 @@ export default function BuilderWorkspaceLayout({
         <div className="order-1 min-h-[70vh] overflow-hidden lg:order-2 lg:min-h-0 lg:h-full">
           {main}
         </div>
-        <WorkspaceSidePanel
-          freeTestMode={freeTestMode}
-          runtime={{ ...runtime, project }}
-        />
+        <WorkspaceSidePanel runtime={{ ...runtime, project }} />
       </div>
     </section>
   );

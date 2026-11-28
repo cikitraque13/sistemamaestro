@@ -64,16 +64,19 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.textContent).not.toContain('Gema Maestra');
   expect(node.textContent).not.toContain('12 créditos');
   expect(node.textContent).not.toContain('+ 3');
-  expect(node.textContent).toContain('Aún no hay cambios');
-  expect(node.textContent).toContain('Siguiente paso recomendado');
+  expect(node.textContent).not.toContain('Aún no hay cambios');
+  expect(node.textContent).not.toContain('Siguiente paso recomendado');
+  expect(node.textContent).not.toContain('Historial');
   expect(node.textContent).toContain('Ejecutor');
   expect(node.querySelector('[aria-label="Mensaje para el ejecutor"]').getAttribute('placeholder')).toBe('Pide un cambio de la página');
   expect([...node.querySelectorAll('button')].some((button) => button.textContent.trim() === 'Enviar')).toBe(true);
   const aside = node.querySelector('[data-testid="builder-side-panel"]');
   expect(aside.className).toContain('overflow-hidden');
   expect(aside.className).not.toMatch(/overflow-(auto|scroll|y-auto|y-scroll)/);
+  expect(aside.childElementCount).toBe(1);
   expect(aside.firstElementChild.getAttribute('aria-label')).toBe('Ejecutor');
   expect(aside.firstElementChild.className).toContain('flex-1');
+  expect(aside.firstElementChild.className).toContain('h-full');
   const sideButtons = [...aside.querySelectorAll('button')].map((button) => button.textContent.trim());
   expect(sideButtons).not.toContain('Preview');
   expect(sideButtons).not.toContain('Extracción');
@@ -117,15 +120,16 @@ test('extraction stays available when the workspace tab is extract, without a si
   act(() => root.unmount());
 });
 
-test('free test mode shows the no-gems badge', () => {
+test('the sidebar is only the executor chat', () => {
   const { node, root } = mount(
     <BuilderWorkspaceLayout freeTestMode project={project} ownerId="alice" credits={12} bonus={0} usageLabel="" />
   );
   const aside = node.querySelector('[data-testid="builder-side-panel"]');
-  const badge = node.querySelector('[data-testid="builder-free-test-badge"]');
-  expect(badge.textContent).toContain('Modo prueba · sin gemas');
-  expect(aside.firstElementChild.contains(badge)).toBe(false);
-  expect(aside.firstElementChild.compareDocumentPosition(badge) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(node.textContent).not.toContain('Gema Maestra');
+  expect(aside.childElementCount).toBe(1);
+  expect(aside.textContent).not.toContain('Modo prueba · sin gemas');
+  expect(aside.textContent).not.toContain('Siguiente paso recomendado');
+  expect(aside.textContent).not.toContain('Historial');
+  expect(aside.textContent).not.toContain('Aún no hay cambios');
+  expect(node.querySelector('[data-testid="builder-free-test-badge"]')).toBeNull();
   act(() => root.unmount());
 });

@@ -13,6 +13,7 @@ export default function BuilderShellHeader({
   activeProjectId = '',
   onProjectChange = () => {},
   onNewProject = () => {},
+  freeTestMode = false,
 }) {
   return (
     <header
@@ -57,6 +58,14 @@ export default function BuilderShellHeader({
           >
             Mejorar plan
           </Link>
+          {freeTestMode ? (
+            <p
+              data-testid="builder-free-test-badge"
+              className="inline-flex shrink-0 items-center rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100"
+            >
+              Modo prueba · sin gemas
+            </p>
+          ) : null}
           <BuilderAccountMenu onNewProject={onNewProject} />
         </div>
       </div>
