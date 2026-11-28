@@ -6,17 +6,11 @@ import {
   Sparkle
 } from '@phosphor-icons/react';
 
-import { PLAN_SIGNAL_META } from '../billing.constants';
-import { buildOperationalItems } from '../billing.utils';
+import { getPlanDisplayCopy } from '../../../content/planDisplayCopy';
 
 const PLAN_ROLE_META = {
   blueprint: {
     stage: 'ACTIVAR',
-    badge: 'Entrada seria',
-    suggestedBadge: 'Recomendado',
-    headline: 'Activa una base real de trabajo.',
-    description:
-      'Idea o diagnóstico convertidos en base operativa lista para Builder.',
     surface:
       'border-orange-300/70 bg-[radial-gradient(circle_at_12%_0%,rgba(249,115,22,0.55),transparent_42%),linear-gradient(165deg,#7c2d12_0%,#431407_48%,#1c0a04_100%)]',
     glow: 'bg-orange-400/40',
@@ -28,10 +22,6 @@ const PLAN_ROLE_META = {
   },
   sistema: {
     stage: 'CONTINUAR',
-    badge: 'Núcleo operativo',
-    headline: 'Convierte el sistema en continuidad operativa.',
-    description:
-      'Iteración, seguimiento y construcción continua para mantener proyectos vivos.',
     surface:
       'border-lime-300/70 bg-[radial-gradient(circle_at_12%_0%,rgba(190,242,100,0.5),transparent_42%),linear-gradient(165deg,#3f6212_0%,#1a2e05_48%,#0a1403_100%)]',
     glow: 'bg-lime-300/35',
@@ -43,10 +33,6 @@ const PLAN_ROLE_META = {
   },
   premium: {
     stage: 'ESCALAR',
-    badge: 'Nivel maestro',
-    headline: 'Activa la capa maestra para casos complejos.',
-    description:
-      'Más criterio, inteligencia y capacidad para preparar una salida seria.',
     surface:
       'border-violet-300/70 bg-[radial-gradient(circle_at_80%_0%,rgba(167,139,250,0.55),transparent_40%),radial-gradient(circle_at_10%_90%,rgba(56,189,248,0.4),transparent_42%),linear-gradient(165deg,#4c1d95_0%,#1e1b4b_55%,#082f49_100%)]',
     glow: 'bg-sky-400/30',
@@ -58,114 +44,28 @@ const PLAN_ROLE_META = {
   }
 };
 
-const TOKEN_PARTS = ['credi', 'tos'];
-const TECH_TOKEN = TOKEN_PARTS.join('');
-
-const normalizeText = (value) =>
-  String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
-
-const cleanVisibleText = (value) =>
-  String(value || '')
-    .replace(/cr[eé]ditos incluidos/gi, 'gemas incluidas')
-    .replace(/cr[eé]ditos/gi, 'gemas')
-    .replace(new RegExp(TECH_TOKEN, 'gi'), 'gemas');
-
-const getVisibleOperationalLabel = (label) => {
-  const normalized = normalizeText(label);
-
-  if (normalized === 'activacion') return 'Activación';
-  if (normalized === 'exportacion') return 'Salida';
-  if (normalized === TECH_TOKEN) return 'Gemas';
-
-  return String(label || '');
-};
-
-const getVisibleOperationalValue = (item) => {
-  const label = getVisibleOperationalLabel(item.label);
-  const rawValue = String(item.value || '');
-
-  if (label === 'Gemas') {
-    const amount = rawValue.match(/\d+/)?.[0];
-    return amount ? `${amount} incluidas` : cleanVisibleText(rawValue);
-  }
-
-  return cleanVisibleText(rawValue);
-};
-
-const buildVisibleIncludes = (plan) => {
-  const operationalItems = buildOperationalItems(plan).map((item) => {
-    const label = getVisibleOperationalLabel(item.label);
-    const value = getVisibleOperationalValue(item);
-
-    return `${label}: ${value}`;
-  });
-
-  const baseHighlights =
-    Array.isArray(plan.billingHighlights) && plan.billingHighlights.length > 0
-      ? plan.billingHighlights
-      : plan.features || [];
-
-  const filteredHighlights = baseHighlights
-    .map(cleanVisibleText)
-    .filter((feature) => {
-      const normalized = normalizeText(feature);
-
-      if (!normalized) return false;
-      if (normalized.includes('gema')) return false;
-      if (normalized.includes('credito')) return false;
-      if (normalized.includes('builder')) return false;
-
-      return true;
-    })
-    .slice(0, 3);
-
-  return [...operationalItems, ...filteredHighlights].reduce((items, item) => {
-    const normalized = normalizeText(item);
-
-    if (items.some((existing) => normalizeText(existing) === normalized)) {
-      return items;
-    }
-
-    return [...items, item];
-  }, []);
-};
-
 const PlanCard = ({
   plan,
   userPlan,
-  suggestedPlanId,
   processingKey,
   onPlanCheckout
 }) => {
   const isCurrentPlan = userPlan === plan.id;
-  const isSuggestedPlan = suggestedPlanId
-    ? suggestedPlanId === plan.id
-    : plan.id === 'blueprint';
-
   const role = PLAN_ROLE_META[plan.id] || PLAN_ROLE_META.blueprint;
-
-  const planSignals = PLAN_SIGNAL_META[plan.id]?.chips || [];
-  const planSignalClass =
-    PLAN_SIGNAL_META[plan.id]?.chipClass ||
-    'bg-white/5 text-[#D4D4D4] border border-white/10';
-
-  const visibleIncludes = buildVisibleIncludes(plan);
+  const display = getPlanDisplayCopy(plan);
 
   const isProcessing = processingKey === `plan:${plan.id}`;
   const isDisabled = isCurrentPlan || isProcessing;
 
   const ctaLabel = isCurrentPlan
     ? 'Plan actual'
-    : plan.cta?.label || `Entrar en ${plan.visibleName}`;
+    : plan.cta?.label || `Entrar en ${display.name}`;
 
   return (
     <article
       className={`relative flex h-full min-h-[620px] flex-col overflow-hidden rounded-[32px] border p-6 shadow-[0_26px_90px_rgba(0,0,0,0.30)] ${role.surface}`}
       data-testid={`plan-card-${plan.id}`}
+      data-highlight={display.highlighted ? 'true' : 'false'}
     >
       <div
         className={`absolute right-[-110px] top-[-120px] h-72 w-72 rounded-full ${role.glow} blur-3xl`}
@@ -174,17 +74,14 @@ const PlanCard = ({
 
       <div className="relative z-10">
         <div className="mb-12 flex min-h-[34px] flex-wrap items-start gap-2">
-          <span
-            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${role.badgeClass}`}
-          >
-            {role.badge}
-          </span>
-
-          {isSuggestedPlan && !isCurrentPlan && role.suggestedBadge && (
-            <span className="inline-flex items-center rounded-full border border-[#8DE1D0]/25 bg-[#0F5257]/18 px-3 py-1 text-xs font-medium text-[#8DE1D0]">
-              {role.suggestedBadge}
+          {display.badge ? (
+            <span
+              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-[0.12em] ${role.badgeClass}`}
+              data-testid={`plan-badge-${plan.id}`}
+            >
+              {display.badge}
             </span>
-          )}
+          ) : null}
 
           {isCurrentPlan && (
             <span className="inline-flex items-center rounded-full bg-white/12 px-3 py-1 text-xs font-medium text-white">
@@ -198,16 +95,18 @@ const PlanCard = ({
             {role.stage}
           </p>
 
-          <h4 className="mb-10 text-4xl font-light leading-tight text-white">
-            {plan.visibleName}
+          <h4
+            className="mb-6 text-4xl font-light leading-tight text-white"
+            data-testid={`plan-name-${plan.id}`}
+          >
+            {display.name}
           </h4>
 
-          <p className="mb-8 min-h-[56px] text-base leading-7 text-white">
-            {role.headline}
-          </p>
-
-          <p className="min-h-[72px] text-sm leading-6 text-white/68">
-            {role.description}
+          <p
+            className="min-h-[56px] text-base leading-7 text-white"
+            data-testid={`plan-tagline-${plan.id}`}
+          >
+            {display.tagline}
           </p>
         </div>
 
@@ -229,20 +128,14 @@ const PlanCard = ({
           />
         </div>
 
-        {planSignals.length > 0 && (
-          <div className="mb-8 min-h-[62px]">
-            <div className="flex flex-wrap gap-2">
-              {planSignals.map((signal) => (
-                <span
-                  key={`${plan.id}-${signal}`}
-                  className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${planSignalClass}`}
-                >
-                  {signal}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        {display.gemsLine ? (
+          <p
+            className="mb-8 text-sm font-medium text-white"
+            data-testid={`plan-gems-${plan.id}`}
+          >
+            {display.gemsLine}
+          </p>
+        ) : null}
       </div>
 
       <div className="relative z-10 flex-1">
@@ -251,7 +144,7 @@ const PlanCard = ({
         </p>
 
         <ul className="space-y-2.5">
-          {visibleIncludes.map((feature) => (
+          {display.bullets.map((feature) => (
             <li
               key={feature}
               className="flex items-start gap-2 text-sm leading-6 text-white/84"

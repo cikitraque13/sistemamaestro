@@ -58,11 +58,6 @@ const BillingPage = () => {
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
-  const suggestedPlanId =
-    location.state?.suggestedPlan ||
-    restoredContext?.suggestedPlan ||
-    null;
-
   const fromProjectId =
     location.state?.fromProjectId ||
     restoredContext?.fromProjectId ||
@@ -219,7 +214,6 @@ const BillingPage = () => {
               key={plan.id}
               plan={plan}
               userPlan={currentPlanId}
-              suggestedPlanId={suggestedPlanId}
               processingKey={processingKey}
               onPlanCheckout={handlePlanCheckout}
             />
