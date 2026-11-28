@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
 from pymongo.errors import DuplicateKeyError
 
+from backend.app.core.advisor_flow import public_advisor_config
 from backend.app.core.builder_access import builder_enabled
 from backend.app.services.embed_agent import embed_agent_enabled
 from backend.app.core.config import get_google_client_id
@@ -24,6 +25,7 @@ async def get_public_config():
         "google_client_id": get_google_client_id(),
         "builder_enabled": builder_enabled(),
         "embed_agent_enabled": embed_agent_enabled(),
+        **public_advisor_config(),
     }
 
 

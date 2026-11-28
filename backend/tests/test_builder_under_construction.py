@@ -80,10 +80,29 @@ def test_flag_defaults_off_and_accepts_only_explicit_true(monkeypatch):
 
 def test_public_config_reports_the_same_flag(monkeypatch):
     monkeypatch.setenv("BUILDER_ENABLED", "false")
+    for name in (
+        "ADVISOR_FLOW_ENABLED",
+        "REACT_APP_ADVISOR_FLOW_ENABLED",
+        "VITE_ADVISOR_FLOW_ENABLED",
+        "ADVISOR_BOOKING_URL",
+        "REACT_APP_ADVISOR_BOOKING_URL",
+        "VITE_ADVISOR_BOOKING_URL",
+        "ADVISOR_PHOTO_URL",
+        "REACT_APP_ADVISOR_PHOTO_URL",
+        "VITE_ADVISOR_PHOTO_URL",
+    ):
+        monkeypatch.delenv(name, raising=False)
     import asyncio
     closed = asyncio.run(get_public_config())
     assert closed["builder_enabled"] is False
+    assert closed["advisor_flow_enabled"] is False
+    assert closed["advisor_booking_url"] == ""
+    assert closed["advisor_photo_url"] == ""
     assert "google_client_id" in closed
     monkeypatch.setenv("BUILDER_ENABLED", "true")
+    monkeypatch.setenv("ADVISOR_FLOW_ENABLED", "true")
+    monkeypatch.setenv("ADVISOR_BOOKING_URL", "https://booking.example.test/30")
     opened = asyncio.run(get_public_config())
     assert opened["builder_enabled"] is True
+    assert opened["advisor_flow_enabled"] is True
+    assert opened["advisor_booking_url"] == "https://booking.example.test/30"
