@@ -85,12 +85,45 @@ function ProjectHistory({ audit, versions }) {
   );
 }
 
+function PreparingPreview() {
+  return (
+    <div className="flex h-full min-h-[520px] items-center justify-center p-6" role="status">
+      <div className="w-full max-w-xl">
+        <div className="mb-5 h-40 animate-pulse rounded-3xl bg-white/10" />
+        <div className="mb-3 h-4 w-2/3 animate-pulse rounded-full bg-white/10" />
+        <div className="h-4 w-1/2 animate-pulse rounded-full bg-white/10" />
+        <h2 className="mt-6 text-2xl font-semibold text-white">Preparando tu página…</h2>
+        <p className="mt-3 text-sm leading-6 text-zinc-400">Estamos escribiendo la primera versión.</p>
+      </div>
+    </div>
+  );
+}
+
+function PreviewFailed({ message, onRetry }) {
+  return (
+    <div className="flex h-full min-h-[520px] items-center justify-center p-6" role="alert">
+      <div className="max-w-xl text-center">
+        <h2 className="text-2xl font-semibold text-white">No se ha podido preparar la página</h2>
+        <p className="mt-3 text-sm leading-6 text-amber-100">{message}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-5 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white"
+        >
+          Reintentar
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function WorkspaceSidePanel({
   activeWorkspaceTab,
   onWorkspaceTabChange,
   credits,
   bonus,
   usageLabel,
+  freeTestMode = false,
   runtime,
 }) {
   const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
@@ -107,6 +140,11 @@ function WorkspaceSidePanel({
       </div>
 
       <GemaMaestra credits={credits} bonus={bonus} usageLabel={usageLabel} />
+      {freeTestMode ? (
+        <p className="w-fit rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100">
+          Modo prueba · sin gemas
+        </p>
+      ) : null}
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
         <BuilderAgentPane
@@ -142,11 +180,14 @@ export default function BuilderWorkspaceLayout({
   credits = 0,
   bonus = 0,
   usageLabel = '',
+  autoStart = false,
+  freeTestMode = false,
 }) {
   const runtime = useBuilderWorkspaceRuntime({
     project,
     ownerId,
     initialPrompt,
+    autoStart,
     loadingProject,
     projectError,
   });
@@ -164,6 +205,10 @@ export default function BuilderWorkspaceLayout({
         className="h-full min-h-[70vh] w-full border-0 bg-[#090b12] lg:min-h-0"
       />
     );
+  } else if (project && visibleTab !== 'extract' && runtime.previewPhase === 'working') {
+    main = <PreparingPreview />;
+  } else if (project && visibleTab !== 'extract' && runtime.previewPhase === 'error') {
+    main = <PreviewFailed message={runtime.previewNotice || 'No se ha podido preparar la preview. No se ha publicado nada.'} onRetry={runtime.retryPreview} />;
   } else if (project) {
     main = (
       <BuilderCanvasPane
@@ -190,6 +235,7 @@ export default function BuilderWorkspaceLayout({
           credits={credits}
           bonus={bonus}
           usageLabel={usageLabel}
+          freeTestMode={freeTestMode}
           runtime={{ ...runtime, project }}
         />
       </div>

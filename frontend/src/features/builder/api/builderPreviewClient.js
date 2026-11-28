@@ -11,6 +11,15 @@ export function previewErrorMessage(error) {
   return 'No se ha podido preparar la preview. No se ha publicado nada.';
 }
 
+export async function loadBuilderSession() {
+  try {
+    const response = await api.get('/builder/session');
+    return { freeTestMode: Boolean(response?.data?.freeTestMode) };
+  } catch {
+    return { freeTestMode: false };
+  }
+}
+
 export async function loadLandingPreview(projectId) {
   try {
     const response = await api.get(`/builder/preview/${encodeURIComponent(projectId)}`);
