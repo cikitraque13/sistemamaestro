@@ -29,6 +29,7 @@ vi.mock('./hooks/useBuilderWorkspaceRuntime', () => ({
     generatedPreview: {
       html: '<h1>Clara atiende</h1>',
       versions: [{ version: 1, instruction: 'Landing de Clara', createdAt: '2026-11-28T01:00:00+00:00' }],
+      evaluation: { total: 14, max: 20, threshold: 12, passed: true },
     },
     previewNotice: '',
     previewPhase: 'ready',
@@ -54,7 +55,7 @@ const project = {
   input_content: 'Landing de Clara',
 };
 
-test('publicar and dominio propio render after the preview when the session opens them', async () => {
+test('Publicar on En vivo opens the slug flow in the chat column', async () => {
   const node = document.createElement('div');
   const root = createRoot(node);
   await act(async () => {
@@ -71,13 +72,17 @@ test('publicar and dominio propio render after the preview when the session open
     );
   });
   const frame = node.querySelector('iframe');
-  const publish = node.querySelector('[aria-label="Publicar"]');
-  const domain = node.querySelector('[aria-label="Dominio propio"]');
+  const open = node.querySelector('[data-testid="builder-publish-open"]');
   expect(frame).not.toBeNull();
+  expect(open.disabled).toBe(false);
+  expect(node.querySelector('[aria-label="Publicar"]')).toBeNull();
+  await act(async () => { open.click(); });
+  const flow = node.querySelector('[data-testid="builder-side-panel"] [data-testid="builder-publish-flow"]');
+  const publish = flow.querySelector('[aria-label="Publicar"]');
+  const domain = flow.querySelector('[aria-label="Dominio propio"]');
   expect(publish).not.toBeNull();
   expect(domain).not.toBeNull();
-  expect(frame.compareDocumentPosition(publish) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(publish.compareDocumentPosition(domain) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(node.querySelector('.studio-right [data-builder-steps="publish"]')).toBeNull();
   expect(node.textContent).toContain('Pendiente de activación por Sistema Maestro');
   expect(node.textContent).toContain('edge.example.net');
   expect(node.textContent).not.toContain('up.railway.app');
@@ -93,6 +98,7 @@ test('the final steps stay hidden while publish is dark', () => {
     );
   });
   expect(node.querySelector('iframe')).not.toBeNull();
+  expect(node.querySelector('[data-testid="builder-publish-open"]')).toBeNull();
   expect(node.querySelector('[aria-label="Publicar"]')).toBeNull();
   expect(node.querySelector('[aria-label="Dominio propio"]')).toBeNull();
   act(() => root.unmount());

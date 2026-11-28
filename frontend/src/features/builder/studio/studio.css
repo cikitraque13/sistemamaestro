@@ -181,6 +181,29 @@
 .studio .st.now i { background: var(--teal); border-color: var(--teal); box-shadow: 0 0 0 3px rgba(46, 230, 200, .16), 0 0 12px rgba(46, 230, 200, .6); }
 .studio .st.off i { border-style: dashed; }
 .studio .st .lab { overflow: visible; }
+.studio .publish-slot {
+  margin: 0 var(--edge) 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.studio .btn-pub {
+  height: 40px; min-width: 148px; padding: 0 18px; border-radius: 8px; border: 0;
+  background: #fff; color: #111; font-size: 14px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.studio .btn-pub:disabled { opacity: .45; cursor: not-allowed; }
+.studio .publish-reason { margin: 0; max-width: 100%; text-align: right; font-size: 12px; color: var(--mute); }
+.studio .live-url {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--teal-2); font-size: 12px; text-decoration: none;
+}
+.studio .publish-flow {
+  margin: 0 var(--edge) 8px; max-height: 280px; overflow: auto;
+  border: 1px solid var(--line-2); border-radius: var(--rad); background: #08070d;
+}
+.studio .publish-flow [data-builder-steps="publish"] { border-top: 0; background: transparent; }
 
 .studio .notice {
   flex: 0 0 var(--row); height: var(--row); margin: 0 var(--edge) 8px;

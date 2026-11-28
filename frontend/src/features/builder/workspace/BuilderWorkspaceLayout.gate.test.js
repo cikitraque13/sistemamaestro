@@ -50,23 +50,42 @@ function render() {
   return { node, root };
 }
 
-test('the score stays on the step bar and the preview toolbar stays out', async () => {
+test('Publicar stays disabled under 12/20 and opens the flow once the score passes', async () => {
   runtime.generatedPreview.evaluation = { total: 11, max: 20, threshold: 12, passed: false };
   const low = render();
+  const blocked = low.node.querySelector('[data-testid="builder-publish-open"]');
   expect(low.node.querySelector('[data-testid="builder-preview-toolbar"]')).toBeNull();
-  expect(low.node.querySelector('[data-testid="builder-publish-button"]')).toBeNull();
-  expect(low.node.querySelector('[data-testid="builder-score-badge"]')).toBeNull();
+  expect(low.node.textContent).not.toMatch(/Historial|Restaurar|Deshacer/);
+  expect(blocked.disabled).toBe(true);
+  expect(blocked.getAttribute('title')).toBe('Necesita 12/20 en Evaluación');
+  expect(low.node.textContent).toContain('Necesita 12/20 en Evaluación');
+  expect(low.node.querySelector('[data-testid="builder-publish-flow"]')).toBeNull();
   expect(low.node.querySelector('[data-testid="builder-step-bar"]').textContent).toContain('Evaluación 11/20');
-  expect(low.node.textContent).toContain('12/20');
   expect(low.node.querySelector('[data-testid="builder-resume-strip"]').textContent).toContain('vista previa estática');
   act(() => low.root.unmount());
 
   runtime.generatedPreview.evaluation = { total: 13, max: 20, threshold: 12, passed: true };
   const high = render();
-  expect(high.node.querySelector('[data-testid="builder-preview-toolbar"]')).toBeNull();
-  expect(high.node.textContent).not.toContain('(12/20)');
+  const open = high.node.querySelector('[data-testid="builder-publish-open"]');
+  expect(open.disabled).toBe(false);
   expect(high.node.querySelector('[data-testid="builder-step-bar"]').textContent).toContain('Evaluación 13/20');
+  await act(async () => { open.click(); });
+  expect(high.node.querySelector('#publish-slug')).not.toBeNull();
+  expect(high.node.querySelector('.studio-right [data-builder-steps="publish"]')).toBeNull();
   act(() => high.root.unmount());
+});
+
+test('En vivo links the public url once the landing is published', async () => {
+  const { loadPublication } = await import('../publish/builderPublishClient');
+  loadPublication.mockResolvedValue({ status: 'published', url: 'https://clara.sistemamaestro.com', slug: 'clara' });
+  runtime.generatedPreview.evaluation = { total: 13, max: 20, threshold: 12, passed: true };
+  const { node, root } = render();
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
+  const envivo = [...node.querySelectorAll('[data-testid="builder-step-bar"] li')].find((item) => item.textContent.includes('En vivo'));
+  expect(envivo.getAttribute('data-done')).toBe('true');
+  expect(node.querySelector('[data-testid="builder-live-url"]').getAttribute('href')).toBe('https://clara.sistemamaestro.com');
+  expect(node.textContent).not.toMatch(/Historial|Restaurar|Deshacer/);
+  act(() => root.unmount());
 });
 
 test('a static preview can resume and an error stays visible', async () => {

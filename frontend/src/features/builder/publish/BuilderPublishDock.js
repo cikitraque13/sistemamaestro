@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import BuilderPublishSteps from './BuilderPublishSteps';
 import {
@@ -18,12 +18,15 @@ export default function BuilderPublishDock({
   hasPreview = false,
   busy = false,
   scoreAllowed = true,
+  onPublication,
 }) {
   const [publication, setPublication] = useState(null);
   const [slug, setSlug] = useState('');
   const [domain, setDomain] = useState('');
   const [notice, setNotice] = useState('');
   const [pending, setPending] = useState(false);
+  const onPublicationRef = useRef(onPublication);
+  onPublicationRef.current = onPublication;
 
   useEffect(() => {
     if (!publishLanding || !projectId) return undefined;
@@ -34,6 +37,7 @@ export default function BuilderPublishDock({
         setPublication(data);
         if (data.slug) setSlug(data.slug);
         if (data.customDomain?.host) setDomain(data.customDomain.host);
+        onPublicationRef.current?.(data);
       })
       .catch(() => {});
     return () => {
@@ -52,6 +56,7 @@ export default function BuilderPublishDock({
       if (data?.slug) setSlug(data.slug);
       if (data?.customDomain?.host) setDomain(data.customDomain.host);
       setNotice(data?.message || '');
+      if (data) onPublication?.(data);
     } catch (error) {
       setNotice(publishErrorMessage(error));
     } finally {
