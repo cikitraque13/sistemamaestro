@@ -154,20 +154,63 @@ def render_preview_html(draft) -> str:
     )
 
 
+def _public_evaluation(version):
+    """Score already stored on the version. Nothing here is recomputed."""
+    from backend.app.services.builder_evaluation import (
+        EVAL_CRITERIA,
+        EVAL_CRITERION_MAX,
+        EVAL_PASS_THRESHOLD,
+    )
+
+    raw = version.get("evaluation") if isinstance(version, dict) else None
+    if not isinstance(raw, dict):
+        return None
+    total = raw.get("total")
+    if isinstance(total, bool) or not isinstance(total, int):
+        return None
+    scores = raw.get("scores")
+    public_scores = None
+    if isinstance(scores, dict):
+        cleaned = {}
+        complete = True
+        for key in EVAL_CRITERIA:
+            value = scores.get(key)
+            if isinstance(value, bool) or not isinstance(value, int):
+                complete = False
+                break
+            cleaned[key] = value
+        if complete and sum(cleaned.values()) == total:
+            public_scores = cleaned
+    payload = {
+        "total": total,
+        "threshold": EVAL_PASS_THRESHOLD,
+        "max": len(EVAL_CRITERIA) * EVAL_CRITERION_MAX,
+        "passed": raw.get("passed") is True and total >= EVAL_PASS_THRESHOLD,
+    }
+    if public_scores is not None:
+        payload["scores"] = public_scores
+    return payload
+
+
 def public_preview(preview: dict) -> dict:
     versions = preview.get("versions") or []
     current = versions[-1]
-    return {
-        "html": current["html"],
-        "versions": [
-            {
-                "version": item["version"],
-                "instruction": item["instruction"],
-                "createdAt": item["createdAt"],
-            }
-            for item in versions
-        ],
-    }
+    public_versions = []
+    for item in versions:
+        public = {
+            "version": item["version"],
+            "instruction": item["instruction"],
+            "createdAt": item["createdAt"],
+        }
+        evaluation = _public_evaluation(item)
+        if evaluation:
+            public["evaluation"] = evaluation
+        public_versions.append(public)
+    result = {"html": current["html"], "versions": public_versions}
+    current_evaluation = _public_evaluation(current)
+    if current_evaluation:
+        result["evaluation"] = current_evaluation
+    return result
 
 
 def _next_preview(previous, owner_id, project_id, instruction, intent, blueprint, html, created_at, evaluation=None, preference=None):
@@ -201,7 +244,7 @@ def _next_preview(previous, owner_id, project_id, instruction, intent, blueprint
     }
 
 
-async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None):
+async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None, writer_model=""):
     from backend.app.services.builder_executor import iter_executor
 
     preview = None
@@ -210,6 +253,7 @@ async def run_pipeline(*, project, owner_id, instruction, classify, blueprint, d
         project=project, owner_id=owner_id, instruction=instruction, classify=classify,
         blueprint=blueprint, draft_landing=draft_landing, draft_section=draft_section,
         judge=judge, previous=previous, created_at=created_at, memory=memory,
+        writer_model=writer_model,
     ):
         if event.get("type") == "result":
             preview = event["preview"]

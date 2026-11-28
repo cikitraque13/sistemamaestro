@@ -68,6 +68,7 @@ export default function BuilderProjectSelect({
   projectItems = [],
   activeProjectId = '',
   onProjectChange = () => {},
+  variant = 'pill',
 }) {
   const fallback = projectItems.map(toSelectableProject).filter(Boolean);
   const [loaded, setLoaded] = useState(null);
@@ -95,10 +96,12 @@ export default function BuilderProjectSelect({
       <DropdownMenuTrigger
         data-testid="builder-project-select"
         aria-label="Seleccionar proyecto"
-        className="inline-flex h-11 min-w-0 max-w-[16rem] items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 text-left text-sm font-medium text-white outline-none transition hover:border-white/20 hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-cyan-300/70"
+        className={variant === 'tab'
+          ? 'inline-flex h-8 min-w-0 max-w-[16rem] items-center bg-transparent px-1 text-left text-sm text-[#f2f2f2] outline-none'
+          : 'inline-flex h-11 min-w-0 max-w-[16rem] items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 text-left text-sm font-medium text-white outline-none transition hover:border-white/20 hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-cyan-300/70'}
       >
         <span className="min-w-0 truncate">{label}</span>
-        <CaretDown aria-hidden="true" size={14} className="shrink-0 text-zinc-400" />
+        {variant === 'tab' ? null : <CaretDown aria-hidden="true" size={14} className="shrink-0 text-zinc-400" />}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"

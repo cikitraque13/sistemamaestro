@@ -91,7 +91,7 @@ def _critique_context(*, text, intent, plan, project):
     return {"instruction": text, "intent": intent, "plan": plan, "project": project}
 
 
-async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_section, project, memory=None, revision_notes=""):
+async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_section, project, memory=None, revision_notes="", writer_model=""):
     payload = {
         "instruction": text,
         "intent": intent,
@@ -101,6 +101,8 @@ async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_
         "revisionNotes": revision_notes,
         "project": project,
     }
+    if writer_model:
+        payload["writerModel"] = writer_model
     sections = []
     if draft_section is not None:
         header = await _maybe_await(draft_section({**payload, "slot": "header", "prior": []}))
@@ -155,7 +157,7 @@ async def _produce_draft(*, text, intent, plan, diagnosis, draft_landing, draft_
     return draft, events
 
 
-async def iter_executor(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None, now=None, timeout_seconds=None, max_iterations=None):
+async def iter_executor(*, project, owner_id, instruction, classify, blueprint, draft_landing, previous=None, created_at="", judge=None, draft_section=None, memory=None, now=None, timeout_seconds=None, max_iterations=None, writer_model=""):
     from backend.app.services.builder_copy_rubric import critique_copy
     from backend.app.services.builder_evaluation import evaluation_from_verdict
     from backend.app.services.builder_memory import infer_preference
@@ -220,6 +222,7 @@ async def iter_executor(*, project, owner_id, instruction, classify, blueprint, 
                 text=text, intent=intent, plan=plan, diagnosis=diagnosis,
                 draft_landing=draft_landing, draft_section=draft_section,
                 project=project, memory=memory, revision_notes=revision_notes,
+                writer_model=writer_model,
             )
         except PipelineError:
             yield _step("textos", "error", "No se ha podido escribir el texto.")

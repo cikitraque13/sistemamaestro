@@ -139,3 +139,5 @@ class FreeTestModeTests(f.ChargedCallerFixture):
         self.assertTrue(admin["freeTestMode"])
         self.assertFalse(member["freeTestMode"])
         self.assertFalse(closed["freeTestMode"])
+        self.assertIn(admin["writerModel"], ("claude-haiku-5-5", "claude-sonnet-5-5"))
+        self.assertIn(admin["judgeModel"], ("grok-4.3", "grok-4.7"))

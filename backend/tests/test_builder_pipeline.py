@@ -243,6 +243,49 @@ def test_publish_stays_off():
     assert "No" in text or "no escribe" in text
 
 
+def test_public_preview_reports_the_stored_score_and_hides_a_pass_under_the_bar():
+    from backend.app.services.builder_evaluation import EVAL_PASS_THRESHOLD
+    from backend.app.services.builder_pipeline import public_preview
+
+    low = {
+        "version": 1,
+        "instruction": "Primera",
+        "createdAt": "2026-11-28T01:00:00+00:00",
+        "html": "<h1>Antes</h1>",
+        "evaluation": {
+            "total": 9,
+            "threshold": EVAL_PASS_THRESHOLD,
+            "passed": False,
+            "scores": {"visual_hierarchy": 2, "selling_microcopy": 2, "objections": 2, "specificity": 3},
+        },
+    }
+    high = {
+        "version": 2,
+        "instruction": "Segunda",
+        "createdAt": "2026-11-28T02:00:00+00:00",
+        "html": "<h1>Ahora</h1>",
+        "evaluation": {
+            "total": 13,
+            "threshold": EVAL_PASS_THRESHOLD,
+            "passed": True,
+            "scores": {"visual_hierarchy": 4, "selling_microcopy": 3, "objections": 3, "specificity": 3},
+        },
+    }
+    public = public_preview({"versions": [low, high]})
+    assert public["evaluation"]["total"] == 13
+    assert public["evaluation"]["max"] == 20
+    assert public["evaluation"]["threshold"] == 12
+    assert public["evaluation"]["passed"] is True
+    assert public["versions"][0]["evaluation"]["passed"] is False
+    assert "html" not in public["versions"][0]
+
+    lied = dict(high)
+    lied["evaluation"] = {**high["evaluation"], "total": 9, "passed": True}
+    assert public_preview({"versions": [lied]})["evaluation"]["passed"] is False
+    bare = public_preview({"versions": [{**low, "evaluation": None}]})
+    assert "evaluation" not in bare
+
+
 def test_preview_html_escapes_markup():
     html = render_preview_html({**DRAFT, "title": "<script>alert(1)</script>"})
     assert "<script>" not in html

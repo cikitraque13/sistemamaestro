@@ -27,6 +27,7 @@ from backend.app.services.builder_landing_state import (
 from backend.app.services.builder_executor import encode_sse, iter_executor, with_heartbeats
 from backend.app.services.builder_executor_providers import draft_page, judge_draft
 from backend.app.services.builder_memory import load_owner_memory, remember_owner_preview
+from backend.app.services.builder_pace import PaceError, writer_model_for_pace
 from backend.app.services.builder_pipeline import GENERIC_MESSAGE, PipelineError, public_preview, run_pipeline
 from backend.app.services.builder_sandbox import DraftBoundary
 from backend.app.services.builder_telemetry import note_funnel
@@ -56,6 +57,15 @@ async def _cancel_task(task):
 class PreviewRequest(BaseModel):
     projectId: str = Field(min_length=1)
     instruction: str = Field(min_length=1, max_length=4000)
+    pace: str | None = Field(default=None, max_length=32)
+
+
+def resolve_writer_model(pace) -> str:
+    """Pace chooses an allowlisted writer. It is not a ledger input."""
+    try:
+        return writer_model_for_pace(pace, configured=ANTHROPIC_MODEL)
+    except PaceError as exc:
+        raise HTTPException(422, detail={"code": "invalid_pace", "message": exc.message}) from None
 
 
 def _http_error(error: PipelineError) -> HTTPException:
@@ -98,6 +108,8 @@ async def builder_session(request: Request):
         "freeTestMode": builder_charge_waived(user),
         "publishLanding": user_may_publish(user),
         "customDomain": user_may_custom_domain(user),
+        "writerModel": ANTHROPIC_MODEL,
+        "judgeModel": GROK_MODEL,
     }
 
 
@@ -135,6 +147,7 @@ async def create_preview(body: PreviewRequest, request: Request):
     if not project:
         raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
     assert_project_revision(project, expected)
+    writer_model = resolve_writer_model(body.pace)
     boundary = DraftBoundary(
         db.projects, db.builder_landing_states, user["user_id"], body.projectId,
         load=load_generated_preview, save=save_generated_preview,
@@ -176,6 +189,7 @@ async def create_preview(body: PreviewRequest, request: Request):
                 judge=judge_draft,
                 previous=previous,
                 memory=memory,
+                writer_model=writer_model,
             )
         except PipelineError:
             await note_funnel(
@@ -223,6 +237,7 @@ async def stream_preview(body: PreviewRequest, request: Request):
     if not project:
         raise HTTPException(404, detail={"message": "No se ha encontrado el proyecto."})
     assert_project_revision(project, expected)
+    writer_model = resolve_writer_model(body.pace)
     boundary = DraftBoundary(
         db.projects, db.builder_landing_states, user["user_id"], body.projectId,
         load=load_generated_preview, save=save_generated_preview,
@@ -268,6 +283,7 @@ async def stream_preview(body: PreviewRequest, request: Request):
                 judge=judge_draft,
                 previous=previous,
                 memory=memory,
+                writer_model=writer_model,
             )):
                 await queue.put(event)
                 if event.get("type") == "error":

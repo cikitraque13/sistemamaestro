@@ -17,6 +17,7 @@ export default function BuilderPublishDock({
   customDomain = false,
   hasPreview = false,
   busy = false,
+  scoreAllowed = true,
 }) {
   const [publication, setPublication] = useState(null);
   const [slug, setSlug] = useState('');
@@ -76,6 +77,7 @@ export default function BuilderPublishDock({
       onUnpublish={() => run(() => unpublishSavedLanding(projectId))}
       onSaveDomain={(value) => run(() => saveCustomDomain(projectId, value))}
       onVerifyDomain={() => run(() => verifyCustomDomain(projectId))}
+      scoreAllowed={scoreAllowed}
     />
   );
 }
