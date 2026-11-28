@@ -31,6 +31,8 @@ export default function AgentPanel({
   onSubmit,
   onAttach,
   onMic,
+  livePublish = null,
+  publishFlow = null,
 }) {
   const threadRef = useRef(null);
   return (
@@ -49,6 +51,8 @@ export default function AgentPanel({
         onCopy={onCopy}
       />
       <StepBar steps={stepItems} />
+      {livePublish}
+      {publishFlow}
       {notice ? <GemNotice tone={notice.tone} text={notice.text} onDismiss={onDismissNotice} /> : null}
       <Composer
         draft={draft}

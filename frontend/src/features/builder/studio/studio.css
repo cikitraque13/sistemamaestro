@@ -21,23 +21,18 @@
   --coral: #e2725b;
   --purple: #7c5cff;
   box-sizing: border-box;
-  height: calc(100% + 28px);
-  width: calc(100% + 32px);
-  margin: -12px -16px -16px;
-  display: flex;
-  min-height: 0;
-  background: var(--bg);
   color: var(--txt);
   font-family: "Inter Tight", system-ui, sans-serif;
 }
-.studio-topbar { margin: 0; width: auto; height: var(--bar); }
-
-@media (min-width: 768px) {
-  .studio {
-    width: calc(100% + 40px);
-    margin-left: -20px;
-    margin-right: -20px;
-  }
+.studio {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
 }
 
 .studio-topbar {
@@ -106,6 +101,12 @@
   width: var(--ctl); height: var(--ctl); border-radius: 99px; background: var(--purple);
   color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 700; border: 0;
 }
+.studio-topbar .proj {
+  height: var(--ctl); padding: 0 12px; border-radius: 8px;
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  border: 1px solid var(--line-2); background: #121212; color: #fff;
+  font-size: 13px; font-weight: 550;
+}
 
 .studio-body { flex: 1; min-height: 0; height: 100%; display: flex; background: #000; }
 .studio-left {
@@ -122,7 +123,7 @@
 }
 .studio-thread {
   flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto;
-  padding: 24px var(--edge) 8px;
+  padding: var(--edge) var(--edge) 8px;
   display: flex; flex-direction: column; justify-content: flex-end; gap: 16px;
 }
 .studio-thread .u {
@@ -180,6 +181,29 @@
 .studio .st.now i { background: var(--teal); border-color: var(--teal); box-shadow: 0 0 0 3px rgba(46, 230, 200, .16), 0 0 12px rgba(46, 230, 200, .6); }
 .studio .st.off i { border-style: dashed; }
 .studio .st .lab { overflow: visible; }
+.studio .publish-slot {
+  margin: 0 var(--edge) 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.studio .btn-pub {
+  height: 40px; min-width: 148px; padding: 0 18px; border-radius: 8px; border: 0;
+  background: #fff; color: #111; font-size: 14px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.studio .btn-pub:disabled { opacity: .45; cursor: not-allowed; }
+.studio .publish-reason { margin: 0; max-width: 100%; text-align: right; font-size: 12px; color: var(--mute); }
+.studio .live-url {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  color: var(--teal-2); font-size: 12px; text-decoration: none;
+}
+.studio .publish-flow {
+  margin: 0 var(--edge) 8px; max-height: 280px; overflow: auto;
+  border: 1px solid var(--line-2); border-radius: var(--rad); background: #08070d;
+}
+.studio .publish-flow [data-builder-steps="publish"] { border-top: 0; background: transparent; }
 
 .studio .notice {
   flex: 0 0 var(--row); height: var(--row); margin: 0 var(--edge) 8px;
@@ -220,28 +244,6 @@
 .studio .send.is-ready { background: #fff; color: #111; }
 
 .studio-right { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; position: relative; }
-.studio .rbar {
-  flex: 0 0 var(--bar); height: var(--bar); padding: 0 var(--inset);
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: inset 0 -1px 0 var(--line); gap: 8px;
-}
-.studio .rl, .studio .rr { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.studio .seg {
-  height: var(--ctl); display: inline-flex; border: 1px solid var(--line-2);
-  border-radius: 8px; overflow: hidden; background: #0d0d0d;
-}
-.studio .seg button {
-  display: inline-flex; align-items: center; gap: 8px; padding: 0 12px;
-  font-size: 13px; font-weight: 550; color: var(--mute); background: transparent; border: 0; height: 100%;
-}
-.studio .seg button.on { background: #1a1a1a; color: #fff; }
-.studio .seg .dot { width: 7px; height: 7px; border-radius: 99px; background: var(--mute); }
-.studio .btn-pub {
-  height: var(--ctl); padding: 0 14px 0 12px; border-radius: 8px; border: 0;
-  background: #fff; color: #111; font-size: 13px; font-weight: 700;
-  display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 0 18px rgba(255, 255, 255, .12);
-}
-.studio .btn-pub:disabled { opacity: .4; cursor: not-allowed; }
 .studio .frame {
   flex: 1; min-height: 0; margin: var(--edge);
   border: 1px solid var(--line-2); border-radius: var(--rad); overflow: hidden;

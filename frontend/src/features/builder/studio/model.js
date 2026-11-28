@@ -13,6 +13,7 @@ export const PACE_OPTIONS = [
 export const EVAL_THRESHOLD = 12;
 export const EVAL_MAX = 20;
 export const EVALUATION_MISS = 'La versión no ha superado la evaluación (12/20). No se ha publicado.';
+export const PUBLISH_SCORE_REASON = 'Necesita 12/20 en Evaluación';
 
 export function paceOption(pace) {
   return PACE_OPTIONS.find((item) => item.id === pace) || PACE_OPTIONS[0];
@@ -41,6 +42,15 @@ export function publishGate(evaluation, { publishEnabled = false, busy = false }
   if (busy) return { enabled: false, reason: 'Espera a que termine la versión en curso.' };
   if (!evaluation?.passed) return { enabled: false, reason: EVALUATION_MISS };
   return { enabled: true, reason: '' };
+}
+
+export function livePublishState({ allowed = false, evaluation = null, busy = false } = {}) {
+  if (!allowed) return { visible: false, enabled: false, reason: '' };
+  if (!evaluation?.passed || evaluation.total < EVAL_THRESHOLD) {
+    return { visible: true, enabled: false, reason: PUBLISH_SCORE_REASON };
+  }
+  if (busy) return { visible: true, enabled: false, reason: 'Espera a que termine la versión en curso.' };
+  return { visible: true, enabled: true, reason: '' };
 }
 
 export function gemNoticeState({ balance = 0, freeTestMode = false, pace = 'rapido' } = {}) {

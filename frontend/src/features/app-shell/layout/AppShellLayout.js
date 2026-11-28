@@ -78,7 +78,7 @@ export default function AppShellLayout({
           freeTestMode={freeTestMode}
         />
 
-        <main className="mx-auto flex min-h-0 w-full max-w-[1840px] flex-1 flex-col overflow-hidden px-4 pb-4 pt-3 md:px-5">
+        <main className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
           <section className="min-h-0 flex-1 overflow-hidden">
             {children || (
               <div className="flex h-full items-center justify-center rounded-[24px] border border-white/[0.08] bg-white/[0.02] px-6 text-center">

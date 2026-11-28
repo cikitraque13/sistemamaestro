@@ -236,6 +236,38 @@ test('test mode still shows Modo prueba on the bar and in the notice', () => {
   node.remove();
 });
 
+test('the preview toolbar is gone and the left column keeps a 16px inset', () => {
+  const node = document.createElement('div');
+  const root = createRoot(node);
+  act(() => {
+    root.render(
+      <MemoryRouter>
+        <BuilderStudioProvider credits={12}>
+          <BuilderWorkspaceLayout
+            ownerId="alice"
+            project={{ project_id: 'p', user_id: 'alice', input_content: 'Clara' }}
+          />
+        </BuilderStudioProvider>
+      </MemoryRouter>,
+    );
+  });
+  expect(node.querySelector('[data-testid="builder-preview-toolbar"]')).toBeNull();
+  expect(node.querySelector('.rbar')).toBeNull();
+  expect(node.querySelector('[data-testid="builder-preview-frame"]')).not.toBeNull();
+  const thread = node.querySelector('[data-testid="builder-executor-thread"]');
+  expect(thread.className).toContain('studio-thread');
+  const css = fs.readFileSync(path.join(process.cwd(), 'src/features/builder/studio/studio.css'), 'utf8');
+  expect(css).toContain('--edge: 16px');
+  expect(css).toContain('--rad: 12px');
+  expect(css).not.toContain('margin: -12px');
+  expect(css).toMatch(/\.studio-thread\s*\{[^}]*padding:\s*var\(--edge\)/);
+  expect(css).toMatch(/\.studio \.frame\s*\{[^}]*margin:\s*var\(--edge\)/);
+  expect(css).toMatch(/\.studio \.frame\s*\{[^}]*border-radius:\s*var\(--rad\)/);
+  expect(css).toMatch(/\.studio\s*\{[^}]*margin:\s*0;/);
+  act(() => root.unmount());
+  node.remove();
+});
+
 test('the advisor capsule draws an animated character and keeps its click', () => {
   const node = document.createElement('div');
   const root = createRoot(node);

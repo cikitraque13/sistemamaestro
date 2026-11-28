@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import BuilderCanvasPane from '../components/BuilderCanvasPane';
 import BuilderPublishDock from '../publish/BuilderPublishDock';
 import { loadPublication, publishErrorMessage } from '../publish/builderPublishClient';
 import AgentPanel from '../studio/components/AgentPanel';
 import PreviewFrame from '../studio/components/PreviewFrame';
-import PreviewToolbar from '../studio/components/PreviewToolbar';
 import ResumeStrip from '../studio/components/ResumeStrip';
 import { useStudioControls } from '../studio/BuilderStudioContext';
-import { gemNoticeState, mapBuilderSteps, publishGate, readEvaluation } from '../studio/model';
+import LivePublish from '../studio/components/LivePublish';
+import { gemNoticeState, livePublishState, mapBuilderSteps, publishGate, readEvaluation } from '../studio/model';
 import { previewPhaseOf } from '../studio/store';
 import useBuilderWorkspaceRuntime from './hooks/useBuilderWorkspaceRuntime';
 import EmbedInstallStep from '../embed/EmbedInstallStep';
@@ -75,13 +75,6 @@ async function copyText(text) {
   await navigator.clipboard.writeText(String(text || ''));
 }
 
-function openHtml(html) {
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const opened = window.open(url, '_blank', 'noopener');
-  if (!opened) throw new Error('El navegador ha bloqueado la ventana de la vista.');
-}
-
 export default function BuilderWorkspaceLayout({
   ownerId = null,
   activeWorkspaceTab = 'preview',
@@ -93,7 +86,6 @@ export default function BuilderWorkspaceLayout({
   publishLanding = false,
   customDomain = false,
   embedInstall = false,
-  onLeave,
 }) {
   const studio = useStudioControls();
   const { state, dispatch } = studio;
@@ -106,6 +98,7 @@ export default function BuilderWorkspaceLayout({
     projectError,
   });
   const frameRef = useRef(null);
+  const [publishOpen, setPublishOpen] = useState(false);
   const preview = runtime.generatedPreview;
   const evaluation = readEvaluation(preview);
   const phase = previewPhaseOf(state, runtime);
@@ -137,6 +130,9 @@ export default function BuilderWorkspaceLayout({
   const liveHtml = (busy && runtime.executor?.partialHtml) || savedHtml;
   const shownHtml = state.ui.codeOpen ? '' : liveHtml;
   const gate = publishGate(evaluation, { publishEnabled: publishLanding, busy });
+  const livePublish = livePublishState({ allowed: publishLanding, evaluation, busy });
+  const published = state.publication?.status === 'published';
+  const publicUrl = published ? String(state.publication?.url || '').trim() : '';
   const notice = state.ui.noticeDismissed ? null : gemNoticeState({
     balance: studio.credits,
     freeTestMode: studio.freeTestMode,
@@ -240,66 +236,37 @@ export default function BuilderWorkspaceLayout({
             onSubmit={() => send()}
             onAttach={() => dispatch({ type: 'note', key: 'attachmentNote', text: 'Este ejecutor no admite archivos.' })}
             onMic={() => dispatch({ type: 'note', key: 'micNote', text: 'El micrófono no está conectado a este ejecutor.' })}
+            livePublish={livePublish.visible ? (
+              <LivePublish
+                enabled={livePublish.enabled}
+                reason={livePublish.reason}
+                url={publicUrl}
+                onOpen={() => setPublishOpen(true)}
+              />
+            ) : null}
+            publishFlow={publishOpen && livePublish.visible ? (
+              <div className="publish-flow" data-testid="builder-publish-flow">
+                <BuilderPublishDock
+                  projectId={project?.project_id || ''}
+                  publishLanding={publishLanding}
+                  customDomain={customDomain}
+                  hasPreview={Boolean(preview?.html)}
+                  busy={busy}
+                  scoreAllowed={gate.enabled}
+                  onPublication={(publication) => dispatch({ type: 'publication', publication, note: '' })}
+                />
+              </div>
+            ) : null}
           />
         ) : null}
         <div className="studio-right">
-          {state.ui.copyNote ? <p role="status" className="text-xs text-[#9a9a9a]">{state.ui.copyNote}</p> : null}
-          <PreviewToolbar
-            chatOpen={state.ui.chatOpen}
-            onToggleChat={() => dispatch({ type: 'toggle-chat' })}
-            surface={state.ui.surface}
-            onSurface={(surface) => dispatch({ type: 'surface', surface })}
-            onEdit={() => document.querySelector('[data-testid="builder-executor-input"]')?.focus()}
-            codeOpen={state.ui.codeOpen}
-            onToggleCode={() => dispatch({ type: 'toggle-code' })}
-            onOpen={shownHtml ? () => {
-              try { openHtml(shownHtml); } catch (error) {
-                dispatch({ type: 'note', key: 'copyNote', text: error.message });
-              }
-            } : undefined}
-            onRefresh={() => { dispatch({ type: 'refresh-frame' }); resume(); }}
-            onShare={async () => {
-              const url = state.publication?.url;
-              if (!url) return;
-              try {
-                await copyText(url);
-                dispatch({ type: 'note', key: 'copyNote', text: 'Dirección copiada.' });
-              } catch (error) {
-                dispatch({ type: 'note', key: 'copyNote', text: error.message });
-              }
-            }}
-            shareEnabled={Boolean(state.publication?.url)}
-            evaluation={evaluation}
-            publishEnabled={gate.enabled}
-            publishReason={gate.reason}
-            onPublish={() => document.getElementById('publish-slug')?.focus()}
-            onClose={() => onLeave?.()}
-            versions={versions}
-            htmlByVersion={state.htmlByVersion}
-            visibleVersion={state.ui.visibleVersion}
-            canUndo={Boolean(runtime.landingTransaction?.canRevert) && !runtime.landingTransaction?.busy}
-            undoError={runtime.landingTransaction?.error || ''}
-            onRestore={(version) => dispatch({ type: 'visible-version', version })}
-            onUndo={async () => {
-              try { await runtime.landingTransaction?.revert?.(); } catch (error) {
-                dispatch({ type: 'note', key: 'copyNote', text: error?.message || 'No se ha podido deshacer.' });
-              }
-            }}
-          />
           <PreviewFrame frameRef={frameRef} strip={showStrip ? <ResumeStrip phase={phase} onResume={resume} /> : null}>
             {frameBody}
           </PreviewFrame>
+          {state.ui.copyNote ? <p role="status" className="px-4 pb-2 text-xs text-[#9a9a9a]">{state.ui.copyNote}</p> : null}
           {state.publicationNote && publishLanding ? (
-            <p role="status" className="mt-2 text-xs text-[#9a9a9a]">{state.publicationNote}</p>
+            <p role="status" className="px-4 pb-2 text-xs text-[#9a9a9a]">{state.publicationNote}</p>
           ) : null}
-          <BuilderPublishDock
-            projectId={project?.project_id || ''}
-            publishLanding={publishLanding}
-            customDomain={customDomain}
-            hasPreview={Boolean(preview?.html)}
-            busy={busy}
-            scoreAllowed={gate.enabled}
-          />
         </div>
       </div>
     </section>
