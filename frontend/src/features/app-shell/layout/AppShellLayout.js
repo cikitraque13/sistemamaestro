@@ -42,57 +42,6 @@ export function GemaMaestra({ credits, bonus, usageLabel }) {
   );
 }
 
-function BuilderCompactHeader({
-  contextTitle,
-  contextBody,
-  workspaceTabs,
-  activeWorkspaceTab,
-  onWorkspaceTabChange,
-  credits,
-  bonus,
-  usageLabel,
-  showGema = true,
-}) {
-  const hasTabs = Array.isArray(workspaceTabs) && workspaceTabs.length > 0;
-
-  return (
-    <section className="shrink-0 rounded-[24px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.012))] shadow-[0_0_70px_rgba(0,0,0,0.22)]">
-      <div className="flex flex-col gap-3 px-4 py-3 xl:flex-row xl:items-center xl:justify-between">
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-            {contextTitle}
-          </p>
-          {contextBody ? (
-            <p className="mt-1 line-clamp-1 max-w-4xl text-sm leading-6 text-zinc-300">
-              {contextBody}
-            </p>
-          ) : null}
-        </div>
-
-        {(hasTabs || showGema) && (
-          <div className="flex shrink-0 flex-col gap-3 xl:flex-row xl:items-center">
-            {hasTabs && (
-              <BuilderWorkspaceTabs
-                items={workspaceTabs}
-                activeId={activeWorkspaceTab}
-                onChange={onWorkspaceTabChange}
-              />
-            )}
-
-            {showGema && (
-              <GemaMaestra
-                credits={credits}
-                bonus={bonus}
-                usageLabel={usageLabel}
-              />
-            )}
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
 export default function AppShellLayout({
   children,
   productLabel = 'Sistema Maestro',
@@ -114,31 +63,20 @@ export default function AppShellLayout({
   contextBody = 'Diagnóstico, preview y borrador en el Builder.',
 }) {
   const isBuilderMode = activeNavId === 'builder';
+  const builderProjects = projectItems === DEFAULT_PROJECTS ? [] : projectItems;
 
   if (isBuilderMode) {
     return (
       <div className="flex h-screen flex-col overflow-hidden bg-[#06080A] text-white">
         <BuilderShellHeader
           productLabel={productLabel}
-          navigationItems={navigationItems}
-          activeNavId={activeNavId}
-          onNavChange={onNavChange}
+          projectItems={builderProjects}
+          activeProjectId={activeProjectId}
+          onProjectChange={onProjectChange}
           onNewProject={onNewProject}
         />
 
-        <main className="mx-auto flex min-h-0 w-full max-w-[1840px] flex-1 flex-col gap-3 overflow-hidden px-4 pb-4 pt-3 md:px-5">
-          <BuilderCompactHeader
-            contextTitle={contextTitle}
-            contextBody={contextBody}
-            workspaceTabs={workspaceTabs}
-            activeWorkspaceTab={activeWorkspaceTab}
-            onWorkspaceTabChange={onWorkspaceTabChange}
-            credits={credits}
-            bonus={bonus}
-            usageLabel={usageLabel}
-            showGema={false}
-          />
-
+        <main className="mx-auto flex min-h-0 w-full max-w-[1840px] flex-1 flex-col overflow-hidden px-4 pb-4 pt-3 md:px-5">
           <section className="min-h-0 flex-1 overflow-hidden">
             {children || (
               <div className="flex h-full items-center justify-center rounded-[24px] border border-white/[0.08] bg-white/[0.02] px-6 text-center">

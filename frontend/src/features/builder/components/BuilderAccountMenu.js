@@ -194,7 +194,7 @@ export default function BuilderAccountMenu({ onNewProject = () => {}, advisorCon
               data-testid="builder-account-upgrade"
               className="flex w-full items-center justify-center rounded-xl border border-amber-200/70 bg-gradient-to-r from-amber-300 via-yellow-100 to-amber-200 px-3 py-2.5 text-sm font-semibold text-black shadow-[0_0_28px_rgba(250,204,21,0.38)] outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70"
             >
-              Mejorar plan
+              Añadir créditos
             </Link>
           </DropdownMenuItem>
         </div>

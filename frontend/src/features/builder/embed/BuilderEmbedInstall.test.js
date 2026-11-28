@@ -40,8 +40,8 @@ const project = {
   status: 'analyzed',
 };
 
-function Harness({ embedInstall = false }) {
-  const [tab, setTab] = useState('preview');
+function Harness({ embedInstall = false, initialTab = 'preview' }) {
+  const [tab, setTab] = useState(initialTab);
   return (
     <BuilderWorkspaceLayout
       ownerId="alice"
@@ -64,13 +64,12 @@ test('sin la bandera no aparece el paso de instalación', () => {
   act(() => root.unmount());
 });
 
-test('con la bandera el paso muestra el proyecto', () => {
+test('el paso de instalación sigue disponible sin el botón del lateral', () => {
   const node = document.createElement('div');
   const root = createRoot(node);
-  act(() => root.render(<Harness embedInstall />));
+  act(() => root.render(<Harness embedInstall initialTab="install" />));
   const button = [...node.querySelectorAll('button')].find((item) => item.textContent === 'Instalar en tu web');
-  expect(button).toBeTruthy();
-  act(() => button.click());
+  expect(button).toBeUndefined();
   expect(node.querySelector('[data-testid="embed-install-step"]').textContent).toBe('Instalar proj_bici');
   act(() => root.unmount());
 });

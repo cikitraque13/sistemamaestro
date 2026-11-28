@@ -1,4 +1,7 @@
 import { requestedProject, validatedProjectIdentity, serverRevision } from '../state/projectIdentity.mjs';
+import { projectHumanName } from './projectLabel';
+
+export { projectHumanName };
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -114,35 +117,6 @@ const resolveBuilderType = (mode) => {
   };
 
   return typeMap[mode] || 'website';
-};
-
-const clipLabel = (value) => (value.length > 72 ? `${value.slice(0, 69)}…` : value);
-
-const isRawProjectId = (value, projectId) => {
-  const text = String(value || '').trim();
-  if (!text) return true;
-  if (projectId && text === projectId) return true;
-  return /^proj_[a-z0-9]+$/i.test(text);
-};
-
-export const projectHumanName = (project) => {
-  if (!project) return 'Proyecto sin nombre';
-  const projectId = String(project.project_id || '');
-  const named = [project.title, project.name, project.blueprint?.title]
-    .map((value) => String(value || '').trim())
-    .find((value) => value && !isRawProjectId(value, projectId));
-  if (named) return clipLabel(named);
-
-  const input = String(project.input_content || '').replace(/\s+/g, ' ').trim();
-  if (isRawProjectId(input, projectId)) return 'Proyecto sin nombre';
-  if (/^https?:\/\//i.test(input)) {
-    try {
-      return new URL(input).hostname.replace(/^www\./, '') || 'Proyecto sin nombre';
-    } catch {
-      return 'Proyecto sin nombre';
-    }
-  }
-  return clipLabel(input);
 };
 
 const getErrorMessage = (error) => {

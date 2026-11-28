@@ -49,33 +49,26 @@ const EmptyState = () => (
   </div>
 );
 
-const viewButtonClass = (active) =>
-  `rounded-full border px-3 py-2 text-sm font-semibold transition ${
-    active
-      ? 'border-cyan-300/50 bg-cyan-300/10 text-cyan-100'
-      : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/20 hover:text-white'
-  }`;
-
 function ProjectHistory({ audit, versions }) {
   const saved = Array.isArray(versions) ? versions.filter((item) => item && item.instruction) : [];
   const items = Array.isArray(audit) ? audit.filter((item) => item && (item.type || item.rationale)) : [];
 
   return (
-    <section aria-label="Historial" className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+    <section aria-label="Historial" className="max-h-28 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2">
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">Historial</p>
       {saved.length === 0 && items.length === 0 ? (
-        <p className="mt-2 text-sm text-zinc-400">Aún no hay cambios</p>
+        <p className="mt-1 text-xs text-zinc-400">Aún no hay cambios</p>
       ) : (
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-1.5 space-y-1">
           {saved.slice().reverse().map((item) => (
-            <li key={`v-${item.version}`} className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm leading-6 text-zinc-200">
+            <li key={`v-${item.version}`} className="truncate rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-xs leading-5 text-zinc-200">
               {`Versión ${item.version}. ${item.instruction}`}
             </li>
           ))}
           {items.slice().reverse().map((item, index) => (
             <li
               key={item.decisionId || `${item.type}-${index}`}
-              className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-sm leading-6 text-zinc-200"
+              className="truncate rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-xs leading-5 text-zinc-200"
             >
               {historyText(item)}
             </li>
@@ -119,40 +112,14 @@ function PreviewFailed({ message, onRetry }) {
 }
 
 function WorkspaceSidePanel({
-  activeWorkspaceTab,
-  onWorkspaceTabChange,
   freeTestMode = false,
-  embedInstall = false,
   runtime,
 }) {
-  const visibleTab = activeWorkspaceTab === 'extract' ? 'extract' : 'preview';
-
   return (
-    <aside className="order-2 flex min-h-0 flex-col gap-3 overflow-auto border-t border-white/10 bg-[#08070D] p-3 lg:order-1 lg:h-full lg:border-r lg:border-t-0">
-      <div className="grid grid-cols-2 gap-2" aria-label="Vista del Builder">
-        <button type="button" className={viewButtonClass(visibleTab === 'preview')} onClick={() => onWorkspaceTabChange?.('preview')}>
-          Preview
-        </button>
-        <button type="button" className={viewButtonClass(visibleTab === 'extract')} onClick={() => onWorkspaceTabChange?.('extract')}>
-          Extracción
-        </button>
-      </div>
-      {embedInstall ? (
-        <button
-          type="button"
-          className={viewButtonClass(activeWorkspaceTab === 'install')}
-          onClick={() => onWorkspaceTabChange?.('install')}
-        >
-          Instalar en tu web
-        </button>
-      ) : null}
-
-      {freeTestMode ? (
-        <p className="w-fit rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100">
-          Modo prueba · sin gemas
-        </p>
-      ) : null}
-
+    <aside
+      data-testid="builder-side-panel"
+      className="order-2 flex min-h-0 flex-col gap-2 overflow-hidden border-t border-white/10 bg-[#08070D] p-2.5 lg:order-1 lg:h-full lg:overflow-hidden lg:border-r lg:border-t-0"
+    >
       <ExecutorChat
         phase={runtime.executor?.phase || 'idle'}
         message={runtime.executor?.message || 'El ejecutor está listo.'}
@@ -162,7 +129,18 @@ function WorkspaceSidePanel({
         onSubmit={runtime.submitMessage}
       />
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2">
+      {freeTestMode ? (
+        <p
+          data-testid="builder-free-test-badge"
+          className="w-fit shrink-0 rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-[11px] font-semibold text-amber-100"
+        >
+          Modo prueba · sin gemas
+        </p>
+      ) : null}
+
+      {runtime.previewNotice ? <p role="alert" className="shrink-0 text-xs leading-5 text-amber-100">{runtime.previewNotice}</p> : null}
+
+      <div className="shrink-0 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
         <BuilderAgentPane
           project={runtime.project}
           copy={runtime.copy}
@@ -177,8 +155,6 @@ function WorkspaceSidePanel({
         />
       </div>
 
-      {runtime.previewNotice ? <p role="alert" className="text-sm text-amber-100">{runtime.previewNotice}</p> : null}
-
       <ProjectHistory audit={runtime.landingTransaction?.audit} versions={runtime.generatedPreview?.versions} />
     </aside>
   );
@@ -191,7 +167,6 @@ export default function BuilderWorkspaceLayout({
   project = null,
   loadingProject = false,
   projectError = '',
-  onWorkspaceTabChange = () => {},
   autoStart = false,
   freeTestMode = false,
   publishLanding = false,
@@ -272,10 +247,7 @@ export default function BuilderWorkspaceLayout({
           {main}
         </div>
         <WorkspaceSidePanel
-          activeWorkspaceTab={visibleTab}
-          onWorkspaceTabChange={onWorkspaceTabChange}
           freeTestMode={freeTestMode}
-          embedInstall={embedInstall}
           runtime={{ ...runtime, project }}
         />
       </div>
