@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
     credit_lifetime_granted: 605,
   },
   logout: vi.fn(async () => {}),
+  newProject: vi.fn(),
 }));
 
 vi.mock('../../../context/AuthContext', () => ({
@@ -49,12 +50,14 @@ function BuilderRoute({ screen }) {
               activeNavId="builder"
               credits={574}
               bonus={605}
+              onNewProject={mocks.newProject}
               projectItems={[{ id: 'p', label: 'Proyecto', status: 'Abierto', accent: 'cyan' }]}
             >
               <div>{screen}</div>
             </AppShellLayout>
           )}
         />
+        <Route path="/dashboard" element={<div>Nuevo proyecto abierto</div>} />
         <Route path="/dashboard/billing" element={<div>Pagina de planes</div>} />
         <Route path="/dashboard/settings" element={<div>Pagina de ajustes</div>} />
         <Route path="/" element={<div>Sesion cerrada</div>} />
@@ -96,6 +99,7 @@ beforeEach(() => {
     credit_lifetime_granted: 605,
   };
   mocks.logout.mockClear();
+  mocks.newProject.mockClear();
 });
 
 test('real balance ignores the lifetime grant figure', () => {
@@ -108,24 +112,51 @@ test('account menu renders on builder screens and shows only the real balance', 
   const { root, rerender } = mount('Preview');
   const trigger = document.querySelector('[data-testid="builder-account-menu"]');
 
+  const header = document.querySelector('[data-testid="builder-shell-header"]');
+  const actions = header.querySelector('[data-testid="builder-header-actions"]');
+  const mark = header.querySelector('[data-testid="builder-workspace-mark"]');
+
   expect(trigger).not.toBeNull();
+  expect(actions.contains(trigger)).toBe(true);
+  expect(mark.textContent).toContain('SM');
+  expect(mark.textContent).toContain('Sistema Maestro');
+  expect(mark.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(trigger.textContent).toContain('Lucas Diaz');
+  expect(trigger.querySelector('[data-testid="builder-account-avatar"]').textContent).toBe('L');
+  expect(trigger.querySelector('[data-testid="builder-account-photo"]')).toBeNull();
+  expect(trigger.querySelector('span.hidden').className).toContain('sm:inline');
   expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
   expect(trigger.getAttribute('aria-expanded')).toBe('false');
   expect(trigger.getAttribute('aria-label')).toBe('Cuenta de Lucas Diaz');
+  expect(header.textContent).not.toContain('Estado');
+  expect(header.textContent).not.toContain('Proyecto abierto');
+  expect(header.textContent).not.toContain('Nuevo proyecto');
+  expect(header.querySelector('[data-testid="builder-header-upgrade"]').getAttribute('href')).toBe('/dashboard/billing');
   expect(document.body.textContent).not.toMatch(/\+\s*605/);
+  expect(document.body.textContent).not.toContain('605');
 
   await openMenu();
   const panel = document.querySelector('[data-testid="builder-account-menu-panel"]');
   expect(panel).not.toBeNull();
   expect(panel.getAttribute('role')).toBe('menu');
-  expect(panel.textContent).toContain('lucas@example.test');
+  expect(panel.getAttribute('data-align')).toBe('end');
+  expect(document.querySelector('[data-testid="builder-account-email"]').textContent).toBe('lucas@example.test');
+  expect(document.querySelector('[data-testid="builder-account-workspace"]').textContent).toContain('Sistema Maestro');
+  expect(document.querySelector('[data-testid="builder-account-workspace"]').textContent).toContain('Propietario');
   expect(panel.textContent).toContain('Créditos');
-  expect(document.querySelector('[data-testid="builder-account-balance"]').textContent).toBe('574');
+  expect(document.querySelector('[data-testid="builder-account-balance"]').textContent).toContain('574');
+  expect(document.querySelector('[data-testid="builder-account-balance"]').textContent).not.toContain('605');
+  expect(document.querySelector('[data-testid="builder-account-gems-info"]').getAttribute('aria-label')).toContain('saldo real');
   expect(panel.textContent).not.toContain('605');
   expect(panel.textContent).not.toMatch(/\+/);
+  expect(panel.textContent).not.toContain('Idioma');
+  expect(panel.textContent).not.toContain('GitHub');
+  expect(panel.textContent).not.toContain('Comunidad');
   expect(document.querySelector('[data-testid="builder-account-upgrade"]').getAttribute('href')).toBe('/dashboard/billing');
+  expect(document.querySelector('[data-testid="builder-account-manage-plan"]').getAttribute('href')).toBe('/dashboard/billing');
   expect(document.querySelector('[data-testid="builder-account-settings"]').getAttribute('href')).toBe('/dashboard/settings');
+  expect(document.querySelector('[data-testid="builder-account-settings"]').textContent).toContain('Configuración de cuenta');
+  expect(document.querySelector('[data-testid="builder-account-logout"]').className).toContain('text-red-400');
 
   const advisor = document.querySelector('[data-testid="builder-account-advisor"]');
   const help = document.querySelector('[data-testid="builder-account-help"]');
@@ -138,10 +169,19 @@ test('account menu renders on builder screens and shows only the real balance', 
   expect(help.getAttribute('aria-disabled')).toBe('true');
   expect(help.getAttribute('href')).toBeNull();
 
+  mocks.user = { ...mocks.user, picture: 'https://example.test/lucas.png' };
+  rerender('Preview');
+  expect(document.querySelector('[data-testid="builder-account-photo"]').getAttribute('src')).toBe('https://example.test/lucas.png');
+  mocks.user = { ...mocks.user, picture: 'javascript:alert(1)' };
+  rerender('Preview');
+  expect(document.querySelector('[data-testid="builder-account-photo"]')).toBeNull();
+  expect(document.querySelector('[data-testid="builder-account-avatar"]').textContent).toBe('L');
+
   rerender('Extracción');
   expect(document.body.textContent).toContain('Extracción');
   expect(document.querySelector('[data-testid="builder-account-menu"]').textContent).toContain('Lucas Diaz');
   expect(document.body.textContent).not.toMatch(/\+\s*605/);
+  expect(document.querySelector('[data-testid="builder-shell-header"]').textContent).not.toContain('Estado');
 
   act(() => root.unmount());
 });
@@ -185,7 +225,7 @@ test('keyboard opens the menu and moves to live actions', async () => {
   });
   expect(document.activeElement?.getAttribute('data-testid')).not.toBe('builder-account-advisor');
   expect(document.activeElement?.getAttribute('data-testid')).not.toBe('builder-account-help');
-  expect(document.activeElement?.textContent || '').toContain('Ajustes');
+  expect(document.activeElement?.textContent || '').toContain('Gestionar tu plan');
 
   act(() => root.unmount());
 });
@@ -202,6 +242,11 @@ test('upgrade, settings and logout use the existing routes and session', async (
   act(() => root.unmount());
 
   const second = mount('Preview');
+  await openMenu();
+  await act(async () => {
+    activate(document.querySelector('[data-testid="builder-account-new-project"]'));
+  });
+  expect(mocks.newProject).toHaveBeenCalledTimes(1);
   await openMenu();
   await act(async () => {
     activate(document.querySelector('[data-testid="builder-account-settings"]'));

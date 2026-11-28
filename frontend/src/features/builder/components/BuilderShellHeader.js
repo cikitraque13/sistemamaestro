@@ -1,13 +1,15 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import BuilderAccountMenu from './BuilderAccountMenu';
 
+const PLANS_PATH = '/dashboard/billing';
+
 export default function BuilderShellHeader({
+  productLabel = 'Sistema Maestro',
   navigationItems = [],
   activeNavId = 'builder',
   onNavChange = () => {},
-  projectCount = 0,
-  creditLabel = '',
   onNewProject = () => {},
 }) {
   return (
@@ -17,26 +19,29 @@ export default function BuilderShellHeader({
     >
       <div className="mx-auto flex max-w-[1800px] flex-col gap-3 px-4 py-3 md:px-6">
         <div className="flex min-w-0 items-center justify-between gap-3">
-          <div className="min-w-0">
-            <BuilderAccountMenu />
-          </div>
-
-          <div className="flex shrink-0 items-center gap-2 md:gap-3">
-            <div className="hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-right lg:block">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Estado</p>
-              <p className="text-xs font-medium text-zinc-200">
-                {projectCount > 0 ? 'Proyecto abierto' : 'Sin proyecto abierto'}
-                {creditLabel ? ` · ${creditLabel}` : ''}
+          <div data-testid="builder-workspace-mark" className="flex min-w-0 items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-cyan-400/25 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.22),rgba(8,11,13,0.95))] text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100 shadow-[0_0_28px_rgba(34,211,238,0.10)]">
+              SM
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-600">
+                Workspace
+              </p>
+              <p className="truncate text-sm font-semibold text-white md:text-base">
+                {productLabel}
               </p>
             </div>
+          </div>
 
-            <button
-              type="button"
-              onClick={onNewProject}
-              className="inline-flex items-center justify-center rounded-2xl border border-amber-200/60 bg-gradient-to-r from-amber-200 via-white to-amber-100 px-4 py-2.5 text-sm font-semibold text-black shadow-[0_10px_24px_rgba(245,158,11,0.12)] transition hover:scale-[1.01] hover:opacity-95"
+          <div data-testid="builder-header-actions" className="flex shrink-0 items-center gap-2">
+            <Link
+              to={PLANS_PATH}
+              data-testid="builder-header-upgrade"
+              className="inline-flex items-center justify-center rounded-full border border-amber-200/70 bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-100 px-3 py-2 text-sm font-semibold text-black shadow-[0_0_22px_rgba(250,204,21,0.28)] transition hover:brightness-105 sm:px-4"
             >
-              Nuevo proyecto
-            </button>
+              Mejorar plan
+            </Link>
+            <BuilderAccountMenu onNewProject={onNewProject} />
           </div>
         </div>
 

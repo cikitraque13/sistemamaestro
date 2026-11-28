@@ -119,11 +119,10 @@ export default function AppShellLayout({
     return (
       <div className="flex h-screen flex-col overflow-hidden bg-[#06080A] text-white">
         <BuilderShellHeader
+          productLabel={productLabel}
           navigationItems={navigationItems}
           activeNavId={activeNavId}
           onNavChange={onNavChange}
-          projectCount={projectItems.length}
-          creditLabel={`${credits} créditos`}
           onNewProject={onNewProject}
         />
 
