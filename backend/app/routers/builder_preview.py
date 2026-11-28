@@ -20,6 +20,7 @@ from backend.app.services.builder_landing_state import (
     save_generated_preview,
 )
 from backend.app.services.builder_pipeline import GENERIC_MESSAGE, PipelineError, public_preview, run_pipeline
+from backend.app.services.builder_test_mode import builder_charge_waived, run_builder_operation
 from backend.app.services.economic_operation import request_operation_id, run_economic_operation
 
 router = APIRouter(prefix="/api/builder", tags=["builder-preview"])
@@ -83,6 +84,13 @@ async def draft_landing_with_claude(data):
     )
     import json
     return json.loads(raw or "{}")
+
+
+@router.get("/session")
+async def builder_session(request: Request):
+    await ensure_builder_available(request)
+    user = await get_current_user(request)
+    return {"freeTestMode": builder_charge_waived(user)}
 
 
 @router.get("/preview/{project_id}")
@@ -156,11 +164,13 @@ async def create_preview(body: PreviewRequest, request: Request):
         return {**result["public"], "updated_at": saved["updated_at"]}
 
     try:
-        return await run_economic_operation(
+        return await run_builder_operation(
             user=user,
+            action="builder_preview",
             consumption_payload=consumption,
             inputs={"projectId": body.projectId, "instruction": body.instruction, "expected": expected},
             work=work,
+            charge=run_economic_operation,
         )
     except PipelineError as exc:
         raise _http_error(exc) from None

@@ -35,7 +35,11 @@ class APIRouter:
         return lambda *args, **kwargs: lambda function: function
 
 
-stub("fastapi", APIRouter=APIRouter, HTTPException=HTTPException, Request=object,
+def Body(*_args, **_kwargs):
+    return None
+
+
+stub("fastapi", APIRouter=APIRouter, HTTPException=HTTPException, Request=object, Body=Body,
      status=SimpleNamespace(HTTP_400_BAD_REQUEST=400, HTTP_500_INTERNAL_SERVER_ERROR=500))
 stub("fastapi.encoders", jsonable_encoder=lambda value: json.loads(json.dumps(value)))
 stub("backend.app.core.security", get_current_user=AsyncMock(return_value={"user_id": "user_test", "plan": "premium"}))

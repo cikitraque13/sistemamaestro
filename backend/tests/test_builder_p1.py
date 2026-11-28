@@ -30,9 +30,10 @@ INFERENCE = {
 
 
 class FakeGrok:
-    def __init__(self, content=None, error=None):
+    def __init__(self, content=None, error=None, finish_reason="stop"):
         self.content = content
         self.error = error
+        self.finish_reason = finish_reason
         self.calls = []
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self.create))
 
@@ -48,7 +49,7 @@ class FakeGrok:
             raise self.error
         return SimpleNamespace(
             choices=[SimpleNamespace(
-                finish_reason="stop",
+                finish_reason=self.finish_reason,
                 message=SimpleNamespace(content=self.content),
             )]
         )
@@ -92,16 +93,68 @@ def test_classifier_uses_configured_grok_model():
         _restore_grok(previous)
 
 
-def test_classifier_provider_failure_is_unavailable():
+def test_classifier_provider_failure_is_unavailable(caplog):
     previous = _pin_grok("synthetic-grok-key")
     client = FakeGrok(error=TimeoutError("synthetic timeout"))
     try:
-        with patch("backend.app.ai.providers.grok_client.GrokChatClient", return_value=client):
-            with pytest.raises(ClassifierUnavailable):
-                asyncio.run(classify_intent({"sources": {"request.text": "Page"}}))
-        assert client.calls
+        with caplog.at_level("WARNING"):
+            with patch("backend.app.ai.providers.grok_client.GrokChatClient", return_value=client):
+                with pytest.raises(ClassifierUnavailable):
+                    asyncio.run(classify_intent({"sources": {"request.text": "Clara, psicóloga en Madrid"}}))
+        assert len(client.calls) == 2
+        assert "category=timeout" in caplog.text
+        assert "synthetic-grok-key" not in caplog.text
+        assert "psicóloga" not in caplog.text
+        assert "synthetic timeout" not in caplog.text
     finally:
         _restore_grok(previous)
+
+
+def test_classifier_keeps_json_when_finish_reason_is_not_stop():
+    previous = _pin_grok("synthetic-grok-key")
+    client = FakeGrok(content=json.dumps(INFERENCE), finish_reason="length")
+    try:
+        with patch("backend.app.ai.providers.grok_client.GrokChatClient", return_value=client):
+            result = asyncio.run(classify_intent({"instruction": "Clara, psicóloga en Madrid"}))
+        assert result["title"] == INFERENCE["title"]
+        assert len(client.calls) == 1
+        assert client.calls[0]["max_tokens"] == 4096
+    finally:
+        _restore_grok(previous)
+
+
+def test_classifier_fills_defaults_and_drops_illegal_paths():
+    previous = _pin_grok("synthetic-grok-key")
+    messy = """Nota del modelo:
+```json
+{"goal":"Primera visita","questions":[{"question_id":"who","question":"¿Para quién?","depends_on":["project.secret","request.text"]}],"blocker_ids":["missing","who"]}
+```
+"""
+    client = FakeGrok(content=messy, finish_reason="length")
+    try:
+        with patch("backend.app.ai.providers.grok_client.GrokChatClient", return_value=client):
+            result = asyncio.run(classify_intent({"instruction": "Clara, psicóloga en Madrid"}))
+        assert result["title"] == "Clara, psicóloga en Madrid"
+        assert result["goal"] == "Primera visita"
+        assert result["scope"] == []
+        assert result["questions"][0]["depends_on"] == ["request.text"]
+        assert result["blocker_ids"] == ["who"]
+        assert len(client.calls) == 1
+    finally:
+        _restore_grok(previous)
+
+
+def test_cost_ceiling_still_allows_priced_grok_models():
+    from backend.app.ai.agents.intent_clarification import MAX_COST_USD, MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS
+    from backend.app.ai.providers.model_pricing import GROK_RATES, worst_case_usd
+
+    assert MAX_OUTPUT_TOKENS == 4096
+    for rate in GROK_RATES.values():
+        ceiling = worst_case_usd(
+            rate["input_usd_per_million"], rate["output_usd_per_million"],
+            MAX_INPUT_TOKENS, MAX_OUTPUT_TOKENS,
+        )
+        assert ceiling <= MAX_COST_USD
 
 
 class ClassifierRouteTests(f.ChargedCallerFixture):

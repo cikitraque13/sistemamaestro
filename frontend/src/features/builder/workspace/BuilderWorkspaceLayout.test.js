@@ -88,3 +88,11 @@ test('workspace shows the sector preview and hides code, landing controls and en
   expect(node.textContent).not.toContain('Destino del CTA');
   act(() => root.unmount());
 });
+
+test('free test mode shows the no-gems badge', () => {
+  const { node, root } = mount(
+    <BuilderWorkspaceLayout freeTestMode project={project} ownerId="alice" credits={12} bonus={0} usageLabel="" />
+  );
+  expect(node.textContent).toContain('Modo prueba · sin gemas');
+  act(() => root.unmount());
+});

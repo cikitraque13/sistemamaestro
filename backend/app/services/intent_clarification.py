@@ -12,6 +12,7 @@ from backend.app.ai.schemas.intent_clarification import LABELS, POLICY_VERSION, 
 from backend.app.ai.agents.intent_clarification import classify_intent
 from backend.app.services.project_context_snapshot import build_project_context_snapshot
 
+logger = logging.getLogger(__name__)
 TERMINAL={"CONFIRMED","CANCELLED","SUPERSEDED"}
 PROJECT_PATHS={"project.input_type","project.input_content","project.route"}
 # Recent replays keep the full response. Older receipts keep a hash and the
@@ -120,15 +121,19 @@ def _projection(intent):
 def _envelope(owner,project_id,intent,revision):
     return {"domain":"SM/J06.1/INTENT-CONFIRM/V1","schema":"sm.j06.1.confirmation-envelope.v1","owner_id":owner,"project_id":project_id,"intent_id":intent["intent_id"],"project_revision":revision,"draft_revision":intent["draft_revision"],"ready_state_revision":intent["state_revision"],"intent_policy_version":POLICY_VERSION,"display_projection":_projection(intent),"source_revision_vector":intent["source_revision_vector"],"unresolved_blocker_ids":[]}
 
+def _reject_classifier(category):
+    logger.warning("classifier_rejected category=%s", category)
+    raise IntentError("CLASSIFIER_UNAVAILABLE")
+
 def _validate_inference(raw):
     try:result=Inference.model_validate(raw).model_dump()
-    except Exception:raise IntentError("CLASSIFIER_UNAVAILABLE") from None
+    except Exception:_reject_classifier("schema")
     ids=[q["question_id"] for q in result["questions"]]
-    if len(ids)!=len(set(ids)) or set(result["blocker_ids"])-set(ids):raise IntentError("CLASSIFIER_UNAVAILABLE")
+    if len(ids)!=len(set(ids)) or set(result["blocker_ids"])-set(ids):_reject_classifier("validation")
     for key in ("scope","assumptions","success_criteria"):
-        if any(not isinstance(x,str) or len(x)>2000 for x in result[key]):raise IntentError("CLASSIFIER_UNAVAILABLE")
+        if any(not isinstance(x,str) or len(x)>2000 for x in result[key]):_reject_classifier("validation")
     for q in result["questions"]:
-        if set(q["depends_on"])-(PROJECT_PATHS|{"request.text"}):raise IntentError("CLASSIFIER_UNAVAILABLE")
+        if set(q["depends_on"])-(PROJECT_PATHS|{"request.text"}):_reject_classifier("validation")
     return result
 
 async def apply_intent(collection,owner,op,expected,classifier=None,revision_factory=None):
@@ -221,7 +226,11 @@ async def apply_intent(collection,owner,op,expected,classifier=None,revision_fac
             raw={**deepcopy(intent["proposal"]),"questions":deepcopy(intent["questions"]),"blocker_ids":list(intent.get("blocker_ids",[]))}
         else:
             try:raw=_validate_inference(await classifier({"sources":values,"answers":{k:v["text"] for k,v in intent["answers"].items()},"questions":[{k:q[k] for k in ("question_id","question","depends_on")} for q in intent["questions"]]}))
-            except Exception:raise IntentError("CLASSIFIER_UNAVAILABLE") from None
+            except IntentError:raise
+            except Exception as exc:
+                if not getattr(exc, "category", None):
+                    logger.warning("classifier_rejected category=%s", "timeout" if isinstance(exc, TimeoutError) else "provider")
+                raise IntentError("CLASSIFIER_UNAVAILABLE") from None
         # Existing questions retain identity/revision; no silent remapping.
         old_questions={q["question_id"]:q for q in intent["questions"]}
         for q in raw["questions"]:

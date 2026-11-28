@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../lib/apiClient';
+import { loadBuilderSession } from '../api/builderPreviewClient';
 import { economicPost } from '../../../lib/economicRequest';
 import AppShellLayout from '../../app-shell/layout/AppShellLayout';
 import BuilderWorkspaceLayout from './BuilderWorkspaceLayout';
@@ -195,6 +196,16 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
   const runtimeProjectId = selectionId;
 
   const [activeWorkspaceTab, setActiveWorkspaceTab] = useState('preview');
+  const [freeTestMode, setFreeTestMode] = useState(false);
+  const autoStart = location.state?.source === 'dashboard-launch-console';
+
+  useEffect(() => {
+    let live = true;
+    loadBuilderSession().then((session) => {
+      if (live) setFreeTestMode(Boolean(session.freeTestMode));
+    });
+    return () => { live = false; };
+  }, []);
 
   const [project, setProject] = useState(null);
   const [loadingProject, setLoadingProject] = useState(Boolean(runtimeProjectId));
@@ -376,6 +387,8 @@ function OwnedBuilderWorkspacePage({ ownerId }) {
         credits={user?.credit_balance ?? 0}
         bonus={user?.credit_lifetime_granted ?? 0}
         usageLabel="Créditos visibles para análisis, Builder y blueprint."
+        autoStart={autoStart}
+        freeTestMode={freeTestMode}
       />
     </AppShellLayout>
   );

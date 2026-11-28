@@ -4,6 +4,8 @@ import { staticTrustDecision } from '../../state/staticSectionMutation.mjs';
 import useDurableLandingTransaction from './useDurableLandingTransaction';
 import { parseLandingChange } from '../../command/parseLandingChange.mjs';
 import { generateLandingPreview, loadLandingPreview, previewErrorMessage } from '../../api/builderPreviewClient';
+
+const autoPreviewJobs = new Map();
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 import {
@@ -612,6 +614,7 @@ export default function useBuilderWorkspaceRuntime({
   ownerId = null,
   project = null,
   initialPrompt = '',
+  autoStart = false,
   loadingProject = false,
   projectError = '',
 } = {}) {
@@ -635,6 +638,7 @@ export default function useBuilderWorkspaceRuntime({
   const [appliedDecisionTypes, setAppliedDecisionTypes] = useState([]);
   const [generatedPreview, setGeneratedPreview] = useState(null);
   const [previewNotice, setPreviewNotice] = useState('');
+  const [previewPhase, setPreviewPhase] = useState(autoStart ? 'working' : '');
 
   let identity = null;
   try { identity = validatedProjectIdentity(project, ownerId, project?.project_id); } catch { /* fail closed */ }
@@ -747,13 +751,34 @@ export default function useBuilderWorkspaceRuntime({
       const value = String(text || '').trim();
 
       if (!value || !projectReady) return;
+      if (project?.project_id && builderBuildState?.projectKind === 'landing') {
+        try {
+          const operations = parseLandingChange(value);
+          if (operations) {
+            if (!ownerId || landingTransaction.status !== 'ready') {
+              landingTransaction.reject('Workspace no disponible. Espera a la recuperación o recarga.');
+              return;
+            }
+            await landingTransaction.propose(operations);
+            return;
+          }
+        } catch {
+          // The text mentions a local control but is not a supported edit.
+          // The saved preview pipeline writes the page instead.
+        }
+      }
       if (project?.project_id) {
+        setPreviewPhase('working');
+        setPreviewNotice('');
         try {
           const preview = await generateLandingPreview(project, value);
           setGeneratedPreview(preview);
           setPreviewNotice('');
+          setPreviewPhase(preview?.html ? 'ready' : 'error');
+          if (!preview?.html) setPreviewNotice('No se ha podido preparar la preview. No se ha publicado nada.');
         } catch (error) {
           setPreviewNotice(previewErrorMessage(error));
+          setPreviewPhase('error');
         }
         return;
       }
@@ -973,6 +998,22 @@ export default function useBuilderWorkspaceRuntime({
     ]
   );
 
+  const retryPreview = useCallback(async () => {
+    const instruction = String(initialPrompt || project?.input_content || '').trim();
+    if (!instruction || !project?.project_id || !projectReady) return;
+    setPreviewPhase('working');
+    setPreviewNotice('');
+    try {
+      const preview = await generateLandingPreview(project, instruction);
+      setGeneratedPreview(preview);
+      setPreviewPhase(preview?.html ? 'ready' : 'error');
+      if (!preview?.html) setPreviewNotice('No se ha podido preparar la preview. No se ha publicado nada.');
+    } catch (error) {
+      setPreviewNotice(previewErrorMessage(error));
+      setPreviewPhase('error');
+    }
+  }, [initialPrompt, project, projectReady]);
+
   const handleDecision = useCallback(
     (option) => {
       if (option?.type === 'add_trust_section' && builderBuildState?.projectKind === 'landing') return landingTransaction.propose(staticTrustDecision(builderBuildState));
@@ -1171,7 +1212,10 @@ export default function useBuilderWorkspaceRuntime({
     applyKernelResult(initialKernelResult);
     const requestIdentity = JSON.stringify(identity);
     loadLandingPreview(projectId).then((preview) => {
-      if (liveIdentity.current === requestIdentity && preview?.html) setGeneratedPreview(preview);
+      if (liveIdentity.current === requestIdentity && preview?.html) {
+        setGeneratedPreview(preview);
+        setPreviewPhase('ready');
+      }
     }).catch(() => {});
   }, [
     applyKernelResult,
@@ -1182,6 +1226,34 @@ export default function useBuilderWorkspaceRuntime({
     projectInputContent,
     initialPrompt,
   ]);
+
+  useEffect(() => {
+    if (!autoStart || !projectReady || !project?.project_id) return undefined;
+    const instruction = String(initialPrompt || project.input_content || '').trim();
+    if (!instruction) return undefined;
+    const currentProjectId = project.project_id;
+    let cancelled = false;
+    setPreviewPhase('working');
+    setPreviewNotice('');
+    const job = autoPreviewJobs.get(currentProjectId) || (async () => {
+      const existing = await loadLandingPreview(currentProjectId);
+      if (existing?.html) return { preview: existing };
+      const created = await generateLandingPreview(project, instruction);
+      return { preview: created };
+    })();
+    if (!autoPreviewJobs.has(currentProjectId)) autoPreviewJobs.set(currentProjectId, job);
+    job.then((result) => {
+      if (cancelled) return;
+      setGeneratedPreview(result.preview);
+      setPreviewNotice(result.preview?.html ? '' : 'No se ha podido preparar la preview. No se ha publicado nada.');
+      setPreviewPhase(result.preview?.html ? 'ready' : 'error');
+    }).catch((error) => {
+      if (cancelled) return;
+      setPreviewNotice(previewErrorMessage(error));
+      setPreviewPhase('error');
+    });
+    return () => { cancelled = true; };
+  }, [autoStart, projectReady, project, initialPrompt]);
 
   useEffect(() => {
     if (!isRunning) return undefined;
@@ -1208,6 +1280,8 @@ export default function useBuilderWorkspaceRuntime({
     landingTransaction,
     generatedPreview,
     previewNotice,
+    previewPhase,
+    retryPreview,
     copy,
     progress,
     isRunning,
