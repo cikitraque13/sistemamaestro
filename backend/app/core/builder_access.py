@@ -33,6 +33,12 @@ def _role_is_admin(role) -> bool:
     return str(role or "").strip().lower() in ADMIN_ROLES
 
 
+def user_is_admin(user) -> bool:
+    if not isinstance(user, dict):
+        return False
+    return _role_is_admin(user.get("role"))
+
+
 async def ensure_builder_available(request) -> None:
     if builder_enabled():
         return
@@ -46,7 +52,7 @@ async def ensure_builder_available(request) -> None:
             raise
         user = None
 
-    if isinstance(user, dict) and _role_is_admin(user.get("role")):
+    if user_is_admin(user):
         return
 
     raise HTTPException(status_code=503, detail=dict(CLOSED_DETAIL))

@@ -27,6 +27,7 @@ from backend.app.services.project_context_snapshot import (
     ProjectContextSnapshotError,
     build_project_context_snapshot,
 )
+from backend.app.services.builder_test_mode import run_builder_operation
 from backend.app.services.economic_operation import (
     request_fingerprint, request_operation_id, run_economic_operation,
 )
@@ -431,8 +432,9 @@ async def build_with_ai(payload: BuilderEndpointInput, request: Request):
         inputs = payload.model_dump(exclude={"userId"})
         if project:
             inputs["expected_revision"] = expected
-        return await run_economic_operation(
-            user=user, consumption_payload=consumption_payload, inputs=inputs, work=work,
+        return await run_builder_operation(
+            user=user, action="builder_build", consumption_payload=consumption_payload,
+            inputs=inputs, work=work, charge=run_economic_operation,
         )
     except HTTPException:
         raise
