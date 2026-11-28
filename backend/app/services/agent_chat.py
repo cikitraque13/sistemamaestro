@@ -25,6 +25,19 @@ from backend.app.ai.providers.model_pricing import (
     estimate_tokens,
     worst_case_usd,
 )
+from backend.app.services.agent_guard import (
+    ACCOUNT_RATE_LIMIT,
+    ACCOUNT_RATE_WINDOW_SECONDS,
+    CALLER_RATE_LIMIT,
+    CALLER_RATE_WINDOW_SECONDS,
+    CHAT_MESSAGE_MAX,
+    PROVIDER_TIMEOUT_SECONDS,
+    REPLY_MAX,
+    positive_int,
+    require_plain_text,
+    timeout_seconds,
+    classify_provider,
+)
 from backend.app.services.agent_modules import AgentModuleError, log_failure
 from backend.app.services.builder_pipeline import landing_brief
 
@@ -92,15 +105,8 @@ def voice_greeting(project: dict, settings: dict | None) -> str:
     )
 
 
-def _positive(name: str, default: int) -> int:
-    raw = (os.environ.get(name) or "").strip()
-    if not raw:
-        return default
-    try:
-        value = int(raw)
-    except ValueError:
-        return default
-    return value if value > 0 else default
+def _positive(name: str, default: int, *, ceiling: int | None = None) -> int:
+    return positive_int(name, default, ceiling=ceiling)
 
 
 def retention_delta() -> timedelta:
@@ -219,9 +225,12 @@ def _parse_arguments(raw):
 
 
 def _clean_reply(text: str) -> str:
-    cleaned = "".join(ch for ch in str(text or "") if ch == "\n" or ord(ch) >= 32)
+    from backend.app.services.agent_guard import _HTML
+
+    cleaned = _HTML.sub(" ", str(text or ""))
+    cleaned = "".join(ch for ch in cleaned if ch == "\n" or ord(ch) >= 32)
     cleaned = " ".join(cleaned.split())
-    return cleaned[:1200] or "No he podido responder ahora mismo."
+    return cleaned[:REPLY_MAX] or "No he podido responder ahora mismo."
 
 
 def _fixed_tool_reply(payload: dict) -> str:
@@ -244,7 +253,12 @@ async def _complete_grok(messages, tools):
 
     base_url = (os.environ.get("GROK_BASE_URL") or "https://api.x.ai/v1").strip()
     try:
-        async with GrokChatClient(api_key=key, timeout=30, max_retries=0, base_url=base_url) as client:
+        async with GrokChatClient(
+            api_key=key,
+            timeout=timeout_seconds("AGENT_PROVIDER_TIMEOUT_SECONDS", PROVIDER_TIMEOUT_SECONDS),
+            max_retries=0,
+            base_url=base_url,
+        ) as client:
             response = await client.chat.completions.create(
                 model=model,
                 temperature=0.2,
@@ -256,9 +270,8 @@ async def _complete_grok(messages, tools):
         message = response.choices[0].message
     except AgentModuleError:
         raise
-    except Exception:
-        log_failure("provider", "chat")
-        raise AgentModuleError("provider", 503) from None
+    except Exception as exc:
+        raise classify_provider(exc, "chat") from None
     calls = []
     for call in getattr(message, "tool_calls", None) or []:
         name = getattr(call, "name", "") or ""
@@ -305,7 +318,11 @@ async def _complete_anthropic(messages, tools):
     if converted:
         kwargs["tools"] = converted
     try:
-        client = AsyncAnthropic(api_key=key, max_retries=0, timeout=30.0)
+        client = AsyncAnthropic(
+            api_key=key,
+            max_retries=0,
+            timeout=timeout_seconds("AGENT_PROVIDER_TIMEOUT_SECONDS", PROVIDER_TIMEOUT_SECONDS),
+        )
         try:
             response = await client.messages.create(**kwargs)
         finally:
@@ -316,9 +333,8 @@ async def _complete_anthropic(messages, tools):
                     await maybe
     except AgentModuleError:
         raise
-    except Exception:
-        log_failure("provider", "chat")
-        raise AgentModuleError("provider", 503) from None
+    except Exception as exc:
+        raise classify_provider(exc, "chat") from None
     calls = []
     texts = []
     for block in getattr(response, "content", None) or []:
@@ -361,11 +377,24 @@ def _caller_key(project_id: str, channel: str, caller: str) -> str:
     return hmac.new(b"agent-rate-v1", material, hashlib.sha256).hexdigest()
 
 
-async def consume_rate(collection, *, project_id: str, channel: str, caller: str, now: datetime) -> None:
-    limit = _positive("AGENT_CHAT_RATE_LIMIT", 20)
-    window = _positive("AGENT_CHAT_RATE_WINDOW_SECONDS", 60)
-    key = _caller_key(project_id, channel, caller)
-    window_start = datetime.fromtimestamp(int(now.timestamp()) // window * window, tz=timezone.utc)
+def _account_key(project_id: str) -> str:
+    material = f"account\n{project_id}".encode("utf-8")
+    return hmac.new(b"agent-rate-v1", material, hashlib.sha256).hexdigest()
+
+
+def _retry_after(now: datetime, window: int) -> int:
+    remaining = window - (int(now.timestamp()) % window)
+    return remaining if remaining > 0 else window
+
+
+async def _bucket_count(collection, key: str, window_start: datetime) -> int:
+    current = await collection.find_one({"key": key})
+    if not current or current.get("window_start") != window_start:
+        return 0
+    return int(current.get("count") or 0)
+
+
+async def _bucket_commit(collection, key: str, window_start: datetime, project_id: str) -> None:
     current = await collection.find_one({"key": key})
     if not current or current.get("window_start") != window_start:
         await collection.update_one(
@@ -379,10 +408,43 @@ async def consume_rate(collection, *, project_id: str, channel: str, caller: str
             upsert=True,
         )
         return
-    if int(current.get("count") or 0) >= limit:
-        log_failure("rate_limit", channel)
-        raise AgentModuleError("rate_limited", 429)
     await collection.update_one({"key": key, "window_start": window_start}, {"$inc": {"count": 1}})
+
+
+def _window_start(now: datetime, window: int) -> datetime:
+    return datetime.fromtimestamp(int(now.timestamp()) // window * window, tz=timezone.utc)
+
+
+async def consume_account_rate(collection, *, project_id: str, channel: str, now: datetime) -> None:
+    """One ceiling for the whole project, shared by chat, voice, WhatsApp, and bookings."""
+    limit = _positive("AGENT_ACCOUNT_RATE_LIMIT", ACCOUNT_RATE_LIMIT)
+    window = _positive("AGENT_ACCOUNT_RATE_WINDOW_SECONDS", ACCOUNT_RATE_WINDOW_SECONDS)
+    start = _window_start(now, window)
+    key = _account_key(project_id)
+    if await _bucket_count(collection, key, start) >= limit:
+        log_failure("rate_limit", channel)
+        raise AgentModuleError("rate_limited", 429, retry_after=_retry_after(now, window))
+    await _bucket_commit(collection, key, start, project_id)
+
+
+async def consume_rate(collection, *, project_id: str, channel: str, caller: str, now: datetime) -> None:
+    """Per-account ceiling, then the existing per-caller window. Neither write happens when blocked."""
+    account_limit = _positive("AGENT_ACCOUNT_RATE_LIMIT", ACCOUNT_RATE_LIMIT)
+    account_window = _positive("AGENT_ACCOUNT_RATE_WINDOW_SECONDS", ACCOUNT_RATE_WINDOW_SECONDS)
+    caller_limit = _positive("AGENT_CHAT_RATE_LIMIT", CALLER_RATE_LIMIT)
+    caller_window = _positive("AGENT_CHAT_RATE_WINDOW_SECONDS", CALLER_RATE_WINDOW_SECONDS)
+    account_start = _window_start(now, account_window)
+    caller_start = _window_start(now, caller_window)
+    account_key = _account_key(project_id)
+    caller_key = _caller_key(project_id, channel, caller or "unknown")
+    if await _bucket_count(collection, account_key, account_start) >= account_limit:
+        log_failure("rate_limit", channel)
+        raise AgentModuleError("rate_limited", 429, retry_after=_retry_after(now, account_window))
+    if await _bucket_count(collection, caller_key, caller_start) >= caller_limit:
+        log_failure("rate_limit", channel)
+        raise AgentModuleError("rate_limited", 429, retry_after=_retry_after(now, caller_window))
+    await _bucket_commit(collection, account_key, account_start, project_id)
+    await _bucket_commit(collection, caller_key, caller_start, project_id)
 
 
 async def _spent(collection, project_id: str, day: str) -> int:
@@ -491,20 +553,21 @@ async def handle_turn(
     citas_settings: dict | None,
     create_if_missing: bool,
     now: datetime | None = None,
+    enforce_rate: bool = True,
 ) -> dict:
     if channel not in _CHANNELS:
         raise AgentModuleError("schema", 400)
-    message = clip(text, 2000)
-    if not message:
-        raise AgentModuleError("schema", 422)
+    module = "voz" if channel == "voice" else channel
+    message = require_plain_text(text, max_len=CHAT_MESSAGE_MAX, module=module)
     moment = now or datetime.now(timezone.utc)
-    await consume_rate(
-        database.agent_rate_windows,
-        project_id=project["project_id"],
-        channel=channel,
-        caller=caller or "unknown",
-        now=moment,
-    )
+    if enforce_rate:
+        await consume_rate(
+            database.agent_rate_windows,
+            project_id=project["project_id"],
+            channel=channel,
+            caller=caller or "unknown",
+            now=moment,
+        )
     doc, conversation_id = await _load_conversation(
         database.agent_conversations,
         project_id=project["project_id"],
@@ -545,9 +608,21 @@ async def handle_turn(
             follow_text = follow_result.get("content") or ""
             reply = _clean_reply(follow_text) if follow_text.strip() else _fixed_tool_reply(payload)
         except AgentModuleError as exc:
-            if exc.code != "cost_cap":
-                raise
+            # The appointment is already confirmed. Keep one complete transcript
+            # line so a retry cannot book the same slot again.
             reply = _fixed_tool_reply(payload)
+            if exc.code != "cost_cap" and channel == "chat":
+                await _save_conversation(
+                    database.agent_conversations,
+                    doc,
+                    conversation_id=conversation_id,
+                    project_id=project["project_id"],
+                    channel=channel,
+                    user_text=message,
+                    reply=reply,
+                    now=moment,
+                )
+                raise
     else:
         reply = _clean_reply(result.get("content") or "")
     await _save_conversation(

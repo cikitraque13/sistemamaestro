@@ -44,6 +44,9 @@ def _compare(value, op, operand):
         return value > operand
     if op == "$gte":
         return value >= operand
+    if op == "$exists":
+        exists = value is not None
+        return exists if operand else not exists
     raise AssertionError(op)
 
 
